@@ -565,14 +565,14 @@ export default function LandingPage() {
             ease: 'power3.out'
           });
 
-          gsap.from('.cta-button', {
-            duration: 1,
-            scale: 0.8,
-            opacity: 0,
-            ease: 'elastic.out(1, 0.3)',
-            stagger: 0.2,
-            delay: 0.5
-          });
+          // gsap.from('.cta-button', {
+          //   duration: 1,
+          //   scale: 0.8,
+          //   opacity: 0,
+          //   ease: 'elastic.out(1, 0.3)',
+          //   stagger: 0.2,
+          //   delay: 0.5
+          // });
         }
       });
 
