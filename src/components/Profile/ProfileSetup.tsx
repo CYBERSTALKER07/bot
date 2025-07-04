@@ -160,7 +160,7 @@ export default function ProfileSetup() {
                     required
                     value={studentProfile.full_name}
                     onChange={(e) => setStudentProfile(prev => ({ ...prev, full_name: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
                   />
                 </div>
 
@@ -173,7 +173,7 @@ export default function ProfileSetup() {
                       required
                       value={studentProfile.major}
                       onChange={(e) => setStudentProfile(prev => ({ ...prev, major: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
                     >
                       <option value="">Select your major</option>
                       {majors.map(major => (
@@ -189,7 +189,7 @@ export default function ProfileSetup() {
                       required
                       value={studentProfile.graduation_year}
                       onChange={(e) => setStudentProfile(prev => ({ ...prev, graduation_year: parseInt(e.target.value) }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
                     >
                       {Array.from({ length: 6 }, (_, i) => new Date().getFullYear() + i).map(year => (
                         <option key={year} value={year}>{year}</option>
@@ -209,7 +209,7 @@ export default function ProfileSetup() {
                     max="4"
                     value={studentProfile.gpa}
                     onChange={(e) => setStudentProfile(prev => ({ ...prev, gpa: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
                     placeholder="3.50"
                   />
                 </div>
@@ -224,13 +224,13 @@ export default function ProfileSetup() {
                       value={skillInput}
                       onChange={(e) => setSkillInput(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
                       placeholder="Add a skill (e.g., JavaScript, Python)"
                     />
                     <button
                       type="button"
                       onClick={addSkill}
-                      className="px-4 py-2 bg-asu-maroon text-white rounded-md hover:bg-asu-maroon-dark transition-colors"
+                      className="px-4 py-2 bg-aut-maroon text-white rounded-md hover:bg-aut-maroon-dark transition-colors"
                     >
                       Add
                     </button>
@@ -239,13 +239,13 @@ export default function ProfileSetup() {
                     {studentProfile.skills.map(skill => (
                       <span
                         key={skill}
-                        className="bg-asu-maroon/10 text-asu-maroon px-3 py-1 rounded-full text-sm flex items-center gap-1"
+                        className="bg-aut-maroon/10 text-aut-maroon px-3 py-1 rounded-full text-sm flex items-center gap-1"
                       >
                         {skill}
                         <button
                           type="button"
                           onClick={() => removeSkill(skill)}
-                          className="text-asu-maroon hover:text-asu-maroon-dark"
+                          className="text-aut-maroon hover:text-aut-maroon-dark"
                         >
                           ×
                         </button>
@@ -262,7 +262,7 @@ export default function ProfileSetup() {
                     rows={4}
                     value={studentProfile.bio}
                     onChange={(e) => setStudentProfile(prev => ({ ...prev, bio: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
                     placeholder="Tell employers about yourself, your interests, and career goals..."
                   />
                 </div>
@@ -275,7 +275,7 @@ export default function ProfileSetup() {
                     type="url"
                     value={studentProfile.website}
                     onChange={(e) => setStudentProfile(prev => ({ ...prev, website: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
                     placeholder="https://yourportfolio.com"
                   />
                 </div>
@@ -292,7 +292,7 @@ export default function ProfileSetup() {
                       required
                       value={employerProfile.company_name}
                       onChange={(e) => setEmployerProfile(prev => ({ ...prev, company_name: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
                     />
                   </div>
                   <div>
@@ -304,7 +304,7 @@ export default function ProfileSetup() {
                       required
                       value={employerProfile.full_name}
                       onChange={(e) => setEmployerProfile(prev => ({ ...prev, full_name: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -318,7 +318,7 @@ export default function ProfileSetup() {
                       required
                       value={employerProfile.industry}
                       onChange={(e) => setEmployerProfile(prev => ({ ...prev, industry: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
                     >
                       <option value="">Select industry</option>
                       {industries.map(industry => (
@@ -334,7 +334,7 @@ export default function ProfileSetup() {
                       required
                       value={employerProfile.company_size}
                       onChange={(e) => setEmployerProfile(prev => ({ ...prev, company_size: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
                     >
                       <option value="">Select company size</option>
                       {companySizes.map(size => (
@@ -354,7 +354,7 @@ export default function ProfileSetup() {
                       required
                       value={employerProfile.contact_title}
                       onChange={(e) => setEmployerProfile(prev => ({ ...prev, contact_title: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
                       placeholder="e.g., Talent Acquisition Manager"
                     />
                   </div>
@@ -366,7 +366,7 @@ export default function ProfileSetup() {
                       type="url"
                       value={employerProfile.website}
                       onChange={(e) => setEmployerProfile(prev => ({ ...prev, website: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
                       placeholder="https://company.com"
                     />
                   </div>
@@ -381,7 +381,7 @@ export default function ProfileSetup() {
                     required
                     value={employerProfile.bio}
                     onChange={(e) => setEmployerProfile(prev => ({ ...prev, bio: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
                     placeholder="Describe your company, culture, and what makes it a great place to work..."
                   />
                 </div>
@@ -392,7 +392,7 @@ export default function ProfileSetup() {
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-asu-maroon text-white px-8 py-3 rounded-md hover:bg-asu-maroon-dark focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+                className="bg-aut-maroon text-white px-8 py-3 rounded-md hover:bg-aut-maroon-dark focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
               >
                 {loading ? (
                   <>

@@ -1,556 +1,417 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useState, useEffect } from 'react';
 import { 
+  Briefcase, 
+  MapPin, 
   Clock, 
+  DollarSign, 
+  Users, 
+  Search, 
+  Filter, 
+  Eye, 
+  Heart, 
+  Building2, 
+  Calendar, 
   CheckCircle, 
   XCircle, 
-  Eye, 
-  Calendar,
-  MapPin,
-  Building2,
-  Filter,
-  Search,
+  AlertCircle, 
+  Star, 
+  Coffee, 
+  Sparkles, 
+  TrendingUp, 
+  Award, 
+  Send, 
+  FileText, 
+  Download,
   ExternalLink,
-  MessageSquare,
-  TrendingUp,
-  Users,
-  Heart
+  Bookmark,
+  Share2
 } from 'lucide-react';
-import { Application, Job } from '../types';
+import { useAuth } from '../context/AuthContext';
 
-// Register GSAP plugins
-gsap.registerPlugin(ScrollTrigger);
-
-interface ApplicationWithJob extends Application {
-  job: Job;
+interface Application {
+  id: string;
+  job_title: string;
+  company: string;
+  location: string;
+  applied_date: string;
+  status: 'pending' | 'reviewing' | 'interview' | 'rejected' | 'accepted';
+  type: 'internship' | 'full-time' | 'part-time';
+  salary?: string;
+  notes?: string;
 }
 
 export default function Applications() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const statsRef = useRef<HTMLDivElement>(null);
-  const filtersRef = useRef<HTMLDivElement>(null);
-
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      // More organic header animation
-      gsap.from(headerRef.current, {
-        duration: 1.2,
-        y: -30,
-        opacity: 0,
-        ease: 'power2.out',
-        rotation: 0.5
-      });
-
-      // Asymmetrical stats cards animation
-      gsap.from('.stat-card', {
-        duration: 1,
-        y: (index) => 20 + (index * 5), // Varied heights
-        opacity: 0,
-        scale: 0.95,
-        rotation: (index) => (index % 2 === 0 ? 0.5 : -0.5), // Slight rotation
-        ease: 'elastic.out(1, 0.6)',
-        stagger: 0.15
-      });
-
-      // Natural filters animation
-      gsap.from(filtersRef.current, {
-        duration: 1,
-        x: -20,
-        opacity: 0,
-        ease: 'power2.out',
-        delay: 0.3
-      });
-
-      // Organic application cards animation
-      ScrollTrigger.create({
-        trigger: '.applications-list',
-        start: 'top 85%',
-        onEnter: () => {
-          gsap.from('.application-card', {
-            duration: 0.8,
-            y: (index) => 30 + (index * 10),
-            opacity: 0,
-            scale: 0.98,
-            rotation: (index) => (index % 2 === 0 ? 0.3 : -0.3),
-            ease: 'power2.out',
-            stagger: 0.12
-          });
-        }
-      });
-
-      // More natural hover animations
-      gsap.utils.toArray('.application-card').forEach((card: any, index) => {
-        const tl = gsap.timeline({ paused: true });
-        const direction = index % 2 === 0 ? 1 : -1;
-        tl.to(card, {
-          y: -8,
-          rotation: direction * 0.5,
-          scale: 1.01,
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15)',
-          duration: 0.4,
-          ease: 'power2.out'
-        });
-
-        card.addEventListener('mouseenter', () => tl.play());
-        card.addEventListener('mouseleave', () => tl.reverse());
-      });
-
-      // Floating status badges
-      gsap.from('.status-badge', {
-        duration: 1,
-        scale: 0.8,
-        opacity: 0,
-        y: 10,
-        ease: 'bounce.out',
-        stagger: 0.08,
-        delay: 0.8
-      });
-
-    }, containerRef);
-
-    return () => ctx.revert();
+    // Simulate loading with smooth entrance
+    const timer = setTimeout(() => setIsLoaded(true), 150);
+    return () => clearTimeout(timer);
   }, []);
 
-  // Mock applications data
-  const applications: ApplicationWithJob[] = [
+  const applications = [
     {
       id: '1',
-      job_id: '1',
-      student_id: 'student-1',
-      status: 'reviewed',
-      applied_date: '2024-01-10',
-      cover_letter: 'I am very interested in this position...',
-      created_at: '2024-01-10',
-      updated_at: '2024-01-12',
-      job: {
-        id: '1',
-        title: 'Software Engineer Intern',
-        company: 'Google',
-        type: 'internship',
-        location: 'Mountain View, CA',
-        salary: '$25-30/hour',
-        description: 'Join our team to work on cutting-edge projects...',
-        requirements: [],
-        skills: ['JavaScript', 'React', 'Node.js'],
-        posted_date: '2024-01-05',
-        deadline: '2024-02-15',
-        applicants_count: 127,
-        employer_id: 'employer-1',
-        created_at: '2024-01-05',
-        updated_at: '2024-01-05'
-      }
+      job_title: 'Software Engineering Intern',
+      company: 'Google',
+      company_logo: '/logos/google.png',
+      location: 'Mountain View, CA',
+      salary_range: '$8,000 - $10,000/month',
+      type: 'internship',
+      applied_date: '2024-01-15',
+      status: 'interview',
+      deadline: '2024-02-15',
+      description: 'Join our world-class engineering team...',
+      tags: ['React', 'Python', 'Machine Learning']
     },
     {
       id: '2',
-      job_id: '2',
-      student_id: 'student-1',
+      job_title: 'Product Marketing Intern',
+      company: 'Microsoft',
+      company_logo: '/logos/microsoft.png',
+      location: 'Seattle, WA',
+      salary_range: '$7,500 - $9,000/month',
+      type: 'internship',
+      applied_date: '2024-01-20',
       status: 'pending',
-      applied_date: '2024-01-12',
-      created_at: '2024-01-12',
-      updated_at: '2024-01-12',
-      job: {
-        id: '2',
-        title: 'Frontend Developer Intern',
-        company: 'Microsoft',
-        type: 'internship',
-        location: 'Remote',
-        salary: '$28-32/hour',
-        description: 'Work on modern web applications...',
-        requirements: [],
-        skills: ['React', 'TypeScript', 'CSS'],
-        posted_date: '2024-01-08',
-        deadline: '2024-02-28',
-        applicants_count: 89,
-        employer_id: 'employer-2',
-        created_at: '2024-01-08',
-        updated_at: '2024-01-08'
-      }
+      deadline: '2024-02-20',
+      description: 'Drive product strategy and marketing...',
+      tags: ['Marketing', 'Analytics', 'Strategy']
     },
-    {
-      id: '3',
-      job_id: '3',
-      student_id: 'student-1',
-      status: 'accepted',
-      applied_date: '2024-01-08',
-      created_at: '2024-01-08',
-      updated_at: '2024-01-15',
-      job: {
-        id: '3',
-        title: 'Data Science Intern',
-        company: 'Apple',
-        type: 'internship',
-        location: 'Cupertino, CA',
-        salary: '$30-35/hour',
-        description: 'Analyze user behavior data...',
-        requirements: [],
-        skills: ['Python', 'Machine Learning', 'SQL'],
-        posted_date: '2024-01-03',
-        deadline: '2024-02-15',
-        applicants_count: 156,
-        employer_id: 'employer-3',
-        created_at: '2024-01-03',
-        updated_at: '2024-01-03'
-      }
-    },
-    {
-      id: '4',
-      job_id: '4',
-      student_id: 'student-1',
-      status: 'rejected',
-      applied_date: '2024-01-05',
-      created_at: '2024-01-05',
-      updated_at: '2024-01-14',
-      job: {
-        id: '4',
-        title: 'Marketing Intern',
-        company: 'Google',
-        type: 'internship',
-        location: 'Mountain View, CA',
-        salary: '$26-30/hour',
-        description: 'Support digital marketing campaigns...',
-        requirements: [],
-        skills: ['Marketing', 'Analytics', 'Communication'],
-        posted_date: '2024-01-01',
-        deadline: '2024-02-01',
-        applicants_count: 203,
-        employer_id: 'employer-4',
-        created_at: '2024-01-01',
-        updated_at: '2024-01-01'
-      }
-    }
+    // ...more applications
   ];
-
-  const filteredApplications = applications.filter(application => {
-    const matchesSearch = application.job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         application.job.company.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || application.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return <Clock className="h-5 w-5 text-yellow-500" />;
-      case 'reviewed':
-        return <Eye className="h-5 w-5 text-blue-500" />;
-      case 'accepted':
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case 'rejected':
-        return <XCircle className="h-5 w-5 text-red-500" />;
-      default:
-        return <Clock className="h-5 w-5 text-gray-500" />;
-    }
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'reviewed':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'interview':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'accepted':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800 border-green-200';
       case 'rejected':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800 border-red-200';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
-  const getStatusText = (status: string) => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
       case 'pending':
-        return 'Pending';
-      case 'reviewed':
-        return 'Reviewed';
+        return <Clock className="h-4 w-4" />;
+      case 'interview':
+        return <Users className="h-4 w-4" />;
       case 'accepted':
-        return 'Accepted';
+        return <CheckCircle className="h-4 w-4" />;
       case 'rejected':
-        return 'Not Selected';
+        return <XCircle className="h-4 w-4" />;
       default:
-        return 'Unknown';
+        return <AlertCircle className="h-4 w-4" />;
     }
   };
 
-  const statusCounts = {
-    all: applications.length,
-    pending: applications.filter(app => app.status === 'pending').length,
-    reviewed: applications.filter(app => app.status === 'reviewed').length,
-    accepted: applications.filter(app => app.status === 'accepted').length,
-    rejected: applications.filter(app => app.status === 'rejected').length,
-  };
+  const filteredApplications = applications.filter(app => {
+    const matchesSearch = app.job_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         app.company.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
+    const matchesType = typeFilter === 'all' || app.type === typeFilter;
+    
+    return matchesSearch && matchesStatus && matchesType;
+  });
 
-  const getRandomCardClass = (index: number) => {
-    const classes = [
-      'transform rotate-0.5',
-      'transform -rotate-0.5',
-      'transform rotate-1',
-      'transform -rotate-1'
-    ];
-    return classes[index % classes.length];
+  const stats = {
+    total: applications.length,
+    pending: applications.filter(app => app.status === 'pending').length,
+    interviews: applications.filter(app => app.status === 'interview').length,
+    accepted: applications.filter(app => app.status === 'accepted').length
   };
 
   return (
-    <div ref={containerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div ref={headerRef} className="mb-12 text-center">
-        <div className="inline-block relative">
-          <h1 className="text-4xl font-bold text-gray-900 mb-3 relative">
-            My Applications
-            <div className="absolute -top-2 -right-6 w-4 h-4 bg-yellow-400 rounded-full animate-pulse"></div>
-          </h1>
-          <div className="w-24 h-1 bg-gradient-to-r from-aut-maroon to-pink-500 mx-auto mb-4 rounded-full"></div>
-        </div>
-        <p className="text-gray-600 text-lg">Track your journey to success 🚀</p>
-      </div>
+    <div className={`min-h-screen bg-gradient-to-br from-gray-50 to-white relative ${isLoaded ? 'animate-fade-in' : ''}`}>
+      {/* Decorative elements with animations */}
+      <div className="absolute top-16 right-24 w-4 h-4 bg-asu-gold/40 rounded-full animate-float"></div>
+      <div className="absolute top-32 left-16 w-3 h-3 bg-asu-maroon/30 rounded-full animate-float animate-delay-200"></div>
+      <Sparkles className="absolute top-24 left-1/4 h-5 w-5 text-asu-gold/60 animate-bounce-gentle" />
+      <Coffee className="absolute bottom-32 right-1/4 h-4 w-4 text-asu-maroon/50 animate-float animate-delay-300" />
 
-      {/* Human-made Stats Cards */}
-      <div ref={statsRef} className="mb-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-          <div className="stat-card bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-            <div className="text-center relative">
-              <div className="text-3xl font-bold text-gray-900 mb-1">{statusCounts.all}</div>
-              <div className="text-sm text-gray-600 font-medium">Total Applications</div>
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-400 rounded-full"></div>
-            </div>
-          </div>
-          
-          <div className="stat-card bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl shadow-lg border border-yellow-100 p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 rotate-1">
-            <div className="text-center relative">
-              <div className="text-3xl font-bold text-yellow-600 mb-1">{statusCounts.pending}</div>
-              <div className="text-sm text-gray-600 font-medium">Pending ⏳</div>
-              <Clock className="absolute -top-2 -right-2 h-4 w-4 text-yellow-500 animate-spin" style={{animationDuration: '3s'}} />
-            </div>
-          </div>
-          
-          <div className="stat-card bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl shadow-lg border border-blue-100 p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 -rotate-1">
-            <div className="text-center relative">
-              <div className="text-3xl font-bold text-blue-600 mb-1">{statusCounts.reviewed}</div>
-              <div className="text-sm text-gray-600 font-medium">Reviewed 👀</div>
-              <Eye className="absolute -top-2 -right-2 h-4 w-4 text-blue-500" />
-            </div>
-          </div>
-          
-          <div className="stat-card bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl shadow-lg border border-green-100 p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 rotate-0.5">
-            <div className="text-center relative">
-              <div className="text-3xl font-bold text-green-600 mb-1">{statusCounts.accepted}</div>
-              <div className="text-sm text-gray-600 font-medium">Accepted 🎉</div>
-              <Heart className="absolute -top-2 -right-2 h-4 w-4 text-green-500 animate-pulse" />
-            </div>
-          </div>
-          
-          <div className="stat-card bg-gradient-to-br from-red-50 to-pink-50 rounded-2xl shadow-lg border border-red-100 p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 -rotate-0.5">
-            <div className="text-center relative">
-              <div className="text-3xl font-bold text-red-600 mb-1">{statusCounts.rejected}</div>
-              <div className="text-sm text-gray-600 font-medium">Not Selected 💪</div>
-              <TrendingUp className="absolute -top-2 -right-2 h-4 w-4 text-red-500" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Organic Filters */}
-      <div ref={filtersRef} className="bg-gradient-to-r from-white to-gray-50 rounded-3xl shadow-lg border border-gray-100 p-8 mb-12 transform -rotate-0.5">
-        <div className="flex flex-col lg:flex-row gap-6">
-          <div className="flex-1 relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search your applications... 🔍"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent bg-white shadow-inner transition-all duration-200 hover:shadow-md"
-            />
-          </div>
-          <div className="flex items-center space-x-3">
-            <Filter className="h-5 w-5 text-gray-400" />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent bg-white shadow-inner cursor-pointer hover:shadow-md transition-all duration-200"
-            >
-              <option value="all">All Status 📋</option>
-              <option value="pending">Pending ⏳</option>
-              <option value="reviewed">Reviewed 👀</option>
-              <option value="accepted">Accepted 🎉</option>
-              <option value="rejected">Not Selected 💪</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Organic Applications List */}
-      <div className="applications-list space-y-8">
-        {filteredApplications.map((application, index) => (
-          <div key={application.id} className={`application-card bg-white rounded-3xl shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-300 overflow-hidden ${getRandomCardClass(index)}`}>
-            <div className="p-8">
-              <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
-                <div className="flex-1">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-2xl font-bold text-gray-900 mb-2 hover:text-aut-maroon transition-colors">
-                        <Link 
-                          to={`/job/${application.job.id}`}
-                          className="relative inline-block"
-                        >
-                          {application.job.title}
-                          <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-aut-maroon transition-all duration-300 hover:w-full"></div>
-                        </Link>
-                      </h3>
-                      <div className="flex items-center space-x-2 mb-3">
-                        <Building2 className="h-5 w-5 text-gray-500" />
-                        <span className="text-xl text-gray-700 font-semibold">{application.job.company}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3 ml-4">
-                      <div className="p-2 rounded-full bg-gray-100">
-                        {getStatusIcon(application.status)}
-                      </div>
-                      <span className={`status-badge px-4 py-2 rounded-full text-sm font-semibold shadow-sm ${getStatusColor(application.status)} transform hover:scale-105 transition-transform duration-200`}>
-                        {getStatusText(application.status)}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-6 mb-6 text-sm text-gray-600">
-                    <div className="flex items-center space-x-2 bg-gray-50 px-3 py-2 rounded-full">
-                      <MapPin className="h-4 w-4" />
-                      <span>{application.job.location}</span>
-                    </div>
-                    <div className="flex items-center space-x-2 bg-gray-50 px-3 py-2 rounded-full">
-                      <Calendar className="h-4 w-4" />
-                      <span>Applied {new Date(application.applied_date).toLocaleDateString()}</span>
-                    </div>
-                    {application.job.salary && (
-                      <div className="flex items-center space-x-2 bg-green-50 px-3 py-2 rounded-full text-green-700">
-                        <span className="font-semibold">{application.job.salary}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex flex-wrap gap-3 mb-6">
-                    <span className={`px-4 py-2 rounded-full text-sm font-semibold shadow-sm transform hover:scale-105 transition-transform duration-200 ${
-                      application.job.type === 'internship' 
-                        ? 'bg-blue-100 text-blue-800' 
-                        : 'bg-green-100 text-green-800'
-                    }`}>
-                      {application.job.type} 
-                      {application.job.type === 'internship' ? ' 🎓' : ' 💼'}
-                    </span>
-                    {application.job.skills.slice(0, 3).map((skill, skillIndex) => (
-                      <span 
-                        key={skillIndex}
-                        className="px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 rounded-full text-sm font-medium hover:from-gray-200 hover:to-gray-300 transition-all duration-200"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                    {application.job.skills.length > 3 && (
-                      <span className="px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-sm font-medium">
-                        +{application.job.skills.length - 3} more
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Enhanced Status-specific content */}
-                  {application.status === 'accepted' && (
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-400 rounded-r-2xl p-6 mb-6">
-                      <div className="flex items-start space-x-3">
-                        <div className="p-2 bg-green-100 rounded-full">
-                          <CheckCircle className="h-5 w-5 text-green-600" />
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-green-900 text-lg mb-1">Congratulations! 🎉</h4>
-                          <p className="text-green-700">
-                            Your application has been accepted! Time to celebrate and prepare for your next adventure.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {application.status === 'rejected' && (
-                    <div className="bg-gradient-to-r from-red-50 to-pink-50 border-l-4 border-red-400 rounded-r-2xl p-6 mb-6">
-                      <div className="flex items-start space-x-3">
-                        <div className="p-2 bg-red-100 rounded-full">
-                          <TrendingUp className="h-5 w-5 text-red-600" />
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-red-900 text-lg mb-1">Keep Going! 💪</h4>
-                          <p className="text-red-700">
-                            This wasn't the right fit, but your perfect opportunity is out there waiting for you!
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {application.status === 'reviewed' && (
-                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-400 rounded-r-2xl p-6 mb-6">
-                      <div className="flex items-start space-x-3">
-                        <div className="p-2 bg-blue-100 rounded-full">
-                          <Eye className="h-5 w-5 text-blue-600" />
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-blue-900 text-lg mb-1">Under Review 👀</h4>
-                          <p className="text-blue-700">
-                            Great news! Your application is being reviewed. Stay tuned for updates!
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header with slide animation */}
+        <div className="mb-12 animate-slide-up">
+          <div className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark rounded-3xl p-8 text-white relative overflow-hidden hover-glow">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-asu-gold/20 rounded-full blur-xl"></div>
+            <div className="relative z-10">
+              <h1 className="text-5xl font-bold mb-4 relative">
+                My Applications 📋
+                <div className="absolute -top-3 -right-8 w-6 h-6 bg-asu-gold rounded-full animate-pulse-gentle"></div>
+              </h1>
+              <p className="text-xl text-white/90 mb-6 max-w-3xl">
+                Track your internship and job applications in one place. Stay organized and never miss an opportunity! 🚀
+              </p>
+              <div className="flex flex-wrap gap-4 text-sm">
+                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 hover-scale">
+                  <Briefcase className="h-5 w-5" />
+                  <span>{stats.total} total applications 📈</span>
                 </div>
-
-                <div className="flex flex-col space-y-3 lg:ml-8 mt-6 lg:mt-0">
-                  <Link
-                    to={`/job/${application.job.id}`}
-                    className="border-2 border-aut-maroon text-aut-maroon px-6 py-3 rounded-2xl hover:bg-aut-maroon hover:text-white transition-all duration-300 text-center flex items-center justify-center space-x-2 font-semibold shadow-sm hover:shadow-md transform hover:scale-105"
-                  >
-                    <span>View Job</span>
-                    <ExternalLink className="h-4 w-4" />
-                  </Link>
-                  {(application.status === 'reviewed' || application.status === 'accepted') && (
-                    <Link
-                      to="/messages"
-                      className="bg-gradient-to-r from-aut-maroon to-red-600 text-white px-6 py-3 rounded-2xl hover:from-red-600 hover:to-aut-maroon transition-all duration-300 text-center flex items-center justify-center space-x-2 font-semibold shadow-md hover:shadow-lg transform hover:scale-105"
-                    >
-                      <MessageSquare className="h-4 w-4" />
-                      <span>Message</span>
-                    </Link>
-                  )}
+                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 hover-scale">
+                  <Users className="h-5 w-5" />
+                  <span>{stats.interviews} interviews scheduled 🎯</span>
+                </div>
+                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 hover-scale">
+                  <Star className="h-5 w-5" />
+                  <span>Track your progress 📊</span>
                 </div>
               </div>
             </div>
           </div>
-        ))}
-      </div>
-
-      {filteredApplications.length === 0 && (
-        <div className="text-center py-16 bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg border border-gray-100 transform -rotate-0.5">
-          <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
-            <Search className="h-12 w-12 text-gray-400" />
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-3">No applications found</h3>
-          <p className="text-gray-600 mb-8 text-lg max-w-md mx-auto">
-            {statusFilter === 'all' 
-              ? "Your journey starts here! 🚀 Let's find some amazing opportunities for you."
-              : `No applications with ${getStatusText(statusFilter).toLowerCase()} status found. Keep exploring! 🔍`
-            }
-          </p>
-          <Link
-            to="/dashboard"
-            className="bg-gradient-to-r from-aut-maroon to-red-600 text-white px-8 py-4 rounded-2xl hover:from-red-600 hover:to-aut-maroon transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
-          >
-            Browse Jobs 🔍
-          </Link>
         </div>
-      )}
+
+        {/* Stats Dashboard with staggered animations */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 interactive-card animate-slide-up animate-delay-100">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">Total Applications</p>
+                <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
+              </div>
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center icon-bounce">
+                <Briefcase className="h-6 w-6 text-blue-600" />
+              </div>
+            </div>
+            <div className="mt-4 flex items-center text-blue-600 text-sm bg-blue-50 rounded-full px-3 py-1 w-fit">
+              <TrendingUp className="h-4 w-4 mr-1" />
+              <span>Keep applying! 📈</span>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 interactive-card animate-slide-up animate-delay-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">Pending Review</p>
+                <p className="text-3xl font-bold text-gray-900">{stats.pending}</p>
+              </div>
+              <div className="w-12 h-12 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-full flex items-center justify-center icon-bounce">
+                <Clock className="h-6 w-6 text-yellow-600" />
+              </div>
+            </div>
+            <div className="mt-4 flex items-center text-yellow-600 text-sm bg-yellow-50 rounded-full px-3 py-1 w-fit">
+              <AlertCircle className="h-4 w-4 mr-1" />
+              <span>In review ⏳</span>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 interactive-card animate-slide-up animate-delay-300">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">Interviews</p>
+                <p className="text-3xl font-bold text-gray-900">{stats.interviews}</p>
+              </div>
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-purple-200 rounded-full flex items-center justify-center icon-bounce">
+                <Users className="h-6 w-6 text-purple-600" />
+              </div>
+            </div>
+            <div className="mt-4 flex items-center text-purple-600 text-sm bg-purple-50 rounded-full px-3 py-1 w-fit">
+              <Star className="h-4 w-4 mr-1" />
+              <span>Great progress! 🌟</span>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 interactive-card animate-slide-up animate-delay-400">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">Accepted</p>
+                <p className="text-3xl font-bold text-gray-900">{stats.accepted}</p>
+              </div>
+              <div className="w-12 h-12 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center icon-bounce">
+                <CheckCircle className="h-6 w-6 text-green-600" />
+              </div>
+            </div>
+            <div className="mt-4 flex items-center text-green-600 text-sm bg-green-50 rounded-full px-3 py-1 w-fit">
+              <Award className="h-4 w-4 mr-1" />
+              <span>Congratulations! 🎉</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Filters with slide animation */}
+        <div className="bg-gradient-to-r from-white to-gray-50 rounded-3xl shadow-lg border border-gray-100 p-8 mb-12 animate-slide-left">
+          <div className="flex flex-col lg:flex-row gap-6">
+            <div className="flex-1 relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search applications... 🔍"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white shadow-inner transition-all duration-200 hover:shadow-md input-focus"
+              />
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <Filter className="h-5 w-5 text-gray-400" />
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="px-4 py-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white shadow-inner cursor-pointer hover:shadow-md transition-all duration-200 input-focus"
+                >
+                  <option value="all">All Status 📋</option>
+                  <option value="pending">Pending ⏳</option>
+                  <option value="interview">Interview 💼</option>
+                  <option value="accepted">Accepted ✅</option>
+                  <option value="rejected">Rejected ❌</option>
+                </select>
+              </div>
+              <select
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                className="px-4 py-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white shadow-inner cursor-pointer hover:shadow-md transition-all duration-200 input-focus"
+              >
+                <option value="all">All Types</option>
+                <option value="internship">Internships 🎓</option>
+                <option value="fulltime">Full-time 💼</option>
+                <option value="parttime">Part-time ⏰</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Applications List with staggered animations */}
+        <div className="space-y-6">
+          {filteredApplications.map((application, index) => (
+            <div 
+              key={application.id} 
+              className={`bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden interactive-card animate-slide-up`}
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
+              <div className="p-8">
+                <div className="flex items-start justify-between mb-6">
+                  <div className="flex items-start space-x-4 flex-1">
+                    <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center shadow-lg hover-scale">
+                      <Building2 className="h-8 w-8 text-gray-600" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <h3 className="text-2xl font-bold text-gray-900 hover:text-asu-maroon transition-colors cursor-pointer">
+                          {application.job_title}
+                        </h3>
+                        <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(application.status)}`}>
+                          <div className="flex items-center space-x-1">
+                            {getStatusIcon(application.status)}
+                            <span className="capitalize">{application.status}</span>
+                          </div>
+                        </span>
+                      </div>
+                      <p className="text-lg font-semibold text-asu-maroon mb-2">{application.company}</p>
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-4">
+                        <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-3 py-1 hover-scale">
+                          <MapPin className="h-4 w-4" />
+                          <span>{application.location}</span>
+                        </div>
+                        <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-3 py-1 hover-scale">
+                          <DollarSign className="h-4 w-4" />
+                          <span>{application.salary_range}</span>
+                        </div>
+                        <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-3 py-1 hover-scale">
+                          <Calendar className="h-4 w-4" />
+                          <span>Applied {new Date(application.applied_date).toLocaleDateString()}</span>
+                        </div>
+                        <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-3 py-1 hover-scale">
+                          <Clock className="h-4 w-4" />
+                          <span>Deadline {new Date(application.deadline).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                      <p className="text-gray-600 mb-4 leading-relaxed">{application.description}</p>
+                      
+                      {application.tags && (
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {application.tags.map((tag, tagIndex) => (
+                            <span
+                              key={tagIndex}
+                              className="px-3 py-1 bg-gradient-to-r from-asu-maroon/10 to-asu-gold/10 text-asu-maroon rounded-full text-xs font-medium hover:from-asu-maroon/20 hover:to-asu-gold/20 transition-all duration-200 cursor-pointer hover-scale"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="text-right">
+                    <div className="text-sm text-gray-500 mb-2">Days since applied</div>
+                    <div className="text-2xl font-bold text-gray-900">
+                      {Math.floor((new Date().getTime() - new Date(application.applied_date).getTime()) / (1000 * 60 * 60 * 24))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  <button className="interactive-button bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white px-6 py-3 rounded-2xl hover:shadow-lg font-semibold shadow-md flex items-center space-x-2">
+                    <Eye className="h-4 w-4" />
+                    <span>View Details</span>
+                  </button>
+                  
+                  <button className="interactive-button border-2 border-asu-maroon text-asu-maroon px-6 py-3 rounded-2xl hover:bg-asu-maroon hover:text-white font-semibold shadow-sm hover:shadow-md flex items-center space-x-2">
+                    <Send className="h-4 w-4" />
+                    <span>Follow Up</span>
+                  </button>
+                  
+                  <button className="interactive-button border border-gray-300 text-gray-600 px-4 py-3 rounded-2xl hover:bg-gray-50 flex items-center justify-center">
+                    <FileText className="h-4 w-4" />
+                  </button>
+                  
+                  <button className="interactive-button border border-gray-300 text-gray-600 px-4 py-3 rounded-2xl hover:bg-gray-50 flex items-center justify-center">
+                    <Share2 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {filteredApplications.length === 0 && (
+          <div className="text-center py-16 bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg border border-gray-100 animate-scale-in">
+            <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner animate-bounce-gentle">
+              <Briefcase className="h-12 w-12 text-gray-400" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              {applications.length === 0 ? 'No applications yet' : 'No matching applications'}
+            </h3>
+            <p className="text-gray-600 mb-8 text-lg max-w-md mx-auto">
+              {applications.length === 0 
+                ? "Ready to start your career journey? Browse available opportunities and apply today! 🚀"
+                : "Try adjusting your search criteria to find your applications! 🔍"
+              }
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              {applications.length === 0 ? (
+                <button className="interactive-button bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white px-8 py-4 rounded-2xl hover:shadow-xl font-semibold shadow-lg">
+                  Browse Jobs 🔍
+                </button>
+              ) : (
+                <button 
+                  onClick={() => {
+                    setSearchTerm('');
+                    setStatusFilter('all');
+                    setTypeFilter('all');
+                  }}
+                  className="interactive-button bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white px-8 py-4 rounded-2xl hover:shadow-xl font-semibold shadow-lg"
+                >
+                  Clear Filters 🔄
+                </button>
+              )}
+              <button className="interactive-button border-2 border-asu-maroon text-asu-maroon px-8 py-4 rounded-2xl hover:bg-asu-maroon hover:text-white font-semibold shadow-sm hover:shadow-md">
+                View All Applications 📋
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

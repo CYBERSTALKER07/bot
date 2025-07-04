@@ -144,38 +144,39 @@ export default function Applicants() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Organic header animation
+      // Header animation - scale from small to big
       gsap.from(headerRef.current, {
         duration: 1.5,
-        y: -40,
+        scale: 0.8,
         opacity: 0,
-        ease: 'power3.out',
+        y: -30,
+        ease: 'elastic.out(1, 0.8)',
         rotation: 0.8
       });
 
-      // Applicant cards animation
+      // Applicant cards animation - scale from small
       gsap.from('.applicant-card', {
-        duration: 1,
-        y: 30,
+        duration: 0.8,
+        scale: 0.9,
         opacity: 0,
-        scale: 0.95,
-        ease: 'power2.out',
+        y: 20,
+        ease: 'back.out(1.7)',
         stagger: 0.1,
         delay: 0.5
       });
 
-      // Stats animation
+      // Stats animation - scale from small
       gsap.from('.stat-card', {
-        duration: 1,
-        y: 20,
+        duration: 0.8,
+        scale: 0.8,
         opacity: 0,
-        scale: 0.9,
+        y: 15,
         ease: 'back.out(1.7)',
         stagger: 0.15,
         delay: 0.3
       });
 
-      // Floating elements
+      // Floating elements - always visible
       gsap.to('.applicant-decoration', {
         y: -6,
         x: 3,
@@ -245,7 +246,7 @@ export default function Applicants() {
 
   return (
     <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
-      {/* Decorative elements */}
+      {/* Decorative elements - Fixed colors */}
       <div className="applicant-decoration absolute top-16 right-24 w-4 h-4 bg-asu-gold/30 rounded-full"></div>
       <div className="applicant-decoration absolute top-32 left-16 w-3 h-3 bg-asu-maroon/20 rounded-full"></div>
       <Sparkles className="applicant-decoration absolute top-24 left-1/4 h-5 w-5 text-asu-gold/50" />

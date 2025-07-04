@@ -105,7 +105,7 @@ What You'll Learn:
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Job Not Found</h2>
-          <Link to="/dashboard" className="text-asu-maroon hover:text-asu-maroon-dark">
+          <Link to="/dashboard" className="text-aut-maroon hover:text-aut-maroon-dark">
             Return to Dashboard
           </Link>
         </div>
@@ -169,7 +169,7 @@ What You'll Learn:
               <div className="flex flex-col space-y-3 mt-6 lg:mt-0 lg:ml-6">
                 <button
                   onClick={() => setShowApplyModal(true)}
-                  className="bg-asu-maroon text-white px-6 py-3 rounded-md hover:bg-asu-maroon-dark transition-colors flex items-center justify-center space-x-2"
+                  className="bg-aut-maroon text-white px-6 py-3 rounded-md hover:bg-aut-maroon-dark transition-colors flex items-center justify-center space-x-2"
                 >
                   <Send className="h-5 w-5" />
                   <span>Apply Now</span>
@@ -219,7 +219,7 @@ What You'll Learn:
                 <ul className="space-y-2">
                   {job.requirements.map((requirement, index) => (
                     <li key={index} className="flex items-start space-x-2">
-                      <span className="text-asu-maroon mt-1">•</span>
+                      <span className="text-aut-maroon mt-1">•</span>
                       <span className="text-gray-700">{requirement}</span>
                     </li>
                   ))}
@@ -254,7 +254,7 @@ What You'll Learn:
                 </p>
                 <a
                   href="#"
-                  className="inline-flex items-center space-x-1 text-asu-maroon hover:text-asu-maroon-dark mt-3 text-sm"
+                  className="inline-flex items-center space-x-1 text-aut-maroon hover:text-aut-maroon-dark mt-3 text-sm"
                 >
                   <span>Learn more about Intel</span>
                   <ExternalLink className="h-4 w-4" />
@@ -300,7 +300,7 @@ What You'll Learn:
                   rows={4}
                   value={coverLetter}
                   onChange={(e) => setCoverLetter(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
                   placeholder="Tell the employer why you're interested in this position..."
                 />
               </div>
@@ -312,7 +312,7 @@ What You'll Learn:
               <button
                 onClick={handleApply}
                 disabled={applying}
-                className="flex-1 bg-asu-maroon text-white py-2 px-4 rounded-md hover:bg-asu-maroon-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex-1 bg-aut-maroon text-white py-2 px-4 rounded-md hover:bg-aut-maroon-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {applying ? 'Submitting...' : 'Submit Application'}
               </button>
