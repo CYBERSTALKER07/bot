@@ -1,679 +1,508 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { 
   MessageSquare, 
-  Send, 
   Search, 
-  Phone, 
-  Video, 
-  MoreVertical, 
-  Paperclip, 
-  Smile, 
-  Image, 
+  Send, 
   User, 
-  Building2, 
-  Calendar, 
-  Clock, 
-  Check, 
-  CheckCheck, 
+  Circle, 
+  Video, 
+  Phone, 
+  MoreHorizontal, 
+  Smile, 
+  Paperclip, 
   Star, 
-  Heart, 
-  Coffee, 
+  TrendingUp, 
+  Users, 
   Sparkles, 
-  Archive, 
-  Trash2, 
-  Pin, 
-  Mute,
-  TrendingUp,
-  Users,
-  Mail,
-  Bell,
-  Bookmark,
-  Reply,
-  Forward,
-  Edit3
+  Coffee, 
+  Heart, 
+  Filter 
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
+gsap.registerPlugin(ScrollTrigger);
+
 interface Message {
   id: string;
-  conversation_id: string;
   sender_id: string;
   sender_name: string;
-  sender_role: 'student' | 'employer' | 'admin';
+  sender_type: 'student' | 'employer';
   content: string;
   timestamp: string;
   read: boolean;
-  type: 'text' | 'image' | 'file';
-  attachment_url?: string;
 }
 
 interface Conversation {
   id: string;
-  participant_id: string;
-  participant_name: string;
-  participant_role: 'student' | 'employer' | 'admin';
-  participant_avatar?: string;
-  last_message: string;
-  last_message_time: string;
-  unread_count: number;
-  is_online: boolean;
-  job_title?: string;
-  company?: string;
-  pinned: boolean;
-  archived: boolean;
+  participant: {
+    id: string;
+    name: string;
+    type: 'student' | 'employer';
+    company?: string;
+    avatar?: string;
+  };
+  lastMessage: Message;
+  unreadCount: number;
+  online: boolean;
 }
 
 export default function Messages() {
   const { user } = useAuth();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const conversationsRef = useRef<HTMLDivElement>(null);
+  const chatRef = useRef<HTMLDivElement>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    // Simulate smooth loading
-    const timer = setTimeout(() => setIsLoaded(true), 200);
-    return () => clearTimeout(timer);
+    const ctx = gsap.context(() => {
+      // Header entrance animation
+      gsap.fromTo(headerRef.current, {
+        opacity: 0,
+        y: -60,
+        scale: 0.8
+      }, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 1.4,
+        ease: 'power3.out'
+      });
+
+      // Conversation cards entrance
+      gsap.fromTo('.conversation-card', {
+        opacity: 0,
+        x: -50,
+        scale: 0.9
+      }, {
+        opacity: 1,
+        x: 0,
+        scale: 1,
+        duration: 0.8,
+        ease: 'power3.out',
+        stagger: 0.1,
+        delay: 0.4
+      });
+
+      // Chat messages entrance
+      gsap.fromTo('.message-item', {
+        opacity: 0,
+        y: 30,
+        scale: 0.9
+      }, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.6,
+        ease: 'back.out(1.7)',
+        stagger: 0.05,
+        delay: 0.8
+      });
+
+      // Online indicators pulse
+      gsap.to('.online-indicator', {
+        scale: 1.2,
+        opacity: 0.8,
+        duration: 1,
+        repeat: -1,
+        yoyo: true,
+        ease: 'power2.inOut'
+      });
+
+      // Floating decorations
+      gsap.to('.message-decoration', {
+        y: -12,
+        x: 6,
+        rotation: 360,
+        duration: 10,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
+      });
+
+      // Typing indicator animation
+      gsap.to('.typing-dot', {
+        y: -4,
+        duration: 0.6,
+        repeat: -1,
+        yoyo: true,
+        ease: 'power2.inOut',
+        stagger: 0.2
+      });
+
+    }, containerRef);
+
+    return () => ctx.revert();
   }, []);
 
-  // Mock data
   const conversations: Conversation[] = [
     {
       id: '1',
-      participant_id: 'emp-1',
-      participant_name: 'Sarah Chen',
-      participant_role: 'employer',
-      last_message: 'Great! Looking forward to discussing the position with you.',
-      last_message_time: '2024-01-15T10:30:00Z',
-      unread_count: 2,
-      is_online: true,
-      job_title: 'Software Engineer Intern',
-      company: 'Google',
-      pinned: true,
-      archived: false
+      participant: {
+        id: '1',
+        name: 'Sarah Johnson',
+        type: 'employer',
+        company: 'Google',
+        avatar: '👩‍💼'
+      },
+      lastMessage: {
+        id: '1',
+        sender_id: '1',
+        sender_name: 'Sarah Johnson',
+        sender_type: 'employer',
+        content: 'Hi! I reviewed your application and I\'m impressed with your portfolio. Would you be available for a quick call this week?',
+        timestamp: '2024-02-05T10:30:00Z',
+        read: false
+      },
+      unreadCount: 2,
+      online: true
     },
     {
       id: '2',
-      participant_id: 'emp-2',
-      participant_name: 'Michael Rodriguez',
-      participant_role: 'employer',
-      last_message: 'Can you send me your portfolio?',
-      last_message_time: '2024-01-14T15:20:00Z',
-      unread_count: 0,
-      is_online: false,
-      job_title: 'UI/UX Designer Intern',
-      company: 'Adobe',
-      pinned: false,
-      archived: false
+      participant: {
+        id: '2',
+        name: 'Michael Chen',
+        type: 'employer',
+        company: 'Microsoft',
+        avatar: '👨‍💻'
+      },
+      lastMessage: {
+        id: '2',
+        sender_id: '2',
+        sender_name: 'Michael Chen',
+        sender_type: 'employer',
+        content: 'Thanks for your interest in our internship program. Let\'s schedule an interview!',
+        timestamp: '2024-02-05T09:15:00Z',
+        read: true
+      },
+      unreadCount: 0,
+      online: false
     },
     {
       id: '3',
-      participant_id: 'stu-1',
-      participant_name: 'Emily Johnson',
-      participant_role: 'student',
-      last_message: 'Thank you for the interview opportunity!',
-      last_message_time: '2024-01-13T09:15:00Z',
-      unread_count: 1,
-      is_online: true,
-      pinned: false,
-      archived: false
-    },
-    {
-      id: '4',
-      participant_id: 'stu-2',
-      participant_name: 'John Doe',
-      participant_role: 'student',
-      last_message: 'I have some questions about the job responsibilities.',
-      last_message_time: '2024-01-12T14:10:00Z',
-      unread_count: 3,
-      is_online: false,
-      pinned: false,
-      archived: false
+      participant: {
+        id: '3',
+        name: 'Emma Wilson',
+        type: 'student',
+        avatar: '👩‍🎓'
+      },
+      lastMessage: {
+        id: '3',
+        sender_id: '3',
+        sender_name: 'Emma Wilson',
+        sender_type: 'student',
+        content: 'Hey! I saw your post about the hackathon. Are you still looking for team members?',
+        timestamp: '2024-02-05T08:45:00Z',
+        read: true
+      },
+      unreadCount: 0,
+      online: true
     }
   ];
-
-  const messages: Message[] = [
-    {
-      id: '1',
-      conversation_id: '1',
-      sender_id: 'emp-1',
-      sender_name: 'Sarah Chen',
-      sender_role: 'employer',
-      content: 'Hi! I reviewed your application for the Software Engineer Intern position. Very impressed with your projects!',
-      timestamp: '2024-01-15T09:00:00Z',
-      read: true,
-      type: 'text'
-    },
-    {
-      id: '2',
-      conversation_id: '1',
-      sender_id: user?.id || 'current-user',
-      sender_name: user?.name || 'You',
-      sender_role: user?.role || 'student',
-      content: 'Thank you so much! I\'m really excited about this opportunity.',
-      timestamp: '2024-01-15T09:15:00Z',
-      read: true,
-      type: 'text'
-    },
-    {
-      id: '3',
-      conversation_id: '1',
-      sender_id: 'emp-1',
-      sender_name: 'Sarah Chen',
-      sender_role: 'employer',
-      content: 'Would you be available for a quick video call this week?',
-      timestamp: '2024-01-15T10:00:00Z',
-      read: true,
-      type: 'text'
-    },
-    {
-      id: '4',
-      conversation_id: '1',
-      sender_id: user?.id || 'current-user',
-      sender_name: user?.name || 'You',
-      sender_role: user?.role || 'student',
-      content: 'Absolutely! I\'m free Wednesday through Friday afternoons.',
-      timestamp: '2024-01-15T10:15:00Z',
-      read: true,
-      type: 'text'
-    },
-    {
-      id: '5',
-      conversation_id: '1',
-      sender_id: 'emp-1',
-      sender_name: 'Sarah Chen',
-      sender_role: 'employer',
-      content: 'Great! Looking forward to discussing the position with you.',
-      timestamp: '2024-01-15T10:30:00Z',
-      read: false,
-      type: 'text'
-    },
-    {
-      id: '6',
-      conversation_id: '2',
-      sender_id: 'emp-2',
-      sender_name: 'Michael Rodriguez',
-      sender_role: 'employer',
-      content: 'Hi! I\'m reviewing your application for the UI/UX Designer Intern position. Impressive portfolio!',
-      timestamp: '2024-01-14T14:00:00Z',
-      read: true,
-      type: 'text'
-    },
-    {
-      id: '7',
-      conversation_id: '2',
-      sender_id: user?.id || 'current-user',
-      sender_name: user?.name || 'You',
-      sender_role: user?.role || 'student',
-      content: 'Thank you! I\'m excited about the opportunity at Adobe.',
-      timestamp: '2024-01-14T14:05:00Z',
-      read: true,
-      type: 'text'
-    },
-    {
-      id: '8',
-      conversation_id: '2',
-      sender_id: 'emp-2',
-      sender_name: 'Michael Rodriguez',
-      sender_role: 'employer',
-      content: 'Can you tell me about your experience with design systems?',
-      timestamp: '2024-01-14T14:10:00Z',
-      read: true,
-      type: 'text'
-    },
-    {
-      id: '9',
-      conversation_id: '2',
-      sender_id: user?.id || 'current-user',
-      sender_name: user?.name || 'You',
-      sender_role: user?.role || 'student',
-      content: 'I\'ve worked with design systems extensively in my previous projects. I can share some examples during the interview.',
-      timestamp: '2024-01-14T14:15:00Z',
-      read: true,
-      type: 'text'
-    },
-    {
-      id: '10',
-      conversation_id: '3',
-      sender_id: 'stu-1',
-      sender_name: 'Emily Johnson',
-      sender_role: 'student',
-      content: 'Hi! I\'m interested in the Software Engineer Intern position. Can we discuss this further?',
-      timestamp: '2024-01-13T09:00:00Z',
-      read: true,
-      type: 'text'
-    },
-    {
-      id: '11',
-      conversation_id: '3',
-      sender_id: 'emp-1',
-      sender_name: 'Sarah Chen',
-      sender_role: 'employer',
-      content: 'Hello Emily! I\'d be happy to discuss the position with you. When are you available for a call?',
-      timestamp: '2024-01-13T09:05:00Z',
-      read: true,
-      type: 'text'
-    },
-    {
-      id: '12',
-      conversation_id: '3',
-      sender_id: user?.id || 'current-user',
-      sender_name: user?.name || 'You',
-      sender_role: user?.role || 'student',
-      content: 'Thank you for considering my application, Sarah. I\'m available for a call on Monday or Tuesday afternoon.',
-      timestamp: '2024-01-13T09:10:00Z',
-      read: true,
-      type: 'text'
-    },
-    {
-      id: '13',
-      conversation_id: '3',
-      sender_id: 'emp-1',
-      sender_name: 'Sarah Chen',
-      sender_role: 'employer',
-      content: 'Great! I\'ll send you a calendar invite for Monday at 3 PM.',
-      timestamp: '2024-01-13T09:15:00Z',
-      read: false,
-      type: 'text'
-    },
-    {
-      id: '14',
-      conversation_id: '4',
-      sender_id: 'stu-2',
-      sender_name: 'John Doe',
-      sender_role: 'student',
-      content: 'Hello! I have some questions regarding the job responsibilities for the Software Engineer Intern position.',
-      timestamp: '2024-01-12T14:00:00Z',
-      read: true,
-      type: 'text'
-    },
-    {
-      id: '15',
-      conversation_id: '4',
-      sender_id: 'emp-1',
-      sender_name: 'Sarah Chen',
-      sender_role: 'employer',
-      content: 'Hi John! I\'d be happy to provide more information. What would you like to know?',
-      timestamp: '2024-01-12T14:05:00Z',
-      read: true,
-      type: 'text'
-    },
-    {
-      id: '16',
-      conversation_id: '4',
-      sender_id: user?.id || 'current-user',
-      sender_name: user?.name || 'You',
-      sender_role: user?.role || 'student',
-      content: 'Thank you for the quick response, Sarah. Could you please elaborate on the day-to-day responsibilities?',
-      timestamp: '2024-01-12T14:10:00Z',
-      read: true,
-      type: 'text'
-    },
-    {
-      id: '17',
-      conversation_id: '4',
-      sender_id: 'emp-1',
-      sender_name: 'Sarah Chen',
-      sender_role: 'employer',
-      content: 'Certainly! As an intern, you\'ll be working on developing features, fixing bugs, and collaborating with the team on various projects.',
-      timestamp: '2024-01-12T14:15:00Z',
-      read: false,
-      type: 'text'
-    }
-  ];
-
-  useEffect(() => {
-    // Scroll to bottom when new messages arrive
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, selectedConversation]);
-
-  const filteredConversations = conversations.filter(conv =>
-    conv.participant_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    conv.last_message.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (conv.company && conv.company.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
 
   const selectedConv = conversations.find(c => c.id === selectedConversation);
-  const conversationMessages = messages.filter(m => m.conversation_id === selectedConversation);
+
+  const mockMessages: Message[] = selectedConv ? [
+    {
+      id: '1',
+      sender_id: selectedConv.participant.id,
+      sender_name: selectedConv.participant.name,
+      sender_type: selectedConv.participant.type,
+      content: 'Hi there! I hope you\'re doing well. I wanted to reach out about the position you applied for.',
+      timestamp: '2024-02-05T10:00:00Z',
+      read: true
+    },
+    {
+      id: '2',
+      sender_id: user?.id || 'me',
+      sender_name: user?.name || 'You',
+      sender_type: 'student',
+      content: 'Hi! Thank you for reaching out. I\'m very interested in learning more about the opportunity.',
+      timestamp: '2024-02-05T10:15:00Z',
+      read: true
+    },
+    {
+      id: '3',
+      sender_id: selectedConv.participant.id,
+      sender_name: selectedConv.participant.name,
+      sender_type: selectedConv.participant.type,
+      content: selectedConv.lastMessage.content,
+      timestamp: selectedConv.lastMessage.timestamp,
+      read: selectedConv.lastMessage.read
+    }
+  ] : [];
 
   const sendMessage = () => {
-    if (!newMessage.trim() || !selectedConversation) return;
-    setNewMessage('');
+    if (newMessage.trim()) {
+      // Animation for sending message
+      gsap.fromTo('.message-input', {
+        scale: 0.95
+      }, {
+        scale: 1,
+        duration: 0.2,
+        ease: 'power2.out'
+      });
+      
+      setNewMessage('');
+      setShowEmojiPicker(false);
+    }
   };
 
   const formatTime = (timestamp: string) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-
-    if (days === 0) {
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    } else if (days === 1) {
-      return 'Yesterday';
-    } else if (days < 7) {
-      return date.toLocaleDateString([], { weekday: 'short' });
-    } else {
-      return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-    }
+    return new Date(timestamp).toLocaleTimeString([], { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
   };
 
-  const getMessageTypeColor = (type: string) => {
-    switch (type) {
-      case 'recruitment':
-        return 'bg-blue-100 text-blue-800';
-      case 'interview':
-        return 'bg-purple-100 text-purple-800';
-      case 'networking':
-        return 'bg-green-100 text-green-800';
-      case 'offer':
-        return 'bg-yellow-100 text-yellow-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const stats = {
-    total: conversations.length,
-    unread: conversations.reduce((acc, conv) => acc + conv.unread_count, 0),
-    active: conversations.filter(conv => conv.is_online).length,
-    offers: conversations.filter(conv => conv.last_message.includes('Congratulations')).length
+  const handleConversationClick = (conversationId: string) => {
+    setSelectedConversation(conversationId);
+    
+    // Animation for conversation selection
+    gsap.fromTo('.chat-container', {
+      opacity: 0,
+      x: 50
+    }, {
+      opacity: 1,
+      x: 0,
+      duration: 0.5,
+      ease: 'power3.out'
+    });
   };
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-gray-50 to-white ${isLoaded ? 'animate-fade-in' : ''}`}>
+    <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-gray-50 to-white relative">
       {/* Decorative elements */}
-      <div className="absolute top-16 right-24 w-4 h-4 bg-asu-gold/40 rounded-full animate-float"></div>
-      <div className="absolute top-32 left-16 w-3 h-3 bg-asu-maroon/30 rounded-full animate-float animate-delay-200"></div>
-      <Sparkles className="absolute top-24 left-1/4 h-5 w-5 text-asu-gold/60 animate-bounce-gentle" />
-      <Coffee className="absolute bottom-32 right-1/4 h-4 w-4 text-asu-maroon/50 animate-float animate-delay-300" />
+      <div className="message-decoration absolute top-16 right-24 w-4 h-4 bg-asu-gold/40 rounded-full"></div>
+      <div className="message-decoration absolute top-32 left-16 w-3 h-3 bg-asu-maroon/30 rounded-full"></div>
+      <Sparkles className="message-decoration absolute top-24 left-1/4 h-5 w-5 text-asu-gold/60" />
+      <Coffee className="message-decoration absolute bottom-32 right-1/4 h-4 w-4 text-asu-maroon/50" />
+      <Heart className="message-decoration absolute bottom-20 left-1/3 h-4 w-4 text-asu-gold/70" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8 animate-slide-up">
-          <div className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark rounded-3xl p-8 text-white relative overflow-hidden hover-glow">
+        <div ref={headerRef} className="mb-8">
+          <div className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark rounded-3xl p-8 text-white relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-asu-gold/20 rounded-full blur-xl"></div>
             <div className="relative z-10">
-              <h1 className="text-4xl font-bold mb-4 relative">
+              <h1 className="text-5xl font-bold mb-4 relative">
                 Messages 💬
-                <div className="absolute -top-2 -right-6 w-4 h-4 bg-asu-gold rounded-full animate-pulse-gentle"></div>
+                <div className="absolute -top-3 -right-8 w-6 h-6 bg-asu-gold rounded-full"></div>
               </h1>
-              <p className="text-lg text-white/90 mb-6">
-                Connect with recruiters, hiring managers, and industry professionals 🤝
+              <p className="text-xl text-white/90 mb-6 max-w-3xl">
+                Connect and communicate with employers and students ✨
               </p>
               <div className="flex flex-wrap gap-4 text-sm">
-                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 hover-scale">
-                  <MessageSquare className="h-4 w-4" />
-                  <span>{stats.total} conversations</span>
+                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
+                  <MessageSquare className="h-5 w-5" />
+                  <span>Real-time messaging 💬</span>
                 </div>
-                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 hover-scale">
-                  <Bell className="h-4 w-4" />
-                  <span>{stats.unread} unread</span>
+                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
+                  <Video className="h-5 w-5" />
+                  <span>Video calls available 📹</span>
                 </div>
-                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 hover-scale">
-                  <Users className="h-4 w-4" />
-                  <span>{stats.active} online</span>
+                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
+                  <Star className="h-5 w-5" />
+                  <span>Secure communication 🔐</span>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Stats with animations */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 interactive-card animate-slide-up animate-delay-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">Total Messages</p>
-                <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
-              </div>
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center icon-bounce">
-                <MessageSquare className="h-6 w-6 text-blue-600" />
-              </div>
-            </div>
-            <div className="mt-4 flex items-center text-blue-600 text-sm bg-blue-50 rounded-full px-3 py-1 w-fit">
-              <TrendingUp className="h-4 w-4 mr-1" />
-              <span>Active networking 📈</span>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 interactive-card animate-slide-up animate-delay-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">Unread</p>
-                <p className="text-3xl font-bold text-gray-900">{stats.unread}</p>
-              </div>
-              <div className="w-12 h-12 bg-gradient-to-br from-red-100 to-red-200 rounded-full flex items-center justify-center icon-bounce">
-                <Mail className="h-6 w-6 text-red-600" />
-              </div>
-            </div>
-            <div className="mt-4 flex items-center text-red-600 text-sm bg-red-50 rounded-full px-3 py-1 w-fit">
-              <Mail className="h-4 w-4 mr-1" />
-              <span>Needs attention 📨</span>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 interactive-card animate-slide-up animate-delay-300">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">Active Contacts</p>
-                <p className="text-3xl font-bold text-gray-900">{stats.active}</p>
-              </div>
-              <div className="w-12 h-12 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center icon-bounce">
-                <Users className="h-6 w-6 text-green-600" />
-              </div>
-            </div>
-            <div className="mt-4 flex items-center text-green-600 text-sm bg-green-50 rounded-full px-3 py-1 w-fit">
-              <Heart className="h-4 w-4 mr-1" />
-              <span>Online now 🟢</span>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 interactive-card animate-slide-up animate-delay-400">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">Job Offers</p>
-                <p className="text-3xl font-bold text-gray-900">{stats.offers}</p>
-              </div>
-              <div className="w-12 h-12 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-full flex items-center justify-center icon-bounce">
-                <Star className="h-6 w-6 text-yellow-600" />
-              </div>
-            </div>
-            <div className="mt-4 flex items-center text-yellow-600 text-sm bg-yellow-50 rounded-full px-3 py-1 w-fit">
-              <Sparkles className="h-4 w-4 mr-1" />
-              <span>Opportunities! 🎉</span>
             </div>
           </div>
         </div>
 
         {/* Messages Interface */}
-        <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden animate-slide-up animate-delay-500">
-          <div className="flex h-[600px]">
-            {/* Conversations List */}
-            <div className="w-1/3 border-r border-gray-200 flex flex-col">
+        <div className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden" style={{ height: '600px' }}>
+          <div className="flex h-full">
+            {/* Conversations Sidebar */}
+            <div ref={conversationsRef} className="w-1/3 border-r border-gray-200 flex flex-col">
               <div className="p-6 border-b border-gray-200">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Search conversations..."
+                    placeholder="Search conversations... 🔍"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-gray-50 input-focus"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent"
                   />
                 </div>
               </div>
               
               <div className="flex-1 overflow-y-auto">
-                {filteredConversations.map((conversation, index) => (
+                {conversations.map((conversation) => (
                   <div
                     key={conversation.id}
-                    onClick={() => setSelectedConversation(conversation.id)}
-                    className={`p-4 cursor-pointer transition-all duration-200 border-b border-gray-100 hover:bg-gray-50 interactive-card animate-slide-right ${
+                    onClick={() => handleConversationClick(conversation.id)}
+                    className={`conversation-card p-4 border-b border-gray-100 cursor-pointer transition-all duration-200 hover:bg-gray-50 ${
                       selectedConversation === conversation.id ? 'bg-asu-maroon/5 border-l-4 border-l-asu-maroon' : ''
                     }`}
-                    style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     <div className="flex items-center space-x-3">
                       <div className="relative">
-                        <div className="w-12 h-12 bg-gradient-to-br from-asu-maroon to-asu-gold rounded-full flex items-center justify-center text-white font-bold">
-                          {conversation.participant_name.charAt(0)}
+                        <div className="w-12 h-12 bg-gradient-to-br from-asu-maroon/20 to-asu-gold/20 rounded-full flex items-center justify-center text-lg">
+                          {conversation.participant.avatar}
                         </div>
-                        {conversation.is_online && (
-                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse-gentle"></div>
+                        {conversation.online && (
+                          <div className="online-indicator absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <h3 className="font-semibold text-gray-900 truncate">{conversation.participant_name}</h3>
-                          <span className="text-xs text-gray-500">{conversation.last_message_time}</span>
-                        </div>
-                        <p className="text-sm text-gray-600 truncate">{conversation.company}</p>
-                        <p className="text-xs text-gray-500 truncate mt-1">{conversation.last_message}</p>
-                      </div>
-                      <div className="flex flex-col items-end space-y-1">
-                        {conversation.unread_count > 0 && (
-                          <span className="bg-asu-maroon text-white text-xs font-bold px-2 py-1 rounded-full animate-bounce-gentle">
-                            {conversation.unread_count}
+                          <h3 className="font-semibold text-gray-900 truncate">
+                            {conversation.participant.name}
+                          </h3>
+                          <span className="text-xs text-gray-500">
+                            {formatTime(conversation.lastMessage.timestamp)}
                           </span>
+                        </div>
+                        {conversation.participant.company && (
+                          <p className="text-sm text-asu-maroon font-medium">
+                            {conversation.participant.company}
+                          </p>
                         )}
-                        <span className={`text-xs px-2 py-1 rounded-full ${getMessageTypeColor(conversation.participant_role)}`}>
-                          {conversation.participant_role}
-                        </span>
+                        <p className="text-sm text-gray-600 truncate mt-1">
+                          {conversation.lastMessage.content}
+                        </p>
                       </div>
+                      {conversation.unreadCount > 0 && (
+                        <div className="w-5 h-5 bg-asu-maroon rounded-full flex items-center justify-center">
+                          <span className="text-xs text-white font-bold">
+                            {conversation.unreadCount}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Message View */}
+            {/* Chat Area */}
             <div className="flex-1 flex flex-col">
-              {selectedConv ? (
-                <>
+              {selectedConversation ? (
+                <div className="chat-container h-full flex flex-col">
                   {/* Chat Header */}
-                  <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-white to-gray-50">
+                  <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-asu-maroon to-asu-gold rounded-full flex items-center justify-center text-white font-bold">
-                          {conversations.find(c => c.id === selectedConversation)?.participant_name.charAt(0)}
+                      <div className="flex items-center space-x-3">
+                        <div className="relative">
+                          <div className="w-10 h-10 bg-gradient-to-br from-asu-maroon/20 to-asu-gold/20 rounded-full flex items-center justify-center">
+                            {selectedConv?.participant.avatar}
+                          </div>
+                          {selectedConv?.online && (
+                            <div className="online-indicator absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                          )}
                         </div>
                         <div>
                           <h3 className="font-semibold text-gray-900">
-                            {conversations.find(c => c.id === selectedConversation)?.participant_name}
+                            {selectedConv?.participant.name}
                           </h3>
                           <p className="text-sm text-gray-600">
-                            {conversations.find(c => c.id === selectedConversation)?.company}
+                            {selectedConv?.online ? 'Online' : 'Offline'} • {selectedConv?.participant.company}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <button className="p-2 hover:bg-gray-100 rounded-full transition-colors icon-bounce">
-                          <Phone className="h-5 w-5 text-gray-600" />
+                        <button className="p-2 text-gray-600 hover:text-asu-maroon hover:bg-asu-maroon/10 rounded-full transition-colors">
+                          <Phone className="h-5 w-5" />
                         </button>
-                        <button className="p-2 hover:bg-gray-100 rounded-full transition-colors icon-bounce">
-                          <Video className="h-5 w-5 text-gray-600" />
+                        <button className="p-2 text-gray-600 hover:text-asu-maroon hover:bg-asu-maroon/10 rounded-full transition-colors">
+                          <Video className="h-5 w-5" />
                         </button>
-                        <button className="p-2 hover:bg-gray-100 rounded-full transition-colors icon-bounce">
-                          <MoreVertical className="h-5 w-5 text-gray-600" />
+                        <button className="p-2 text-gray-600 hover:text-asu-maroon hover:bg-asu-maroon/10 rounded-full transition-colors">
+                          <MoreHorizontal className="h-5 w-5" />
                         </button>
                       </div>
                     </div>
                   </div>
 
                   {/* Messages */}
-                  <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                    {conversationMessages.map((message, index) => (
+                  <div ref={chatRef} className="flex-1 overflow-y-auto p-6 space-y-4">
+                    {mockMessages.map((message) => (
                       <div
                         key={message.id}
-                        className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'} animate-slide-up`}
-                        style={{ animationDelay: `${index * 0.1}s` }}
+                        className={`message-item flex ${
+                          message.sender_id === user?.id ? 'justify-end' : 'justify-start'
+                        }`}
                       >
-                        <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
-                          message.sender_id === user?.id
-                            ? 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white'
-                            : 'bg-gray-100 text-gray-900'
-                        } hover-scale`}>
-                          <p className="text-sm">{message.content}</p>
-                          <div className="flex items-center justify-between mt-2">
-                            <span className="text-xs opacity-75">
-                              {new Date(message.timestamp).toLocaleTimeString([], {
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })}
-                            </span>
-                            {message.sender_id === user?.id && (
-                              <CheckCircle2 className={`h-4 w-4 ${message.read ? 'text-blue-300' : 'text-gray-400'}`} />
-                            )}
-                          </div>
+                        <div
+                          className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
+                            message.sender_id === user?.id
+                              ? 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white'
+                              : 'bg-gray-100 text-gray-900'
+                          }`}
+                        >
+                          <p className="text-sm leading-relaxed">{message.content}</p>
+                          <p className={`text-xs mt-2 ${
+                            message.sender_id === user?.id ? 'text-white/70' : 'text-gray-500'
+                          }`}>
+                            {formatTime(message.timestamp)}
+                          </p>
                         </div>
                       </div>
                     ))}
-                    <div ref={messagesEndRef} />
+                    
+                    {/* Typing indicator */}
+                    {selectedConv?.online && (
+                      <div className="flex justify-start">
+                        <div className="bg-gray-100 px-4 py-3 rounded-2xl max-w-xs">
+                          <div className="flex items-center space-x-1">
+                            <div className="typing-dot w-2 h-2 bg-gray-400 rounded-full"></div>
+                            <div className="typing-dot w-2 h-2 bg-gray-400 rounded-full"></div>
+                            <div className="typing-dot w-2 h-2 bg-gray-400 rounded-full"></div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Message Input */}
-                  <div className="p-6 border-t border-gray-200 bg-gradient-to-r from-white to-gray-50">
-                    <div className="flex items-center space-x-4">
-                      <button className="p-2 hover:bg-gray-100 rounded-full transition-colors icon-bounce">
-                        <Paperclip className="h-5 w-5 text-gray-600" />
-                      </button>
+                  <div className="p-6 border-t border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+                    <div className="flex items-center space-x-3">
                       <div className="flex-1 relative">
                         <input
                           type="text"
-                          placeholder="Type a message..."
+                          placeholder="Type your message... ✨"
                           value={newMessage}
                           onChange={(e) => setNewMessage(e.target.value)}
                           onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white input-focus"
+                          className="message-input w-full px-5 py-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white shadow-inner transition-all duration-200 font-medium"
                         />
                         <button
                           onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                          className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full transition-colors"
+                          className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-asu-maroon transition-colors p-1 rounded-full hover:bg-asu-maroon/10"
                         >
-                          <Smile className="h-5 w-5 text-gray-600" />
+                          <Smile className="h-5 w-5" />
                         </button>
                       </div>
                       <button
                         onClick={sendMessage}
                         disabled={!newMessage.trim()}
-                        className="interactive-button bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white p-3 rounded-full hover:shadow-lg transition-all duration-200 disabled:opacity-50"
+                        className="p-4 bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white rounded-full hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-md"
                       >
                         <Send className="h-5 w-5" />
                       </button>
                     </div>
-                    
-                    {showEmojiPicker && (
-                      <div className="absolute bottom-20 right-4 bg-white border-2 border-gray-200 rounded-3xl p-6 shadow-2xl z-10">
-                        <div className="grid grid-cols-8 gap-2">
-                          {['😊', '😍', '👍', '❤️', '😂', '🔥', '💯', '🎉', '✨', '🚀', '💪', '🙌', '👏', '🎯', '💡', '🌟'].map((emoji, index) => (
-                            <button
-                              key={index}
-                              onClick={() => {
-                                setNewMessage(prev => prev + emoji);
-                                setShowEmojiPicker(false);
-                              }}
-                              className="text-2xl hover:bg-asu-maroon/10 p-2 rounded-xl transition-all duration-200"
-                            >
-                              {emoji}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
                   </div>
-                </>
+                </div>
               ) : (
-                <div className="flex-1 flex items-center justify-center animate-scale-in">
+                <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-gray-50 to-white">
                   <div className="text-center">
-                    <div className="w-24 h-24 bg-gradient-to-br from-asu-maroon/10 to-asu-gold/10 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce-gentle">
+                    <div className="w-24 h-24 bg-gradient-to-br from-asu-maroon/20 to-asu-gold/20 rounded-full flex items-center justify-center mx-auto mb-6">
                       <MessageSquare className="h-12 w-12 text-asu-maroon" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">Select a conversation</h3>
-                    <p className="text-gray-600">Choose a conversation from the list to start messaging 💬</p>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      Select a conversation
+                    </h3>
+                    <p className="text-gray-600 max-w-sm">
+                      Choose a conversation from the sidebar to start messaging 💬
+                    </p>
                   </div>
                 </div>
               )}
