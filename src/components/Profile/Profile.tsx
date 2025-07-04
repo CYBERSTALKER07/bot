@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   User, 
   MapPin, 
@@ -97,6 +97,7 @@ export default function Profile() {
   const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
+  const [isLoaded, setIsLoaded] = useState(false);
   const [profileData, setProfileData] = useState<ProfileData>({
     name: user?.name || 'User',
     email: user?.email || '',
@@ -117,6 +118,12 @@ export default function Profile() {
     industry: '',
     website: ''
   });
+
+  useEffect(() => {
+    // Smooth entrance animation
+    const timer = setTimeout(() => setIsLoaded(true), 200);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleSave = () => {
     setIsEditing(false);
@@ -142,23 +149,23 @@ export default function Profile() {
   const isEmployer = user?.role === 'employer';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+    <div className={`min-h-screen bg-gradient-to-br from-gray-50 to-white ${isLoaded ? 'animate-fade-in' : ''}`}>
       {/* Decorative elements */}
-      <div className="absolute top-20 right-20 w-4 h-4 bg-asu-gold/40 rounded-full"></div>
-      <div className="absolute top-40 left-20 w-3 h-3 bg-asu-maroon/30 rounded-full"></div>
-      <Sparkles className="absolute top-32 left-1/4 h-5 w-5 text-asu-gold/60" />
-      <Coffee className="absolute bottom-32 right-1/3 h-4 w-4 text-asu-maroon/50" />
+      <div className="absolute top-20 right-20 w-4 h-4 bg-asu-gold/40 rounded-full animate-float"></div>
+      <div className="absolute top-40 left-20 w-3 h-3 bg-asu-maroon/30 rounded-full animate-float animate-delay-200"></div>
+      <Sparkles className="absolute top-32 left-1/4 h-5 w-5 text-asu-gold/60 animate-bounce-gentle" />
+      <Coffee className="absolute bottom-32 right-1/3 h-4 w-4 text-asu-maroon/50 animate-float animate-delay-300" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark rounded-3xl p-8 text-white mb-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-asu-gold/20 rounded-full blur-xl"></div>
+        <div className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark rounded-3xl p-8 text-white mb-8 relative overflow-hidden animate-slide-up hover-glow">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl animate-pulse-gentle"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-asu-gold/20 rounded-full blur-xl animate-pulse-gentle animate-delay-200"></div>
           
           <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between">
             <div className="flex items-center space-x-6">
-              <div className="relative">
-                <div className="w-24 h-24 bg-gradient-to-br from-asu-gold to-yellow-300 rounded-full flex items-center justify-center text-4xl font-bold text-asu-maroon shadow-2xl">
+              <div className="relative animate-scale-in">
+                <div className="w-24 h-24 bg-gradient-to-br from-asu-gold to-yellow-300 rounded-full flex items-center justify-center text-4xl font-bold text-asu-maroon shadow-2xl hover-scale">
                   {profileData.name.charAt(0) || '👤'}
                 </div>
                 <button className="absolute -bottom-2 -right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300">
@@ -166,22 +173,23 @@ export default function Profile() {
                 </button>
               </div>
               
-              <div>
-                <h1 className="text-4xl font-bold mb-2">
+              <div className="animate-slide-left">
+                <h1 className="text-4xl font-bold mb-2 relative">
                   {profileData.name || 'Your Name'} 
                   {isStudent && ' 🎓'}
                   {isEmployer && ' 🏢'}
+                  <div className="absolute -top-2 -right-4 w-3 h-3 bg-asu-gold rounded-full animate-pulse-gentle"></div>
                 </h1>
                 <p className="text-xl text-white/90 mb-2">
                   {isStudent && 'ASU Student'}
                   {isEmployer && (profileData.company_name || 'Company Representative')}
                 </p>
                 <div className="flex items-center space-x-4 text-white/80">
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 animate-slide-right animate-delay-100">
                     <MapPin className="h-4 w-4" />
                     <span>{profileData.location || 'Phoenix, AZ'}</span>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 animate-slide-right animate-delay-200">
                     <Mail className="h-4 w-4" />
                     <span>{profileData.email}</span>
                   </div>
@@ -191,7 +199,7 @@ export default function Profile() {
             
             <button
               onClick={() => setIsEditing(!isEditing)}
-              className="mt-4 md:mt-0 bg-white/20 backdrop-blur-sm border-2 border-white/30 text-white px-6 py-3 rounded-2xl hover:bg-white/30 transition-all duration-300 flex items-center space-x-2"
+              className="mt-4 md:mt-0 bg-white/20 backdrop-blur-sm border-2 border-white/30 text-white px-6 py-3 rounded-2xl hover:bg-white/30 transition-all duration-300 flex items-center space-x-2 interactive-button animate-slide-up animate-delay-300"
             >
               {isEditing ? <X className="h-4 w-4" /> : <Edit3 className="h-4 w-4" />}
               <span>{isEditing ? 'Cancel' : 'Edit Profile'}</span>
@@ -200,7 +208,7 @@ export default function Profile() {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="bg-white rounded-2xl shadow-lg border mb-8 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-lg border mb-8 overflow-hidden animate-slide-up animate-delay-400">
           <div className="flex flex-wrap border-b">
             {[
               { id: 'overview', label: 'Overview', icon: User, emoji: '👤' },
@@ -209,21 +217,25 @@ export default function Profile() {
               ...(isStudent ? [{ id: 'projects', label: 'Projects', icon: Code, emoji: '💻' }] : []),
               { id: 'skills', label: 'Skills', icon: Zap, emoji: '⚡' },
               { id: 'certifications', label: 'Certifications', icon: Award, emoji: '🏆' }
-            ].map((tab) => {
+            ].map((tab, index) => {
               const Icon = tab.icon;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-3 px-6 py-4 font-medium transition-all duration-300 ${
+                  className={`flex items-center space-x-3 px-6 py-4 font-medium transition-all duration-300 relative animate-slide-right ${
                     activeTab === tab.id
                       ? 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white shadow-lg'
                       : 'text-gray-600 hover:text-asu-maroon hover:bg-asu-maroon/5'
                   }`}
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <Icon className="h-5 w-5" />
+                  <Icon className="h-5 w-5 icon-bounce" />
                   <span className="hidden md:inline">{tab.label}</span>
-                  <span>{tab.emoji}</span>
+                  <span className="animate-bounce-gentle">{tab.emoji}</span>
+                  {activeTab === tab.id && (
+                    <div className="absolute bottom-0 left-0 w-full h-1 bg-asu-gold animate-scale-in"></div>
+                  )}
                 </button>
               );
             })}
@@ -235,10 +247,10 @@ export default function Profile() {
           {/* Main Content */}
           <div className="lg:col-span-2">
             {activeTab === 'overview' && (
-              <div className="bg-white rounded-2xl shadow-lg border p-8">
+              <div className="bg-white rounded-2xl shadow-lg border p-8 animate-slide-up animate-delay-500">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                    <User className="h-6 w-6 mr-2" />
+                    <User className="h-6 w-6 mr-2 icon-bounce" />
                     About Me 👋
                   </h2>
                 </div>
@@ -248,16 +260,16 @@ export default function Profile() {
                     value={profileData.bio}
                     onChange={(e) => setProfileData(prev => ({...prev, bio: e.target.value}))}
                     placeholder="Tell us about yourself..."
-                    className="w-full h-32 p-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent resize-none"
+                    className="w-full h-32 p-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent resize-none input-focus"
                   />
                 ) : (
-                  <p className="text-gray-600 leading-relaxed text-lg">
+                  <p className="text-gray-600 leading-relaxed text-lg animate-fade-in">
                     {profileData.bio || 'Passionate ASU student pursuing excellence in technology and innovation. Always eager to learn new skills and take on challenging projects that make a real impact! ✨'}
                   </p>
                 )}
 
                 {isEmployer && (
-                  <div className="mt-8 p-6 bg-gradient-to-r from-asu-maroon/5 to-asu-gold/5 rounded-2xl">
+                  <div className="mt-8 p-6 bg-gradient-to-r from-asu-maroon/5 to-asu-gold/5 rounded-2xl animate-slide-up animate-delay-600">
                     <h3 className="text-xl font-bold text-gray-900 mb-4">Company Information 🏢</h3>
                     {isEditing ? (
                       <div className="space-y-4">
@@ -265,19 +277,19 @@ export default function Profile() {
                           value={profileData.company_name}
                           onChange={(e) => setProfileData(prev => ({...prev, company_name: e.target.value}))}
                           placeholder="Company Name"
-                          className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-asu-maroon"
+                          className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-asu-maroon input-focus"
                         />
                         <textarea
                           value={profileData.company_description}
                           onChange={(e) => setProfileData(prev => ({...prev, company_description: e.target.value}))}
                           placeholder="Company Description"
-                          className="w-full h-24 p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-asu-maroon resize-none"
+                          className="w-full h-24 p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-asu-maroon resize-none input-focus"
                         />
                         <div className="grid grid-cols-2 gap-4">
                           <select
                             value={profileData.company_size}
                             onChange={(e) => setProfileData(prev => ({...prev, company_size: e.target.value}))}
-                            className="p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-asu-maroon"
+                            className="p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-asu-maroon input-focus"
                           >
                             <option value="">Company Size</option>
                             <option value="1-10">1-10 employees</option>
@@ -290,16 +302,16 @@ export default function Profile() {
                             value={profileData.industry}
                             onChange={(e) => setProfileData(prev => ({...prev, industry: e.target.value}))}
                             placeholder="Industry"
-                            className="p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-asu-maroon"
+                            className="p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-asu-maroon input-focus"
                           />
                         </div>
                       </div>
                     ) : (
                       <div className="space-y-3">
-                        <p><strong>Company:</strong> {profileData.company_name || 'Tech Solutions Inc.'}</p>
-                        <p><strong>Description:</strong> {profileData.company_description || 'Leading technology company'}</p>
-                        <p><strong>Size:</strong> {profileData.company_size || '51-200 employees'}</p>
-                        <p><strong>Industry:</strong> {profileData.industry || 'Technology'}</p>
+                        <p className="animate-slide-up animate-delay-700"><strong>Company:</strong> {profileData.company_name || 'Tech Solutions Inc.'}</p>
+                        <p className="animate-slide-up animate-delay-800"><strong>Description:</strong> {profileData.company_description || 'Leading technology company'}</p>
+                        <p className="animate-slide-up animate-delay-900"><strong>Size:</strong> {profileData.company_size || '51-200 employees'}</p>
+                        <p className="animate-slide-up animate-delay-1000"><strong>Industry:</strong> {profileData.industry || 'Technology'}</p>
                       </div>
                     )}
                   </div>
@@ -308,10 +320,10 @@ export default function Profile() {
             )}
 
             {activeTab === 'skills' && (
-              <div className="bg-white rounded-2xl shadow-lg border p-8">
+              <div className="bg-white rounded-2xl shadow-lg border p-8 animate-slide-up animate-delay-500">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                    <Zap className="h-6 w-6 mr-2" />
+                    <Zap className="h-6 w-6 mr-2 icon-bounce" />
                     Skills & Expertise ⚡
                   </h2>
                   {isEditing && (
@@ -320,7 +332,7 @@ export default function Profile() {
                         const skill = prompt('Enter a skill:');
                         if (skill) addSkill(skill);
                       }}
-                      className="bg-asu-maroon text-white px-4 py-2 rounded-xl hover:bg-asu-maroon-dark transition-colors flex items-center space-x-2"
+                      className="interactive-button bg-asu-maroon text-white px-4 py-2 rounded-xl hover:bg-asu-maroon-dark transition-colors flex items-center space-x-2"
                     >
                       <Plus className="h-4 w-4" />
                       <span>Add Skill</span>
@@ -330,20 +342,21 @@ export default function Profile() {
                 
                 <div className="flex flex-wrap gap-3">
                   {profileData.skills.length === 0 ? (
-                    <p className="text-gray-500 text-center w-full py-8">
+                    <p className="text-gray-500 text-center w-full py-8 animate-fade-in">
                       No skills added yet. {isEditing && "Click 'Add Skill' to get started! 🚀"}
                     </p>
                   ) : (
                     profileData.skills.map((skill, index) => (
                       <div
                         key={index}
-                        className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white px-4 py-2 rounded-full font-medium shadow-lg hover:shadow-xl transition-shadow flex items-center space-x-2"
+                        className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white px-4 py-2 rounded-full font-medium shadow-lg hover:shadow-xl transition-shadow flex items-center space-x-2 animate-slide-up hover-scale"
+                        style={{ animationDelay: `${index * 0.1}s` }}
                       >
                         <span>{skill}</span>
                         {isEditing && (
                           <button
                             onClick={() => removeSkill(skill)}
-                            className="ml-2 hover:text-red-200 transition-colors"
+                            className="ml-2 hover:text-red-200 transition-colors interactive-button"
                           >
                             <X className="h-3 w-3" />
                           </button>
@@ -357,19 +370,17 @@ export default function Profile() {
 
             {/* Placeholder for other tabs */}
             {activeTab !== 'overview' && activeTab !== 'skills' && (
-              <div className="bg-white rounded-2xl shadow-lg border p-8">
+              <div className="bg-white rounded-2xl shadow-lg border p-8 animate-slide-up animate-delay-500">
                 <div className="text-center py-12">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                  <div className="w-16 h-16 bg-asu-maroon/10 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce-gentle">
+                    <Award className="h-8 w-8 text-asu-maroon" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4 animate-slide-up animate-delay-600">
                     {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Section
                   </h3>
-                  <p className="text-gray-600 mb-6">
+                  <p className="text-gray-600 mb-6 animate-slide-up animate-delay-700">
                     This section is under development. Coming soon! 🚀
                   </p>
-                  <div className="flex justify-center">
-                    <div className="w-16 h-16 bg-asu-maroon/10 rounded-full flex items-center justify-center">
-                      <Award className="h-8 w-8 text-asu-maroon" />
-                    </div>
-                  </div>
                 </div>
               </div>
             )}
@@ -378,21 +389,21 @@ export default function Profile() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Contact Information */}
-            <div className="bg-white rounded-2xl shadow-lg border p-6">
+            <div className="bg-white rounded-2xl shadow-lg border p-6 interactive-card animate-slide-left animate-delay-600">
               <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                <Phone className="h-5 w-5 mr-2" />
+                <Phone className="h-5 w-5 mr-2 icon-bounce" />
                 Contact Info 📞
               </h3>
               <div className="space-y-3">
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3 animate-slide-right animate-delay-700">
                   <Mail className="h-4 w-4 text-gray-400" />
                   <span className="text-gray-600">{profileData.email}</span>
                 </div>
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3 animate-slide-right animate-delay-800">
                   <Phone className="h-4 w-4 text-gray-400" />
                   <span className="text-gray-600">{profileData.phone || '(480) 555-0123'}</span>
                 </div>
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3 animate-slide-right animate-delay-900">
                   <MapPin className="h-4 w-4 text-gray-400" />
                   <span className="text-gray-600">{profileData.location || 'Phoenix, AZ'}</span>
                 </div>
@@ -400,30 +411,30 @@ export default function Profile() {
             </div>
 
             {/* Links */}
-            <div className="bg-white rounded-2xl shadow-lg border p-6">
+            <div className="bg-white rounded-2xl shadow-lg border p-6 interactive-card animate-slide-left animate-delay-700">
               <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                <LinkIcon className="h-5 w-5 mr-2" />
+                <LinkIcon className="h-5 w-5 mr-2 icon-bounce" />
                 Links 🔗
               </h3>
               <div className="space-y-3">
                 {isStudent && (
                   <>
-                    <a href={profileData.portfolio_url || '#'} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 text-asu-maroon hover:text-asu-maroon-dark transition-colors">
+                    <a href={profileData.portfolio_url || '#'} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 text-asu-maroon hover:text-asu-maroon-dark transition-colors hover-scale animate-slide-right animate-delay-800">
                       <FileText className="h-4 w-4" />
                       <span>Portfolio</span>
                     </a>
-                    <a href={profileData.github_url || '#'} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 text-asu-maroon hover:text-asu-maroon-dark transition-colors">
+                    <a href={profileData.github_url || '#'} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 text-asu-maroon hover:text-asu-maroon-dark transition-colors hover-scale animate-slide-right animate-delay-900">
                       <Code className="h-4 w-4" />
                       <span>GitHub</span>
                     </a>
                   </>
                 )}
-                <a href={profileData.linkedin_url || '#'} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 text-asu-maroon hover:text-asu-maroon-dark transition-colors">
+                <a href={profileData.linkedin_url || '#'} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 text-asu-maroon hover:text-asu-maroon-dark transition-colors hover-scale animate-slide-right animate-delay-1000">
                   <Building2 className="h-4 w-4" />
                   <span>LinkedIn</span>
                 </a>
                 {isEmployer && (
-                  <a href={profileData.website || '#'} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 text-asu-maroon hover:text-asu-maroon-dark transition-colors">
+                  <a href={profileData.website || '#'} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 text-asu-maroon hover:text-asu-maroon-dark transition-colors hover-scale animate-slide-right animate-delay-1100">
                     <LinkIcon className="h-4 w-4" />
                     <span>Company Website</span>
                   </a>
@@ -432,28 +443,28 @@ export default function Profile() {
             </div>
 
             {/* Stats */}
-            <div className="bg-gradient-to-br from-asu-maroon to-asu-maroon-dark rounded-2xl p-6 text-white">
+            <div className="bg-gradient-to-br from-asu-maroon to-asu-maroon-dark rounded-2xl p-6 text-white hover-glow animate-slide-left animate-delay-800">
               <h3 className="text-xl font-bold mb-4 flex items-center">
-                <TrendingUp className="h-5 w-5 mr-2" />
+                <TrendingUp className="h-5 w-5 mr-2 icon-bounce" />
                 Profile Stats 📊
               </h3>
               <div className="space-y-3">
-                <div className="flex justify-between">
+                <div className="flex justify-between animate-slide-right animate-delay-900">
                   <span>Profile Views</span>
                   <span className="font-bold">42</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between animate-slide-right animate-delay-1000">
                   <span>Connections</span>
                   <span className="font-bold">18</span>
                 </div>
                 {isStudent && (
-                  <div className="flex justify-between">
+                  <div className="flex justify-between animate-slide-right animate-delay-1100">
                     <span>Applications</span>
                     <span className="font-bold">7</span>
                   </div>
                 )}
                 {isEmployer && (
-                  <div className="flex justify-between">
+                  <div className="flex justify-between animate-slide-right animate-delay-1100">
                     <span>Job Posts</span>
                     <span className="font-bold">3</span>
                   </div>
@@ -465,10 +476,10 @@ export default function Profile() {
 
         {/* Save Button */}
         {isEditing && (
-          <div className="fixed bottom-8 right-8 z-50">
+          <div className="fixed bottom-8 right-8 z-50 animate-scale-in">
             <button
               onClick={handleSave}
-              className="bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-4 rounded-full shadow-2xl hover:shadow-3xl transition-shadow flex items-center space-x-3"
+              className="interactive-button bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-4 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center space-x-3 animate-bounce-gentle"
             >
               <Save className="h-5 w-5" />
               <span className="font-semibold">Save Changes</span>

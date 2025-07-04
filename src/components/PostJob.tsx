@@ -540,7 +540,7 @@ export default function PostJob() {
             {/* Tips */}
             <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-8">
               <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-green- to-green- rounded-full flex items-center justify-center">
                   <Award className="h-5 w-5 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900">Tips for Success 💡</h3>
