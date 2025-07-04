@@ -27,7 +27,10 @@ import {
   BookOpen,
   Code,
   Laptop,
-  Trophy
+  Trophy,
+  Coffee,
+  Smile,
+  Sun
 } from 'lucide-react';
 
 // Register GSAP plugins
@@ -60,9 +63,9 @@ const companyLogos = [
     color: '#1877F2'
   },
   { 
-    name: 'Netflix', 
-    logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTUuMzk4IDBoLS43OTZBMSAxIDAgMCAwIDQgMXYyMmExIDEgMCAwIDAgLjYwMi45MmwxMS4yIDIuOGMuMzA4LjA3Ny42MTgtLjEyNi42MjItLjQ0NEwyMCAzLjIzNmMwLS4zLS4yNDgtLjU0LS41NDgtLjQ5OGwtOC4wNSAxLjEwNkE1LjM5OCA1LjM5OCAwIDAgMCA1LjM5OCAwWiIgZmlsbD0iI0UyMDYxNCIvPgo8L3N2Zz4K',
-    color: '#E20614'
+    name: 'Tesla', 
+    logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDEuNUw4LjkgNC43NkM5LjYgNC4zNSAxMC40IDQuMDUgMTEuMzMgMy45MmMuNjctLjEzIDEuMzMtLjEzIDIgMGMuOTMuMTMgMS43My40MyAyLjQzLjg0bC0zLjEtMy4yNloiIGZpbGw9IiNDQzAwMDAiLz4KPHBhdGggZD0iTTEyIDIyLjVMMTUuMSAxOS4yNEMxNC40NSAxOS42NiAxMy42NSAxOS45NiAxMi42NyAyMC4wOGMtLjY3LjEzLTEuMzMuMTMtMiAwYy0uOTMtLjEzLTEuNzMtLjQzLTIuNDMtLjg0bDMuMSAzLjI2WiIgZmlsbD0iI0NDMDAwMCIvPgo8cGF0aCBkPSJNMTIgMjIuNUwxNS4xIDE5LjI0QzE0LjQ1IDE5LjY2IDEzLjY1IDE5Ljk2IDEyLjY3IDIwLjA4Yy0uNjcuMTMtMS4zMy4xMy0yIDBjLS45My0uMTMtMS43My0uNDMtMi40My04NGwzLjEgMy4yNloiIGZpbGw9IiNDQzAwMDAiLz4KPC9zdmc+',
+    color: '#CC0000'
   },
   { 
     name: 'Adobe', 
@@ -70,9 +73,14 @@ const companyLogos = [
     color: '#FF0000'
   },
   { 
-    name: 'Tesla', 
-    logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1zbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDEuNUw4LjkgNC43NkM5LjYgNC4zNSAxMC40IDQuMDUgMTEuMzMgMy45MmMuNjctLjEzIDEuMzMtLjEzIDIgDBjLjkzLjEzIDEuNzMuNDMgMi40My44NGwtMy4xLTMuMjZaIiBmaWxsPSIjQ0MwMDAwIi8+CjxwYXRoIGQ9Ik0xMiAyMi41TDE1LjEgMTkuMjRDMTQuNDUgMTkuNjYgMTMuNjUgMTkuOTYgMTIuNjcgMjAuMDhjLS42Ny4xMy0xLjMzLjEzLTIgMGMtLjkzLS4xMy0xLjczLS40My0yLjQzLS44NGwzLjEgMy4yNloiIGZpbGw9IiNDQzAwMDAiLz4KPC9zdmc+',
-    color: '#CC0000'
+    name: 'Netflix', 
+    logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1zbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTUuMzk4IDBoLS43OTZBMSAxIDAgMCAwIDQgMXYyMmExIDEgMCAwIDAgLjYwMi45MmwxMS4yIDIuOGMuMzA4LjA3Ny42MTgtLjEyNi42MjItLjQ0NEwyMCAzLjIzNmMwLS4zLS4yNDgtLjU0LS41NDgtLjQ5OGwtOC4wNSAxLjEwNkE1LjM5OCA1LjM5OCAwIDAgMCA1LjM5OCAwWiIgZmlsbD0iI0UyMDYxNCIvPgo8L3N2Zz4K',
+    color: '#E20614'
+  },
+  { 
+    name: 'Intel', 
+    logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/intel/intel-original.svg',
+    color: '#0071C5'
   },
   { 
     name: 'Spotify', 
@@ -83,11 +91,6 @@ const companyLogos = [
     name: 'Uber', 
     logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1zbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDI0QzE4LjYyNzQgMjQgMjQgMTguNjI3NCAyNCAxMkMyNCA1LjM3MjU4IDE4LjYyNzQgMCAxMiAwQzUuMzcyNTggMCAwIDUuMzcyNTggMCAxMkMwIDE4LjYyNzQgNS4zNzI1OCAyNCAxMiAyNFoiIGZpbGw9IiMwMDAwMDAiLz4KPHBhdGggZD0iTTEyIDIwQzE2LjQxODMgMjAgMjAgMTYuNDE4MyAyMCAxMkMyMCA3LjU4MTcyIDE2LjQxODMgNCAxMiA0QzcuNTgxNzIgNCA0IDcuNTgxNzIgNCAxMkM0IDE2LjQxODMgNy41ODE3MiAyMCAxMiAyMFoiIGZpbGw9IiNGRkZGRkYiLz4KPC9zdmc+',
     color: '#000000'
-  },
-  { 
-    name: 'Intel', 
-    logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/intel/intel-original.svg',
-    color: '#0071C5'
   },
   { 
     name: 'Airbnb', 
@@ -562,14 +565,14 @@ export default function LandingPage() {
             ease: 'power3.out'
           });
 
-          // gsap.from('.cta-button', {
-          //   duration: 1,
-          //   scale: 0.8,
-          //   opacity: 0,
-          //   ease: 'elastic.out(1, 0.3)',
-          //   stagger: 0.2,
-          //   delay: 0.5
-          // });
+          gsap.from('.cta-button', {
+            duration: 1,
+            scale: 0.8,
+            opacity: 0,
+            ease: 'elastic.out(1, 0.3)',
+            stagger: 0.2,
+            delay: 0.5
+          });
         }
       });
 
@@ -603,137 +606,164 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white overflow-x-hidden">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-xl z-50 border-b border-gray-100 shadow-lg">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 overflow-x-hidden">
+      {/* Hand-drawn style navigation */}
+      <nav className="fixed top-0 w-full bg-white/90 backdrop-blur-xl z-50 border-b-4 border-asu-maroon/20 shadow-lg transform rotate-0.5">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-asu-maroon via-asu-gold to-asu-maroon opacity-60"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <div className="relative">
-                <GraduationCap className="h-8 w-8 text-asu-maroon" />
+            <div className="flex items-center space-x-3 group">
+              <div className="relative transform group-hover:rotate-12 transition-transform duration-300">
+                <GraduationCap className="h-9 w-9 text-asu-maroon" />
                 <Sparkles className="sparkle absolute -top-1 -right-1 h-4 w-4 text-asu-gold" />
+                <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-asu-gold/50 rounded-full animate-pulse"></div>
               </div>
-              <span className="font-bold text-xl text-gray-900">ASU Handshake</span>
+              <span className="font-bold text-xl text-gray-900 relative">
+                ASU Handshake
+                <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-asu-maroon/30 transform -skew-x-12"></div>
+              </span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
-              <button onClick={() => scrollToSection(featuresRef)} className="text-gray-600 hover:text-asu-maroon transition-all duration-300 hover:scale-105">Features</button>
-              <button onClick={() => scrollToSection(howItWorksRef)} className="text-gray-600 hover:text-asu-maroon transition-all duration-300 hover:scale-105">How it Works</button>
-              <button onClick={() => scrollToSection(demoRef)} className="text-gray-600 hover:text-asu-maroon transition-all duration-300 hover:scale-105">Demo</button>
-              <Link to="/login" className="text-gray-600 hover:text-asu-maroon transition-all duration-300 hover:scale-105">Sign In</Link>
-              <Link to="/register" className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white px-6 py-2 rounded-full hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1">
-                Get Started
+              <button onClick={() => scrollToSection(featuresRef)} className="text-gray-600 hover:text-asu-maroon transition-all duration-300 hover:scale-105 transform hover:-rotate-1 relative group">
+                Features
+                <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-asu-maroon transition-all duration-300 group-hover:w-full transform -skew-x-12"></div>
+              </button>
+              <button onClick={() => scrollToSection(howItWorksRef)} className="text-gray-600 hover:text-asu-maroon transition-all duration-300 hover:scale-105 transform hover:rotate-1 relative group">
+                How it Works
+                <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-asu-maroon transition-all duration-300 group-hover:w-full transform skew-x-12"></div>
+              </button>
+              <button onClick={() => scrollToSection(demoRef)} className="text-gray-600 hover:text-asu-maroon transition-all duration-300 hover:scale-105 transform hover:-rotate-1 relative group">
+                Demo
+                <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-asu-maroon transition-all duration-300 group-hover:w-full transform -skew-x-12"></div>
+              </button>
+              <Link to="/login" className="text-gray-600 hover:text-asu-maroon transition-all duration-300 hover:scale-105 transform hover:rotate-1 relative group">
+                Sign In
+                <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-asu-maroon transition-all duration-300 group-hover:w-full transform skew-x-12"></div>
+              </Link>
+              <Link to="/register" className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white px-6 py-2 rounded-full hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 hover:rotate-1 relative overflow-hidden">
+                <span className="relative z-10">Get Started 🚀</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-asu-gold/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
               </Link>
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero Section - More organic and handcrafted */}
       <section ref={heroRef} className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-asu-maroon via-asu-maroon-dark to-gray-900 overflow-hidden">
-        {/* Enhanced animated background elements */}
+        {/* Hand-drawn style background elements */}
         <div className="absolute inset-0">
-          <div className="float-1 floating-element absolute top-20 left-10 w-24 h-24 bg-asu-gold/20 rounded-full blur-xl"></div>
-          <div className="float-2 floating-element absolute top-40 right-20 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-          <div className="float-3 floating-element absolute bottom-20 left-1/4 w-28 h-28 bg-asu-gold/30 rounded-full blur-xl"></div>
-          <Sparkles className="sparkle absolute top-1/4 left-1/3 h-6 w-6 text-asu-gold/50" />
-          <Sparkles className="sparkle absolute top-3/4 right-1/4 h-8 w-8 text-white/30" />
-          <Sparkles className="sparkle absolute top-1/2 left-1/5 h-4 w-4 text-asu-gold/40" />
+          <div className="float-1 floating-element absolute top-16 left-8 w-28 h-28 bg-asu-gold/20 rounded-full blur-2xl transform rotate-12"></div>
+          <div className="float-2 floating-element absolute top-32 right-16 w-36 h-36 bg-white/10 rounded-full blur-3xl transform -rotate-6"></div>
+          <div className="float-3 floating-element absolute bottom-16 left-1/3 w-32 h-32 bg-asu-gold/25 rounded-full blur-2xl transform rotate-45"></div>
+          <Sparkles className="sparkle absolute top-1/4 left-1/4 h-8 w-8 text-asu-gold/60" />
+          <Sparkles className="sparkle absolute top-3/4 right-1/3 h-6 w-6 text-white/40" />
+          <Sparkles className="sparkle absolute top-1/2 left-1/6 h-5 w-5 text-asu-gold/50" />
+          <Coffee className="sparkle absolute top-1/3 right-1/4 h-6 w-6 text-asu-gold/40" />
+          <Heart className="sparkle absolute bottom-1/3 left-1/2 h-5 w-5 text-white/30" />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="text-white">
-              <h1 className="hero-title text-5xl md:text-7xl font-bold mb-6 leading-tight">
+            <div className="text-white transform -rotate-1">
+              <h1 className="hero-title text-5xl md:text-7xl font-bold mb-6 leading-tight relative">
                 Your Career
-                <span className="block bg-gradient-to-r from-asu-gold via-yellow-300 to-asu-gold bg-clip-text text-transparent animate-pulse">
-                  Starts Here
+                <span className="block bg-gradient-to-r from-asu-gold via-yellow-300 to-asu-gold bg-clip-text text-transparent animate-pulse transform rotate-1">
+                  Starts Here ✨
                 </span>
+                <div className="absolute -top-3 -right-8 text-4xl animate-bounce">🎯</div>
               </h1>
-              <p className="hero-subtitle text-xl md:text-2xl text-gray-200 mb-8 leading-relaxed">
-                Connect with top employers, find your dream internship, and launch your career at Arizona State University's premier job platform.
+              <p className="hero-subtitle text-xl md:text-2xl text-gray-200 mb-8 leading-relaxed transform rotate-0.5">
+                Connect with amazing companies, find your dream internship, and launch your career at Arizona State University's most human job platform! 🌟
               </p>
               <div className="hero-buttons flex flex-col sm:flex-row gap-4">
-                <Link to="/register?role=student" className="group bg-gradient-to-r from-asu-gold to-yellow-300 text-asu-maroon px-8 py-4 rounded-full font-semibold text-lg hover:from-yellow-300 hover:to-asu-gold transition-all duration-500 transform hover:scale-110 hover:shadow-2xl flex items-center justify-center relative overflow-hidden">
-                  <span className="relative z-10">Find Opportunities</span>
+                <Link to="/register?role=student" className="group bg-gradient-to-r from-asu-gold to-yellow-300 text-asu-maroon px-8 py-4 rounded-full font-semibold text-lg hover:from-yellow-300 hover:to-asu-gold transition-all duration-500 transform hover:scale-110 hover:shadow-2xl hover:-rotate-1 flex items-center justify-center relative overflow-hidden">
+                  <span className="relative z-10">Find My Dream Job 🚀</span>
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-2 transition-transform duration-300 relative z-10" />
-                  <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform rotate-12"></div>
                 </Link>
-                <Link to="/register?role=employer" className="group border-2 border-white text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white hover:text-asu-maroon transition-all duration-500 transform hover:scale-110 hover:shadow-2xl flex items-center justify-center relative overflow-hidden">
-                  <span className="relative z-10">Post Jobs</span>
+                <Link to="/register?role=employer" className="group border-2 border-white text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white hover:text-asu-maroon transition-all duration-500 transform hover:scale-110 hover:shadow-2xl hover:rotate-1 flex items-center justify-center relative overflow-hidden">
+                  <span className="relative z-10">Post Amazing Jobs 💼</span>
                   <Building2 className="ml-2 h-5 w-5 group-hover:rotate-12 transition-transform duration-300 relative z-10" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform -rotate-6"></div>
                 </Link>
               </div>
             </div>
             
-            {/* Simplified Hero Image with Student */}
-            <div className="hero-mockup relative">
-              {/* Student Success Image */}
-              <div className="relative z-10 bg-white/10 backdrop-blur-2xl rounded-3xl p-8 border border-white/20 shadow-2xl">
-                {/* Student Image Container */}
-                <div className="relative w-full h-96 bg-gradient-to-br from-white/20 to-white/5 rounded-2xl overflow-hidden flex items-center justify-center">
-                  {/* Student Illustration */}
+            {/* More organic hero image */}
+            <div className="hero-mockup relative transform rotate-2">
+              <div className="relative z-10 bg-white/15 backdrop-blur-2xl rounded-3xl p-8 border-2 border-white/30 shadow-2xl transform -rotate-1">
+                <div className="relative w-full h-96 bg-gradient-to-br from-white/25 to-white/5 rounded-2xl overflow-hidden flex items-center justify-center transform rotate-1">
                   <div className="text-center">
                     <div className="text-9xl mb-4 animate-pulse">🎓</div>
-                    <div className="bg-white/90 rounded-2xl p-6 shadow-lg">
+                    <div className="bg-white/95 rounded-2xl p-6 shadow-lg transform -rotate-1">
                       <h3 className="text-2xl font-bold text-asu-maroon mb-2">Your Success Story</h3>
-                      <p className="text-gray-600 text-lg">Starts Here at ASU</p>
+                      <p className="text-gray-600 text-lg">Starts Right Here! 🌟</p>
+                      <div className="mt-3 text-sm text-gray-500">Join 15,000+ students</div>
                     </div>
                   </div>
                 </div>
 
-                {/* Floating Achievement Badges */}
-                <div className="absolute -top-4 -right-4 bg-white p-3 rounded-full shadow-lg animate-bounce">
+                {/* Organic floating badges */}
+                <div className="absolute -top-6 -right-6 bg-white p-3 rounded-full shadow-lg animate-bounce transform rotate-12">
                   <Trophy className="h-6 w-6 text-asu-maroon" />
                 </div>
-                <div className="absolute -bottom-4 -left-4 bg-asu-maroon p-3 rounded-full shadow-lg animate-pulse">
+                <div className="absolute -bottom-6 -left-6 bg-asu-maroon p-3 rounded-full shadow-lg animate-pulse transform -rotate-12">
                   <Zap className="h-6 w-6 text-white" />
                 </div>
-                <div className="absolute top-1/2 -right-6 bg-white p-2 rounded-full shadow-lg">
+                <div className="absolute top-1/2 -right-8 bg-asu-gold p-2 rounded-full shadow-lg transform rotate-45">
                   <TrendingUp className="h-5 w-5 text-asu-maroon" />
+                </div>
+                <div className="absolute bottom-8 -left-4 bg-white p-2 rounded-full shadow-lg transform -rotate-45">
+                  <Smile className="h-5 w-5 text-asu-maroon" />
                 </div>
               </div>
 
-              {/* Background decoration */}
-              <div className="absolute inset-0 bg-gradient-to-t from-asu-maroon/20 to-transparent rounded-3xl transform rotate-3 scale-105 blur-sm"></div>
+              {/* Organic background decoration */}
+              <div className="absolute inset-0 bg-gradient-to-t from-asu-maroon/20 to-transparent rounded-3xl transform rotate-6 scale-105 blur-sm"></div>
               
-              {/* Success Metrics Overlay */}
-              <div className="absolute bottom-4 left-4 success-metric bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-lg">
+              {/* Hand-drawn style success metrics */}
+              <div className="absolute bottom-6 left-6 bg-white/98 backdrop-blur-sm rounded-xl p-4 shadow-lg transform rotate-3">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-red-800">95%</div>
-                  <div className="text-xs text-gray-600 font-medium">Success Rate</div>
+                  <div className="text-2xl font-bold text-asu-maroon">95%</div>
+                  <div className="text-xs text-gray-600 font-medium">Happy Students 😊</div>
                 </div>
               </div>
               
-              <div className="absolute top-4 left-4 success-metric bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-lg">
+              <div className="absolute top-6 left-6 bg-white/98 backdrop-blur-sm rounded-xl p-4 shadow-lg transform -rotate-2">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-red-800">2.5k+</div>
-                  <div className="text-xs text-gray-600 font-medium">Jobs Posted</div>
+                  <div className="text-2xl font-bold text-asu-maroon">2.5k+</div>
+                  <div className="text-xs text-gray-600 font-medium">Dream Jobs 💼</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Enhanced scroll indicator */}
+        {/* Organic scroll indicator */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white animate-bounce">
-          <div className="flex flex-col items-center space-y-2">
-            <span className="text-sm font-medium">Scroll to explore</span>
-            <ChevronDown className="h-8 w-8" />
+          <div className="flex flex-col items-center space-y-2 transform rotate-1">
+            <span className="text-sm font-medium">Scroll for magic ✨</span>
+            <ChevronDown className="h-8 w-8 animate-pulse" />
           </div>
         </div>
       </section>
 
-      {/* Enhanced Company Logos Section */}
-      <section ref={companiesRef} className="py-20 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
+      {/* Hand-drawn style company section */}
+      <section ref={companiesRef} className="py-20 bg-gradient-to-b from-gray-50 to-white overflow-hidden relative">
+        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-transparent via-asu-maroon/30 to-transparent transform -skew-x-12"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-16">
-          <h2 className="text-reveal text-4xl md:text-5xl font-bold text-gray-900 mb-6">Trusted by Industry Leaders</h2>
-          <p className="text-reveal text-xl text-gray-600 max-w-2xl mx-auto">Join thousands of students who've found their dream jobs with top companies</p>
+          <h2 className="text-reveal text-4xl md:text-5xl font-bold text-gray-900 mb-6 transform -rotate-1">
+            Trusted by Amazing Companies 🏢
+          </h2>
+          <p className="text-reveal text-xl text-gray-600 max-w-2xl mx-auto transform rotate-0.5">
+            Join thousands of students who've found their dream jobs with these incredible companies! 🌟
+          </p>
         </div>
         <div className="relative">
           <div className="company-scroll flex space-x-16 items-center">
             {[...companyLogos, ...companyLogos].map((company, index) => (
-              <div key={index} className="company-logo flex-shrink-0 bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-110 hover:-translate-y-2 border border-gray-100">
+              <div key={index} className={`company-logo flex-shrink-0 bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-110 hover:-translate-y-2 border-2 border-gray-100 ${index % 2 === 0 ? 'rotate-1' : '-rotate-1'}`}>
                 <div className="flex items-center space-x-4">
                   <img 
                     src={company.logo} 
@@ -747,32 +777,40 @@ export default function LandingPage() {
             ))}
           </div>
           
-          {/* Gradient overlays */}
           <div className="absolute left-0 top-0 w-32 h-full bg-gradient-to-r from-white to-transparent z-10"></div>
           <div className="absolute right-0 top-0 w-32 h-full bg-gradient-to-l from-white to-transparent z-10"></div>
         </div>
       </section>
 
-      {/* Enhanced Stats Section */}
-      <section className="py-24 bg-gradient-to-r from-asu-maroon via-asu-maroon-dark to-asu-maroon relative overflow-hidden">
+      {/* Organic stats section */}
+      <section ref={statsRef} className="py-24 bg-gradient-to-r from-asu-maroon via-asu-maroon-dark to-asu-maroon relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
+        <div className="absolute top-0 left-0 w-full h-full">
+          <div className="absolute top-12 left-12 w-32 h-32 bg-asu-gold/20 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-12 right-12 w-28 h-28 bg-white/10 rounded-full blur-2xl"></div>
+          <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-asu-gold/15 rounded-full blur-xl"></div>
+        </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center text-white">
-            <div className="space-y-4 transform hover:scale-105 transition-transform duration-300">
+            <div className="stat-card space-y-4 transform hover:scale-105 transition-transform duration-300 rotate-1">
               <div className="stat-number text-5xl md:text-6xl font-bold bg-gradient-to-b from-white to-asu-gold bg-clip-text text-transparent" data-target="15000">0</div>
-              <div className="stat-label text-asu-gold font-bold text-lg">Active Students</div>
+              <div className="text-asu-gold font-bold text-lg">Happy Students 😊</div>
+              <div className="text-sm text-gray-300">Ready to succeed!</div>
             </div>
-            <div className="space-y-4 transform hover:scale-105 transition-transform duration-300">
+            <div className="stat-card space-y-4 transform hover:scale-105 transition-transform duration-300 -rotate-1">
               <div className="stat-number text-5xl md:text-6xl font-bold bg-gradient-to-b from-white to-asu-gold bg-clip-text text-transparent" data-target="500">0</div>
-              <div className="stat-label text-asu-gold font-bold text-lg">Partner Companies</div>
+              <div className="text-asu-gold font-bold text-lg">Amazing Companies 🏢</div>
+              <div className="text-sm text-gray-300">Looking for talent!</div>
             </div>
-            <div className="space-y-4 transform hover:scale-105 transition-transform duration-300">
+            <div className="stat-card space-y-4 transform hover:scale-105 transition-transform duration-300 rotate-0.5">
               <div className="stat-number text-5xl md:text-6xl font-bold bg-gradient-to-b from-white to-asu-gold bg-clip-text text-transparent" data-target="2000">0</div>
-              <div className="stat-label text-asu-gold font-bold text-lg">Job Postings</div>
+              <div className="text-asu-gold font-bold text-lg">Dream Jobs 💼</div>
+              <div className="text-sm text-gray-300">Posted monthly!</div>
             </div>
-            <div className="space-y-4 transform hover:scale-105 transition-transform duration-300">
+            <div className="stat-card space-y-4 transform hover:scale-105 transition-transform duration-300 -rotate-0.5">
               <div className="stat-number text-5xl md:text-6xl font-bold bg-gradient-to-b from-white to-asu-gold bg-clip-text text-transparent" data-target="95">0</div>
-              <div className="stat-label text-asu-gold font-bold text-lg">% Success Rate</div>
+              <div className="text-asu-gold font-bold text-lg">% Success Rate 🎯</div>
+              <div className="text-sm text-gray-300">Absolutely amazing!</div>
             </div>
           </div>
         </div>
