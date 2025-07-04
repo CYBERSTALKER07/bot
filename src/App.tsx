@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navigation from './components/Navigation';
@@ -12,6 +12,10 @@ import JobDetails from './components/JobDetails';
 import Messages from './components/Messages';
 import Applications from './components/Applications';
 import PostJob from './components/PostJob';
+import Events from './components/Events';
+import ResourceCenter from './components/ResourceCenter';
+import AdminDashboard from './components/Dashboard/AdminDashboard';
+import SplashScreen from './components/SplashScreen';
 import { Loader2 } from 'lucide-react';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -47,11 +51,30 @@ function DashboardRouter() {
   
   if (!user) return <Navigate to="/login" />;
   
+  if (user.role === 'admin') return <AdminDashboard />;
   return user.role === 'student' ? <StudentDashboard /> : <EmployerDashboard />;
 }
 
 function AppContent() {
   const { user, loading } = useAuth();
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    // Show splash screen on first load
+    const hasSeenSplash = sessionStorage.getItem('hasSeenSplash');
+    if (hasSeenSplash) {
+      setShowSplash(false);
+    }
+  }, []);
+
+  const handleSplashComplete = () => {
+    setShowSplash(false);
+    sessionStorage.setItem('hasSeenSplash', 'true');
+  };
+
+  if (showSplash) {
+    return <SplashScreen onComplete={handleSplashComplete} />;
+  }
 
   if (loading) {
     return (
@@ -78,6 +101,8 @@ function AppContent() {
         <Route path="/job/:id" element={<ProtectedRoute><JobDetails /></ProtectedRoute>} />
         <Route path="/applications" element={<ProtectedRoute><Applications /></ProtectedRoute>} />
         <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+        <Route path="/events" element={<ProtectedRoute><Events /></ProtectedRoute>} />
+        <Route path="/resources" element={<ProtectedRoute><ResourceCenter /></ProtectedRoute>} />
         
         {/* Employer Routes */}
         <Route path="/post-job" element={<ProtectedRoute><PostJob /></ProtectedRoute>} />

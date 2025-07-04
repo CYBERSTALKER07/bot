@@ -13,20 +13,8 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // Static user for demo purposes
-  const [user, setUser] = useState<User | null>({
-    id: 'demo-student-1',
-    email: 'student@asu.edu',
-    role: 'student',
-    profile: {
-      id: 'demo-student-1',
-      username: 'student',
-      full_name: 'Demo Student',
-      bio: 'Computer Science student at ASU',
-      avatar_url: null,
-      website: null
-    }
-  });
+  // Start with no user - users must log in to access protected routes
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
 
   const login = async (email: string, password: string, role: 'student' | 'employer') => {
@@ -44,7 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           id: 'demo-student-1',
           username: email.split('@')[0],
           full_name: 'Demo Student',
-          bio: 'Computer Science student at ASU',
+          bio: 'Computer Science student at AUT',
           avatar_url: null,
           website: null
         }
@@ -86,7 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           id: 'demo-student-new',
           username: email.split('@')[0],
           full_name: 'New Student',
-          bio: 'New ASU student',
+          bio: 'New AUT student',
           avatar_url: null,
           website: null
         }

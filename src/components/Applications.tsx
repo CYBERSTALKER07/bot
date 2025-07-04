@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { 
   Clock, 
   CheckCircle, 
@@ -15,13 +17,97 @@ import {
 } from 'lucide-react';
 import { Application, Job } from '../types';
 
+// Register GSAP plugins
+gsap.registerPlugin(ScrollTrigger);
+
 interface ApplicationWithJob extends Application {
   job: Job;
 }
 
 export default function Applications() {
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const containerRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const statsRef = useRef<HTMLDivElement>(null);
+  const filtersRef = useRef<HTMLDivElement>(null);
+
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Header animation
+      gsap.from(headerRef.current, {
+        duration: 1,
+        y: -50,
+        opacity: 0,
+        ease: 'power3.out'
+      });
+
+      // Stats cards animation
+      gsap.from('.stat-card', {
+        duration: 0.8,
+        y: 30,
+        opacity: 0,
+        scale: 0.9,
+        ease: 'back.out(1.7)',
+        stagger: 0.1,
+        delay: 0.3
+      });
+
+      // Filters animation
+      gsap.from(filtersRef.current, {
+        duration: 0.8,
+        y: 20,
+        opacity: 0,
+        ease: 'power2.out',
+        delay: 0.5
+      });
+
+      // Application cards animation
+      ScrollTrigger.create({
+        trigger: '.applications-list',
+        start: 'top 80%',
+        onEnter: () => {
+          gsap.from('.application-card', {
+            duration: 0.6,
+            y: 40,
+            opacity: 0,
+            scale: 0.95,
+            ease: 'power2.out',
+            stagger: 0.1
+          });
+        }
+      });
+
+      // Hover animations for cards
+      gsap.utils.toArray('.application-card').forEach((card: any) => {
+        const tl = gsap.timeline({ paused: true });
+        tl.to(card, {
+          y: -5,
+          scale: 1.02,
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          duration: 0.3,
+          ease: 'power2.out'
+        });
+
+        card.addEventListener('mouseenter', () => tl.play());
+        card.addEventListener('mouseleave', () => tl.reverse());
+      });
+
+      // Status badge animations
+      gsap.from('.status-badge', {
+        duration: 0.8,
+        scale: 0,
+        opacity: 0,
+        ease: 'elastic.out(1, 0.3)',
+        stagger: 0.05,
+        delay: 1
+      });
+
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
 
   // Mock applications data
   const applications: ApplicationWithJob[] = [
@@ -36,16 +122,16 @@ export default function Applications() {
       updated_at: '2024-01-12',
       job: {
         id: '1',
-        title: 'Software Engineering Intern',
-        company: 'Intel Corporation',
+        title: 'Software Engineer Intern',
+        company: 'Google',
         type: 'internship',
-        location: 'Phoenix, AZ',
+        location: 'Mountain View, CA',
         salary: '$25-30/hour',
-        description: 'Join our software engineering team...',
+        description: 'Join our team to work on cutting-edge projects...',
         requirements: [],
-        skills: ['Python', 'Java', 'React'],
+        skills: ['JavaScript', 'React', 'Node.js'],
         posted_date: '2024-01-05',
-        deadline: '2024-03-01',
+        deadline: '2024-02-15',
         applicants_count: 127,
         employer_id: 'employer-1',
         created_at: '2024-01-05',
@@ -132,11 +218,11 @@ export default function Applications() {
     }
   ];
 
-  const filteredApplications = applications.filter(app => {
-    const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
-    const matchesSearch = app.job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         app.job.company.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesStatus && matchesSearch;
+  const filteredApplications = applications.filter(application => {
+    const matchesSearch = application.job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         application.job.company.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || application.status === statusFilter;
+    return matchesSearch && matchesStatus;
   });
 
   const getStatusIcon = (status: string) => {
@@ -172,7 +258,7 @@ export default function Applications() {
   const getStatusText = (status: string) => {
     switch (status) {
       case 'pending':
-        return 'Under Review';
+        return 'Pending';
       case 'reviewed':
         return 'Reviewed';
       case 'accepted':
@@ -180,7 +266,7 @@ export default function Applications() {
       case 'rejected':
         return 'Not Selected';
       default:
-        return status;
+        return 'Unknown';
     }
   };
 
@@ -193,39 +279,39 @@ export default function Applications() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
+    <div ref={containerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div ref={headerRef} className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">My Applications</h1>
         <p className="text-gray-600">Track the status of your job applications</p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-        <div className="bg-white rounded-lg shadow-sm border p-6">
+      {/* Enhanced Stats Cards */}
+      <div ref={statsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        <div className="stat-card bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow">
           <div className="text-center">
             <div className="text-2xl font-bold text-gray-900">{statusCounts.all}</div>
             <div className="text-sm text-gray-600">Total Applications</div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border p-6">
+        <div className="stat-card bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow">
           <div className="text-center">
             <div className="text-2xl font-bold text-yellow-600">{statusCounts.pending}</div>
             <div className="text-sm text-gray-600">Pending</div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border p-6">
+        <div className="stat-card bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow">
           <div className="text-center">
             <div className="text-2xl font-bold text-blue-600">{statusCounts.reviewed}</div>
             <div className="text-sm text-gray-600">Reviewed</div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border p-6">
+        <div className="stat-card bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow">
           <div className="text-center">
             <div className="text-2xl font-bold text-green-600">{statusCounts.accepted}</div>
             <div className="text-sm text-gray-600">Accepted</div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border p-6">
+        <div className="stat-card bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow">
           <div className="text-center">
             <div className="text-2xl font-bold text-red-600">{statusCounts.rejected}</div>
             <div className="text-sm text-gray-600">Not Selected</div>
@@ -233,8 +319,8 @@ export default function Applications() {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
+      {/* Enhanced Filters */}
+      <div ref={filtersRef} className="bg-white rounded-lg shadow-sm border p-6 mb-8">
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -263,10 +349,10 @@ export default function Applications() {
         </div>
       </div>
 
-      {/* Applications List */}
-      <div className="space-y-6">
+      {/* Enhanced Applications List */}
+      <div className="applications-list space-y-6">
         {filteredApplications.map((application) => (
-          <div key={application.id} className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow">
+          <div key={application.id} className="application-card bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow">
             <div className="p-6">
               <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
                 <div className="flex-1">
@@ -287,7 +373,7 @@ export default function Applications() {
                     </div>
                     <div className="flex items-center space-x-2">
                       {getStatusIcon(application.status)}
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(application.status)}`}>
+                      <span className={`status-badge px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(application.status)}`}>
                         {getStatusText(application.status)}
                       </span>
                     </div>
@@ -311,27 +397,23 @@ export default function Applications() {
 
                   <div className="flex flex-wrap gap-2 mb-4">
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      application.job.type === 'internship' ? 'bg-blue-100 text-blue-800' :
-                      application.job.type === 'full-time' ? 'bg-green-100 text-green-800' :
-                      'bg-yellow-100 text-yellow-800'
+                      application.job.type === 'internship' 
+                        ? 'bg-blue-100 text-blue-800' 
+                        : 'bg-green-100 text-green-800'
                     }`}>
-                      {application.job.type.replace('-', ' ').toUpperCase()}
+                      {application.job.type}
                     </span>
-                    {application.job.skills.slice(0, 3).map((skill) => (
-                      <span
-                        key={skill}
-                        className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
+                    {application.job.skills.map((skill, index) => (
+                      <span 
+                        key={index}
+                        className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm"
                       >
                         {skill}
                       </span>
                     ))}
-                    {application.job.skills.length > 3 && (
-                      <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
-                        +{application.job.skills.length - 3} more
-                      </span>
-                    )}
                   </div>
 
+                  {/* Status-specific content */}
                   {application.status === 'accepted' && (
                     <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-4">
                       <div className="flex items-center space-x-2">

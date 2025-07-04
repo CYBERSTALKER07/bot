@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { 
   Calendar, 
   MapPin, 
@@ -11,105 +13,204 @@ import {
   Plus,
   ExternalLink,
   Bookmark,
-  BookmarkPlus
+  BookmarkPlus,
+  Star,
+  TrendingUp,
+  Award
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Event } from '../types';
 
+// Register GSAP plugins
+gsap.registerPlugin(ScrollTrigger);
+
 export default function Events() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const statsRef = useRef<HTMLDivElement>(null);
+  const filtersRef = useRef<HTMLDivElement>(null);
+  const eventsRef = useRef<HTMLDivElement>(null);
+
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
-  const [dateFilter, setDateFilter] = useState('upcoming');
-  
+  const [dateFilter, setDateFilter] = useState('all');
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Header animation
+      gsap.from(headerRef.current, {
+        duration: 1.2,
+        y: -60,
+        opacity: 0,
+        ease: 'power3.out'
+      });
+
+      // Stats cards animation
+      gsap.from('.event-stat', {
+        duration: 0.8,
+        y: 40,
+        opacity: 0,
+        scale: 0.9,
+        ease: 'back.out(1.7)',
+        stagger: 0.15,
+        delay: 0.3
+      });
+
+      // Filters animation
+      gsap.from(filtersRef.current, {
+        duration: 0.8,
+        y: 30,
+        opacity: 0,
+        ease: 'power2.out',
+        delay: 0.6
+      });
+
+      // Event cards scroll trigger animation
+      ScrollTrigger.create({
+        trigger: eventsRef.current,
+        start: 'top 80%',
+        onEnter: () => {
+          gsap.from('.event-card', {
+            duration: 0.6,
+            y: 50,
+            opacity: 0,
+            scale: 0.95,
+            ease: 'power2.out',
+            stagger: 0.1
+          });
+        }
+      });
+
+      // Enhanced hover animations for event cards
+      gsap.utils.toArray('.event-card').forEach((card: any) => {
+        const tl = gsap.timeline({ paused: true });
+        tl.to(card, {
+          y: -8,
+          scale: 1.02,
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          duration: 0.4,
+          ease: 'power2.out'
+        });
+
+        card.addEventListener('mouseenter', () => tl.play());
+        card.addEventListener('mouseleave', () => tl.reverse());
+      });
+
+      // Animate event type badges
+      gsap.from('.event-badge', {
+        duration: 0.6,
+        scale: 0,
+        opacity: 0,
+        ease: 'elastic.out(1, 0.3)',
+        stagger: 0.05,
+        delay: 1.2
+      });
+
+      // Animate bookmark buttons
+      gsap.utils.toArray('.bookmark-event').forEach((btn: any) => {
+        const tl = gsap.timeline({ paused: true });
+        tl.to(btn, {
+          scale: 1.2,
+          rotation: 10,
+          duration: 0.3,
+          ease: 'back.out(1.7)'
+        });
+
+        btn.addEventListener('mouseenter', () => tl.play());
+        btn.addEventListener('mouseleave', () => tl.reverse());
+      });
+
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
+
   // Mock events data
   const events: Event[] = [
     {
       id: '1',
-      title: 'Fall 2024 Career Fair',
-      description: 'Connect with top employers from tech, finance, healthcare, and more. Bring your resume and dress professionally.',
+      title: 'Tech Career Fair 2024',
+      description: 'Connect with top tech companies including Google, Microsoft, Apple, and more. Explore internship and full-time opportunities.',
       type: 'career_fair',
-      location: 'ASU Memorial Union Ballroom',
-      start_date: '2024-10-15T09:00:00Z',
-      end_date: '2024-10-15T16:00:00Z',
-      capacity: 500,
-      registered_count: 387,
-      organizer_id: 'admin-1',
-      organizer_type: 'admin',
-      status: 'published',
-      requirements: ['Bring printed resumes', 'Business professional attire'],
-      tags: ['career', 'networking', 'jobs'],
-      image_url: 'https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg',
-      created_at: '2024-09-01T00:00:00Z',
-      updated_at: '2024-09-15T00:00:00Z'
+      date: '2024-02-15',
+      time: '10:00 AM - 4:00 PM',
+      location: 'AUT Tempe Campus - Memorial Union',
+      is_virtual: false,
+      attendees_count: 450,
+      max_attendees: 500,
+      organizer: 'AUT Career Services',
+      created_at: '2024-01-15',
+      updated_at: '2024-01-15'
     },
     {
       id: '2',
       title: 'Resume Writing Workshop',
-      description: 'Learn how to craft a compelling resume that stands out to employers. Interactive session with personalized feedback.',
+      description: 'Learn how to craft compelling resumes that get noticed by recruiters. Get personalized feedback from career experts.',
       type: 'workshop',
+      date: '2024-02-08',
+      time: '2:00 PM - 4:00 PM',
       location: 'Virtual Event',
-      virtual_link: 'https://zoom.us/j/example',
-      start_date: '2024-09-25T14:00:00Z',
-      end_date: '2024-09-25T16:00:00Z',
-      capacity: 50,
-      registered_count: 42,
-      organizer_id: 'admin-2',
-      organizer_type: 'admin',
-      status: 'published',
-      requirements: ['Bring current resume draft', 'Laptop or tablet'],
-      tags: ['resume', 'workshop', 'career development'],
-      created_at: '2024-09-01T00:00:00Z',
-      updated_at: '2024-09-10T00:00:00Z'
+      is_virtual: true,
+      attendees_count: 85,
+      max_attendees: 100,
+      organizer: 'Career Development Center',
+      created_at: '2024-01-20',
+      updated_at: '2024-01-20'
     },
     {
       id: '3',
-      title: 'Intel Information Session',
-      description: 'Learn about internship and full-time opportunities at Intel. Q&A session with current engineers and recruiters.',
+      title: 'Google Information Session',
+      description: 'Join Google engineers and recruiters to learn about internship programs, company culture, and application tips.',
       type: 'info_session',
-      location: 'Engineering Center Room 202',
-      start_date: '2024-10-05T18:00:00Z',
-      end_date: '2024-10-05T19:30:00Z',
-      capacity: 100,
-      registered_count: 78,
-      organizer_id: 'employer-1',
-      organizer_type: 'employer',
-      status: 'published',
-      requirements: ['RSVP required'],
-      tags: ['intel', 'technology', 'internships'],
-      created_at: '2024-09-15T00:00:00Z',
-      updated_at: '2024-09-20T00:00:00Z'
+      date: '2024-02-12',
+      time: '6:00 PM - 7:30 PM',
+      location: 'Engineering Center G-Wing',
+      is_virtual: false,
+      attendees_count: 120,
+      max_attendees: 150,
+      organizer: 'Google',
+      created_at: '2024-01-18',
+      updated_at: '2024-01-18'
     },
     {
       id: '4',
-      title: 'Tech Industry Networking Night',
-      description: 'Network with alumni and professionals in the technology industry. Casual networking with refreshments provided.',
+      title: 'Interview Skills Webinar',
+      description: 'Master the art of interviewing with tips from industry professionals. Includes mock interview sessions.',
+      type: 'webinar',
+      date: '2024-02-20',
+      time: '7:00 PM - 8:30 PM',
+      location: 'Online',
+      is_virtual: true,
+      attendees_count: 200,
+      max_attendees: 300,
+      organizer: 'AUT Alumni Network',
+      created_at: '2024-01-25',
+      updated_at: '2024-01-25'
+    },
+    {
+      id: '5',
+      title: 'Startup Networking Night',
+      description: 'Network with local entrepreneurs and startup founders. Perfect for students interested in the startup ecosystem.',
       type: 'networking',
-      location: 'ASU SkySong Innovation Center',
-      start_date: '2024-10-20T17:00:00Z',
-      end_date: '2024-10-20T20:00:00Z',
-      capacity: 150,
-      registered_count: 89,
-      organizer_id: 'admin-3',
-      organizer_type: 'admin',
-      status: 'published',
-      requirements: ['Business casual attire', 'Bring business cards if available'],
-      tags: ['networking', 'technology', 'alumni'],
-      created_at: '2024-09-10T00:00:00Z',
-      updated_at: '2024-09-25T00:00:00Z'
+      date: '2024-02-25',
+      time: '5:30 PM - 8:00 PM',
+      location: 'SkySong Innovation Center',
+      is_virtual: false,
+      attendees_count: 75,
+      max_attendees: 120,
+      organizer: 'AUT Entrepreneurship Club',
+      created_at: '2024-01-30',
+      updated_at: '2024-01-30'
     }
   ];
 
   const filteredEvents = events.filter(event => {
     const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         event.description.toLowerCase().includes(searchTerm.toLowerCase());
+                         event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         event.organizer.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = typeFilter === 'all' || event.type === typeFilter;
-    
-    const eventDate = new Date(event.start_date);
-    const now = new Date();
-    const matchesDate = dateFilter === 'all' || 
-                       (dateFilter === 'upcoming' && eventDate > now) ||
-                       (dateFilter === 'past' && eventDate < now);
+    const matchesDate = dateFilter === 'all'; // Implement date filtering logic as needed
     
     return matchesSearch && matchesType && matchesDate;
   });
@@ -131,62 +232,128 @@ export default function Events() {
     }
   };
 
-  const formatEventType = (type: string) => {
-    return type.split('_').map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ');
+  const getEventTypeIcon = (type: string) => {
+    switch (type) {
+      case 'career_fair':
+        return <Users className="h-4 w-4" />;
+      case 'workshop':
+        return <Award className="h-4 w-4" />;
+      case 'info_session':
+        return <ExternalLink className="h-4 w-4" />;
+      case 'webinar':
+        return <Video className="h-4 w-4" />;
+      case 'networking':
+        return <Star className="h-4 w-4" />;
+      default:
+        return <Calendar className="h-4 w-4" />;
+    }
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    });
-  };
-
-  const isUpcoming = (dateString: string) => {
-    return new Date(dateString) > new Date();
-  };
-
-  const handleRegister = (eventId: string) => {
-    // In real implementation, this would call Supabase
-    alert('Registration successful! Check your email for event details.');
+  const eventStats = {
+    total: events.length,
+    thisWeek: events.filter(event => {
+      const eventDate = new Date(event.date);
+      const now = new Date();
+      const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+      return eventDate >= now && eventDate <= weekFromNow;
+    }).length,
+    virtual: events.filter(event => event.is_virtual).length,
+    registered: 3 // Mock registered events count
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Events</h1>
-            <p className="text-gray-600">Discover career fairs, workshops, and networking opportunities</p>
+    <div ref={containerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Enhanced Header */}
+      <div ref={headerRef} className="mb-8">
+        <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-8 text-white">
+          <h1 className="text-4xl font-bold mb-2">Career Events & Workshops</h1>
+          <p className="text-xl text-gray-200 mb-4">Boost your career with networking events, workshops, and company sessions</p>
+          <div className="flex flex-wrap gap-4 text-sm">
+            <div className="flex items-center space-x-2">
+              <TrendingUp className="h-5 w-5" />
+              <span>5 events this week</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Users className="h-5 w-5" />
+              <span>1,000+ students attending</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Star className="h-5 w-5" />
+              <span>Top companies participating</span>
+            </div>
           </div>
-          {user?.role === 'admin' && (
-            <Link
-              to="/create-event"
-              className="mt-4 sm:mt-0 bg-asu-maroon text-white px-6 py-3 rounded-md hover:bg-asu-maroon-dark transition-colors flex items-center space-x-2"
-            >
-              <Plus className="h-5 w-5" />
-              <span>Create Event</span>
-            </Link>
-          )}
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
+      {/* Enhanced Stats Dashboard */}
+      <div ref={statsRef} className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="event-stat bg-white rounded-xl shadow-lg border p-6 hover:shadow-xl transition-shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 mb-1">Total Events</p>
+              <p className="text-3xl font-bold text-gray-900">{eventStats.total}</p>
+            </div>
+            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+              <Calendar className="h-6 w-6 text-blue-600" />
+            </div>
+          </div>
+          <div className="mt-4 flex items-center text-green-600 text-sm">
+            <TrendingUp className="h-4 w-4 mr-1" />
+            <span>Always growing</span>
+          </div>
+        </div>
+
+        <div className="event-stat bg-white rounded-xl shadow-lg border p-6 hover:shadow-xl transition-shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 mb-1">This Week</p>
+              <p className="text-3xl font-bold text-gray-900">{eventStats.thisWeek}</p>
+            </div>
+            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+              <Clock className="h-6 w-6 text-green-600" />
+            </div>
+          </div>
+          <div className="mt-4 flex items-center text-blue-600 text-sm">
+            <Calendar className="h-4 w-4 mr-1" />
+            <span>Don't miss out</span>
+          </div>
+        </div>
+
+        <div className="event-stat bg-white rounded-xl shadow-lg border p-6 hover:shadow-xl transition-shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 mb-1">Virtual Events</p>
+              <p className="text-3xl font-bold text-gray-900">{eventStats.virtual}</p>
+            </div>
+            <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+              <Video className="h-6 w-6 text-purple-600" />
+            </div>
+          </div>
+          <div className="mt-4 flex items-center text-green-600 text-sm">
+            <TrendingUp className="h-4 w-4 mr-1" />
+            <span>Join from anywhere</span>
+          </div>
+        </div>
+
+        <div className="event-stat bg-white rounded-xl shadow-lg border p-6 hover:shadow-xl transition-shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 mb-1">My Registered</p>
+              <p className="text-3xl font-bold text-gray-900">{eventStats.registered}</p>
+            </div>
+            <div className="w-12 h-12 bg-asu-maroon/10 rounded-full flex items-center justify-center">
+              <Bookmark className="h-6 w-6 text-asu-maroon" />
+            </div>
+          </div>
+          <div className="mt-4 flex items-center text-blue-600 text-sm">
+            <Clock className="h-4 w-4 mr-1" />
+            <span>Ready to attend</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Enhanced Filters */}
+      <div ref={filtersRef} className="bg-white rounded-xl shadow-lg border p-6 mb-8">
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -195,7 +362,7 @@ export default function Events() {
               placeholder="Search events..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
             />
           </div>
           <div className="flex items-center space-x-4">
@@ -204,7 +371,7 @@ export default function Events() {
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent"
+                className="px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
               >
                 <option value="all">All Types</option>
                 <option value="career_fair">Career Fairs</option>
@@ -214,110 +381,82 @@ export default function Events() {
                 <option value="networking">Networking</option>
               </select>
             </div>
-            <select
-              value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
-              className="px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent"
-            >
-              <option value="upcoming">Upcoming</option>
-              <option value="past">Past Events</option>
-              <option value="all">All Events</option>
-            </select>
+            {user?.role === 'employer' && (
+              <Link
+                to="/create-event"
+                className="flex items-center space-x-2 bg-aut-maroon text-white px-4 py-3 rounded-lg hover:bg-aut-maroon-dark transition-colors"
+              >
+                <Plus className="h-5 w-5" />
+                <span>Create Event</span>
+              </Link>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Events Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Enhanced Events Grid */}
+      <div ref={eventsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredEvents.map((event) => (
-          <div key={event.id} className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-md transition-shadow">
-            {event.image_url && (
-              <div className="h-48 overflow-hidden">
-                <img
-                  src={event.image_url}
-                  alt={event.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
+          <div key={event.id} className="event-card bg-white rounded-xl shadow-lg border hover:shadow-xl transition-all duration-300">
             <div className="p-6">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${getEventTypeColor(event.type)}`}>
-                    {formatEventType(event.type)}
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center space-x-2">
+                  <span className={`event-badge px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1 ${getEventTypeColor(event.type)}`}>
+                    {getEventTypeIcon(event.type)}
+                    <span className="capitalize">{event.type.replace('_', ' ')}</span>
                   </span>
+                  {event.is_virtual && (
+                    <span className="event-badge px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                      Virtual
+                    </span>
+                  )}
                 </div>
-                <button className="text-gray-400 hover:text-asu-maroon transition-colors">
+                <button className="bookmark-event p-2 text-gray-400 hover:text-aut-maroon transition-colors">
                   <BookmarkPlus className="h-5 w-5" />
                 </button>
               </div>
 
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">{event.title}</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3 leading-tight">{event.title}</h3>
+              
               <p className="text-gray-600 text-sm mb-4 line-clamp-3">{event.description}</p>
 
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <div className="space-y-2 mb-4 text-sm text-gray-600">
+                <div className="flex items-center space-x-2">
                   <Calendar className="h-4 w-4" />
-                  <span>{formatDate(event.start_date)}</span>
+                  <span>{new Date(event.date).toLocaleDateString()} at {event.time}</span>
                 </div>
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
-                  <Clock className="h-4 w-4" />
-                  <span>{formatTime(event.start_date)} - {formatTime(event.end_date)}</span>
+                <div className="flex items-center space-x-2">
+                  {event.is_virtual ? <Video className="h-4 w-4" /> : <MapPin className="h-4 w-4" />}
+                  <span>{event.location}</span>
                 </div>
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
-                  {event.virtual_link ? (
-                    <>
-                      <Video className="h-4 w-4" />
-                      <span>Virtual Event</span>
-                    </>
-                  ) : (
-                    <>
-                      <MapPin className="h-4 w-4" />
-                      <span>{event.location}</span>
-                    </>
-                  )}
-                </div>
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                <div className="flex items-center space-x-2">
                   <Users className="h-4 w-4" />
-                  <span>{event.registered_count}/{event.capacity || '∞'} registered</span>
+                  <span>{event.attendees_count}/{event.max_attendees} attendees</span>
                 </div>
               </div>
 
-              {event.tags && event.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1 mb-4">
-                  {event.tags.slice(0, 3).map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs"
-                    >
-                      #{tag}
-                    </span>
-                  ))}
-                  {event.tags.length > 3 && (
-                    <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">
-                      +{event.tags.length - 3} more
-                    </span>
-                  )}
+              <div className="mb-4">
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-aut-maroon h-2 rounded-full transition-all duration-300" 
+                    style={{ width: `${(event.attendees_count / event.max_attendees) * 100}%` }}
+                  ></div>
                 </div>
-              )}
+                <p className="text-xs text-gray-500 mt-1">
+                  {event.max_attendees - event.attendees_count} spots remaining
+                </p>
+              </div>
 
-              <div className="flex space-x-2">
-                <Link
-                  to={`/event/${event.id}`}
-                  className="flex-1 border border-asu-maroon text-asu-maroon px-4 py-2 rounded-md hover:bg-asu-maroon hover:text-white transition-colors text-center flex items-center justify-center space-x-1"
-                >
-                  <span>View Details</span>
+              <p className="text-sm text-gray-500 mb-6">Organized by {event.organizer}</p>
+
+              <div className="flex space-x-3">
+                <button className="flex-1 bg-aut-maroon text-white px-4 py-2 rounded-lg hover:bg-aut-maroon-dark transition-colors font-medium">
+                  Register Now
+                </button>
+                <button className="px-4 py-2 border border-aut-maroon text-aut-maroon rounded-lg hover:bg-aut-maroon hover:text-white transition-colors flex items-center space-x-1">
                   <ExternalLink className="h-4 w-4" />
-                </Link>
-                {user?.role === 'student' && isUpcoming(event.start_date) && (
-                  <button
-                    onClick={() => handleRegister(event.id)}
-                    className="flex-1 bg-asu-maroon text-white px-4 py-2 rounded-md hover:bg-asu-maroon-dark transition-colors"
-                    disabled={event.capacity && event.registered_count >= event.capacity}
-                  >
-                    {event.capacity && event.registered_count >= event.capacity ? 'Full' : 'Register'}
-                  </button>
-                )}
+                  <span>Details</span>
+                </button>
               </div>
             </div>
           </div>
@@ -325,15 +464,24 @@ export default function Events() {
       </div>
 
       {filteredEvents.length === 0 && (
-        <div className="text-center py-12 bg-white rounded-lg shadow-sm border">
-          <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No events found</h3>
-          <p className="text-gray-600">
-            {searchTerm || typeFilter !== 'all' || dateFilter !== 'upcoming'
-              ? 'Try adjusting your search criteria or filters'
-              : 'No events are currently scheduled'
-            }
+        <div className="text-center py-12 bg-white rounded-xl shadow-lg border">
+          <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Calendar className="h-12 w-12 text-gray-400" />
+          </div>
+          <h3 className="text-2xl font-semibold text-gray-900 mb-3">No events found</h3>
+          <p className="text-gray-600 mb-6 max-w-md mx-auto">
+            Try adjusting your search criteria or check back later for new events.
           </p>
+          <button 
+            onClick={() => {
+              setSearchTerm('');
+              setTypeFilter('all');
+              setDateFilter('all');
+            }}
+            className="bg-aut-maroon text-white px-6 py-3 rounded-lg hover:bg-aut-maroon-dark transition-colors"
+          >
+            Clear Filters
+          </button>
         </div>
       )}
     </div>

@@ -843,7 +843,7 @@ export default function LandingPage() {
                 size: "medium"
               }
             ].map((feature, index) => (
-              <div key={index} className={`feature-card group relative bg-white rounded-2xl p-6 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 hover:border-asu-maroon/20 break-inside-avoid mb-6 ${feature.size === 'large' ? 'lg:p-8' : feature.size === 'medium' ? 'lg:p-7' : 'lg:p-6'}`}>
+              <div key={index} className={`feature-card group relative bg-white rounded-2xl p-6 hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 hover:border-asu-maroon/20 break-inside-avoid mb-6 ${feature.size === 'large' ? 'lg:p-8' : feature.size === 'medium' ? 'lg:p-7' : 'lg:p-6'}`}>
                 <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-5 rounded-2xl transition-opacity duration-500`}></div>
                 <div className="relative z-10">
                   <div className={`feature-icon mb-4 w-16 h-16 bg-gradient-to-br ${feature.gradient === "from-white to-gray-100" ? "from-asu-maroon to-asu-maroon-dark" : feature.gradient} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500 shadow-lg`}>
