@@ -23,8 +23,26 @@ import {
   Users,
   Settings,
   FileText,
-  Zap
+  Zap,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
+import { 
+  AccountCircle,
+  Business,
+  School,
+  AutoAwesome,
+  Person,
+  Work,
+  Group,
+  Dashboard,
+  Assignment,
+  Chat,
+  Event,
+  MenuBook,
+  Bolt,
+  Waving
+} from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navigation() {
@@ -32,74 +50,123 @@ export default function Navigation() {
   const location = useLocation();
   const navigate = useNavigate();
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
 
+  // Check screen size and update responsive state
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Simple navigation items animation - removed problematic opacity animation
-      gsap.from('.nav-item', {
-        duration: 0.4,
-        x: -15,
-        ease: 'power2.out',
-        stagger: 0.05,
-        delay: 0.1
-      });
+    const checkScreenSize = () => {
+      const width = window.innerWidth;
+      setIsMobile(width < 768);
+      setIsTablet(width >= 768 && width < 1024);
+      
+      // Auto-collapse sidebar on tablet
+      if (width < 1024) {
+        setIsCollapsed(true);
+      }
+    };
 
-      // Floating animations for decorative elements
-      gsap.to('.nav-decoration', {
-        y: -3,
-        x: 2,
-        rotation: 180,
-        duration: 4,
-        repeat: -1,
-        yoyo: true,
-        ease: 'power1.inOut'
-      });
-
-    }, sidebarRef);
-
-    return () => ctx.revert();
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
+
+  // Handle mobile menu animations
+  useEffect(() => {
+    if (isMobileMenuOpen && mobileMenuRef.current) {
+      gsap.fromTo(mobileMenuRef.current, 
+        { opacity: 0, y: -20 },
+        { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }
+      );
+      gsap.fromTo('.mobile-nav-item', 
+        { opacity: 0, x: -20 },
+        { opacity: 1, x: 0, duration: 0.4, stagger: 0.1, delay: 0.1 }
+      );
+    }
+  }, [isMobileMenuOpen]);
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+    setActiveDropdown(null);
+  }, [location.pathname]);
+
+  // Desktop sidebar animations
+  useEffect(() => {
+    if (!isMobile) {
+      const ctx = gsap.context(() => {
+        gsap.from('.nav-item', {
+          duration: 0.4,
+          x: -15,
+          ease: 'power2.out',
+          stagger: 0.05,
+          delay: 0.1
+        });
+
+        gsap.to('.nav-decoration', {
+          y: -3,
+          x: 2,
+          rotation: 180,
+          duration: 4,
+          repeat: -1,
+          yoyo: true,
+          ease: 'power1.inOut'
+        });
+      }, sidebarRef);
+
+      return () => ctx.revert();
+    }
+  }, [isMobile]);
 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
 
-  // Show simple top nav for non-authenticated users
+  // Show mobile-friendly top nav for non-authenticated users
   if (!user) {
     return (
       <nav className="bg-white shadow-lg border-b-2 border-asu-maroon/20 relative z-50">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-asu-maroon via-asu-gold to-asu-maroon"></div>
-        <Coffee className="nav-decoration absolute top-1 right-40 h-3 w-3 text-asu-gold" />
-        <Star className="nav-decoration absolute bottom-1 right-60 h-2 w-2 text-asu-maroon" />
+        <Coffee className="nav-decoration absolute top-1 right-40 h-3 w-3 text-asu-gold hidden sm:block" />
+        <Star className="nav-decoration absolute bottom-1 right-60 h-2 w-2 text-asu-maroon hidden sm:block" />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link to="/" className="flex items-center space-x-3 group transform hover:scale-105 transition-all duration-300">
+            <Link to="/" className="flex items-center space-x-2 sm:space-x-3 group transform hover:scale-105 transition-all duration-300">
               <div className="relative">
-                <GraduationCap className="h-9 w-9 text-asu-maroon group-hover:text-asu-gold transition-colors duration-300 group-hover:rotate-12" />
-                <Sparkles className="nav-decoration absolute -top-1 -right-1 h-4 w-4 text-asu-gold" />
-                <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-asu-gold rounded-full animate-pulse"></div>
+                <GraduationCap className="h-8 w-8 sm:h-9 sm:w-9 text-asu-maroon group-hover:text-asu-gold transition-colors duration-300 group-hover:rotate-12" />
+                <AutoAwesome className="nav-decoration absolute -top-1 -right-1 h-3 w-3 sm:h-4 sm:w-4 text-asu-gold hidden sm:block" />
+                <div className="absolute -bottom-1 -left-1 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-asu-gold rounded-full animate-pulse"></div>
               </div>
-              <span className="font-bold text-xl text-gray-900 relative">
-                ASU Handshake
+              <span className="font-bold text-lg sm:text-xl text-gray-900 relative">
+                <span className="hidden sm:inline">ASU Handshake</span>
+                <span className="sm:hidden">ASU</span>
                 <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-asu-maroon transform -skew-x-12"></div>
               </span>
             </Link>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <Link
                 to="/login"
-                className="text-gray-600 hover:text-asu-maroon transition-all duration-300 hover:scale-105 transform hover:-rotate-1 relative group"
+                className="text-gray-600 hover:text-asu-maroon transition-all duration-300 hover:scale-105 transform hover:-rotate-1 relative group text-sm sm:text-base"
               >
-                Sign In
+                <span className="hidden sm:inline">Sign In</span>
+                <span className="sm:hidden">Login</span>
                 <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-asu-maroon transition-all duration-300 group-hover:w-full transform -skew-x-12"></div>
               </Link>
               <Link
                 to="/register"
-                className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white px-6 py-2 rounded-full hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 hover:rotate-1 relative overflow-hidden"
+                className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white px-4 py-2 sm:px-6 sm:py-2 rounded-full hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 hover:rotate-1 relative overflow-hidden text-sm sm:text-base"
               >
-                <span className="relative z-10">Get Started ✨</span>
+                <span className="relative z-10 flex items-center space-x-1">
+                  <span className="hidden sm:inline">Get Started</span>
+                  <span className="sm:hidden">Start</span>
+                  <AutoAwesome className="h-4 w-4" />
+                </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-asu-gold/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
               </Link>
             </div>
@@ -112,28 +179,28 @@ export default function Navigation() {
   const isActive = (path: string) => location.pathname === path;
 
   const studentNavItems = [
-    { path: '/dashboard', icon: Home, label: 'Dashboard', emoji: '🏠', description: 'Your career hub' },
-    { path: '/job-search', icon: Search, label: 'Find Jobs', emoji: '🔍', description: 'Discover opportunities' },
-    { path: '/applications', icon: FileText, label: 'My Applications', emoji: '📝', description: 'Track your progress' },
-    { path: '/messages', icon: MessageSquare, label: 'Messages', emoji: '💬', description: 'Connect with employers' },
-    { path: '/events', icon: Calendar, label: 'Events', emoji: '📅', description: 'Career events & workshops' },
-    { path: '/resources', icon: BookOpen, label: 'Resources', emoji: '📚', description: 'Career guidance' },
-    { path: '/profile', icon: User, label: 'Profile', emoji: '👤', description: 'Manage your profile' },
+    { path: '/dashboard', icon: Home, label: 'Dashboard', muiIcon: Dashboard, description: 'Your career hub' },
+    { path: '/job-search', icon: Search, label: 'Find Jobs', muiIcon: Search, description: 'Discover opportunities' },
+    { path: '/applications', icon: FileText, label: 'My Applications', muiIcon: Assignment, description: 'Track your progress' },
+    { path: '/messages', icon: MessageSquare, label: 'Messages', muiIcon: Chat, description: 'Connect with employers' },
+    { path: '/events', icon: Calendar, label: 'Events', muiIcon: Event, description: 'Career events & workshops' },
+    { path: '/resources', icon: BookOpen, label: 'Resources', muiIcon: MenuBook, description: 'Career guidance' },
+    { path: '/profile', icon: User, label: 'Profile', muiIcon: Person, description: 'Manage your profile' },
   ];
 
   const employerNavItems = [
-    { path: '/dashboard', icon: Building2, label: 'Dashboard', emoji: '🏢', description: 'Employer overview' },
-    { path: '/post-job', icon: Briefcase, label: 'Post Jobs', emoji: '✨', description: 'Create job postings' },
-    { path: '/applicants', icon: Users, label: 'Applicants', emoji: '👥', description: 'Review candidates' },
-    { path: '/messages', icon: MessageSquare, label: 'Messages', emoji: '💬', description: 'Connect with students' },
-    { path: '/events', icon: Calendar, label: 'Events', emoji: '📅', description: 'Host events' },
-    { path: '/profile', icon: Building2, label: 'Company Profile', emoji: '🏢', description: 'Company information' },
+    { path: '/dashboard', icon: Building2, label: 'Dashboard', muiIcon: Dashboard, description: 'Employer overview' },
+    { path: '/post-job', icon: Briefcase, label: 'Post Jobs', muiIcon: Work, description: 'Create job postings' },
+    { path: '/applicants', icon: Users, label: 'Applicants', muiIcon: Group, description: 'Review candidates' },
+    { path: '/messages', icon: MessageSquare, label: 'Messages', muiIcon: Chat, description: 'Connect with students' },
+    { path: '/events', icon: Calendar, label: 'Events', muiIcon: Event, description: 'Host events' },
+    { path: '/profile', icon: Building2, label: 'Company Profile', muiIcon: Business, description: 'Company information' },
   ];
 
   const adminNavItems = [
-    { path: '/dashboard', icon: Settings, label: 'Admin Dashboard', emoji: '⚡', description: 'Platform management' },
-    { path: '/events', icon: Calendar, label: 'Events', emoji: '📅', description: 'Event management' },
-    { path: '/resources', icon: BookOpen, label: 'Resources', emoji: '📚', description: 'Content management' },
+    { path: '/dashboard', icon: Settings, label: 'Admin Dashboard', muiIcon: Dashboard, description: 'Platform management' },
+    { path: '/events', icon: Calendar, label: 'Events', muiIcon: Event, description: 'Event management' },
+    { path: '/resources', icon: BookOpen, label: 'Resources', muiIcon: MenuBook, description: 'Content management' },
   ];
 
   const getNavItems = () => {
@@ -143,9 +210,217 @@ export default function Navigation() {
 
   const navItems = getNavItems();
 
+  // Mobile Navigation
+  if (isMobile) {
+    return (
+      <>
+        {/* Mobile Top Bar */}
+        <div className="fixed top-0 left-0 right-0 bg-white shadow-lg border-b-2 border-asu-maroon/20 z-50">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-asu-maroon via-asu-gold to-asu-maroon"></div>
+          
+          <div className="flex items-center justify-between px-4 h-16">
+            {/* Logo */}
+            <Link to="/dashboard" className="flex items-center space-x-2 group">
+              <div className="relative">
+                <GraduationCap className="h-8 w-8 text-asu-maroon group-hover:text-asu-gold transition-colors duration-300" />
+                <div className="absolute -bottom-1 -left-1 w-1.5 h-1.5 bg-asu-gold rounded-full animate-pulse"></div>
+              </div>
+              <span className="font-bold text-lg text-gray-900">ASU</span>
+            </Link>
+
+            {/* Right Side */}
+            <div className="flex items-center space-x-3">
+              {/* Notifications */}
+              <div className="relative">
+                <Bell className="h-6 w-6 text-gray-700" />
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-asu-maroon rounded-full flex items-center justify-center">
+                  <span className="text-xs text-white font-bold">3</span>
+                </div>
+              </div>
+
+              {/* Profile */}
+              <div className="relative"></div>
+                <div className="w-8 h-8 bg-gradient-to-br from-asu-maroon to-asu-maroon-dark rounded-full flex items-center justify-center text-white font-bold text-sm">
+                  {user.name?.charAt(0) || <AccountCircle className="h-5 w-5" />}
+                </div>
+                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+              </div>
+
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2 text-gray-700 hover:text-asu-maroon transition-colors"
+              >
+                {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
+            </div>
+          </div>
+        {/* </div> */}
+
+        {/* Mobile Menu Overlay */}
+        {isMobileMenuOpen && (
+          <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setIsMobileMenuOpen(false)} />
+        )}
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div
+            ref={mobileMenuRef}
+            className="fixed top-16 left-0 right-0 bg-white shadow-2xl border-b-2 border-gray-200 z-50 max-h-[calc(100vh-4rem)] overflow-y-auto"
+          >
+            {/* User Profile Section */}
+            <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-asu-maroon/5 to-asu-gold/5">
+              <div className="flex items-center space-x-3">
+                <div className="relative">
+                  <div className="w-12 h-12 bg-gradient-to-br from-asu-maroon to-asu-maroon-dark rounded-full flex items-center justify-center text-white font-bold text-lg">
+                    {user.name?.charAt(0) || <AccountCircle className="h-6 w-6" />}
+                  </div>
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">{user.name || 'User'}</h3>
+                  <p className="text-sm text-gray-600 capitalize flex items-center space-x-1">
+                    <span>{user.role}</span>
+                    {user.role === 'student' && <School className="h-4 w-4" />}
+                    {user.role === 'employer' && <Business className="h-4 w-4" />}
+                    {user.role === 'admin' && <Bolt className="h-4 w-4" />}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Navigation Items */}
+            <div className="py-2">
+              {navItems.map((item, index) => {
+                const Icon = item.icon;
+                const MuiIcon = item.muiIcon;
+                const active = isActive(item.path);
+                
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`mobile-nav-item flex items-center space-x-3 px-4 py-4 transition-all duration-200 ${
+                      active
+                        ? 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white border-l-4 border-asu-gold'
+                        : 'text-gray-700 hover:bg-asu-maroon/10 hover:text-asu-maroon'
+                    }`}
+                  >
+                    <div className={`rounded-xl p-2 ${
+                      active 
+                        ? 'bg-white/25' 
+                        : 'bg-asu-maroon/15'
+                    }`}>
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2">
+                        <span className="font-medium">{item.label}</span>
+                        <MuiIcon className="h-5 w-5" />
+                      </div>
+                      <p className={`text-xs ${
+                        active ? 'text-white/90' : 'text-gray-500'
+                      }`}>
+                        {item.description}
+                      </p>
+                    </div>
+                    {active && <ChevronRight className="h-4 w-4" />}
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Quick Actions */}
+            <div className="p-4 border-t border-gray-200 bg-gray-50">
+              <h4 className="text-sm font-semibold text-gray-800 mb-3">Quick Actions</h4>
+              <div className="grid grid-cols-2 gap-3">
+                {user.role === 'student' && (
+                  <>
+                    <button className="flex flex-col items-center p-3 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors">
+                      <Search className="h-5 w-5 text-blue-600 mb-1" />
+                      <span className="text-xs text-blue-700 font-medium">Search Jobs</span>
+                    </button>
+                    <button className="flex flex-col items-center p-3 bg-green-50 hover:bg-green-100 rounded-xl transition-colors">
+                      <Event className="h-5 w-5 text-green-600 mb-1" />
+                      <span className="text-xs text-green-700 font-medium">Events</span>
+                    </button>
+                  </>
+                )}
+                
+                {user.role === 'employer' && (
+                  <>
+                    <button className="flex flex-col items-center p-3 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors">
+                      <Work className="h-5 w-5 text-purple-600 mb-1" />
+                      <span className="text-xs text-purple-700 font-medium">Post Job</span>
+                    </button>
+                    <button className="flex flex-col items-center p-3 bg-orange-50 hover:bg-orange-100 rounded-xl transition-colors">
+                      <Group className="h-5 w-5 text-orange-600 mb-1" />
+                      <span className="text-xs text-orange-700 font-medium">Applicants</span>
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Logout Button */}
+            <div className="p-4 border-t border-gray-200">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+              >
+                <LogOut className="h-5 w-5" />
+                <span className="font-medium">Sign Out</span>
+                <Waving className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Mobile Bottom Navigation */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl z-40">
+          <div className="flex items-center justify-around py-2">
+            {navItems.slice(0, 4).map((item) => {
+              const Icon = item.icon;
+              const active = isActive(item.path);
+              
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex flex-col items-center py-2 px-3 rounded-xl transition-all duration-200 ${
+                    active
+                      ? 'text-asu-maroon bg-asu-maroon/10'
+                      : 'text-gray-600 hover:text-asu-maroon hover:bg-asu-maroon/5'
+                  }`}
+                >
+                  <Icon className="h-5 w-5 mb-1" />
+                  <span className="text-xs font-medium">{item.label.split(' ')[0]}</span>
+                  {active && <div className="w-1 h-1 bg-asu-maroon rounded-full mt-1"></div>}
+                </Link>
+              );
+            })}
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="flex flex-col items-center py-2 px-3 rounded-xl text-gray-600 hover:text-asu-maroon hover:bg-asu-maroon/5 transition-colors"
+            >
+              <Menu className="h-5 w-5 mb-1" />
+              <span className="text-xs font-medium">More</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Content Spacer */}
+        <div className="h-16" />
+        {/* Bottom spacer for bottom navigation */}
+        <div className="h-16 fixed bottom-0 left-0 right-0 pointer-events-none" />
+      </>
+    );
+  }
+
+  // Desktop/Tablet Navigation
   return (
     <>
-      {/* Desktop Sidebar - Fixed visibility issues */}
+      {/* Desktop Sidebar */}
       <div
         ref={sidebarRef}
         className={`fixed left-0 top-0 h-full bg-white shadow-2xl border-r-2 border-gray-200 z-40 transition-all duration-300 ease-in-out ${
@@ -184,7 +459,7 @@ export default function Navigation() {
               <div className={`bg-gradient-to-br from-asu-maroon to-asu-maroon-dark rounded-full flex items-center justify-center text-white font-bold shadow-lg ${
                 isCollapsed ? 'w-10 h-10 text-sm' : 'w-12 h-12 text-lg'
               }`}>
-                {user.name?.charAt(0) || '👤'}
+                {user.name?.charAt(0) || <AccountCircle className="h-6 w-6" />}
               </div>
               <div className={`absolute bg-green-500 rounded-full border-2 border-white ${
                 isCollapsed ? '-bottom-0.5 -right-0.5 w-3 h-3' : '-bottom-1 -right-1 w-4 h-4'
@@ -193,11 +468,11 @@ export default function Navigation() {
             {!isCollapsed && (
               <div className="ml-3 flex-1 min-w-0">
                 <h3 className="font-semibold text-gray-900 truncate">{user.name || 'User'}</h3>
-                <p className="text-sm text-gray-600 capitalize">
-                  {user.role}
-                  {user.role === 'student' && ' 🎓'}
-                  {user.role === 'employer' && ' 🏢'}
-                  {user.role === 'admin' && ' ⚡'}
+                <p className="text-sm text-gray-600 capitalize flex items-center space-x-1">
+                  <span>{user.role}</span>
+                  {user.role === 'student' && <School className="h-4 w-4" />}
+                  {user.role === 'employer' && <Business className="h-4 w-4" />}
+                  {user.role === 'admin' && <Bolt className="h-4 w-4" />}
                 </p>
               </div>
             )}
@@ -221,6 +496,7 @@ export default function Navigation() {
           <nav className={`space-y-2 ${isCollapsed ? 'px-2' : 'px-4'}`}>
             {navItems.map((item, index) => {
               const Icon = item.icon;
+              const MuiIcon = item.muiIcon;
               const active = isActive(item.path);
               
               return (
@@ -247,7 +523,7 @@ export default function Navigation() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center space-x-2">
                           <span className="font-medium">{item.label}</span>
-                          <span className="text-lg">{item.emoji}</span>
+                          <MuiIcon className="h-5 w-5" />
                         </div>
                         <p className={`text-xs mt-1 ${
                           active ? 'text-white/90' : 'text-gray-600 group-hover:text-asu-maroon/90'
@@ -297,7 +573,7 @@ export default function Navigation() {
                     <span className="text-xs text-blue-700 font-medium">Search Jobs</span>
                   </button>
                   <button className="p-3 bg-green-50 hover:bg-green-100 rounded-xl transition-all duration-300 transform hover:scale-105">
-                    <Calendar className="h-4 w-4 text-green-600 mx-auto mb-1" />
+                    <Event className="h-4 w-4 text-green-600 mx-auto mb-1" />
                     <span className="text-xs text-green-700 font-medium">Events</span>
                   </button>
                 </>
@@ -306,11 +582,11 @@ export default function Navigation() {
               {user.role === 'employer' && (
                 <>
                   <button className="p-3 bg-purple-50 hover:bg-purple-100 rounded-xl transition-all duration-300 transform hover:scale-105">
-                    <Briefcase className="h-4 w-4 text-purple-600 mx-auto mb-1" />
+                    <Work className="h-4 w-4 text-purple-600 mx-auto mb-1" />
                     <span className="text-xs text-purple-700 font-medium">Post Job</span>
                   </button>
                   <button className="p-3 bg-orange-50 hover:bg-orange-100 rounded-xl transition-all duration-300 transform hover:scale-105">
-                    <Users className="h-4 w-4 text-orange-600 mx-auto mb-1" />
+                    <Group className="h-4 w-4 text-orange-600 mx-auto mb-1" />
                     <span className="text-xs text-orange-700 font-medium">Applicants</span>
                   </button>
                 </>
@@ -387,17 +663,19 @@ export default function Navigation() {
           </div>
         </div>
 
-        {/* Collapse/Expand Button */}
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -right-3 top-1/2 transform -translate-y-1/2 w-6 h-6 bg-asu-maroon rounded-full flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 z-50"
-        >
-          {isCollapsed ? (
-            <ChevronRight className="h-3 w-3" />
-          ) : (
-            <ChevronLeft className="h-3 w-3" />
-          )}
-        </button>
+        {/* Collapse/Expand Button - Hide on mobile */}
+        {!isMobile && (
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="absolute -right-3 top-1/2 transform -translate-y-1/2 w-6 h-6 bg-asu-maroon rounded-full flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 z-50"
+          >
+            {isCollapsed ? (
+              <ChevronRight className="h-3 w-3" />
+            ) : (
+              <ChevronLeft className="h-3 w-3" />
+            )}
+          </button>
+        )}
       </div>
 
       {/* Main Content Spacer */}

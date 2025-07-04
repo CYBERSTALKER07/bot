@@ -15,7 +15,9 @@ import Applications from './components/Applications';
 import Applicants from './components/Applicants';
 import PostJob from './components/PostJob';
 import Events from './components/Events';
+import EventDetails from './components/EventDetails';
 import ResourceCenter from './components/ResourceCenter';
+import ResourceDetails from './components/ResourceDetails';
 import AdminDashboard from './components/Dashboard/AdminDashboard';
 import SplashScreen from './components/SplashScreen';
 import { Loader2 } from 'lucide-react';
@@ -27,7 +29,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="flex items-center space-x-2">
-          <Loader2 className="h-6 w-6 animate-spin text-aut-maroon" />
+          <Loader2 className="h-6 w-6 animate-spin text-asu-maroon" />
           <span className="text-gray-600">Loading...</span>
         </div>
       </div>
@@ -44,7 +46,7 @@ function DashboardRouter() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="flex items-center space-x-2">
-          <Loader2 className="h-6 w-6 animate-spin text-aut-maroon" />
+          <Loader2 className="h-6 w-6 animate-spin text-asu-maroon" />
           <span className="text-gray-600">Loading...</span>
         </div>
       </div>
@@ -82,7 +84,7 @@ function AppContent() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="flex items-center space-x-2">
-          <Loader2 className="h-6 w-6 animate-spin text-aut-maroon" />
+          <Loader2 className="h-6 w-6 animate-spin text-asu-maroon" />
           <span className="text-gray-600">Loading...</span>
         </div>
       </div>
@@ -105,7 +107,9 @@ function AppContent() {
         <Route path="/applications" element={<ProtectedRoute><Applications /></ProtectedRoute>} />
         <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
         <Route path="/events" element={<ProtectedRoute><Events /></ProtectedRoute>} />
+        <Route path="/event/:id" element={<ProtectedRoute><EventDetails /></ProtectedRoute>} />
         <Route path="/resources" element={<ProtectedRoute><ResourceCenter /></ProtectedRoute>} />
+        <Route path="/resource/:id" element={<ProtectedRoute><ResourceDetails /></ProtectedRoute>} />
         
         {/* Employer Routes */}
         <Route path="/post-job" element={<ProtectedRoute><PostJob /></ProtectedRoute>} />

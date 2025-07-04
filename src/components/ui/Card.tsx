@@ -1,6 +1,18 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { LucideIcon } from 'lucide-react';
+import { 
+  BookmarkBorder, 
+  LocationOn, 
+  Schedule, 
+  People, 
+  AttachMoney, 
+  School, 
+  Work,
+  Visibility,
+  RocketLaunch,
+  Star
+} from '@mui/icons-material';
 
 interface CardProps {
   children: React.ReactNode;
@@ -99,9 +111,23 @@ export const Card: React.FC<CardProps> = ({
   return (
     <div
       ref={cardRef}
-      className={`bg-white rounded-2xl shadow-lg border-2 border-gray-100 hover:shadow-xl transition-all duration-300 ${className}`}
+      className={`bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 relative overflow-hidden ${className}`}
+      style={{
+        background: 'linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)',
+        border: '1px solid rgba(255,255,255,0.3)',
+        borderRadius: `${20 + Math.random() * 10}px ${25 + Math.random() * 8}px ${22 + Math.random() * 12}px ${18 + Math.random() * 10}px`
+      }}
     >
-      {children}
+      {/* Organic background patterns */}
+      <>
+        <div className="absolute inset-0 opacity-5"></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-asu-maroon/10 via-transparent to-asu-gold/10" />
+        <div className="absolute top-4 right-4 w-32 h-32 bg-gradient-radial from-asu-gold/20 to-transparent rounded-full blur-2xl" />
+        <div className="absolute bottom-4 left-4 w-24 h-24 bg-gradient-radial from-asu-maroon/20 to-transparent rounded-full blur-xl" />
+        <div className="relative z-10">
+          {children}
+        </div>
+      </>
     </div>
   );
 };
@@ -121,12 +147,12 @@ export const StatsCard: React.FC<StatsCardProps> = ({
   const valueRef = useRef<HTMLParagraphElement>(null);
 
   const colorClasses = {
-    blue: 'from-blue-100 to-blue-200 text-blue-700',
-    green: 'from-green-100 to-green-200 text-green-700',
-    purple: 'from-purple-100 to-purple-200 text-purple-700',
-    yellow: 'from-yellow-100 to-yellow-200 text-yellow-700',
-    red: 'from-red-100 to-red-200 text-red-700',
-    'asu-maroon': 'from-asu-maroon/20 to-asu-maroon/30 text-asu-maroon'
+    blue: 'from-blue-400/20 to-blue-600/30',
+    green: 'from-green-400/20 to-green-600/30',
+    purple: 'from-purple-400/20 to-purple-600/30',
+    yellow: 'from-yellow-400/20 to-yellow-600/30',
+    red: 'from-red-400/20 to-red-600/30',
+    'asu-maroon': 'from-asu-maroon/20 to-asu-maroon/40'
   };
 
   useEffect(() => {
@@ -170,24 +196,39 @@ export const StatsCard: React.FC<StatsCardProps> = ({
   return (
     <div
       ref={cardRef}
-      className={`bg-white rounded-2xl shadow-lg border-2 border-gray-100 hover:shadow-xl transition-all duration-300 p-6 transform ${rotation > 0 ? 'rotate-1' : rotation < 0 ? '-rotate-1' : ''}`}
+      className="bg-white/70 backdrop-blur-lg rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 p-6 relative overflow-hidden group"
+      style={{
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 100%)',
+        borderRadius: `${18 + Math.random() * 8}px ${22 + Math.random() * 6}px ${20 + Math.random() * 10}px ${16 + Math.random() * 8}px`,
+        transform: `rotate(${rotation}deg) translateY(${Math.random() * 4 - 2}px)`
+      }}
     >
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-semibold text-gray-700 mb-1">{title}</p>
-          <p ref={valueRef} className="text-3xl font-bold text-gray-900">
-            {value}
-          </p>
+      {/* Flowing background gradient */}
+      <div className={`absolute inset-0 bg-gradient-to-br ${colorClasses[color]} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+      
+      <div className="relative z-10">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-gray-700 mb-2 opacity-80">{title}</p>
+            <p ref={valueRef} className="text-4xl font-bold text-gray-900 tracking-tight">
+              {value}
+            </p>
+          </div>
+          <div 
+            className="w-16 h-16 bg-gradient-to-br from-white/40 to-white/10 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg"
+            style={{
+              borderRadius: `${50 + Math.random() * 10}% ${45 + Math.random() * 15}% ${55 + Math.random() * 10}% ${50 + Math.random() * 12}%`
+            }}
+          >
+            <Icon className="h-7 w-7 text-gray-600" />
+          </div>
         </div>
-        <div className={`w-12 h-12 bg-gradient-to-br ${colorClasses[color]} rounded-full flex items-center justify-center transform rotate-12`}>
-          <Icon className="h-6 w-6" />
-        </div>
+        {subtitle && (
+          <div className="mt-4 text-sm text-gray-600 bg-white/40 backdrop-blur-sm px-4 py-2 rounded-full inline-block">
+            {subtitle}
+          </div>
+        )}
       </div>
-      {subtitle && (
-        <div className="mt-4 text-sm text-gray-600 bg-gray-50 rounded-full px-3 py-1 w-fit">
-          {subtitle}
-        </div>
-      )}
     </div>
   );
 };
@@ -251,101 +292,116 @@ export const JobCard: React.FC<JobCardProps> = ({
   return (
     <div
       ref={cardRef}
-      className={`bg-white rounded-3xl shadow-lg border-2 border-gray-100 overflow-hidden transform rotate-${rotation}`}
+      className="bg-white/85 backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden group relative"
+      style={{
+        background: 'linear-gradient(150deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
+        borderRadius: `${20 + Math.random() * 10}px ${25 + Math.random() * 8}px ${22 + Math.random() * 12}px ${18 + Math.random() * 10}px`,
+        transform: `rotate(${rotation}deg)`
+      }}
     >
-      <div className="p-6">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center space-x-3">
-            <div className={`w-14 h-14 bg-gradient-to-br from-asu-maroon to-asu-maroon-dark rounded-2xl flex items-center justify-center shadow-lg transform ${index % 2 === 0 ? 'rotate-3' : '-rotate-3'}`}>
-              <div className="text-white font-bold text-lg">
-                {job.company.charAt(0)}
-              </div>
+      {/* Organic flowing background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-asu-maroon/5 via-transparent to-asu-gold/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      
+      <div className="p-7 relative z-10">
+        <div className="flex items-start justify-between mb-5">
+          <div className="flex items-center space-x-4">
+            <div 
+              className="w-16 h-16 bg-gradient-to-br from-asu-maroon/80 to-asu-maroon-dark shadow-lg flex items-center justify-center text-white font-bold text-xl"
+              style={{
+                borderRadius: `${15 + Math.random() * 8}px ${20 + Math.random() * 6}px ${18 + Math.random() * 10}px ${14 + Math.random() * 8}px`,
+                transform: `rotate(${index % 2 === 0 ? 3 : -3}deg)`
+              }}
+            >
+              {job.company.charAt(0)}
             </div>
             <div>
               <h3 className="font-bold text-lg text-gray-900 leading-tight">
                 {job.company}
               </h3>
-              <p className="text-sm text-gray-600 flex items-center">
-                Verified Employer ✅
+              <p className="text-sm text-gray-600 flex items-center mt-1">
+                <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+                Verified Employer
               </p>
             </div>
           </div>
           <button
             onClick={onBookmark}
-            className="p-3 text-gray-500 hover:text-asu-maroon transition-colors bg-gray-50 rounded-full hover:bg-asu-maroon/10"
+            className="p-3 text-gray-500 hover:text-asu-maroon transition-colors bg-white/60 backdrop-blur-sm rounded-full hover:bg-asu-maroon/10 shadow-sm"
             aria-label="Bookmark job"
           >
-            📌
+            <BookmarkBorder className="h-5 w-5" />
           </button>
         </div>
 
-        <h2 className="text-xl font-semibold text-gray-900 mb-3 leading-tight">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4 leading-tight">
           {job.title}
         </h2>
         
-        <div className="flex flex-wrap items-center gap-3 mb-4 text-sm text-gray-700">
-          <div className="flex items-center space-x-1 bg-gray-100 px-3 py-1 rounded-full">
-            📍
+        <div className="flex flex-wrap gap-2 mb-5">
+          <span className="flex items-center space-x-1 text-sm text-gray-700 bg-white/60 backdrop-blur-sm px-3 py-1.5 rounded-full">
+            <LocationOn className="h-4 w-4" />
             <span className="font-medium">{job.location}</span>
-          </div>
-          <div className="flex items-center space-x-1 bg-gray-100 px-3 py-1 rounded-full">
-            🕐
-            <span className="font-medium">
-              {new Date(job.posted_date).toLocaleDateString()}
-            </span>
-          </div>
-          <div className="flex items-center space-x-1 bg-gray-100 px-3 py-1 rounded-full">
-            👥
+          </span>
+          <span className="flex items-center space-x-1 text-sm text-gray-700 bg-white/60 backdrop-blur-sm px-3 py-1.5 rounded-full">
+            <Schedule className="h-4 w-4" />
+            <span className="font-medium">{new Date(job.posted_date).toLocaleDateString()}</span>
+          </span>
+          <span className="flex items-center space-x-1 text-sm text-gray-700 bg-white/60 backdrop-blur-sm px-3 py-1.5 rounded-full">
+            <People className="h-4 w-4" />
             <span className="font-medium">{job.applicants_count} applicants</span>
-          </div>
+          </span>
         </div>
 
         {job.salary && (
-          <div className="flex items-center space-x-1 mb-4 text-green-700 font-semibold bg-green-50 px-3 py-2 rounded-full w-fit">
-            💰
+          <div className="flex items-center space-x-2 mb-4 text-green-700 font-semibold bg-green-50/80 backdrop-blur-sm px-4 py-2 rounded-full inline-block">
+            <AttachMoney className="h-4 w-4" />
             <span>{job.salary}</span>
           </div>
         )}
 
-        <div className="flex flex-wrap gap-2 mb-4">
-          <span className={`px-4 py-2 rounded-full text-sm font-medium shadow-sm transform hover:scale-105 transition-transform duration-200 ${
+        <div className="flex flex-wrap gap-2 mb-5">
+          <span className={`px-4 py-2 rounded-full text-sm font-medium shadow-sm transform hover:scale-105 transition-transform duration-200 flex items-center space-x-1 ${
             job.type === 'internship' 
-              ? 'bg-blue-100 text-blue-800' 
-              : 'bg-green-100 text-green-800'
+              ? 'bg-blue-100/80 text-blue-800 backdrop-blur-sm' 
+              : 'bg-green-100/80 text-green-800 backdrop-blur-sm'
           }`}>
-            {job.type} {job.type === 'internship' ? '🎓' : '💼'}
+            {job.type === 'internship' ? <School className="h-4 w-4" /> : <Work className="h-4 w-4" />}
+            <span>{job.type}</span>
           </span>
           {job.skills.slice(0, 2).map((skill, skillIndex) => (
             <span 
               key={skillIndex}
-              className="px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 rounded-full text-sm font-medium hover:from-gray-200 hover:to-gray-300 transition-all duration-200"
+              className="px-3 py-1 bg-gray-100/80 backdrop-blur-sm text-gray-800 rounded-full text-sm font-medium hover:bg-gray-200/80 transition-all duration-200"
             >
               {skill}
             </span>
           ))}
           {job.skills.length > 2 && (
-            <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm font-medium">
-              +{job.skills.length - 2} more ✨
+            <span className="px-3 py-1 bg-gray-100/80 backdrop-blur-sm text-gray-600 rounded-full text-sm font-medium flex items-center space-x-1">
+              <span>+{job.skills.length - 2} more</span>
+              <Star className="h-3 w-3" />
             </span>
           )}
         </div>
 
-        <p className="text-gray-700 text-sm mb-6 line-clamp-3 leading-relaxed">
+        <p className="text-gray-700 text-sm mb-6 line-clamp-3 leading-relaxed opacity-90">
           {job.description}
         </p>
 
         <div className="flex space-x-3">
           <button
             onClick={() => window.open(`/job/${job.id}`, '_blank')}
-            className="flex-1 bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white px-6 py-3 rounded-2xl hover:from-asu-maroon-dark hover:to-asu-maroon transition-all duration-300 text-center font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
+            className="flex-1 bg-gradient-to-r from-asu-maroon/90 to-asu-maroon-dark/90 text-white px-6 py-3 rounded-2xl hover:from-asu-maroon hover:to-asu-maroon-dark transition-all duration-300 text-center font-medium shadow-lg hover:shadow-xl transform hover:scale-105 backdrop-blur-sm flex items-center justify-center space-x-2"
           >
-            View Details 👁️
+            <Visibility className="h-4 w-4" />
+            <span>View Details</span>
           </button>
           <button
             onClick={onApply}
-            className="px-6 py-3 border-2 border-asu-maroon text-asu-maroon rounded-2xl hover:bg-asu-maroon hover:text-white transition-all duration-300 flex items-center space-x-2 font-medium shadow-sm hover:shadow-md transform hover:scale-105"
+            className="px-6 py-3 bg-white/60 backdrop-blur-sm border border-asu-maroon/30 text-asu-maroon rounded-2xl hover:bg-asu-maroon hover:text-white transition-all duration-300 flex items-center space-x-2 font-medium shadow-sm hover:shadow-md transform hover:scale-105"
           >
-            <span>Apply 🚀</span>
+            <RocketLaunch className="h-4 w-4" />
+            <span>Apply</span>
           </button>
         </div>
       </div>
