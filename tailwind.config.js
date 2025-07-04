@@ -4,12 +4,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        asu: {
-          maroon: '#8C1D40',
-          gold: '#FFC627',
-          'maroon-dark': '#7A1B3A',
-          'gold-dark': '#E6B122',
-        },
+        // Custom Colors
+        deepgreen: '#003432', // HEX (Pantone 2217 C)
+        burgundy: '#80003A', // HEX (Pantone 208 C)
+        blueaccent: '#2C43DE', // HEX (Pantone 2132 C)
+        gold: '#A87026', // HEX (Pantone 730 C)
+        blackbase: '#21201E', // HEX
+        mintgreen: '#CCEFBA', // HEX (Pantone 9561 C)
+        aqua: '#AADED9', // HEX (Pantone 9501 C)
+        cream: '#F0EFE3', // HEX
+        lime: '#E3FF70', // HEX (Pantone 930 C)
         gray: {
           50: '#F9FAFB',
           100: '#F3F4F6',

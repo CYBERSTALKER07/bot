@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { 
@@ -22,10 +22,7 @@ import {
   Briefcase,
   Users,
   Settings,
-  FileText,
-  Zap,
-  ChevronDown,
-  ChevronUp
+  FileText
 } from 'lucide-react';
 import { 
   AccountCircle,
@@ -40,8 +37,7 @@ import {
   Chat,
   Event,
   MenuBook,
-  Bolt,
-  Waving
+  Bolt
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 
@@ -239,7 +235,7 @@ export default function Navigation() {
               </div>
 
               {/* Profile */}
-              <div className="relative"></div>
+              <div className="relative">
                 <div className="w-8 h-8 bg-gradient-to-br from-asu-maroon to-asu-maroon-dark rounded-full flex items-center justify-center text-white font-bold text-sm">
                   {user.name?.charAt(0) || <AccountCircle className="h-5 w-5" />}
                 </div>
@@ -255,7 +251,7 @@ export default function Navigation() {
               </button>
             </div>
           </div>
-        {/* </div> */}
+        </div>
 
         {/* Mobile Menu Overlay */}
         {isMobileMenuOpen && (
@@ -370,7 +366,7 @@ export default function Navigation() {
               >
                 <LogOut className="h-5 w-5" />
                 <span className="font-medium">Sign Out</span>
-                <Waving className="h-5 w-5" />
+                <span className="text-lg">👋</span>
               </button>
             </div>
           </div>
