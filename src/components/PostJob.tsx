@@ -1,6 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { gsap } from 'gsap';
 import { 
   Save, 
   Add, 
@@ -12,15 +11,9 @@ import {
   Description, 
   People, 
   CheckCircle,
-  AutoAwesome,
-  LocalCafe,
-  Favorite,
-  Bolt,
-  Star,
-  TrendingUp,
-  EmojiEvents,
   Close,
-  Work
+  Work,
+  Schedule
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -28,15 +21,9 @@ import Typography from './ui/Typography';
 import Input from './ui/Input';
 import Button from './ui/Button';
 import { Card } from './ui/Card';
-import Badge from './ui/Badge';
 import Select from './ui/Select';
 
 export default function PostJob() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const formRef = useRef<HTMLFormElement>(null);
-  const previewRef = useRef<HTMLDivElement>(null);
-  
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isDark } = useTheme();
@@ -60,54 +47,6 @@ export default function PostJob() {
   });
   
   const [newSkill, setNewSkill] = useState('');
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Material Design entrance animations
-      gsap.fromTo('.post-job-header', {
-        opacity: 0,
-        y: -30,
-        scale: 0.95
-      }, {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.8,
-        ease: 'power2.out'
-      });
-
-      gsap.fromTo('.form-section', {
-        opacity: 0,
-        y: 20,
-        scale: 0.98
-      }, {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.6,
-        ease: 'power2.out',
-        stagger: 0.1,
-        delay: 0.3
-      });
-
-      gsap.fromTo('.skill-chip', {
-        opacity: 0,
-        scale: 0.8,
-        y: 10
-      }, {
-        opacity: 1,
-        scale: 1,
-        y: 0,
-        duration: 0.4,
-        ease: 'back.out(1.7)',
-        stagger: 0.05,
-        delay: 0.6
-      });
-
-    }, containerRef);
-
-    return () => ctx.revert();
-  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -154,49 +93,89 @@ export default function PostJob() {
   ];
 
   return (
-    <div ref={containerRef} className={`min-h-screen relative ${
-      isDark ? 'bg-dark-bg' : 'bg-gray-50'
-    }`}>
+    <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
         {/* Header */}
-        <div className="post-job-header mb-12">
-          <Card className="overflow-hidden" elevation={2}>
-            <div className={`p-8 text-white relative ${
-              isDark 
-                ? 'bg-gradient-to-r from-dark-surface to-dark-bg' 
-                : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
-            }`}>
-              <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl ${
-                isDark ? 'bg-lime/10' : 'bg-white/10'
-              }`}></div>
-              <div className={`absolute bottom-0 left-0 w-24 h-24 rounded-full blur-xl ${
-                isDark ? 'bg-dark-accent/20' : 'bg-asu-gold/20'
-              }`}></div>
-              
-              <div className="relative z-10">
-                <Typography variant="h3" className="font-bold mb-4 text-white">
-                  Post a New Job
+        <div className="mb-8">
+          <Typography variant="h4" className="font-medium mb-2">
+            Post a Job
+          </Typography>
+          <Typography variant="body1" color="textSecondary">
+            Create a compelling job posting to attract top talent from ASU's student body.
+          </Typography>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card className="p-6" elevation={1}>
+            <div className="flex items-center">
+              <div className={`p-3 rounded-xl ${
+                isDark ? 'bg-lime/10 text-lime' : 'bg-asu-maroon/10 text-asu-maroon'
+              }`}>
+                <People className="h-6 w-6" />
+              </div>
+              <div className="ml-4">
+                <Typography variant="h5" className="font-semibold">
+                  50,000+
                 </Typography>
-                <Typography variant="subtitle1" className={`max-w-3xl ${
-                  isDark ? 'text-dark-muted' : 'text-white/90'
-                }`}>
-                  Find the perfect candidates for your team. Create a compelling job posting that attracts top talent
+                <Typography variant="body2" color="textSecondary">
+                  Active Students
                 </Typography>
-                
-                <div className="flex flex-wrap gap-4 mt-6">
-                  <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-                    <TrendingUp className="h-5 w-5" />
-                    <span className="text-sm">95% job fill rate</span>
-                  </div>
-                  <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-                    <People className="h-5 w-5" />
-                    <span className="text-sm">50,000+ active students</span>
-                  </div>
-                  <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-                    <Star className="h-5 w-5" />
-                    <span className="text-sm">Top quality candidates</span>
-                  </div>
-                </div>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6" elevation={1}>
+            <div className="flex items-center">
+              <div className={`p-3 rounded-xl ${
+                isDark ? 'bg-blue-500/10 text-blue-400' : 'bg-blue-50 text-blue-600'
+              }`}>
+                <Business className="h-6 w-6" />
+              </div>
+              <div className="ml-4">
+                <Typography variant="h5" className="font-semibold">
+                  2,500+
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  Companies
+                </Typography>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6" elevation={1}>
+            <div className="flex items-center">
+              <div className={`p-3 rounded-xl ${
+                isDark ? 'bg-green-500/10 text-green-400' : 'bg-green-50 text-green-600'
+              }`}>
+                <Work className="h-6 w-6" />
+              </div>
+              <div className="ml-4">
+                <Typography variant="h5" className="font-semibold">
+                  15,000+
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  Jobs Posted
+                </Typography>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6" elevation={1}>
+            <div className="flex items-center">
+              <div className={`p-3 rounded-xl ${
+                isDark ? 'bg-purple-500/10 text-purple-400' : 'bg-purple-50 text-purple-600'
+              }`}>
+                <CheckCircle className="h-6 w-6" />
+              </div>
+              <div className="ml-4">
+                <Typography variant="h5" className="font-semibold">
+                  95%
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  Success Rate
+                </Typography>
               </div>
             </div>
           </Card>
@@ -205,23 +184,15 @@ export default function PostJob() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Form */}
           <div className="lg:col-span-2">
-            <form ref={formRef} onSubmit={handleSubmit} className="space-y-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              
               {/* Job Details Section */}
-              <Card className="form-section p-8" elevation={2}>
-                <div className="flex items-center space-x-3 mb-6">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    isDark ? 'bg-lime/20' : 'bg-asu-maroon/10'
-                  }`}>
-                    <Description className={`h-5 w-5 ${
-                      isDark ? 'text-lime' : 'text-asu-maroon'
-                    }`} />
-                  </div>
-                  <Typography variant="h5" color="textPrimary" className="font-bold">
-                    Job Details
-                  </Typography>
-                </div>
+              <Card className="p-6" elevation={1}>
+                <Typography variant="h6" className="font-medium mb-6">
+                  Job Details
+                </Typography>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input
                     label="Job Title"
                     type="text"
@@ -294,20 +265,20 @@ export default function PostJob() {
                   />
                 </div>
                 
-                <div className="mt-6">
+                <div className="mt-4">
                   <label className="flex items-center space-x-3 cursor-pointer">
                     <input
                       type="checkbox"
                       name="is_remote"
                       checked={formData.is_remote}
                       onChange={handleInputChange}
-                      className={`w-5 h-5 rounded border-2 focus:ring-2 ${
+                      className={`w-4 h-4 rounded border-2 focus:ring-2 ${
                         isDark 
                           ? 'text-lime border-lime/30 focus:ring-lime' 
                           : 'text-asu-maroon border-gray-300 focus:ring-asu-maroon'
                       }`}
                     />
-                    <Typography variant="body2" color="textPrimary" className="font-medium">
+                    <Typography variant="body2" className="font-medium">
                       Remote work available
                     </Typography>
                   </label>
@@ -315,21 +286,12 @@ export default function PostJob() {
               </Card>
 
               {/* Description Section */}
-              <Card className="form-section p-8" elevation={2}>
-                <div className="flex items-center space-x-3 mb-6">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    isDark ? 'bg-lime/20' : 'bg-asu-maroon/10'
-                  }`}>
-                    <Description className={`h-5 w-5 ${
-                      isDark ? 'text-lime' : 'text-asu-maroon'
-                    }`} />
-                  </div>
-                  <Typography variant="h5" color="textPrimary" className="font-bold">
-                    Job Description
-                  </Typography>
-                </div>
+              <Card className="p-6" elevation={1}>
+                <Typography variant="h6" className="font-medium mb-6">
+                  Job Description
+                </Typography>
                 
-                <div className="space-y-6">
+                <div className="space-y-4">
                   <Input
                     label="Job Description"
                     name="description"
@@ -371,19 +333,10 @@ export default function PostJob() {
               </Card>
 
               {/* Skills Section */}
-              <Card className="form-section p-8" elevation={2}>
-                <div className="flex items-center space-x-3 mb-6">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    isDark ? 'bg-lime/20' : 'bg-asu-maroon/10'
-                  }`}>
-                    <Bolt className={`h-5 w-5 ${
-                      isDark ? 'text-lime' : 'text-asu-maroon'
-                    }`} />
-                  </div>
-                  <Typography variant="h5" color="textPrimary" className="font-bold">
-                    Required Skills
-                  </Typography>
-                </div>
+              <Card className="p-6" elevation={1}>
+                <Typography variant="h6" className="font-medium mb-6">
+                  Required Skills
+                </Typography>
                 
                 <div className="space-y-4">
                   <div className="flex space-x-2">
@@ -400,45 +353,37 @@ export default function PostJob() {
                       variant="contained"
                       color="primary"
                       onClick={addSkill}
-                      size="large"
-                      className="px-6"
+                      className="px-4"
                     >
-                      <Add />
+                      <Add className="h-5 w-5" />
                     </Button>
                   </div>
                   
                   <div className="flex flex-wrap gap-2">
                     {formData.skills.map((skill, index) => (
-                      <Badge
+                      <span
                         key={index}
-                        className="skill-chip cursor-pointer"
-                        variant="filled"
-                        color="primary"
                         onClick={() => removeSkill(skill)}
+                        className={`px-3 py-1 rounded-full text-sm font-medium cursor-pointer transition-colors ${
+                          isDark 
+                            ? 'bg-lime/10 text-lime hover:bg-lime/20' 
+                            : 'bg-asu-maroon/10 text-asu-maroon hover:bg-asu-maroon/20'
+                        }`}
                       >
                         {skill} ×
-                      </Badge>
+                      </span>
                     ))}
                   </div>
                 </div>
               </Card>
 
               {/* Additional Details */}
-              <Card className="form-section p-8" elevation={2}>
-                <div className="flex items-center space-x-3 mb-6">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    isDark ? 'bg-lime/20' : 'bg-asu-maroon/10'
-                  }`}>
-                    <CalendarToday className={`h-5 w-5 ${
-                      isDark ? 'text-lime' : 'text-asu-maroon'
-                    }`} />
-                  </div>
-                  <Typography variant="h5" color="textPrimary" className="font-bold">
-                    Additional Details
-                  </Typography>
-                </div>
+              <Card className="p-6" elevation={1}>
+                <Typography variant="h6" className="font-medium mb-6">
+                  Additional Details
+                </Typography>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input
                     label="Application Deadline"
                     type="date"
@@ -476,54 +421,48 @@ export default function PostJob() {
               </Card>
 
               {/* Submit Buttons */}
-              <div className="flex justify-center space-x-4">
-                <Button
-                  type="button"
-                  variant="outlined"
-                  color="primary"
-                  size="large"
-                  startIcon={Visibility}
-                  onClick={() => setShowPreview(!showPreview)}
-                  className="px-8"
-                >
-                  {showPreview ? 'Hide Preview' : 'Preview Job'}
-                </Button>
-                
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  size="large"
-                  startIcon={Save}
-                  className="px-8"
-                >
-                  Post Job
-                </Button>
-              </div>
+              <Card className="p-6" elevation={1}>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button
+                    type="button"
+                    variant="outlined"
+                    color="primary"
+                    size="large"
+                    startIcon={<Visibility />}
+                    onClick={() => setShowPreview(!showPreview)}
+                    fullWidth
+                  >
+                    {showPreview ? 'Hide Preview' : 'Preview Job'}
+                  </Button>
+                  
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    startIcon={<Save />}
+                    fullWidth
+                  >
+                    Post Job
+                  </Button>
+                </div>
+              </Card>
             </form>
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-8">
+          <div className="space-y-6">
+            
             {/* Tips Card */}
-            <Card className="p-6" elevation={2}>
-              <div className="flex items-center space-x-3 mb-6">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  isDark ? 'bg-lime/20' : 'bg-asu-maroon/10'
-                }`}>
-                  <EmojiEvents className={`h-5 w-5 ${
-                    isDark ? 'text-lime' : 'text-asu-maroon'
-                  }`} />
-                </div>
-                <Typography variant="h6" color="textPrimary" className="font-bold">
-                  Tips for Success
-                </Typography>
-              </div>
+            <Card className="p-6" elevation={1}>
+              <Typography variant="h6" className="font-medium mb-4">
+                Tips for Success
+              </Typography>
               
               <div className="space-y-3">
                 <div className="flex items-start space-x-3">
                   <CheckCircle className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
-                    isDark ? 'text-lime' : 'text-green-500'
+                    isDark ? 'text-lime' : 'text-asu-maroon'
                   }`} />
                   <Typography variant="body2" color="textSecondary">
                     Write a clear, compelling job title that accurately reflects the role
@@ -531,7 +470,7 @@ export default function PostJob() {
                 </div>
                 <div className="flex items-start space-x-3">
                   <CheckCircle className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
-                    isDark ? 'text-lime' : 'text-green-500'
+                    isDark ? 'text-lime' : 'text-asu-maroon'
                   }`} />
                   <Typography variant="body2" color="textSecondary">
                     Include salary range to attract quality candidates
@@ -539,7 +478,7 @@ export default function PostJob() {
                 </div>
                 <div className="flex items-start space-x-3">
                   <CheckCircle className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
-                    isDark ? 'text-lime' : 'text-green-500'
+                    isDark ? 'text-lime' : 'text-asu-maroon'
                   }`} />
                   <Typography variant="body2" color="textSecondary">
                     Be specific about required skills and experience
@@ -547,7 +486,7 @@ export default function PostJob() {
                 </div>
                 <div className="flex items-start space-x-3">
                   <CheckCircle className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
-                    isDark ? 'text-lime' : 'text-green-500'
+                    isDark ? 'text-lime' : 'text-asu-maroon'
                   }`} />
                   <Typography variant="body2" color="textSecondary">
                     Highlight unique benefits and company culture
@@ -556,17 +495,17 @@ export default function PostJob() {
               </div>
             </Card>
 
-            {/* Stats Card */}
-            <Card className="p-6" elevation={2}>
-              <Typography variant="h6" color="textPrimary" className="font-bold mb-6">
-                Platform Stats
+            {/* Platform Stats */}
+            <Card className="p-6" elevation={1}>
+              <Typography variant="h6" className="font-medium mb-4">
+                Platform Reach
               </Typography>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <Typography variant="body2" color="textSecondary">
                     Active Students
                   </Typography>
-                  <Typography variant="body2" color="primary" className="font-bold">
+                  <Typography variant="body2" className="font-semibold">
                     50,000+
                   </Typography>
                 </div>
@@ -574,23 +513,23 @@ export default function PostJob() {
                   <Typography variant="body2" color="textSecondary">
                     Companies Hiring
                   </Typography>
-                  <Typography variant="body2" color="primary" className="font-bold">
+                  <Typography variant="body2" className="font-semibold">
                     2,500+
                   </Typography>
                 </div>
                 <div className="flex justify-between items-center">
                   <Typography variant="body2" color="textSecondary">
-                    Jobs Posted
+                    Average Applications
                   </Typography>
-                  <Typography variant="body2" color="primary" className="font-bold">
-                    15,000+
+                  <Typography variant="body2" className="font-semibold">
+                    47 per job
                   </Typography>
                 </div>
                 <div className="flex justify-between items-center">
                   <Typography variant="body2" color="textSecondary">
-                    Success Rate
+                    Hire Success Rate
                   </Typography>
-                  <Typography variant="body2" color="primary" className="font-bold">
+                  <Typography variant="body2" className="font-semibold">
                     95%
                   </Typography>
                 </div>
@@ -601,115 +540,109 @@ export default function PostJob() {
 
         {/* Preview Modal */}
         {showPreview && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <Card ref={previewRef} className="max-w-4xl w-full max-h-[90vh] overflow-y-auto p-8" elevation={4}>
-              <div className="flex justify-between items-center mb-6">
-                <Typography variant="h4" color="textPrimary" className="font-bold">
-                  Job Preview
-                </Typography>
-                <Button
-                  variant="text"
-                  onClick={() => setShowPreview(false)}
-                  size="small"
-                  className="p-2"
-                >
-                  <Close />
-                </Button>
-              </div>
-              
-              {/* Job Preview Content */}
-              <div className="space-y-6">
-                <div className={`border-b pb-6 ${
-                  isDark ? 'border-gray-600' : 'border-gray-200'
-                }`}>
-                  <Typography variant="h3" color="textPrimary" className="font-bold mb-2">
-                    {formData.title || 'Job Title'}
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <Card className="max-w-4xl w-full max-h-[90vh] overflow-y-auto" elevation={3}>
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <Typography variant="h5" className="font-medium">
+                    Job Preview
                   </Typography>
-                  <div className="flex flex-wrap gap-4">
-                    {formData.company && (
-                      <div className="flex items-center space-x-1">
-                        <Business className="h-4 w-4" />
-                        <Typography variant="body2" color="textSecondary">
-                          {formData.company}
-                        </Typography>
-                      </div>
-                    )}
-                    {formData.location && (
-                      <div className="flex items-center space-x-1">
-                        <LocationOn className="h-4 w-4" />
-                        <Typography variant="body2" color="textSecondary">
-                          {formData.location}
-                        </Typography>
-                      </div>
-                    )}
-                    <div className="flex items-center space-x-1">
-                      <Work className="h-4 w-4" />
-                      <Typography variant="body2" color="textSecondary">
-                        {formData.type}
-                      </Typography>
-                    </div>
-                    {formData.salary && (
-                      <div className="flex items-center space-x-1">
-                        <AttachMoney className="h-4 w-4" />
-                        <Typography variant="body2" color="textSecondary">
-                          {formData.salary}
-                        </Typography>
-                      </div>
-                    )}
-                  </div>
+                  <Button
+                    variant="text"
+                    onClick={() => setShowPreview(false)}
+                    className="min-w-0 p-2"
+                  >
+                    <Close className="h-5 w-5" />
+                  </Button>
                 </div>
                 
-                {formData.description && (
-                  <div>
-                    <Typography variant="h6" color="textPrimary" className="font-semibold mb-3">
-                      Job Description
+                {/* Job Preview Content */}
+                <div className="space-y-6">
+                  <div className={`border-b pb-6 ${
+                    isDark ? 'border-gray-600' : 'border-gray-200'
+                  }`}>
+                    <Typography variant="h4" className="font-medium mb-3">
+                      {formData.title || 'Job Title'}
                     </Typography>
-                    <Typography variant="body1" color="textSecondary" className="whitespace-pre-wrap">
-                      {formData.description}
-                    </Typography>
-                  </div>
-                )}
-                
-                {formData.requirements && (
-                  <div>
-                    <Typography variant="h6" color="textPrimary" className="font-semibold mb-3">
-                      Requirements
-                    </Typography>
-                    <Typography variant="body1" color="textSecondary" className="whitespace-pre-wrap">
-                      {formData.requirements}
-                    </Typography>
-                  </div>
-                )}
-                
-                {formData.skills.length > 0 && (
-                  <div>
-                    <Typography variant="h6" color="textPrimary" className="font-semibold mb-3">
-                      Required Skills
-                    </Typography>
-                    <div className="flex flex-wrap gap-2">
-                      {formData.skills.map((skill, index) => (
-                        <Badge
-                          key={index}
-                          variant="filled"
-                          color="primary"
-                        >
-                          {skill}
-                        </Badge>
-                      ))}
+                    <div className="flex flex-wrap gap-4 text-sm">
+                      {formData.company && (
+                        <div className="flex items-center space-x-1">
+                          <Business className="h-4 w-4" />
+                          <span>{formData.company}</span>
+                        </div>
+                      )}
+                      {formData.location && (
+                        <div className="flex items-center space-x-1">
+                          <LocationOn className="h-4 w-4" />
+                          <span>{formData.location}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center space-x-1">
+                        <Work className="h-4 w-4" />
+                        <span className="capitalize">{formData.type.replace('-', ' ')}</span>
+                      </div>
+                      {formData.salary && (
+                        <div className="flex items-center space-x-1">
+                          <AttachMoney className="h-4 w-4" />
+                          <span>{formData.salary}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
-                )}
-                
-                {formData.benefits && (
-                  <div>
-                    <Typography variant="h6" color="textPrimary" className="font-semibold mb-3">
-                      Benefits
-                    </Typography>
-                    <Typography variant="body1" color="textSecondary" className="whitespace-pre-wrap">
-                      {formData.benefits}
-                    </Typography>
-                  </div>
-                )}
+                  
+                  {formData.description && (
+                    <div>
+                      <Typography variant="h6" className="font-medium mb-3">
+                        Job Description
+                      </Typography>
+                      <Typography variant="body1" color="textSecondary" className="whitespace-pre-wrap">
+                        {formData.description}
+                      </Typography>
+                    </div>
+                  )}
+                  
+                  {formData.requirements && (
+                    <div>
+                      <Typography variant="h6" className="font-medium mb-3">
+                        Requirements
+                      </Typography>
+                      <Typography variant="body1" color="textSecondary" className="whitespace-pre-wrap">
+                        {formData.requirements}
+                      </Typography>
+                    </div>
+                  )}
+                  
+                  {formData.skills.length > 0 && (
+                    <div>
+                      <Typography variant="h6" className="font-medium mb-3">
+                        Required Skills
+                      </Typography>
+                      <div className="flex flex-wrap gap-2">
+                        {formData.skills.map((skill, index) => (
+                          <span
+                            key={index}
+                            className={`px-3 py-1 rounded-full text-sm font-medium ${
+                              isDark ? 'bg-lime/10 text-lime' : 'bg-asu-maroon/10 text-asu-maroon'
+                            }`}
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {formData.benefits && (
+                    <div>
+                      <Typography variant="h6" className="font-medium mb-3">
+                        Benefits
+                      </Typography>
+                      <Typography variant="body1" color="textSecondary" className="whitespace-pre-wrap">
+                        {formData.benefits}
+                      </Typography>
+                    </div>
+                  )}
+                </div>
               </div>
             </Card>
           </div>

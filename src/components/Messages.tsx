@@ -1,11 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { gsap } from 'gsap';
+import React, { useState, useEffect } from 'react';
 import { 
   Search, 
   Send, 
   Person, 
-  AccessTime, 
   Chat, 
   Phone, 
   VideoCall, 
@@ -15,7 +12,6 @@ import {
   Star,
   Archive,
   Delete,
-  Circle,
   Check,
   DoneAll,
   FilterList,
@@ -23,25 +19,20 @@ import {
   Business,
   School,
   Work,
-  AutoAwesome,
-  LocalCafe,
-  Favorite,
   Message,
   Forum,
   VideoCallOutlined,
   PhoneInTalk,
-  EmojiEvents,
-  TrendingUp,
-  People,
-  Notifications
+  Notifications,
+  ArrowBack,
+  Menu
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import Typography from './ui/Typography';
 import Button from './ui/Button';
 import Input from './ui/Input';
-import { Card, StatsCard } from './ui/Card';
-import Badge from './ui/Badge';
+import { Card } from './ui/Card';
 import Avatar from './ui/Avatar';
 
 interface Message {
@@ -74,89 +65,13 @@ interface Conversation {
 export default function Messages() {
   const { user } = useAuth();
   const { isDark } = useTheme();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const conversationsRef = useRef<HTMLDivElement>(null);
-  const messagesRef = useRef<HTMLDivElement>(null);
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState<'all' | 'student' | 'employer'>('all');
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const ctx = gsap.context(() => {
-      // Material Design entrance animations
-      gsap.fromTo('.header-card', {
-        opacity: 0,
-        y: -30,
-        scale: 0.98
-      }, {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.8,
-        ease: 'power2.out'
-      });
-
-      gsap.fromTo('.stats-card', {
-        opacity: 0,
-        y: 20,
-        scale: 0.9
-      }, {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.6,
-        stagger: 0.1,
-        ease: 'back.out(1.7)',
-        delay: 0.2
-      });
-
-      gsap.fromTo('.conversation-card', {
-        opacity: 0,
-        x: -30,
-        scale: 0.95
-      }, {
-        opacity: 1,
-        x: 0,
-        scale: 1,
-        duration: 0.5,
-        stagger: 0.05,
-        ease: 'power2.out',
-        delay: 0.4
-      });
-
-      gsap.fromTo('.messages-area', {
-        opacity: 0,
-        x: 30,
-        scale: 0.98
-      }, {
-        opacity: 1,
-        x: 0,
-        scale: 1,
-        duration: 0.6,
-        ease: 'power2.out',
-        delay: 0.6
-      });
-
-      // Floating decorations
-      gsap.to('.messages-decoration', {
-        y: -10,
-        x: 5,
-        rotation: 180,
-        duration: 15,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut'
-      });
-
-    }, containerRef);
-
-    return () => ctx.revert();
-  }, []);
+  const [showSidebar, setShowSidebar] = useState(true);
 
   useEffect(() => {
     // Mock conversations data
@@ -299,386 +214,322 @@ export default function Messages() {
     (msg.sender_id === user?.id && msg.recipient_id === selectedConversation)
   );
 
-  const messageStats = [
-    { 
-      title: 'Total Messages', 
-      value: messages.length.toString(), 
-      subtitle: 'All conversations',
-      icon: Message,
-      color: 'primary' as const,
-      trend: 'up' as const,
-      trendValue: 'All conversations'
-    },
-    { 
-      title: 'Unread', 
-      value: conversations.reduce((sum, conv) => sum + conv.unread_count, 0).toString(), 
-      subtitle: 'Need attention',
-      icon: Notifications,
-      color: 'warning' as const,
-      trend: 'up' as const,
-      trendValue: 'Need attention'
-    },
-    { 
-      title: 'Active Chats', 
-      value: conversations.length.toString(), 
-      subtitle: 'Ongoing conversations',
-      icon: Forum,
-      color: 'success' as const,
-      trend: 'up' as const,
-      trendValue: 'Ongoing conversations'
-    },
-    { 
-      title: 'Response Rate', 
-      value: '95%', 
-      subtitle: 'Within 24 hours',
-      icon: TrendingUp,
-      color: 'info' as const,
-      trend: 'up' as const,
-      trendValue: 'Within 24 hours'
-    },
-  ];
-
   return (
-    <div ref={containerRef} className={`min-h-screen relative ${
-      isDark ? 'bg-dark-bg' : 'bg-gray-50'
-    }`}>
-      {/* Remove decorative elements */}
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <Card className="header-card overflow-hidden mb-8" elevation={3}>
-          <div className={`p-8 text-white relative ${
-            isDark 
-              ? 'bg-gradient-to-r from-dark-surface to-dark-bg' 
-              : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
+    <div className={`h-screen flex flex-col ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+      
+      {/* Mobile Header */}
+      <div className={`lg:hidden flex items-center justify-between p-4 border-b ${
+        isDark ? 'border-gray-600 bg-dark-surface' : 'border-gray-200 bg-white'
+      }`}>
+        <div className="flex items-center space-x-3">
+          <Button
+            variant="text"
+            size="small"
+            onClick={() => setShowSidebar(!showSidebar)}
+            className="lg:hidden"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+          <Typography variant="h6" className="font-medium">
+            Messages
+          </Typography>
+        </div>
+        <div className="flex items-center space-x-2">
+          <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+            isDark ? 'bg-lime/10 text-lime' : 'bg-asu-maroon/10 text-asu-maroon'
           }`}>
-            <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl ${
-              isDark ? 'bg-lime/10' : 'bg-white/10'
-            }`}></div>
-            <div className={`absolute bottom-0 left-0 w-24 h-24 rounded-full blur-xl ${
-              isDark ? 'bg-dark-accent/20' : 'bg-asu-gold/20'
-            }`}></div>
-            
-            <div className="relative z-10">
-              <Typography variant="h3" className="font-bold mb-4 text-white">
-                Messages
-              </Typography>
-              <Typography variant="subtitle1" className={`mb-6 max-w-3xl ${
-                isDark ? 'text-dark-muted' : 'text-white/90'
-              }`}>
-                Connect with students and employers through our messaging system
-              </Typography>
-              <div className="flex flex-wrap gap-4">
-                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-                  <EmojiEvents className="h-5 w-5" />
-                  <span>Real-time messaging</span>
-                </div>
-                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-                  <People className="h-5 w-5" />
-                  <span>Professional networking</span>
-                </div>
-                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-                  <Star className="h-5 w-5" />
-                  <span>Secure communication</span>
+            {conversations.reduce((sum, conv) => sum + conv.unread_count, 0)} unread
+          </div>
+        </div>
+      </div>
+
+      {/* Main Chat Interface */}
+      <div className="flex flex-1 overflow-hidden">
+        
+        {/* Conversations Sidebar */}
+        <div className={`${
+          showSidebar ? 'flex' : 'hidden'
+        } lg:flex flex-col w-full lg:w-80 xl:w-96 border-r ${
+          isDark ? 'border-gray-600 bg-dark-surface' : 'border-gray-200 bg-white'
+        }`}>
+          
+          {/* Search and Filter */}
+          <div className="p-4 border-b space-y-3">
+            <Input
+              placeholder="Search conversations..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              startIcon={<Search />}
+              variant="outlined"
+              fullWidth
+            />
+            <select
+              value={filterRole}
+              onChange={(e) => setFilterRole(e.target.value as 'all' | 'student' | 'employer')}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
+                isDark 
+                  ? 'border-gray-600 bg-dark-bg text-dark-text focus:ring-lime' 
+                  : 'border-gray-300 bg-white text-gray-900 focus:ring-asu-maroon'
+              }`}
+            >
+              <option value="all">All Conversations</option>
+              <option value="student">Students</option>
+              <option value="employer">Employers</option>
+            </select>
+          </div>
+
+          {/* Conversations List */}
+          <div className="flex-1 overflow-y-auto">
+            {filteredConversations.map((conversation) => (
+              <div
+                key={conversation.id}
+                onClick={() => {
+                  setSelectedConversation(conversation.id);
+                  setShowSidebar(false); // Hide sidebar on mobile when selecting conversation
+                }}
+                className={`p-4 border-b cursor-pointer transition-colors ${
+                  isDark 
+                    ? `border-gray-700 hover:bg-dark-bg ${
+                        selectedConversation === conversation.id 
+                          ? 'bg-lime/10 border-l-4 border-l-lime' 
+                          : ''
+                      }`
+                    : `border-gray-100 hover:bg-gray-50 ${
+                        selectedConversation === conversation.id 
+                          ? 'bg-asu-maroon/5 border-l-4 border-l-asu-maroon' 
+                          : ''
+                      }`
+                }`}
+              >
+                <div className="flex items-start space-x-3">
+                  <div className="relative">
+                    <Avatar
+                      src={conversation.participant_avatar}
+                      alt={conversation.participant_name}
+                      size="md"
+                      fallback={conversation.participant_name[0]}
+                    />
+                    <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-white text-xs ${getRoleColor(conversation.participant_role)}`}>
+                      {getRoleIcon(conversation.participant_role)}
+                    </div>
+                    {conversation.unread_count > 0 && (
+                      <div className={`absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold ${
+                        isDark ? 'bg-lime' : 'bg-asu-maroon'
+                      }`}>
+                        {conversation.unread_count}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <Typography variant="subtitle2" className="font-medium truncate">
+                        {conversation.participant_name}
+                      </Typography>
+                      <Typography variant="caption" color="textSecondary">
+                        {new Date(conversation.last_message_time).toLocaleTimeString([], { 
+                          hour: '2-digit', 
+                          minute: '2-digit' 
+                        })}
+                      </Typography>
+                    </div>
+                    {conversation.job_title && (
+                      <div className="flex items-center space-x-1 mb-1">
+                        <Work className={`h-3 w-3 ${isDark ? 'text-dark-muted' : 'text-gray-400'}`} />
+                        <Typography variant="caption" color="textSecondary" className="truncate">
+                          {conversation.job_title}
+                        </Typography>
+                      </div>
+                    )}
+                    <Typography variant="body2" color="textSecondary" className="truncate">
+                      {conversation.last_message}
+                    </Typography>
+                  </div>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
-        </Card>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {messageStats.map((stat, index) => (
-            <div key={index} className="stats-card">
-              <StatsCard
-                title={stat.title}
-                value={stat.value}
-                icon={stat.icon}
-                subtitle={stat.subtitle}
-                color={stat.color}
-                trend={stat.trend}
-                trendValue={stat.trendValue}
-                delay={index * 0.1}
-                rotation={index % 2 === 0 ? -0.5 : 0.5}
-              />
-            </div>
-          ))}
         </div>
 
-        {/* Messages Interface */}
-        <Card className="overflow-hidden h-[700px]" elevation={3}>
-          <div className="flex h-full">
-            {/* Conversations Sidebar */}
-            <div className={`w-1/3 border-r flex flex-col ${
-              isDark ? 'border-lime/20' : 'border-gray-200'
-            }`}>
-              {/* Search and Filter */}
-              <div className={`p-4 border-b ${
-                isDark 
-                  ? 'border-lime/20 bg-gradient-to-r from-lime to-dark-accent' 
-                  : 'border-gray-200 bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
+        {/* Messages Area */}
+        <div className={`flex-1 flex flex-col ${
+          !showSidebar || selectedConversation ? 'flex' : 'hidden lg:flex'
+        }`}>
+          {selectedConversation && currentConversation ? (
+            <>
+              {/* Chat Header */}
+              <div className={`p-4 border-b flex items-center justify-between ${
+                isDark ? 'border-gray-600 bg-dark-surface' : 'border-gray-200 bg-white'
               }`}>
-                <div className="mb-4">
-                  <Input
-                    placeholder="Search conversations..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    startIcon={<Search />}
-                    variant="outlined"
-                    fullWidth
-                    className="bg-white/20 backdrop-blur-sm border-white/30 text-white placeholder-white/70"
-                  />
+                <div className="flex items-center space-x-3">
+                  <Button
+                    variant="text"
+                    size="small"
+                    onClick={() => setShowSidebar(true)}
+                    className="lg:hidden"
+                  >
+                    <ArrowBack className="h-5 w-5" />
+                  </Button>
+                  <div className="relative">
+                    <Avatar
+                      src={currentConversation.participant_avatar}
+                      alt={currentConversation.participant_name}
+                      size="md"
+                      fallback={currentConversation.participant_name[0]}
+                    />
+                    <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-white text-xs ${getRoleColor(currentConversation.participant_role)}`}>
+                      {getRoleIcon(currentConversation.participant_role)}
+                    </div>
+                  </div>
+                  <div>
+                    <Typography variant="subtitle1" className="font-medium">
+                      {currentConversation.participant_name}
+                    </Typography>
+                    {currentConversation.job_title && (
+                      <div className="flex items-center space-x-1">
+                        <Work className={`h-3 w-3 ${isDark ? 'text-dark-muted' : 'text-gray-400'}`} />
+                        <Typography variant="caption" color="textSecondary">
+                          {currentConversation.job_title}
+                        </Typography>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <FilterList className="h-4 w-4 text-white/70" />
-                  <select
-                    value={filterRole}
-                    onChange={(e) => setFilterRole(e.target.value as 'all' | 'student' | 'employer')}
-                    className="flex-1 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-3 py-1 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/50"
-                  >
-                    <option value="all">All Roles</option>
-                    <option value="student">Students</option>
-                    <option value="employer">Employers</option>
-                  </select>
+                  <Button variant="text" size="small" className="hidden sm:flex">
+                    <PhoneInTalk className="h-5 w-5" />
+                  </Button>
+                  <Button variant="text" size="small" className="hidden sm:flex">
+                    <VideoCallOutlined className="h-5 w-5" />
+                  </Button>
+                  <Button variant="text" size="small">
+                    <MoreHoriz className="h-5 w-5" />
+                  </Button>
                 </div>
               </div>
 
-              {/* Conversations List */}
-              <div className="flex-1 overflow-y-auto">
-                {filteredConversations.map((conversation) => (
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                {conversationMessages.map((message) => (
                   <div
-                    key={conversation.id}
-                    onClick={() => setSelectedConversation(conversation.id)}
-                    className={`conversation-card p-4 border-b cursor-pointer transition-colors ${
-                      isDark 
-                        ? `border-lime/10 hover:bg-dark-bg ${
-                            selectedConversation === conversation.id 
-                              ? 'bg-lime/5 border-l-4 border-l-lime' 
-                              : ''
-                          }`
-                        : `border-gray-100 hover:bg-gray-50 ${
-                            selectedConversation === conversation.id 
-                              ? 'bg-asu-maroon/5 border-l-4 border-l-asu-maroon' 
-                              : ''
-                          }`
-                    }`}
+                    key={message.id}
+                    className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
                   >
-                    <div className="flex items-start space-x-3">
-                      <div className="relative">
-                        <Avatar
-                          src={conversation.participant_avatar}
-                          alt={conversation.participant_name}
-                          size="md"
-                          fallback={conversation.participant_name[0]}
-                        />
-                        <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center ${getRoleColor(conversation.participant_role)}`}>
-                          {getRoleIcon(conversation.participant_role)}
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <Typography variant="subtitle2" color="textPrimary" className="font-semibold truncate">
-                            {conversation.participant_name}
-                          </Typography>
-                          <Typography variant="caption" color="textSecondary">
-                            {new Date(conversation.last_message_time).toLocaleTimeString([], { 
-                              hour: '2-digit', 
-                              minute: '2-digit' 
-                            })}
-                          </Typography>
-                        </div>
-                        {conversation.job_title && (
-                          <div className="flex items-center space-x-1 mb-1">
-                            <Work className={`h-3 w-3 ${isDark ? 'text-dark-muted' : 'text-gray-400'}`} />
-                            <Typography variant="caption" color="textSecondary" className="truncate">
-                              {conversation.job_title}
-                            </Typography>
+                    <div
+                      className={`max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg px-4 py-3 rounded-2xl ${
+                        message.sender_id === user?.id
+                          ? isDark
+                            ? 'bg-lime text-dark-surface rounded-br-md'
+                            : 'bg-asu-maroon text-white rounded-br-md'
+                          : isDark
+                            ? 'bg-dark-bg text-dark-text rounded-bl-md border border-gray-600'
+                            : 'bg-gray-100 text-gray-900 rounded-bl-md'
+                      }`}
+                    >
+                      <Typography variant="body2" className="mb-2 break-words">
+                        {message.content}
+                      </Typography>
+                      <div className="flex items-center justify-between">
+                        <Typography variant="caption" className={`${
+                          message.sender_id === user?.id 
+                            ? isDark 
+                              ? 'text-dark-surface/70' 
+                              : 'text-white/70'
+                            : isDark 
+                              ? 'text-dark-muted' 
+                              : 'text-gray-500'
+                        }`}>
+                          {new Date(message.timestamp).toLocaleTimeString([], { 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                          })}
+                        </Typography>
+                        {message.sender_id === user?.id && (
+                          <div className="ml-2">
+                            {message.read ? (
+                              <DoneAll className={`h-4 w-4 ${
+                                isDark ? 'text-dark-surface/70' : 'text-white/70'
+                              }`} />
+                            ) : (
+                              <Check className={`h-4 w-4 ${
+                                isDark ? 'text-dark-surface/70' : 'text-white/70'
+                              }`} />
+                            )}
                           </div>
                         )}
-                        <Typography variant="body2" color="textSecondary" className="truncate">
-                          {conversation.last_message}
-                        </Typography>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
-            </div>
 
-            {/* Messages Area */}
-            <div className="flex-1 flex flex-col messages-area">
-              {selectedConversation && currentConversation ? (
-                <>
-                  {/* Chat Header */}
-                  <div className={`p-4 border-b ${
-                    isDark 
-                      ? 'border-lime/20 bg-gradient-to-r from-dark-surface to-dark-bg' 
-                      : 'border-gray-200 bg-gradient-to-r from-white to-gray-50'
-                  }`}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="relative">
-                          <Avatar
-                            src={currentConversation.participant_avatar}
-                            alt={currentConversation.participant_name}
-                            size="md"
-                            fallback={currentConversation.participant_name[0]}
-                          />
-                          <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center ${getRoleColor(currentConversation.participant_role)}`}>
-                            {getRoleIcon(currentConversation.participant_role)}
-                          </div>
-                        </div>
-                        <div>
-                          <Typography variant="subtitle1" color="textPrimary" className="font-semibold">
-                            {currentConversation.participant_name}
-                          </Typography>
-                          {currentConversation.job_title && (
-                            <div className="flex items-center space-x-1">
-                              <Work className={`h-3 w-3 ${isDark ? 'text-dark-muted' : 'text-gray-400'}`} />
-                              <Typography variant="caption" color="textSecondary">
-                                {currentConversation.job_title}
-                              </Typography>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Button variant="text" size="small" className="min-w-0 p-2">
-                          <PhoneInTalk className="h-5 w-5" />
-                        </Button>
-                        <Button variant="text" size="small" className="min-w-0 p-2">
-                          <VideoCallOutlined className="h-5 w-5" />
-                        </Button>
-                        <Button variant="text" size="small" className="min-w-0 p-2">
-                          <MoreHoriz className="h-5 w-5" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Messages */}
-                  <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                    {conversationMessages.map((message) => (
-                      <div
-                        key={message.id}
-                        className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
-                      >
-                        <div
-                          className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
-                            message.sender_id === user?.id
-                              ? isDark
-                                ? 'bg-lime text-dark-surface rounded-br-md'
-                                : 'bg-asu-maroon text-white rounded-br-md'
-                              : isDark
-                                ? 'bg-dark-bg text-dark-text rounded-bl-md'
-                                : 'bg-gray-100 text-gray-900 rounded-bl-md'
-                          }`}
-                        >
-                          <Typography variant="body2" className="mb-2">
-                            {message.content}
-                          </Typography>
-                          <div className="flex items-center justify-between">
-                            <Typography variant="caption" className={`${
-                              message.sender_id === user?.id 
-                                ? isDark 
-                                  ? 'text-dark-surface/70' 
-                                  : 'text-white/70'
-                                : isDark 
-                                  ? 'text-dark-muted' 
-                                  : 'text-gray-500'
-                            }`}>
-                              {new Date(message.timestamp).toLocaleTimeString([], { 
-                                hour: '2-digit', 
-                                minute: '2-digit' 
-                              })}
-                            </Typography>
-                            {message.sender_id === user?.id && (
-                              <div className="ml-2">
-                                {message.read ? (
-                                  <DoneAll className={`h-4 w-4 ${
-                                    isDark ? 'text-dark-surface/70' : 'text-white/70'
-                                  }`} />
-                                ) : (
-                                  <Check className={`h-4 w-4 ${
-                                    isDark ? 'text-dark-surface/70' : 'text-white/70'
-                                  }`} />
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Message Input */}
-                  <div className={`p-4 border-t ${
-                    isDark 
-                      ? 'border-lime/20 bg-gradient-to-r from-dark-surface to-dark-bg' 
-                      : 'border-gray-200 bg-gradient-to-r from-white to-gray-50'
-                  }`}>
-                    <div className="flex items-center space-x-3">
-                      <Button variant="text" size="small" className="min-w-0 p-2">
-                        <AttachFile className="h-5 w-5" />
-                      </Button>
-                      <div className="flex-1">
-                        <Input
-                          value={newMessage}
-                          onChange={(e) => setNewMessage(e.target.value)}
-                          onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                          placeholder="Type your message..."
-                          variant="outlined"
-                          fullWidth
-                          endIcon={
-                            <Button variant="text" size="small" className="min-w-0 p-1">
-                              <EmojiEmotions className="h-5 w-5" />
-                            </Button>
-                          }
-                        />
-                      </div>
-                      <Button
-                        onClick={handleSendMessage}
-                        disabled={!newMessage.trim()}
-                        variant="contained"
-                        color="primary"
-                        size="small"
-                        className="min-w-0 p-3"
-                      >
-                        <Send className="h-5 w-5" />
-                      </Button>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                /* No Conversation Selected */
-                <div className="flex-1 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className={`w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center ${
-                      isDark ? 'bg-lime/20' : 'bg-asu-maroon/10'
-                    }`}>
-                      <Chat className={`w-12 h-12 ${
-                        isDark ? 'text-lime' : 'text-asu-maroon'
-                      }`} />
-                    </div>
-                    <Typography variant="h5" color="textPrimary" className="font-bold mb-4">
-                      Select a conversation
-                    </Typography>
-                    <Typography variant="body1" color="textSecondary" className="mb-6">
-                      Choose a conversation from the sidebar to start messaging
-                    </Typography>
-                    <Button 
+              {/* Message Input */}
+              <div className={`p-4 border-t ${
+                isDark ? 'border-gray-600 bg-dark-surface' : 'border-gray-200 bg-white'
+              }`}>
+                <div className="flex items-end space-x-2">
+                  <Button variant="text" size="small" className="hidden sm:flex mb-3">
+                    <AttachFile className="h-5 w-5" />
+                  </Button>
+                  <div className="flex-1">
+                    <Input
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendMessage())}
+                      placeholder="Type your message..."
                       variant="outlined"
-                      color="primary"
-                      startIcon={<Add />}
-                    >
-                      Start New Conversation
-                    </Button>
+                      fullWidth
+                      multiline
+                      rows={1}
+                      endIcon={
+                        <Button variant="text" size="small" className="hidden sm:flex">
+                          <EmojiEmotions className="h-5 w-5" />
+                        </Button>
+                      }
+                    />
                   </div>
+                  <Button
+                    onClick={handleSendMessage}
+                    disabled={!newMessage.trim()}
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    className="mb-3"
+                  >
+                    <Send className="h-5 w-5" />
+                  </Button>
                 </div>
-              )}
+              </div>
+            </>
+          ) : (
+            /* No Conversation Selected */
+            <div className="flex-1 flex items-center justify-center p-8">
+              <div className="text-center">
+                <div className={`w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 rounded-full flex items-center justify-center ${
+                  isDark ? 'bg-lime/10' : 'bg-asu-maroon/10'
+                }`}>
+                  <Chat className={`w-8 h-8 sm:w-12 sm:h-12 ${
+                    isDark ? 'text-lime' : 'text-asu-maroon'
+                  }`} />
+                </div>
+                <Typography variant="h6" className="font-medium mb-2">
+                  Select a conversation
+                </Typography>
+                <Typography variant="body2" color="textSecondary" className="mb-4">
+                  Choose a conversation to start messaging
+                </Typography>
+                <Button 
+                  variant="outlined"
+                  color="primary"
+                  startIcon={<Add />}
+                  onClick={() => setShowSidebar(true)}
+                  className="lg:hidden"
+                >
+                  View Conversations
+                </Button>
+              </div>
             </div>
-          </div>
-        </Card>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -699,10 +550,10 @@ const getRoleIcon = (role: string) => {
 const getRoleColor = (role: string) => {
   switch (role) {
     case 'student':
-      return 'bg-blue-100 text-blue-800';
+      return 'bg-blue-500';
     case 'employer':
-      return 'bg-green-100 text-green-800';
+      return 'bg-green-500';
     default:
-      return 'bg-gray-100 text-gray-800';
+      return 'bg-gray-500';
   }
 };

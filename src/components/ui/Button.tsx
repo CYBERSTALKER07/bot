@@ -1,133 +1,164 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useState } from 'react';
 import { LucideIcon } from 'lucide-react';
 import { CircularProgress } from '@mui/material';
 import { useTheme } from '../../context/ThemeContext';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'contained' | 'outlined' | 'text' | 'fab';
+  variant?: 'filled' | 'outlined' | 'text' | 'elevated' | 'tonal' | 'fab';
   size?: 'small' | 'medium' | 'large';
   color?: 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info';
   startIcon?: LucideIcon | React.ComponentType<React.SVGProps<SVGSVGElement>> | React.ReactElement;
   endIcon?: LucideIcon | React.ComponentType<React.SVGProps<SVGSVGElement>> | React.ReactElement;
   loading?: boolean;
   fullWidth?: boolean;
-  elevation?: number;
-  disableElevation?: boolean;
   href?: string;
   component?: React.ElementType;
   to?: string;
   children: React.ReactNode;
+  ripple?: boolean;
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
-  variant = 'contained',
+  variant = 'filled',
   size = 'medium',
   color = 'primary',
   startIcon: StartIcon,
   endIcon: EndIcon,
   loading = false,
   fullWidth = false,
-  elevation = 2,
-  disableElevation = false,
   href,
   component,
   to,
   className = '',
   children,
   disabled,
+  ripple = true,
   ...props
 }, ref) => {
   const { isDark } = useTheme();
+  const [isPressed, setIsPressed] = useState(false);
   
   const baseClasses = `
-    inline-flex items-center justify-center font-medium transition-all duration-200 
+    relative inline-flex items-center justify-center font-medium
+    transition-all duration-200 ease-material-standard
     focus:outline-none focus:ring-2 focus:ring-offset-2 
     disabled:opacity-50 disabled:cursor-not-allowed
-    transform hover:scale-105 active:scale-95
+    disabled:pointer-events-none overflow-hidden
+    select-none cursor-pointer
   `;
 
   const sizeClasses = {
-    small: 'px-3 py-1.5 text-sm rounded-lg min-h-[32px]',
-    medium: 'px-4 py-2 text-base rounded-xl min-h-[40px]',
-    large: 'px-6 py-3 text-lg rounded-2xl min-h-[48px]'
+    small: 'px-3 py-1.5 text-label-medium rounded-lg min-h-[32px] gap-1',
+    medium: 'px-4 py-2.5 text-label-large rounded-xl min-h-[40px] gap-2',
+    large: 'px-6 py-3 text-label-large rounded-2xl min-h-[48px] gap-2'
   };
 
   const getColorClasses = () => {
     const colors = {
       primary: {
-        contained: isDark 
-          ? 'bg-lime text-dark-surface hover:bg-lime/90 focus:ring-lime shadow-lg hover:shadow-xl'
-          : 'bg-asu-maroon text-white hover:bg-asu-maroon/90 focus:ring-asu-maroon shadow-lg hover:shadow-xl',
+        filled: isDark 
+          ? 'bg-lime text-dark-surface hover:shadow-elevation-2 focus:ring-lime/20 active:shadow-elevation-1'
+          : 'bg-asu-maroon text-white hover:shadow-elevation-2 focus:ring-asu-maroon/20 active:shadow-elevation-1',
         outlined: isDark
-          ? 'border-2 border-lime text-lime hover:bg-lime/10 focus:ring-lime'
-          : 'border-2 border-asu-maroon text-asu-maroon hover:bg-asu-maroon/10 focus:ring-asu-maroon',
+          ? 'border border-lime text-lime hover:bg-lime/8 focus:ring-lime/20 active:bg-lime/12'
+          : 'border border-asu-maroon text-asu-maroon hover:bg-asu-maroon/8 focus:ring-asu-maroon/20 active:bg-asu-maroon/12',
         text: isDark
-          ? 'text-lime hover:bg-lime/10 focus:ring-lime'
-          : 'text-asu-maroon hover:bg-asu-maroon/10 focus:ring-asu-maroon',
+          ? 'text-lime hover:bg-lime/8 focus:ring-lime/20 active:bg-lime/12'
+          : 'text-asu-maroon hover:bg-asu-maroon/8 focus:ring-asu-maroon/20 active:bg-asu-maroon/12',
+        elevated: isDark
+          ? 'bg-dark-surface text-lime shadow-elevation-1 hover:shadow-elevation-2 focus:ring-lime/20 active:shadow-elevation-1'
+          : 'bg-surface-50 text-asu-maroon shadow-elevation-1 hover:shadow-elevation-2 focus:ring-asu-maroon/20 active:shadow-elevation-1',
+        tonal: isDark
+          ? 'bg-lime/10 text-lime hover:bg-lime/20 focus:ring-lime/20 active:bg-lime/15'
+          : 'bg-asu-maroon/10 text-asu-maroon hover:bg-asu-maroon/20 focus:ring-asu-maroon/20 active:bg-asu-maroon/15',
         fab: isDark
-          ? 'bg-lime text-dark-surface hover:bg-lime/90 focus:ring-lime shadow-lg hover:shadow-xl rounded-full'
-          : 'bg-asu-maroon text-white hover:bg-asu-maroon/90 focus:ring-asu-maroon shadow-lg hover:shadow-xl rounded-full'
+          ? 'bg-lime text-dark-surface shadow-elevation-3 hover:shadow-elevation-4 focus:ring-lime/20 active:shadow-elevation-2 rounded-2xl'
+          : 'bg-asu-maroon text-white shadow-elevation-3 hover:shadow-elevation-4 focus:ring-asu-maroon/20 active:shadow-elevation-2 rounded-2xl'
       },
       secondary: {
-        contained: isDark 
-          ? 'bg-dark-accent text-dark-surface hover:bg-dark-accent/90 focus:ring-dark-accent shadow-lg hover:shadow-xl'
-          : 'bg-asu-gold text-white hover:bg-asu-gold/90 focus:ring-asu-gold shadow-lg hover:shadow-xl',
+        filled: isDark 
+          ? 'bg-secondary-300 text-secondary-900 hover:shadow-elevation-2 focus:ring-secondary-300/20 active:shadow-elevation-1'
+          : 'bg-secondary-600 text-white hover:shadow-elevation-2 focus:ring-secondary-600/20 active:shadow-elevation-1',
         outlined: isDark
-          ? 'border-2 border-dark-accent text-dark-accent hover:bg-dark-accent/10 focus:ring-dark-accent'
-          : 'border-2 border-asu-gold text-asu-gold hover:bg-asu-gold/10 focus:ring-asu-gold',
+          ? 'border border-secondary-300 text-secondary-300 hover:bg-secondary-300/8 focus:ring-secondary-300/20 active:bg-secondary-300/12'
+          : 'border border-secondary-600 text-secondary-600 hover:bg-secondary-600/8 focus:ring-secondary-600/20 active:bg-secondary-600/12',
         text: isDark
-          ? 'text-dark-accent hover:bg-dark-accent/10 focus:ring-dark-accent'
-          : 'text-asu-gold hover:bg-asu-gold/10 focus:ring-asu-gold',
+          ? 'text-secondary-300 hover:bg-secondary-300/8 focus:ring-secondary-300/20 active:bg-secondary-300/12'
+          : 'text-secondary-600 hover:bg-secondary-600/8 focus:ring-secondary-600/20 active:bg-secondary-600/12',
+        elevated: isDark
+          ? 'bg-dark-surface text-secondary-300 shadow-elevation-1 hover:shadow-elevation-2 focus:ring-secondary-300/20 active:shadow-elevation-1'
+          : 'bg-surface-50 text-secondary-600 shadow-elevation-1 hover:shadow-elevation-2 focus:ring-secondary-600/20 active:shadow-elevation-1',
+        tonal: isDark
+          ? 'bg-secondary-300/10 text-secondary-300 hover:bg-secondary-300/20 focus:ring-secondary-300/20 active:bg-secondary-300/15'
+          : 'bg-secondary-600/10 text-secondary-600 hover:bg-secondary-600/20 focus:ring-secondary-600/20 active:bg-secondary-600/15',
         fab: isDark
-          ? 'bg-dark-accent text-dark-surface hover:bg-dark-accent/90 focus:ring-dark-accent shadow-lg hover:shadow-xl rounded-full'
-          : 'bg-asu-gold text-white hover:bg-asu-gold/90 focus:ring-asu-gold shadow-lg hover:shadow-xl rounded-full'
+          ? 'bg-secondary-300 text-secondary-900 shadow-elevation-3 hover:shadow-elevation-4 focus:ring-secondary-300/20 active:shadow-elevation-2 rounded-2xl'
+          : 'bg-secondary-600 text-white shadow-elevation-3 hover:shadow-elevation-4 focus:ring-secondary-600/20 active:shadow-elevation-2 rounded-2xl'
       },
       success: {
-        contained: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 shadow-lg hover:shadow-xl',
-        outlined: 'border-2 border-green-600 text-green-600 hover:bg-green-50 focus:ring-green-500',
-        text: 'text-green-600 hover:bg-green-50 focus:ring-green-500',
-        fab: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 shadow-lg hover:shadow-xl rounded-full'
+        filled: 'bg-success-600 text-white hover:shadow-elevation-2 focus:ring-success-600/20 active:shadow-elevation-1',
+        outlined: 'border border-success-600 text-success-600 hover:bg-success-600/8 focus:ring-success-600/20 active:bg-success-600/12',
+        text: 'text-success-600 hover:bg-success-600/8 focus:ring-success-600/20 active:bg-success-600/12',
+        elevated: isDark
+          ? 'bg-dark-surface text-success-400 shadow-elevation-1 hover:shadow-elevation-2 focus:ring-success-400/20 active:shadow-elevation-1'
+          : 'bg-surface-50 text-success-600 shadow-elevation-1 hover:shadow-elevation-2 focus:ring-success-600/20 active:shadow-elevation-1',
+        tonal: 'bg-success-600/10 text-success-600 hover:bg-success-600/20 focus:ring-success-600/20 active:bg-success-600/15',
+        fab: 'bg-success-600 text-white shadow-elevation-3 hover:shadow-elevation-4 focus:ring-success-600/20 active:shadow-elevation-2 rounded-2xl'
       },
       error: {
-        contained: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 shadow-lg hover:shadow-xl',
-        outlined: 'border-2 border-red-600 text-red-600 hover:bg-red-50 focus:ring-red-500',
-        text: 'text-red-600 hover:bg-red-50 focus:ring-red-500',
-        fab: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 shadow-lg hover:shadow-xl rounded-full'
+        filled: 'bg-error-600 text-white hover:shadow-elevation-2 focus:ring-error-600/20 active:shadow-elevation-1',
+        outlined: 'border border-error-600 text-error-600 hover:bg-error-600/8 focus:ring-error-600/20 active:bg-error-600/12',
+        text: 'text-error-600 hover:bg-error-600/8 focus:ring-error-600/20 active:bg-error-600/12',
+        elevated: isDark
+          ? 'bg-dark-surface text-error-400 shadow-elevation-1 hover:shadow-elevation-2 focus:ring-error-400/20 active:shadow-elevation-1'
+          : 'bg-surface-50 text-error-600 shadow-elevation-1 hover:shadow-elevation-2 focus:ring-error-600/20 active:shadow-elevation-1',
+        tonal: 'bg-error-600/10 text-error-600 hover:bg-error-600/20 focus:ring-error-600/20 active:bg-error-600/15',
+        fab: 'bg-error-600 text-white shadow-elevation-3 hover:shadow-elevation-4 focus:ring-error-600/20 active:shadow-elevation-2 rounded-2xl'
       },
       warning: {
-        contained: 'bg-amber-600 text-white hover:bg-amber-700 focus:ring-amber-500 shadow-lg hover:shadow-xl',
-        outlined: 'border-2 border-amber-600 text-amber-600 hover:bg-amber-50 focus:ring-amber-500',
-        text: 'text-amber-600 hover:bg-amber-50 focus:ring-amber-500',
-        fab: 'bg-amber-600 text-white hover:bg-amber-700 focus:ring-amber-500 shadow-lg hover:shadow-xl rounded-full'
+        filled: 'bg-warning-600 text-white hover:shadow-elevation-2 focus:ring-warning-600/20 active:shadow-elevation-1',
+        outlined: 'border border-warning-600 text-warning-600 hover:bg-warning-600/8 focus:ring-warning-600/20 active:bg-warning-600/12',
+        text: 'text-warning-600 hover:bg-warning-600/8 focus:ring-warning-600/20 active:bg-warning-600/12',
+        elevated: isDark
+          ? 'bg-dark-surface text-warning-400 shadow-elevation-1 hover:shadow-elevation-2 focus:ring-warning-400/20 active:shadow-elevation-1'
+          : 'bg-surface-50 text-warning-600 shadow-elevation-1 hover:shadow-elevation-2 focus:ring-warning-600/20 active:shadow-elevation-1',
+        tonal: 'bg-warning-600/10 text-warning-600 hover:bg-warning-600/20 focus:ring-warning-600/20 active:bg-warning-600/15',
+        fab: 'bg-warning-600 text-white shadow-elevation-3 hover:shadow-elevation-4 focus:ring-warning-600/20 active:shadow-elevation-2 rounded-2xl'
       },
       info: {
-        contained: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 shadow-lg hover:shadow-xl',
-        outlined: 'border-2 border-blue-600 text-blue-600 hover:bg-blue-50 focus:ring-blue-500',
-        text: 'text-blue-600 hover:bg-blue-50 focus:ring-blue-500',
-        fab: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 shadow-lg hover:shadow-xl rounded-full'
+        filled: 'bg-info-600 text-white hover:shadow-elevation-2 focus:ring-info-600/20 active:shadow-elevation-1',
+        outlined: 'border border-info-600 text-info-600 hover:bg-info-600/8 focus:ring-info-600/20 active:bg-info-600/12',
+        text: 'text-info-600 hover:bg-info-600/8 focus:ring-info-600/20 active:bg-info-600/12',
+        elevated: isDark
+          ? 'bg-dark-surface text-info-400 shadow-elevation-1 hover:shadow-elevation-2 focus:ring-info-400/20 active:shadow-elevation-1'
+          : 'bg-surface-50 text-info-600 shadow-elevation-1 hover:shadow-elevation-2 focus:ring-info-600/20 active:shadow-elevation-1',
+        tonal: 'bg-info-600/10 text-info-600 hover:bg-info-600/20 focus:ring-info-600/20 active:bg-info-600/15',
+        fab: 'bg-info-600 text-white shadow-elevation-3 hover:shadow-elevation-4 focus:ring-info-600/20 active:shadow-elevation-2 rounded-2xl'
       }
     };
 
     return colors[color][variant] || colors.primary[variant];
   };
 
-  const elevationClasses = !disableElevation && variant === 'contained' 
-    ? `shadow-${elevation === 1 ? 'sm' : elevation === 2 ? 'md' : 'lg'} hover:shadow-xl`
-    : '';
-
   const widthClasses = fullWidth ? 'w-full' : '';
   
   const fabClasses = variant === 'fab' 
-    ? 'w-14 h-14 rounded-full p-0' 
+    ? size === 'small' 
+      ? 'w-10 h-10 p-0' 
+      : size === 'large' 
+        ? 'w-14 h-14 p-0' 
+        : 'w-12 h-12 p-0'
     : '';
+
+  const stateClasses = isPressed ? 'transform scale-95' : '';
 
   const buttonClasses = `
     ${baseClasses}
     ${sizeClasses[size]}
     ${getColorClasses()}
-    ${elevationClasses}
     ${widthClasses}
     ${fabClasses}
+    ${stateClasses}
     ${className}
   `.trim().replace(/\s+/g, ' ');
 
@@ -137,14 +168,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   const renderIcon = (Icon: typeof StartIcon, iconClassName: string) => {
     if (!Icon) return null;
     
-    // Handle React elements (JSX)
     if (React.isValidElement(Icon)) {
       return React.cloneElement(Icon as React.ReactElement<{className?: string}>, { 
         className: iconClassName 
       });
     }
     
-    // Handle React components (MUI icons, Lucide icons)
     if (typeof Icon === 'function' || typeof Icon === 'object') {
       const IconComponent = Icon as React.ComponentType<{className?: string; style?: React.CSSProperties}>;
       return <IconComponent className={iconClassName} style={{ fontSize: iconSize }} />;
@@ -153,11 +182,26 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
     return null;
   };
 
+  const handleMouseDown = () => {
+    setIsPressed(true);
+  };
+
+  const handleMouseUp = () => {
+    setIsPressed(false);
+  };
+
+  const handleMouseLeave = () => {
+    setIsPressed(false);
+  };
+
   const Component = component || (href ? 'a' : 'button');
   const componentProps = {
     ref,
     className: buttonClasses,
     disabled: disabled || loading,
+    onMouseDown: handleMouseDown,
+    onMouseUp: handleMouseUp,
+    onMouseLeave: handleMouseLeave,
     ...(href && { href }),
     ...(to && { to }),
     ...props
@@ -165,24 +209,30 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
 
   return (
     <Component {...componentProps}>
-      {loading ? (
-        <CircularProgress 
-          size={loadingSize} 
-          className={`mr-2 ${
-            variant === 'contained' 
-              ? 'text-current' 
-              : isDark ? 'text-lime' : 'text-asu-maroon'
-          }`}
-        />
-      ) : StartIcon && (
-        renderIcon(StartIcon, `mr-2 ${variant === 'fab' ? 'mr-0' : ''}`)
+      {/* Ripple Effect */}
+      {ripple && (
+        <span className="absolute inset-0 overflow-hidden rounded-inherit">
+          <span className="absolute inset-0 rounded-inherit transition-opacity duration-200 opacity-0 hover:opacity-100 bg-white/10" />
+        </span>
       )}
       
-      {variant !== 'fab' && children}
-      
-      {!loading && EndIcon && (
-        renderIcon(EndIcon, `ml-2 ${variant === 'fab' ? 'ml-0' : ''}`)
-      )}
+      {/* Content */}
+      <span className="relative z-10 flex items-center justify-center gap-inherit">
+        {loading ? (
+          <CircularProgress 
+            size={loadingSize} 
+            className="text-current"
+          />
+        ) : StartIcon && (
+          renderIcon(StartIcon, variant === 'fab' ? '' : '')
+        )}
+        
+        {variant !== 'fab' && children}
+        
+        {!loading && EndIcon && (
+          renderIcon(EndIcon, variant === 'fab' ? '' : '')
+        )}
+      </span>
     </Component>
   );
 });
@@ -191,19 +241,22 @@ Button.displayName = 'Button';
 
 export default Button;
 
-// Predefined button variants for common use cases
+// Material Design 3 Button Variants
 export const MaterialButton = {
-  Primary: (props: Omit<ButtonProps, 'variant' | 'color'>) => 
-    <Button variant="contained" color="primary" {...props} />,
-  
-  Secondary: (props: Omit<ButtonProps, 'variant' | 'color'>) => 
-    <Button variant="contained" color="secondary" {...props} />,
+  Filled: (props: Omit<ButtonProps, 'variant'>) => 
+    <Button variant="filled" {...props} />,
   
   Outlined: (props: Omit<ButtonProps, 'variant'>) => 
     <Button variant="outlined" {...props} />,
   
   Text: (props: Omit<ButtonProps, 'variant'>) => 
     <Button variant="text" {...props} />,
+  
+  Elevated: (props: Omit<ButtonProps, 'variant'>) => 
+    <Button variant="elevated" {...props} />,
+  
+  Tonal: (props: Omit<ButtonProps, 'variant'>) => 
+    <Button variant="tonal" {...props} />,
   
   FAB: (props: Omit<ButtonProps, 'variant'>) => 
     <Button variant="fab" {...props} />,

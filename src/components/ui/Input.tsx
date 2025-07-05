@@ -24,6 +24,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   rows?: number;
   showPasswordToggle?: boolean;
   focused?: boolean;
+  showLabel?: boolean; // New prop to control label visibility
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(({
@@ -39,6 +40,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
   rows = 3,
   showPasswordToggle = false,
   focused = false,
+  showLabel = false, // Default to false to hide labels
   className = '',
   type = 'text',
   ...props
@@ -106,7 +108,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
             isDark ? 'bg-dark-surface text-lime' : 'bg-white text-asu-maroon'
           }`
         : `top-1 text-xs ${
-            isDark ? 'text-lime' : 'text-asu-maroon'
+            isDark ? 'text-lime' : 'bg-white text-asu-maroon'
           }`
       : variant === 'standard'
         ? `top-1/2 -translate-y-1/2 text-base ${
@@ -189,8 +191,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
           />
         )}
 
-        {/* Floating Label */}
-        {label && (
+        {/* Floating Label - Only show if showLabel is true */}
+        {label && showLabel && (
           <label className={labelClasses}>
             {label}
           </label>

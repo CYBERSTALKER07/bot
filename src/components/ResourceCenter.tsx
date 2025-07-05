@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { gsap } from 'gsap';
 import { 
   Description, 
   VideoLibrary, 
@@ -15,10 +14,6 @@ import {
   TrendingUp,
   People,
   EmojiEvents,
-  AutoAwesome,
-  LocalCafe,
-  Favorite,
-  Bolt,
   Share,
   BookmarkAdd,
   Bookmark,
@@ -38,72 +33,10 @@ import Badge from './ui/Badge';
 
 export default function ResourceCenter() {
   const { isDark } = useTheme();
-  const containerRef = useRef<HTMLDivElement>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
   const [bookmarkedResources, setBookmarkedResources] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const ctx = gsap.context(() => {
-      // Material Design entrance animations
-      gsap.fromTo('.header-card', {
-        opacity: 0,
-        y: -30,
-        scale: 0.98
-      }, {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.8,
-        ease: 'power2.out'
-      });
-
-      gsap.fromTo('.stats-card', {
-        opacity: 0,
-        y: 20,
-        scale: 0.9
-      }, {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.6,
-        stagger: 0.1,
-        ease: 'back.out(1.7)',
-        delay: 0.2
-      });
-
-      gsap.fromTo('.resource-card', {
-        opacity: 0,
-        y: 30,
-        scale: 0.95
-      }, {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.5,
-        stagger: 0.08,
-        ease: 'power2.out',
-        delay: 0.4
-      });
-
-      // Floating decorations
-      gsap.to('.resource-decoration', {
-        y: -10,
-        x: 5,
-        rotation: 180,
-        duration: 15,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut'
-      });
-
-    }, containerRef);
-
-    return () => ctx.revert();
-  }, []);
 
   // Mock resources data
   const resources: Resource[] = [
@@ -249,72 +182,50 @@ export default function ResourceCenter() {
   ];
 
   return (
-    <div ref={containerRef} className={`min-h-screen relative ${
-      isDark ? 'bg-dark-bg' : 'bg-gray-50'
-    }`}>
+    <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
         {/* Header */}
-        <Card className="header-card overflow-hidden mb-8" elevation={3}>
-          <div className={`p-8 text-white relative ${
-            isDark 
-              ? 'bg-gradient-to-r from-dark-surface to-dark-bg' 
-              : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
-          }`}>
-            <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl ${
-              isDark ? 'bg-lime/10' : 'bg-white/10'
-            }`}></div>
-            <div className={`absolute bottom-0 left-0 w-24 h-24 rounded-full blur-xl ${
-              isDark ? 'bg-dark-accent/20' : 'bg-asu-gold/20'
-            }`}></div>
-            
-            <div className="relative z-10">
-              <Typography variant="h3" className="font-bold mb-4 text-white">
-                Resource Center
-              </Typography>
-              <Typography variant="subtitle1" className={`mb-6 max-w-3xl ${
-                isDark ? 'text-dark-muted' : 'text-white/90'
-              }`}>
-                Comprehensive career resources to help you succeed in your professional journey
-              </Typography>
-              <div className="flex flex-wrap gap-4">
-                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-                  <EmojiEvents className="h-5 w-5" />
-                  <span>Expert-curated content</span>
-                </div>
-                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-                  <People className="h-5 w-5" />
-                  <span>Trusted by thousands</span>
-                </div>
-                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-                  <Star className="h-5 w-5" />
-                  <span>Regularly updated</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Card>
+        <div className="mb-8">
+          <Typography variant="h4" className="font-medium mb-2">
+            Resource Center
+          </Typography>
+          <Typography variant="body1" color="textSecondary">
+            Comprehensive career resources to help you succeed in your professional journey.
+          </Typography>
+        </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {resourceStats.map((stat, index) => (
-            <div key={index} className="stats-card">
-              <StatsCard
-                title={stat.title}
-                value={stat.value}
-                icon={stat.icon}
-                subtitle={stat.subtitle}
-                color={stat.color}
-                trend={stat.trend}
-                trendValue={stat.trendValue}
-                delay={index * 0.1}
-                rotation={index % 2 === 0 ? -0.5 : 0.5}
-              />
-            </div>
+            <Card key={index} className="p-6" elevation={1}>
+              <div className="flex items-center">
+                <div className={`p-3 rounded-xl ${
+                  stat.color === 'primary' 
+                    ? isDark ? 'bg-lime/10 text-lime' : 'bg-asu-maroon/10 text-asu-maroon'
+                    : stat.color === 'success'
+                    ? isDark ? 'bg-green-500/10 text-green-400' : 'bg-green-50 text-green-600'
+                    : stat.color === 'info'
+                    ? isDark ? 'bg-blue-500/10 text-blue-400' : 'bg-blue-50 text-blue-600'
+                    : isDark ? 'bg-orange-500/10 text-orange-400' : 'bg-orange-50 text-orange-600'
+                }`}>
+                  <stat.icon className="h-6 w-6" />
+                </div>
+                <div className="ml-4">
+                  <Typography variant="h5" className="font-semibold">
+                    {stat.value}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    {stat.subtitle}
+                  </Typography>
+                </div>
+              </div>
+            </Card>
           ))}
         </div>
 
         {/* Search and Filters */}
-        <Card className="p-6 mb-8" elevation={2}>
+        <Card className="p-6 mb-8" elevation={1}>
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <Input
@@ -327,32 +238,27 @@ export default function ResourceCenter() {
               />
             </div>
             <div className="flex gap-4">
-              <div className="flex items-center space-x-2">
-                <FilterList className={`h-5 w-5 ${
-                  isDark ? 'text-dark-muted' : 'text-gray-400'
-                }`} />
-                <select
-                  value={categoryFilter}
-                  onChange={(e) => setCategoryFilter(e.target.value)}
-                  className={`px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
-                    isDark 
-                      ? 'border-lime/20 bg-dark-bg text-dark-text focus:ring-lime' 
-                      : 'border-gray-300 bg-white text-gray-900 focus:ring-asu-maroon'
-                  }`}
-                >
-                  <option value="all">All Categories</option>
-                  <option value="resume">Resume & CV</option>
-                  <option value="interview">Interview Prep</option>
-                  <option value="career_planning">Career Planning</option>
-                  <option value="networking">Networking</option>
-                </select>
-              </div>
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                className={`px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
+                  isDark 
+                    ? 'border-gray-600 bg-dark-surface text-dark-text focus:ring-lime' 
+                    : 'border-gray-300 bg-white text-gray-900 focus:ring-asu-maroon'
+                }`}
+              >
+                <option value="all">All Categories</option>
+                <option value="resume">Resume & Cover Letter</option>
+                <option value="interview">Interview Prep</option>
+                <option value="networking">Networking</option>
+                <option value="career_planning">Career Planning</option>
+              </select>
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className={`px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
+                className={`px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
                   isDark 
-                    ? 'border-lime/20 bg-dark-bg text-dark-text focus:ring-lime' 
+                    ? 'border-gray-600 bg-dark-surface text-dark-text focus:ring-lime' 
                     : 'border-gray-300 bg-white text-gray-900 focus:ring-asu-maroon'
                 }`}
               >
@@ -361,7 +267,6 @@ export default function ResourceCenter() {
                 <option value="video">Videos</option>
                 <option value="template">Templates</option>
                 <option value="guide">Guides</option>
-                <option value="faq">FAQs</option>
               </select>
             </div>
           </div>
@@ -375,22 +280,45 @@ export default function ResourceCenter() {
         </div>
 
         {/* Resources Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredResources.map((resource) => (
-            <Card key={resource.id} className="resource-card overflow-hidden hover:shadow-lg transition-shadow" elevation={2}>
-              <div className="p-6">
+        {filteredResources.length === 0 ? (
+          <Card className="p-12 text-center" elevation={1}>
+            <MenuBook className={`h-16 w-16 mx-auto mb-4 ${
+              isDark ? 'text-dark-muted' : 'text-gray-400'
+            }`} />
+            <Typography variant="h6" className="mb-2">
+              No resources found
+            </Typography>
+            <Typography variant="body1" color="textSecondary" className="mb-4">
+              Try adjusting your search criteria or check back later for new resources!
+            </Typography>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  setSearchTerm('');
+                  setCategoryFilter('all');
+                  setTypeFilter('all');
+                }}
+              >
+                Clear Filters
+              </Button>
+              <Button 
+                variant="outlined"
+                color="primary"
+              >
+                Browse All Resources
+              </Button>
+            </div>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredResources.map((resource) => (
+              <Card key={resource.id} className="p-6 hover:shadow-lg transition-shadow" elevation={1}>
                 <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <div className={`p-2 rounded-xl ${getResourceTypeColor(resource.type)}`}>
-                      {getResourceTypeIcon(resource.type)}
-                    </div>
-                    <Badge 
-                      color={getResourceTypeBadgeColor(resource.type)}
-                      variant="standard"
-                      className="capitalize"
-                    >
-                      {resource.type}
-                    </Badge>
+                  <div className={`flex items-center space-x-2 px-3 py-1 rounded-full text-sm font-medium ${getResourceTypeColor(resource.type)}`}>
+                    {getResourceTypeIcon(resource.type)}
+                    <span className="capitalize">{resource.type}</span>
                   </div>
                   <Button
                     variant="text"
@@ -405,7 +333,7 @@ export default function ResourceCenter() {
                   </Button>
                 </div>
 
-                <Typography variant="h6" color="textPrimary" className="font-bold mb-3">
+                <Typography variant="h6" className="font-medium mb-3">
                   {resource.title}
                 </Typography>
                 
@@ -414,31 +342,27 @@ export default function ResourceCenter() {
                 </Typography>
 
                 <div className="flex flex-wrap gap-2 mb-4">
-                  <Badge
-                    variant="outlined"
-                    color="primary"
-                    className="capitalize"
-                  >
+                  <span className={`px-2 py-1 rounded text-xs font-medium capitalize ${
+                    isDark ? 'bg-lime/10 text-lime' : 'bg-asu-maroon/10 text-asu-maroon'
+                  }`}>
                     {resource.category.replace('_', ' ')}
-                  </Badge>
+                  </span>
                   {resource.tags && resource.tags.slice(0, 2).map((tag, index) => (
-                    <Badge
+                    <span
                       key={index}
-                      variant="standard"
-                      color="secondary"
-                      className="text-xs"
+                      className={`px-2 py-1 rounded text-xs font-medium ${
+                        isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'
+                      }`}
                     >
                       {tag}
-                    </Badge>
+                    </span>
                   ))}
                   {resource.tags && resource.tags.length > 2 && (
-                    <Badge
-                      variant="standard"
-                      color="secondary"
-                      className="text-xs"
-                    >
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                      isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'
+                    }`}>
                       +{resource.tags.length - 2} more
-                    </Badge>
+                    </span>
                   )}
                 </div>
 
@@ -489,47 +413,9 @@ export default function ResourceCenter() {
                     View
                   </Button>
                 </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-
-        {/* Empty State */}
-        {filteredResources.length === 0 && (
-          <Card className="p-12 text-center">
-            <div className={`w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center ${
-              isDark ? 'bg-lime/20' : 'bg-asu-maroon/10'
-            }`}>
-              <Search className={`w-12 h-12 ${
-                isDark ? 'text-lime' : 'text-asu-maroon'
-              }`} />
-            </div>
-            <Typography variant="h5" color="textPrimary" className="font-bold mb-4">
-              No resources found
-            </Typography>
-            <Typography variant="body1" color="textSecondary" className="mb-6 max-w-md mx-auto">
-              Try adjusting your search criteria or check back later for new resources!
-            </Typography>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                variant="contained"
-                color="primary"
-                onClick={() => {
-                  setSearchTerm('');
-                  setCategoryFilter('all');
-                  setTypeFilter('all');
-                }}
-              >
-                Clear Filters
-              </Button>
-              <Button 
-                variant="outlined"
-                color="primary"
-              >
-                Browse All Resources
-              </Button>
-            </div>
-          </Card>
+              </Card>
+            ))}
+          </div>
         )}
       </div>
     </div>
@@ -539,51 +425,20 @@ export default function ResourceCenter() {
 // Helper functions
 const getResourceTypeColor = (type: string) => {
   switch (type) {
-    case 'article':
-      return 'bg-blue-100 text-blue-800';
-    case 'video':
-      return 'bg-red-100 text-red-800';
-    case 'template':
-      return 'bg-green-100 text-green-800';
-    case 'guide':
-      return 'bg-purple-100 text-purple-800';
-    case 'faq':
-      return 'bg-yellow-100 text-yellow-800';
-    default:
-      return 'bg-gray-100 text-gray-800';
-  }
-};
-
-const getResourceTypeBadgeColor = (type: string): 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' => {
-  switch (type) {
-    case 'article':
-      return 'info';
-    case 'video':
-      return 'error';
-    case 'template':
-      return 'success';
-    case 'guide':
-      return 'secondary';
-    case 'faq':
-      return 'warning';
-    default:
-      return 'primary';
+    case 'article': return 'bg-blue-100 text-blue-800';
+    case 'video': return 'bg-red-100 text-red-800';
+    case 'template': return 'bg-green-100 text-green-800';
+    case 'guide': return 'bg-purple-100 text-purple-800';
+    default: return 'bg-gray-100 text-gray-800';
   }
 };
 
 const getResourceTypeIcon = (type: string) => {
   switch (type) {
-    case 'article':
-      return <Article className="h-4 w-4" />;
-    case 'video':
-      return <VideoLibrary className="h-4 w-4" />;
-    case 'template':
-      return <GetApp className="h-4 w-4" />;
-    case 'guide':
-      return <MenuBook className="h-4 w-4" />;
-    case 'faq':
-      return <HelpOutline className="h-4 w-4" />;
-    default:
-      return <Description className="h-4 w-4" />;
+    case 'article': return <Article className="h-4 w-4" />;
+    case 'video': return <VideoLibrary className="h-4 w-4" />;
+    case 'template': return <GetApp className="h-4 w-4" />;
+    case 'guide': return <MenuBook className="h-4 w-4" />;
+    default: return <Description className="h-4 w-4" />;
   }
 };

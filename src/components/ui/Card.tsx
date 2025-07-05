@@ -10,7 +10,10 @@ import {
   Visibility,
   RocketLaunch,
   Star,
-  Business
+  Business,
+  TrendingUp,
+  TrendingDown,
+  TrendingFlat
 } from '@mui/icons-material';
 import { useTheme } from '../../context/ThemeContext';
 import Badge from './Badge';
@@ -24,14 +27,15 @@ const cn = (...classes: (string | undefined | null | false)[]): string => {
 interface CardProps {
   children: React.ReactNode;
   className?: string;
-  variant?: 'default' | 'elevated' | 'outlined' | 'filled';
+  variant?: 'elevated' | 'filled' | 'outlined';
   padding?: 'none' | 'small' | 'medium' | 'large';
-  hover?: boolean;
+  interactive?: boolean;
   animated?: boolean;
   rotation?: number;
   delay?: number;
   scale?: number;
-  elevation?: number;
+  clickable?: boolean;
+  onClick?: () => void;
 }
 
 interface StatsCardProps {
@@ -65,18 +69,19 @@ interface JobCardProps {
   className?: string;
 }
 
-// Base Card Component with Material Design principles
+// Material Design 3 Card Component
 export const Card: React.FC<CardProps> = ({
   children,
   className = '',
-  variant = 'default',
+  variant = 'elevated',
   padding = 'medium',
-  hover = false,
+  interactive = false,
   animated = true,
   rotation = 0,
   delay = 0,
   scale = 1,
-  elevation = 1
+  clickable = false,
+  onClick
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const { isDark } = useTheme();
@@ -85,12 +90,11 @@ export const Card: React.FC<CardProps> = ({
     if (!animated || !cardRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Material Design entrance animation
       gsap.set(cardRef.current, {
-        scale: 0.8,
+        scale: 0.95,
         opacity: 0,
-        y: 20,
-        rotation: rotation + (Math.random() - 0.5) * 3
+        y: 8,
+        rotation: rotation + (Math.random() - 0.5) * 1
       });
 
       gsap.to(cardRef.current, {
@@ -98,7 +102,7 @@ export const Card: React.FC<CardProps> = ({
         opacity: 1,
         y: 0,
         rotation: rotation,
-        duration: 0.6,
+        duration: 0.3,
         delay: delay,
         ease: 'power2.out'
       });
@@ -107,21 +111,23 @@ export const Card: React.FC<CardProps> = ({
     return () => ctx.revert();
   }, [animated, rotation, delay, scale]);
 
-  const baseClasses = "transition-all duration-300 ease-out";
+  const baseClasses = `
+    transition-all duration-200 ease-material-standard
+    rounded-xl overflow-hidden
+    ${clickable ? 'cursor-pointer' : ''}
+    ${interactive ? 'hover:shadow-elevation-2 active:shadow-elevation-1' : ''}
+  `;
 
   const variantClasses = {
-    default: isDark 
-      ? "bg-dark-surface border border-lime/20 shadow-md hover:shadow-lg" 
-      : "bg-white border border-gray-200 shadow-md hover:shadow-lg",
     elevated: isDark 
-      ? "bg-dark-surface shadow-lg hover:shadow-xl border border-lime/20" 
-      : "bg-white shadow-lg hover:shadow-xl border border-gray-100",
-    outlined: isDark 
-      ? "bg-dark-surface border-2 border-lime/40 shadow-sm hover:shadow-md" 
-      : "bg-white border-2 border-gray-300 shadow-sm hover:shadow-md",
+      ? "bg-dark-surface shadow-elevation-1 hover:shadow-elevation-2 border-0" 
+      : "bg-surface-50 shadow-elevation-1 hover:shadow-elevation-2 border-0",
     filled: isDark 
-      ? "bg-dark-bg border border-lime/10 shadow-sm hover:shadow-md" 
-      : "bg-gray-50 border border-gray-100 shadow-sm hover:shadow-md"
+      ? "bg-dark-bg border-0 shadow-none" 
+      : "bg-surface-200 border-0 shadow-none",
+    outlined: isDark 
+      ? "bg-dark-surface border border-gray-600 shadow-none hover:shadow-elevation-1" 
+      : "bg-surface-50 border border-gray-200 shadow-none hover:shadow-elevation-1"
   };
 
   const paddingClasses = {
@@ -131,34 +137,32 @@ export const Card: React.FC<CardProps> = ({
     large: 'p-8'
   };
 
-  const hoverClasses = hover ? "hover:scale-105 hover:-rotate-1 cursor-pointer" : "";
-  
-  const elevationClasses = {
-    0: 'shadow-none',
-    1: 'shadow-sm hover:shadow-md',
-    2: 'shadow-md hover:shadow-lg',
-    3: 'shadow-lg hover:shadow-xl',
-    4: 'shadow-xl hover:shadow-2xl'
-  };
+  const interactiveClasses = interactive 
+    ? "hover:scale-[1.02] active:scale-[0.98] transform" 
+    : "";
 
   const cardClasses = cn(
     baseClasses,
-    'rounded-2xl', // Material Design rounded corners
     variantClasses[variant],
     paddingClasses[padding],
-    elevationClasses[elevation],
-    hoverClasses,
+    interactiveClasses,
     className
   );
 
   return (
-    <div ref={cardRef} className={cardClasses}>
+    <div 
+      ref={cardRef} 
+      className={cardClasses}
+      onClick={clickable ? onClick : undefined}
+      role={clickable ? "button" : undefined}
+      tabIndex={clickable ? 0 : undefined}
+    >
       {children}
     </div>
   );
 };
 
-// Material Design Stats Card
+// Material Design 3 Stats Card
 export const StatsCard: React.FC<StatsCardProps> = ({
   title,
   value,
@@ -175,59 +179,69 @@ export const StatsCard: React.FC<StatsCardProps> = ({
   
   const colorClasses = {
     primary: isDark ? 'text-lime' : 'text-asu-maroon',
-    secondary: isDark ? 'text-dark-accent' : 'text-asu-gold',
-    success: 'text-green-500',
-    error: 'text-red-500',
-    warning: 'text-amber-500',
-    info: 'text-blue-500'
+    secondary: isDark ? 'text-secondary-300' : 'text-secondary-600',
+    success: 'text-success-600',
+    error: 'text-error-600',
+    warning: 'text-warning-600',
+    info: 'text-info-600'
+  };
+
+  const iconBackgroundClasses = {
+    primary: isDark ? 'bg-lime/10' : 'bg-asu-maroon/10',
+    secondary: isDark ? 'bg-secondary-300/10' : 'bg-secondary-600/10',
+    success: 'bg-success-600/10',
+    error: 'bg-error-600/10',
+    warning: 'bg-warning-600/10',
+    info: 'bg-info-600/10'
   };
 
   const trendColors = {
-    up: 'text-green-500',
-    down: 'text-red-500',
+    up: 'text-success-600',
+    down: 'text-error-600',
     neutral: isDark ? 'text-dark-muted' : 'text-gray-500'
   };
 
+  const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : TrendingFlat;
+
   return (
     <Card
+      variant="elevated"
       animated={animated}
       delay={delay}
       rotation={rotation}
-      className="group hover:scale-105 hover:-rotate-1 transition-all duration-300"
-      elevation={2}
+      interactive
+      className="group"
     >
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <p className={`text-sm font-medium ${
+          <p className={`text-label-medium font-medium ${
             isDark ? 'text-dark-muted' : 'text-gray-600'
           }`}>
             {title}
           </p>
-          <p className={`text-3xl font-bold mt-1 ${
+          <p className={`text-display-small font-normal mt-1 ${
             isDark ? 'text-dark-text' : 'text-gray-900'
           }`}>
             {value}
           </p>
           {subtitle && (
-            <p className={`text-xs mt-1 ${
+            <p className={`text-body-small mt-1 ${
               isDark ? 'text-dark-muted' : 'text-gray-500'
             }`}>
               {subtitle}
             </p>
           )}
           {trend && trendValue && (
-            <div className={`flex items-center mt-2 text-sm ${trendColors[trend]}`}>
-              {trend === 'up' && <span>↗</span>}
-              {trend === 'down' && <span>↘</span>}
-              {trend === 'neutral' && <span>→</span>}
-              <span className="ml-1">{trendValue}</span>
+            <div className={`flex items-center mt-2 text-label-medium ${trendColors[trend]}`}>
+              <TrendIcon className="h-4 w-4 mr-1" />
+              <span>{trendValue}</span>
             </div>
           )}
         </div>
         {Icon && (
           <div className={`p-4 rounded-2xl ${
-            isDark ? 'bg-dark-bg' : 'bg-gray-50'
-          } group-hover:scale-110 transition-transform duration-300`}>
+            iconBackgroundClasses[color]
+          } group-hover:scale-110 transition-transform duration-200`}>
             <Icon className={`h-8 w-8 ${colorClasses[color]}`} />
           </div>
         )}
@@ -236,7 +250,7 @@ export const StatsCard: React.FC<StatsCardProps> = ({
   );
 };
 
-// Material Design Job Card
+// Material Design 3 Job Card
 export const JobCard: React.FC<JobCardProps> = ({
   job,
   onView,
@@ -274,9 +288,11 @@ export const JobCard: React.FC<JobCardProps> = ({
 
   return (
     <Card 
-      className={`group hover:shadow-xl transition-all duration-300 ${className}`}
-      hover
-      elevation={2}
+      variant="elevated"
+      className={`group ${className}`}
+      interactive
+      clickable
+      onClick={onView}
     >
       <div className="space-y-4">
         {/* Header */}
@@ -285,18 +301,21 @@ export const JobCard: React.FC<JobCardProps> = ({
             <div className="flex items-center space-x-2 mb-2">
               <Badge 
                 color={getJobTypeColor(job.type) as any}
-                variant="standard"
+                variant="tonal"
                 className="capitalize"
               >
                 {job.type.replace('-', ' ')}
               </Badge>
               {job.applicants_count && job.applicants_count > 50 && (
                 <Badge color="error" variant="outlined">
+                  <Star className="h-3 w-3 mr-1" />
                   Popular
                 </Badge>
               )}
             </div>
-            <h3 className={`text-xl font-semibold mb-1 group-hover:text-opacity-80 transition-all ${
+            <h3 className={`text-title-large font-medium mb-1 group-hover:${
+              isDark ? 'text-lime' : 'text-asu-maroon'
+            } transition-colors ${
               isDark ? 'text-dark-text' : 'text-gray-900'
             }`}>
               {job.title}
@@ -305,24 +324,24 @@ export const JobCard: React.FC<JobCardProps> = ({
               <Business className={`h-4 w-4 ${
                 isDark ? 'text-dark-muted' : 'text-gray-500'
               }`} />
-              <p className={`font-medium ${
-                isDark ? 'text-dark-accent' : 'text-asu-gold'
+              <p className={`text-body-medium font-medium ${
+                isDark ? 'text-lime' : 'text-asu-maroon'
               }`}>
                 {job.company}
               </p>
             </div>
           </div>
-          <div className={`p-2 rounded-full ${
+          <div className={`p-3 rounded-xl ${
             isDark ? 'bg-lime/10' : 'bg-asu-maroon/10'
-          }`}>
-            <Work className={`h-5 w-5 ${
+          } group-hover:scale-110 transition-transform duration-200`}>
+            <Work className={`h-6 w-6 ${
               isDark ? 'text-lime' : 'text-asu-maroon'
             }`} />
           </div>
         </div>
 
         {/* Job Details */}
-        <div className={`flex flex-wrap items-center gap-4 text-sm ${
+        <div className={`flex flex-wrap items-center gap-4 text-body-medium ${
           isDark ? 'text-dark-muted' : 'text-gray-600'
         }`}>
           <div className="flex items-center space-x-1">
@@ -348,7 +367,7 @@ export const JobCard: React.FC<JobCardProps> = ({
         </div>
 
         {/* Description */}
-        <p className={`text-sm leading-relaxed line-clamp-3 ${
+        <p className={`text-body-medium leading-relaxed line-clamp-3 ${
           isDark ? 'text-dark-muted' : 'text-gray-600'
         }`}>
           {job.description}
@@ -360,17 +379,17 @@ export const JobCard: React.FC<JobCardProps> = ({
             {job.requirements.slice(0, 3).map((req, index) => (
               <span
                 key={index}
-                className={`inline-block px-3 py-1 text-xs rounded-full ${
+                className={`inline-flex items-center px-3 py-1 text-label-small rounded-full ${
                   isDark 
-                    ? 'bg-dark-bg text-dark-text' 
-                    : 'bg-gray-100 text-gray-700'
+                    ? 'bg-dark-bg text-dark-text border border-gray-600' 
+                    : 'bg-surface-200 text-gray-700 border border-gray-200'
                 }`}
               >
                 {req}
               </span>
             ))}
             {job.requirements.length > 3 && (
-              <span className={`text-xs ${
+              <span className={`text-label-small ${
                 isDark ? 'text-dark-muted' : 'text-gray-500'
               }`}>
                 +{job.requirements.length - 3} more
@@ -380,22 +399,28 @@ export const JobCard: React.FC<JobCardProps> = ({
         )}
 
         {/* Actions */}
-        <div className="flex items-center justify-between pt-2 border-t border-opacity-20">
+        <div className="flex items-center gap-3 pt-2 border-t border-opacity-20">
           <Button
             variant="outlined"
             size="small"
             startIcon={Visibility}
-            onClick={onView}
-            className="flex-1 mr-2"
+            onClick={(e) => {
+              e.stopPropagation();
+              onView();
+            }}
+            className="flex-1"
           >
             View Details
           </Button>
           <Button
-            variant="contained"
+            variant="filled"
             size="small"
             startIcon={RocketLaunch}
-            onClick={onApply}
-            className="flex-1 ml-2"
+            onClick={(e) => {
+              e.stopPropagation();
+              onApply();
+            }}
+            className="flex-1"
           >
             Apply Now
           </Button>
