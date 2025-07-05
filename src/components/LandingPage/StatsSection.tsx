@@ -1,14 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-interface StatsSectionProps {
-  statsRef: React.RefObject<HTMLDivElement>;
-}
+export default function StatsSection() {
+  const statsRef = useRef<HTMLDivElement>(null);
 
-export default function StatsSection({ statsRef }: StatsSectionProps) {
   useEffect(() => {
     const ctx = gsap.context(() => {
       // Enhanced stats counter animation - only numbers change
@@ -59,7 +57,7 @@ export default function StatsSection({ statsRef }: StatsSectionProps) {
     });
 
     return () => ctx.revert();
-  }, [statsRef]);
+  }, []);
 
   return (
     <section ref={statsRef} className="py-24 bg-gradient-to-r from-asu-maroon via-asu-maroon-dark to-asu-maroon relative overflow-hidden">

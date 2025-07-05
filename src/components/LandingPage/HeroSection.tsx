@@ -10,16 +10,14 @@ import {
   Zap,
   Heart,
   Coffee,
-  Sparkles,
   Smile,
-  ChevronDown
+  ChevronDown,
+  Sparkles
 } from 'lucide-react';
 
-interface HeroSectionProps {
-  heroRef: React.RefObject<HTMLDivElement>;
-}
+export default function HeroSection() {
+  const heroRef = useRef<HTMLDivElement>(null);
 
-export default function HeroSection({ heroRef }: HeroSectionProps) {
   useEffect(() => {
     const ctx = gsap.context(() => {
       // Enhanced Hero Section Animations
@@ -146,7 +144,7 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
     });
 
     return () => ctx.revert();
-  }, [heroRef]);
+  }, []);
 
   return (
     <section ref={heroRef} className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-asu-maroon via-asu-maroon-dark to-gray-900 overflow-hidden">
