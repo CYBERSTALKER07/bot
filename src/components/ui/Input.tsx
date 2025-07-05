@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useState } from 'react';
 import { 
   Visibility, 
   VisibilityOff, 
@@ -7,7 +7,9 @@ import {
   Person, 
   Lock, 
   Phone, 
-  LocationOn 
+  LocationOn,
+  Error,
+  CheckCircle
 } from '@mui/icons-material';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -17,14 +19,15 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   helperText?: string;
   startIcon?: React.ReactNode;
   endIcon?: React.ReactNode;
-  variant?: 'outlined' | 'filled' | 'standard';
+  variant?: 'outlined' | 'filled';
   size?: 'small' | 'medium' | 'large';
   fullWidth?: boolean;
   multiline?: boolean;
   rows?: number;
   showPasswordToggle?: boolean;
   focused?: boolean;
-  showLabel?: boolean; // New prop to control label visibility
+  supportingText?: string;
+  success?: boolean;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(({
@@ -40,91 +43,99 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
   rows = 3,
   showPasswordToggle = false,
   focused = false,
-  showLabel = false, // Default to false to hide labels
+  supportingText,
+  success = false,
   className = '',
   type = 'text',
   ...props
 }, ref) => {
   const { isDark } = useTheme();
-  const [showPassword, setShowPassword] = React.useState(false);
-  const [isFocused, setIsFocused] = React.useState(focused);
-  const [hasValue, setHasValue] = React.useState(Boolean(props.value || props.defaultValue));
+  const [showPassword, setShowPassword] = useState(false);
+  const [isFocused, setIsFocused] = useState(focused);
+  const [hasValue, setHasValue] = useState(Boolean(props.value || props.defaultValue));
 
   const actualType = type === 'password' && showPassword ? 'text' : type;
+  const isFloating = isFocused || hasValue;
+  const hasError = Boolean(error);
 
   const baseClasses = `
-    w-full transition-all duration-200 
-    focus:outline-none focus:ring-2 
-    disabled:opacity-50 disabled:cursor-not-allowed
+    w-full transition-all duration-200 ease-material-standard
+    focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed
+    text-body-large
   `;
 
   const sizeClasses = {
-    small: 'px-3 py-2 text-sm',
-    medium: 'px-4 py-3 text-base',
-    large: 'px-6 py-4 text-lg'
+    small: 'px-4 py-2 text-body-small',
+    medium: 'px-4 py-4 text-body-large',
+    large: 'px-4 py-5 text-body-large'
+  };
+
+  const getStateColor = () => {
+    if (hasError) return isDark ? 'error-400' : 'error-600';
+    if (success) return isDark ? 'success-400' : 'success-600';
+    if (isFocused) return isDark ? 'lime' : 'asu-maroon';
+    return isDark ? 'gray-600' : 'gray-300';
   };
 
   const variantClasses = {
     outlined: `
-      border-2 rounded-xl
+      border-2 rounded-lg bg-transparent
       ${isDark 
-        ? `bg-dark-surface border-gray-600 text-dark-text placeholder-dark-muted
-           focus:border-lime focus:ring-lime/20 hover:border-gray-500
-           ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}` 
-        : `bg-white border-gray-300 text-gray-900 placeholder-gray-500
-           focus:border-asu-maroon focus:ring-asu-maroon/20 hover:border-gray-400
-           ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`
+        ? `text-dark-text placeholder-transparent
+           border-gray-600 hover:border-gray-500
+           focus:border-${getStateColor()} focus:ring-4 focus:ring-${getStateColor()}/10` 
+        : `text-gray-900 placeholder-transparent
+           border-gray-300 hover:border-gray-400
+           focus:border-${getStateColor()} focus:ring-4 focus:ring-${getStateColor()}/10`
       }
+      ${hasError ? `border-error-600 focus:border-error-600 focus:ring-error-600/10` : ''}
+      ${success ? `border-success-600 focus:border-success-600 focus:ring-success-600/10` : ''}
     `,
     filled: `
-      border-0 border-b-2 rounded-t-xl
+      border-0 border-b-2 rounded-t-lg
       ${isDark 
-        ? `bg-dark-surface/50 border-gray-600 text-dark-text placeholder-dark-muted
-           focus:border-lime focus:ring-0 focus:bg-dark-surface
-           ${error ? 'border-red-500 focus:border-red-500' : ''}` 
-        : `bg-gray-100 border-gray-300 text-gray-900 placeholder-gray-500
-           focus:border-asu-maroon focus:ring-0 focus:bg-gray-50
-           ${error ? 'border-red-500 focus:border-red-500' : ''}`
+        ? `bg-dark-surface/50 text-dark-text placeholder-transparent
+           border-gray-600 hover:border-gray-500
+           focus:border-${getStateColor()} focus:ring-0 focus:bg-dark-surface/70` 
+        : `bg-surface-200 text-gray-900 placeholder-transparent
+           border-gray-300 hover:border-gray-400
+           focus:border-${getStateColor()} focus:ring-0 focus:bg-surface-300`
       }
-    `,
-    standard: `
-      border-0 border-b-2 bg-transparent rounded-none
-      ${isDark 
-        ? `border-gray-600 text-dark-text placeholder-dark-muted
-           focus:border-lime focus:ring-0
-           ${error ? 'border-red-500 focus:border-red-500' : ''}` 
-        : `border-gray-300 text-gray-900 placeholder-gray-500
-           focus:border-asu-maroon focus:ring-0
-           ${error ? 'border-red-500 focus:border-red-500' : ''}`
-      }
+      ${hasError ? `border-error-600 focus:border-error-600` : ''}
+      ${success ? `border-success-600 focus:border-success-600` : ''}
     `
   };
 
   const labelClasses = `
-    absolute left-4 transition-all duration-200 pointer-events-none
-    ${isFocused || hasValue 
-      ? variant === 'outlined' 
-        ? `top-0 text-xs px-2 -translate-y-1/2 ${
-            isDark ? 'bg-dark-surface text-lime' : 'bg-white text-asu-maroon'
+    absolute left-4 transition-all duration-200 ease-material-standard pointer-events-none
+    ${isFloating
+      ? variant === 'outlined'
+        ? `top-0 text-label-small px-2 -translate-y-1/2 ${
+            isDark ? 'bg-dark-surface' : 'bg-white'
           }`
-        : `top-1 text-xs ${
-            isDark ? 'text-lime' : 'bg-white text-asu-maroon'
-          }`
-      : variant === 'standard'
-        ? `top-1/2 -translate-y-1/2 text-base ${
-            isDark ? 'text-dark-muted' : 'text-gray-500'
-          }`
-        : `top-1/2 -translate-y-1/2 text-base ${
-            isDark ? 'text-dark-muted' : 'text-gray-500'
-          }`
+        : `top-2 text-label-small`
+      : `top-1/2 -translate-y-1/2 text-body-large`
     }
-    ${error ? 'text-red-500' : ''}
+    ${hasError 
+      ? 'text-error-600' 
+      : success 
+        ? 'text-success-600'
+        : isFocused 
+          ? isDark ? 'text-lime' : 'text-asu-maroon'
+          : isDark ? 'text-gray-400' : 'text-gray-500'
+    }
   `;
 
   const iconClasses = `
-    absolute top-1/2 transform -translate-y-1/2 
-    ${isDark ? 'text-dark-muted' : 'text-gray-400'}
-    ${error ? 'text-red-500' : ''}
+    absolute top-1/2 transform -translate-y-1/2 w-5 h-5
+    ${hasError 
+      ? 'text-error-600' 
+      : success 
+        ? 'text-success-600'
+        : isFocused 
+          ? isDark ? 'text-lime' : 'text-asu-maroon'
+          : isDark ? 'text-gray-400' : 'text-gray-500'
+    }
   `;
 
   const inputClasses = `
@@ -132,14 +143,47 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
     ${sizeClasses[size]}
     ${variantClasses[variant]}
     ${startIcon ? 'pl-12' : ''}
-    ${endIcon || showPasswordToggle ? 'pr-12' : ''}
+    ${(endIcon || showPasswordToggle || hasError || success) ? 'pr-12' : ''}
     ${fullWidth ? 'w-full' : ''}
     ${className}
   `.trim().replace(/\s+/g, ' ');
 
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    setIsFocused(true);
+    props.onFocus?.(e);
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    setIsFocused(false);
+    setHasValue(Boolean(e.target.value));
+    props.onBlur?.(e);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setHasValue(Boolean(e.target.value));
+    props.onChange?.(e);
+  };
+
+  const renderEndIcon = () => {
+    if (showPasswordToggle && type === 'password') {
+      return (
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="hover:opacity-70 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded"
+        >
+          {showPassword ? <VisibilityOff className="w-5 h-5" /> : <Visibility className="w-5 h-5" />}
+        </button>
+      );
+    }
+    if (hasError) return <Error className="w-5 h-5" />;
+    if (success) return <CheckCircle className="w-5 h-5" />;
+    return endIcon;
+  };
+
   return (
     <div className={`relative ${fullWidth ? 'w-full' : ''}`}>
-      {/* Input Field */}
+      {/* Input Container */}
       <div className="relative">
         {/* Start Icon */}
         {startIcon && (
@@ -148,25 +192,15 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
           </div>
         )}
 
-        {/* Input */}
+        {/* Input Field */}
         {multiline ? (
           <textarea
             ref={ref as any}
             rows={rows}
             className={inputClasses}
-            onFocus={(e) => {
-              setIsFocused(true);
-              props.onFocus?.(e as any);
-            }}
-            onBlur={(e) => {
-              setIsFocused(false);
-              setHasValue(Boolean(e.target.value));
-              props.onBlur?.(e as any);
-            }}
-            onChange={(e) => {
-              setHasValue(Boolean(e.target.value));
-              props.onChange?.(e as any);
-            }}
+            onFocus={handleFocus as any}
+            onBlur={handleBlur as any}
+            onChange={handleChange as any}
             {...props}
           />
         ) : (
@@ -174,56 +208,38 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
             ref={ref}
             type={actualType}
             className={inputClasses}
-            onFocus={(e) => {
-              setIsFocused(true);
-              props.onFocus?.(e);
-            }}
-            onBlur={(e) => {
-              setIsFocused(false);
-              setHasValue(Boolean(e.target.value));
-              props.onBlur?.(e);
-            }}
-            onChange={(e) => {
-              setHasValue(Boolean(e.target.value));
-              props.onChange?.(e);
-            }}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            onChange={handleChange}
             {...props}
           />
         )}
 
-        {/* Floating Label - Only show if showLabel is true */}
-        {label && showLabel && (
+        {/* Floating Label */}
+        {label && (
           <label className={labelClasses}>
             {label}
           </label>
         )}
 
-        {/* End Icon or Password Toggle */}
-        {(endIcon || showPasswordToggle) && (
+        {/* End Icon */}
+        {(endIcon || showPasswordToggle || hasError || success) && (
           <div className={`${iconClasses} right-4`}>
-            {showPasswordToggle && type === 'password' ? (
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="hover:opacity-70 transition-opacity"
-              >
-                {showPassword ? <VisibilityOff /> : <Visibility />}
-              </button>
-            ) : (
-              endIcon
-            )}
+            {renderEndIcon()}
           </div>
         )}
       </div>
 
-      {/* Helper Text or Error */}
-      {(helperText || error) && (
-        <div className={`mt-1 text-sm px-4 ${
+      {/* Supporting Text */}
+      {(supportingText || error || helperText) && (
+        <div className={`mt-1 px-4 text-body-small ${
           error 
-            ? 'text-red-500' 
-            : isDark ? 'text-dark-muted' : 'text-gray-600'
+            ? 'text-error-600' 
+            : success
+              ? 'text-success-600'
+              : isDark ? 'text-dark-muted' : 'text-gray-600'
         }`}>
-          {error || helperText}
+          {error || supportingText || helperText}
         </div>
       )}
     </div>
@@ -234,7 +250,7 @@ Input.displayName = 'Input';
 
 export default Input;
 
-// Predefined input variants for common use cases
+// Material Design 3 Input Variants
 export const MaterialInput = {
   Email: (props: Omit<InputProps, 'type' | 'startIcon'>) => 
     <Input type="email" startIcon={<Email />} {...props} />,

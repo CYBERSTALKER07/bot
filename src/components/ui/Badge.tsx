@@ -2,8 +2,8 @@ import React from 'react';
 import { useTheme } from '../../context/ThemeContext';
 
 interface BadgeProps {
-  variant?: 'standard' | 'dot' | 'outlined';
-  color?: 'default' | 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success' | 'standard';
+  variant?: 'filled' | 'outlined' | 'tonal';
+  color?: 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
   size?: 'small' | 'medium' | 'large';
   overlap?: 'circular' | 'rectangular';
   anchorOrigin?: {
@@ -19,8 +19,8 @@ interface BadgeProps {
 }
 
 const Badge: React.FC<BadgeProps> = ({
-  variant = 'standard',
-  color = 'default',
+  variant = 'filled',
+  color = 'primary',
   size = 'medium',
   overlap = 'rectangular',
   anchorOrigin = { vertical: 'top', horizontal: 'right' },
@@ -35,57 +35,71 @@ const Badge: React.FC<BadgeProps> = ({
   const { isDark } = useTheme();
 
   const getBadgeContent = () => {
-    if (variant === 'dot') return null;
-    
     if (typeof badgeContent === 'number') {
       if (!showZero && badgeContent === 0) return null;
       return badgeContent > max ? `${max}+` : badgeContent;
     }
-    
     return badgeContent;
   };
 
   const content = getBadgeContent();
-  const shouldShow = !invisible && (variant === 'dot' || content !== null);
+  const shouldShow = !invisible && content !== null;
 
   const getColorClasses = () => {
-    const colors = {
-      default: isDark 
-        ? 'bg-gray-600 text-gray-100' 
-        : 'bg-gray-500 text-white',
-      standard: isDark 
-        ? 'bg-gray-600 text-gray-100' 
-        : 'bg-gray-500 text-white',
-      primary: isDark 
-        ? 'bg-lime text-dark-surface' 
-        : 'bg-asu-maroon text-white',
-      secondary: isDark 
-        ? 'bg-dark-accent text-dark-surface' 
-        : 'bg-asu-gold text-white',
-      error: 'bg-red-500 text-white',
-      warning: 'bg-amber-500 text-white',
-      info: 'bg-blue-500 text-white',
-      success: 'bg-green-500 text-white'
+    const colorMap = {
+      primary: {
+        filled: isDark 
+          ? 'bg-lime text-dark-surface' 
+          : 'bg-asu-maroon text-white',
+        outlined: isDark 
+          ? 'border-lime text-lime bg-transparent' 
+          : 'border-asu-maroon text-asu-maroon bg-transparent',
+        tonal: isDark 
+          ? 'bg-lime/20 text-lime' 
+          : 'bg-asu-maroon/20 text-asu-maroon'
+      },
+      secondary: {
+        filled: isDark 
+          ? 'bg-secondary-300 text-secondary-900' 
+          : 'bg-secondary-600 text-white',
+        outlined: isDark 
+          ? 'border-secondary-300 text-secondary-300 bg-transparent' 
+          : 'border-secondary-600 text-secondary-600 bg-transparent',
+        tonal: isDark 
+          ? 'bg-secondary-300/20 text-secondary-300' 
+          : 'bg-secondary-600/20 text-secondary-600'
+      },
+      error: {
+        filled: 'bg-error-600 text-white',
+        outlined: 'border-error-600 text-error-600 bg-transparent',
+        tonal: 'bg-error-600/20 text-error-600'
+      },
+      warning: {
+        filled: 'bg-warning-600 text-white',
+        outlined: 'border-warning-600 text-warning-600 bg-transparent',
+        tonal: 'bg-warning-600/20 text-warning-600'
+      },
+      info: {
+        filled: 'bg-info-600 text-white',
+        outlined: 'border-info-600 text-info-600 bg-transparent',
+        tonal: 'bg-info-600/20 text-info-600'
+      },
+      success: {
+        filled: 'bg-success-600 text-white',
+        outlined: 'border-success-600 text-success-600 bg-transparent',
+        tonal: 'bg-success-600/20 text-success-600'
+      }
     };
-    return colors[color];
+    return colorMap[color][variant];
   };
 
   const getSizeClasses = () => {
-    if (variant === 'dot') {
-      const dotSizes = {
-        small: 'w-1.5 h-1.5',
-        medium: 'w-2 h-2',
-        large: 'w-2.5 h-2.5'
-      };
-      return dotSizes[size];
-    }
-
-    const standardSizes = {
-      small: 'min-w-[16px] h-4 px-1 text-xs',
-      medium: 'min-w-[20px] h-5 px-1.5 text-xs',
-      large: 'min-w-[24px] h-6 px-2 text-sm'
+    const sizeMap = {
+      small: 'min-w-[16px] h-4 px-1.5 text-label-small',
+      medium: 'min-w-[20px] h-5 px-2 text-label-medium',
+      large: 'min-w-[24px] h-6 px-2.5 text-label-large'
     };
-    return standardSizes[size];
+    return sizeMap[size];
   };
 
   const getPositionClasses = () => {
@@ -105,26 +119,17 @@ const Badge: React.FC<BadgeProps> = ({
   };
 
   const getVariantClasses = () => {
-    const baseClasses = 'absolute flex items-center justify-center font-medium transition-all duration-200';
+    const baseClasses = `
+      absolute flex items-center justify-center font-medium 
+      transition-all duration-200 ease-material-standard
+      rounded-full shadow-elevation-1
+    `;
     
-    if (variant === 'dot') {
-      return `${baseClasses} rounded-full ${getSizeClasses()} ${getColorClasses()}`;
-    }
+    const borderClass = variant === 'outlined' ? 'border-2' : '';
     
-    if (variant === 'outlined') {
-      return `
-        ${baseClasses} rounded-full border-2 bg-transparent
-        ${getSizeClasses()}
-        ${isDark 
-          ? 'border-lime text-lime' 
-          : 'border-asu-maroon text-asu-maroon'
-        }
-      `;
-    }
-    
-    // Standard variant
     return `
-      ${baseClasses} rounded-full shadow-sm
+      ${baseClasses}
+      ${borderClass}
       ${getSizeClasses()}
       ${getColorClasses()}
     `;
@@ -159,16 +164,16 @@ const Badge: React.FC<BadgeProps> = ({
 
 export default Badge;
 
-// Predefined badge variants for common use cases
+// Material Design 3 Badge Variants
 export const MaterialBadge = {
   Notification: (props: Omit<BadgeProps, 'color' | 'variant'>) => 
-    <Badge color="error" variant="standard" {...props} />,
+    <Badge color="error" variant="filled" {...props} />,
   
   Status: (props: Omit<BadgeProps, 'variant'>) => 
-    <Badge variant="dot" {...props} />,
+    <Badge variant="tonal" {...props} />,
   
   Count: (props: Omit<BadgeProps, 'variant'>) => 
-    <Badge variant="standard" {...props} />,
+    <Badge variant="filled" {...props} />,
   
   Primary: (props: Omit<BadgeProps, 'color'>) => 
     <Badge color="primary" {...props} />,
