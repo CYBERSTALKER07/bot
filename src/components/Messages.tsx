@@ -1,33 +1,48 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { 
   Search, 
   Send, 
-  User, 
-  Clock, 
-  MessageCircle, 
+  Person, 
+  AccessTime, 
+  Chat, 
   Phone, 
-  Video, 
-  MoreHorizontal, 
-  Paperclip, 
-  Smile,
+  VideoCall, 
+  MoreHoriz, 
+  AttachFile, 
+  EmojiEmotions,
   Star,
   Archive,
-  Trash2,
+  Delete,
   Circle,
   Check,
-  CheckCheck,
-  Filter,
-  Plus,
-  Building2,
-  GraduationCap,
-  Briefcase,
-  Coffee,
-  Heart,
-  Sparkles
-} from 'lucide-react';
+  DoneAll,
+  FilterList,
+  Add,
+  Business,
+  School,
+  Work,
+  AutoAwesome,
+  LocalCafe,
+  Favorite,
+  Message,
+  Forum,
+  VideoCallOutlined,
+  PhoneInTalk,
+  EmojiEvents,
+  TrendingUp,
+  People,
+  Notifications
+} from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import Typography from './ui/Typography';
+import Button from './ui/Button';
+import Input from './ui/Input';
+import { Card, StatsCard } from './ui/Card';
+import Badge from './ui/Badge';
+import Avatar from './ui/Avatar';
 
 interface Message {
   id: string;
@@ -70,7 +85,81 @@ export default function Messages() {
   const [filterRole, setFilterRole] = useState<'all' | 'student' | 'employer'>('all');
 
   useEffect(() => {
-    // Mock conversations data - replace with Supabase fetch
+    if (!containerRef.current) return;
+
+    const ctx = gsap.context(() => {
+      // Material Design entrance animations
+      gsap.fromTo('.header-card', {
+        opacity: 0,
+        y: -30,
+        scale: 0.98
+      }, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.8,
+        ease: 'power2.out'
+      });
+
+      gsap.fromTo('.stats-card', {
+        opacity: 0,
+        y: 20,
+        scale: 0.9
+      }, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: 'back.out(1.7)',
+        delay: 0.2
+      });
+
+      gsap.fromTo('.conversation-card', {
+        opacity: 0,
+        x: -30,
+        scale: 0.95
+      }, {
+        opacity: 1,
+        x: 0,
+        scale: 1,
+        duration: 0.5,
+        stagger: 0.05,
+        ease: 'power2.out',
+        delay: 0.4
+      });
+
+      gsap.fromTo('.messages-area', {
+        opacity: 0,
+        x: 30,
+        scale: 0.98
+      }, {
+        opacity: 1,
+        x: 0,
+        scale: 1,
+        duration: 0.6,
+        ease: 'power2.out',
+        delay: 0.6
+      });
+
+      // Floating decorations
+      gsap.to('.messages-decoration', {
+        y: -10,
+        x: 5,
+        rotation: 180,
+        duration: 15,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
+      });
+
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    // Mock conversations data
     const mockConversations: Conversation[] = [
       {
         id: '1',
@@ -166,49 +255,6 @@ export default function Messages() {
     setSelectedConversation(mockConversations[0]?.id || null);
   }, [user]);
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const ctx = gsap.context(() => {
-      // Animate conversations list
-      gsap.fromTo(conversationsRef.current, {
-        x: -50,
-        opacity: 0
-      }, {
-        x: 0,
-        opacity: 1,
-        duration: 1,
-        ease: 'power3.out'
-      });
-
-      // Animate messages area
-      gsap.fromTo(messagesRef.current, {
-        x: 50,
-        opacity: 0
-      }, {
-        x: 0,
-        opacity: 1,
-        duration: 1,
-        ease: 'power3.out',
-        delay: 0.2
-      });
-
-      // Floating decorations
-      gsap.to('.messages-decoration', {
-        y: -15,
-        x: 10,
-        rotation: 360,
-        duration: 20,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut'
-      });
-
-    }, containerRef);
-
-    return () => ctx.revert();
-  }, []);
-
   const handleSendMessage = () => {
     if (!newMessage.trim() || !selectedConversation) return;
 
@@ -253,86 +299,147 @@ export default function Messages() {
     (msg.sender_id === user?.id && msg.recipient_id === selectedConversation)
   );
 
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case 'student':
-        return <GraduationCap className="h-4 w-4" />;
-      case 'employer':
-        return <Building2 className="h-4 w-4" />;
-      default:
-        return <User className="h-4 w-4" />;
-    }
-  };
-
-  const getRoleColor = (role: string) => {
-    switch (role) {
-      case 'student':
-        return isDark ? 'bg-blue-900/30 text-blue-300' : 'bg-blue-100 text-blue-800';
-      case 'employer':
-        return isDark ? 'bg-green-900/30 text-green-300' : 'bg-green-100 text-green-800';
-      default:
-        return isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-800';
-    }
-  };
+  const messageStats = [
+    { 
+      title: 'Total Messages', 
+      value: messages.length.toString(), 
+      subtitle: 'All conversations',
+      icon: Message,
+      color: 'primary' as const,
+      trend: 'up' as const,
+      trendValue: 'All conversations'
+    },
+    { 
+      title: 'Unread', 
+      value: conversations.reduce((sum, conv) => sum + conv.unread_count, 0).toString(), 
+      subtitle: 'Need attention',
+      icon: Notifications,
+      color: 'warning' as const,
+      trend: 'up' as const,
+      trendValue: 'Need attention'
+    },
+    { 
+      title: 'Active Chats', 
+      value: conversations.length.toString(), 
+      subtitle: 'Ongoing conversations',
+      icon: Forum,
+      color: 'success' as const,
+      trend: 'up' as const,
+      trendValue: 'Ongoing conversations'
+    },
+    { 
+      title: 'Response Rate', 
+      value: '95%', 
+      subtitle: 'Within 24 hours',
+      icon: TrendingUp,
+      color: 'info' as const,
+      trend: 'up' as const,
+      trendValue: 'Within 24 hours'
+    },
+  ];
 
   return (
-    <div ref={containerRef} className={`min-h-screen relative transition-colors duration-300 ${
-      isDark ? 'bg-gradient-to-br from-dark-bg to-dark-surface' : 'bg-gradient-to-br from-gray-50 to-white'
+    <div ref={containerRef} className={`min-h-screen relative ${
+      isDark ? 'bg-dark-bg' : 'bg-gray-50'
     }`}>
       {/* Decorative elements */}
-      <div className={`messages-decoration absolute top-16 right-24 w-4 h-4 rounded-full ${
-        isDark ? 'bg-lime/40' : 'bg-asu-gold/40'
-      }`}></div>
-      <div className={`messages-decoration absolute top-32 left-16 w-3 h-3 rounded-full ${
-        isDark ? 'bg-lime/30' : 'bg-asu-maroon/30'
-      }`}></div>
-      <Sparkles className={`messages-decoration absolute top-24 left-1/4 h-5 w-5 ${
+      <AutoAwesome className={`messages-decoration absolute top-20 right-20 h-5 w-5 ${
+        isDark ? 'text-lime/50' : 'text-asu-gold/50'
+      }`} />
+      <LocalCafe className={`messages-decoration absolute top-40 left-20 h-4 w-4 ${
+        isDark ? 'text-dark-accent/40' : 'text-asu-maroon/40'
+      }`} />
+      <Favorite className={`messages-decoration absolute bottom-32 right-1/3 h-4 w-4 ${
         isDark ? 'text-lime/60' : 'text-asu-gold/60'
-      }`} />
-      <Coffee className={`messages-decoration absolute bottom-32 right-1/4 h-4 w-4 ${
-        isDark ? 'text-lime/50' : 'text-asu-maroon/50'
-      }`} />
-      <Heart className={`messages-decoration absolute bottom-20 left-1/3 h-4 w-4 ${
-        isDark ? 'text-lime/70' : 'text-asu-gold/70'
       }`} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className={`text-3xl font-bold mb-2 transition-colors ${
-            isDark ? 'text-dark-text' : 'text-gray-900'
-          }`}>Messages</h1>
-          <p className={`transition-colors ${
-            isDark ? 'text-dark-muted' : 'text-gray-600'
-          }`}>Connect with students and employers</p>
+        <Card className="header-card overflow-hidden mb-8" elevation={3}>
+          <div className={`p-8 text-white relative ${
+            isDark 
+              ? 'bg-gradient-to-r from-dark-surface to-dark-bg' 
+              : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
+          }`}>
+            <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl ${
+              isDark ? 'bg-lime/10' : 'bg-white/10'
+            }`}></div>
+            <div className={`absolute bottom-0 left-0 w-24 h-24 rounded-full blur-xl ${
+              isDark ? 'bg-dark-accent/20' : 'bg-asu-gold/20'
+            }`}></div>
+            
+            <div className="relative z-10">
+              <Typography variant="h3" className="font-bold mb-4 text-white">
+                Messages
+              </Typography>
+              <Typography variant="subtitle1" className={`mb-6 max-w-3xl ${
+                isDark ? 'text-dark-muted' : 'text-white/90'
+              }`}>
+                Connect with students and employers through our messaging system
+              </Typography>
+              <div className="flex flex-wrap gap-4">
+                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
+                  <EmojiEvents className="h-5 w-5" />
+                  <span>Real-time messaging</span>
+                </div>
+                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
+                  <People className="h-5 w-5" />
+                  <span>Professional networking</span>
+                </div>
+                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
+                  <Star className="h-5 w-5" />
+                  <span>Secure communication</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {messageStats.map((stat, index) => (
+            <div key={index} className="stats-card">
+              <StatsCard
+                title={stat.title}
+                value={stat.value}
+                icon={stat.icon}
+                subtitle={stat.subtitle}
+                color={stat.color}
+                trend={stat.trend}
+                trendValue={stat.trendValue}
+                delay={index * 0.1}
+                rotation={index % 2 === 0 ? -0.5 : 0.5}
+              />
+            </div>
+          ))}
         </div>
 
-        <div className={`rounded-3xl shadow-lg border overflow-hidden transition-colors duration-300 ${
-          isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-100'
-        }`}>
-          <div className="flex h-[700px]">
+        {/* Messages Interface */}
+        <Card className="overflow-hidden h-[700px]" elevation={3}>
+          <div className="flex h-full">
             {/* Conversations Sidebar */}
-            <div ref={conversationsRef} className={`w-1/3 border-r flex flex-col transition-colors duration-300 ${
+            <div className={`w-1/3 border-r flex flex-col ${
               isDark ? 'border-lime/20' : 'border-gray-200'
             }`}>
               {/* Search and Filter */}
-              <div className={`p-4 border-b transition-colors duration-300 ${
+              <div className={`p-4 border-b ${
                 isDark 
                   ? 'border-lime/20 bg-gradient-to-r from-lime to-dark-accent' 
                   : 'border-gray-200 bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
               }`}>
-                <div className="relative mb-4">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/70" />
-                  <input
-                    type="text"
+                <div className="mb-4">
+                  <Input
                     placeholder="Search conversations..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-white/50 text-white placeholder-white/70"
+                    startIcon={<Search />}
+                    variant="outlined"
+                    fullWidth
+                    className="bg-white/20 backdrop-blur-sm border-white/30 text-white placeholder-white/70"
                   />
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Filter className="h-4 w-4 text-white/70" />
+                  <FilterList className="h-4 w-4 text-white/70" />
                   <select
                     value={filterRole}
                     onChange={(e) => setFilterRole(e.target.value as 'all' | 'student' | 'employer')}
@@ -351,7 +458,7 @@ export default function Messages() {
                   <div
                     key={conversation.id}
                     onClick={() => setSelectedConversation(conversation.id)}
-                    className={`p-4 border-b cursor-pointer transition-colors ${
+                    className={`conversation-card p-4 border-b cursor-pointer transition-colors ${
                       isDark 
                         ? `border-lime/10 hover:bg-dark-bg ${
                             selectedConversation === conversation.id 
@@ -367,59 +474,44 @@ export default function Messages() {
                   >
                     <div className="flex items-start space-x-3">
                       <div className="relative">
-                        {conversation.participant_avatar ? (
-                          <img
-                            src={conversation.participant_avatar}
-                            alt={conversation.participant_name}
-                            className="w-12 h-12 rounded-full object-cover"
-                          />
-                        ) : (
-                          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                            isDark ? 'bg-lime/20' : 'bg-asu-maroon/20'
-                          }`}>
-                            <User className={`h-6 w-6 ${
-                              isDark ? 'text-lime' : 'text-asu-maroon'
-                            }`} />
-                          </div>
-                        )}
+                        <Avatar
+                          src={conversation.participant_avatar}
+                          alt={conversation.participant_name}
+                          size="md"
+                          fallback={conversation.participant_name[0]}
+                        />
                         <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center ${getRoleColor(conversation.participant_role)}`}>
                           {getRoleIcon(conversation.participant_role)}
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
-                          <h3 className={`font-semibold truncate transition-colors ${
-                            isDark ? 'text-dark-text' : 'text-gray-900'
-                          }`}>{conversation.participant_name}</h3>
-                          <span className={`text-xs transition-colors ${
-                            isDark ? 'text-dark-muted' : 'text-gray-500'
-                          }`}>
+                          <Typography variant="subtitle2" color="textPrimary" className="font-semibold truncate">
+                            {conversation.participant_name}
+                          </Typography>
+                          <Typography variant="caption" color="textSecondary">
                             {new Date(conversation.last_message_time).toLocaleTimeString([], { 
                               hour: '2-digit', 
                               minute: '2-digit' 
                             })}
-                          </span>
+                          </Typography>
                         </div>
                         {conversation.job_title && (
                           <div className="flex items-center space-x-1 mb-1">
-                            <Briefcase className={`h-3 w-3 transition-colors ${
-                              isDark ? 'text-dark-muted' : 'text-gray-400'
-                            }`} />
-                            <span className={`text-xs truncate transition-colors ${
-                              isDark ? 'text-dark-muted' : 'text-gray-500'
-                            }`}>{conversation.job_title}</span>
+                            <Work className={`h-3 w-3 ${isDark ? 'text-dark-muted' : 'text-gray-400'}`} />
+                            <Typography variant="caption" color="textSecondary" className="truncate">
+                              {conversation.job_title}
+                            </Typography>
                           </div>
                         )}
-                        <p className={`text-sm truncate transition-colors ${
-                          isDark ? 'text-dark-muted' : 'text-gray-600'
-                        }`}>{conversation.last_message}</p>
+                        <Typography variant="body2" color="textSecondary" className="truncate">
+                          {conversation.last_message}
+                        </Typography>
                         {conversation.unread_count > 0 && (
                           <div className="flex items-center justify-between mt-2">
-                            <span className={`text-xs transition-colors ${
-                              isDark ? 'text-dark-muted' : 'text-gray-500'
-                            }`}>
+                            <Badge variant="standard" color="error" className="text-xs">
                               {conversation.unread_count} unread
-                            </span>
+                            </Badge>
                             <div className={`w-2 h-2 rounded-full ${
                               isDark ? 'bg-lime' : 'bg-asu-maroon'
                             }`}></div>
@@ -433,11 +525,11 @@ export default function Messages() {
             </div>
 
             {/* Messages Area */}
-            <div ref={messagesRef} className="flex-1 flex flex-col">
+            <div className="flex-1 flex flex-col messages-area">
               {selectedConversation && currentConversation ? (
                 <>
                   {/* Chat Header */}
-                  <div className={`p-4 border-b transition-colors duration-300 ${
+                  <div className={`p-4 border-b ${
                     isDark 
                       ? 'border-lime/20 bg-gradient-to-r from-dark-surface to-dark-bg' 
                       : 'border-gray-200 bg-gradient-to-r from-white to-gray-50'
@@ -445,63 +537,40 @@ export default function Messages() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <div className="relative">
-                          {currentConversation.participant_avatar ? (
-                            <img
-                              src={currentConversation.participant_avatar}
-                              alt={currentConversation.participant_name}
-                              className="w-10 h-10 rounded-full object-cover"
-                            />
-                          ) : (
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                              isDark ? 'bg-lime/20' : 'bg-asu-maroon/20'
-                            }`}>
-                              <User className={`h-5 w-5 ${
-                                isDark ? 'text-lime' : 'text-asu-maroon'
-                              }`} />
-                            </div>
-                          )}
+                          <Avatar
+                            src={currentConversation.participant_avatar}
+                            alt={currentConversation.participant_name}
+                            size="md"
+                            fallback={currentConversation.participant_name[0]}
+                          />
                           <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center ${getRoleColor(currentConversation.participant_role)}`}>
                             {getRoleIcon(currentConversation.participant_role)}
                           </div>
                         </div>
                         <div>
-                          <h3 className={`font-semibold transition-colors ${
-                            isDark ? 'text-dark-text' : 'text-gray-900'
-                          }`}>{currentConversation.participant_name}</h3>
+                          <Typography variant="subtitle1" color="textPrimary" className="font-semibold">
+                            {currentConversation.participant_name}
+                          </Typography>
                           {currentConversation.job_title && (
                             <div className="flex items-center space-x-1">
-                              <Briefcase className={`h-3 w-3 transition-colors ${
-                                isDark ? 'text-dark-muted' : 'text-gray-400'
-                              }`} />
-                              <span className={`text-xs transition-colors ${
-                                isDark ? 'text-dark-muted' : 'text-gray-500'
-                              }`}>{currentConversation.job_title}</span>
+                              <Work className={`h-3 w-3 ${isDark ? 'text-dark-muted' : 'text-gray-400'}`} />
+                              <Typography variant="caption" color="textSecondary">
+                                {currentConversation.job_title}
+                              </Typography>
                             </div>
                           )}
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <button className={`p-2 rounded-full transition-colors ${
-                          isDark ? 'hover:bg-dark-bg' : 'hover:bg-gray-100'
-                        }`}>
-                          <Phone className={`h-5 w-5 transition-colors ${
-                            isDark ? 'text-dark-muted' : 'text-gray-600'
-                          }`} />
-                        </button>
-                        <button className={`p-2 rounded-full transition-colors ${
-                          isDark ? 'hover:bg-dark-bg' : 'hover:bg-gray-100'
-                        }`}>
-                          <Video className={`h-5 w-5 transition-colors ${
-                            isDark ? 'text-dark-muted' : 'text-gray-600'
-                          }`} />
-                        </button>
-                        <button className={`p-2 rounded-full transition-colors ${
-                          isDark ? 'hover:bg-dark-bg' : 'hover:bg-gray-100'
-                        }`}>
-                          <MoreHorizontal className={`h-5 w-5 transition-colors ${
-                            isDark ? 'text-dark-muted' : 'text-gray-600'
-                          }`} />
-                        </button>
+                        <Button variant="text" size="small" className="min-w-0 p-2">
+                          <PhoneInTalk className="h-5 w-5" />
+                        </Button>
+                        <Button variant="text" size="small" className="min-w-0 p-2">
+                          <VideoCallOutlined className="h-5 w-5" />
+                        </Button>
+                        <Button variant="text" size="small" className="min-w-0 p-2">
+                          <MoreHoriz className="h-5 w-5" />
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -524,9 +593,11 @@ export default function Messages() {
                                 : 'bg-gray-100 text-gray-900 rounded-bl-md'
                           }`}
                         >
-                          <p className="text-sm">{message.content}</p>
-                          <div className="flex items-center justify-between mt-2">
-                            <span className={`text-xs ${
+                          <Typography variant="body2" className="mb-2">
+                            {message.content}
+                          </Typography>
+                          <div className="flex items-center justify-between">
+                            <Typography variant="caption" className={`${
                               message.sender_id === user?.id 
                                 ? isDark 
                                   ? 'text-dark-surface/70' 
@@ -539,11 +610,11 @@ export default function Messages() {
                                 hour: '2-digit', 
                                 minute: '2-digit' 
                               })}
-                            </span>
+                            </Typography>
                             {message.sender_id === user?.id && (
                               <div className="ml-2">
                                 {message.read ? (
-                                  <CheckCheck className={`h-4 w-4 ${
+                                  <DoneAll className={`h-4 w-4 ${
                                     isDark ? 'text-dark-surface/70' : 'text-white/70'
                                   }`} />
                                 ) : (
@@ -560,51 +631,40 @@ export default function Messages() {
                   </div>
 
                   {/* Message Input */}
-                  <div className={`p-4 border-t transition-colors duration-300 ${
+                  <div className={`p-4 border-t ${
                     isDark 
                       ? 'border-lime/20 bg-gradient-to-r from-dark-surface to-dark-bg' 
                       : 'border-gray-200 bg-gradient-to-r from-white to-gray-50'
                   }`}>
                     <div className="flex items-center space-x-3">
-                      <button className={`p-2 rounded-full transition-colors ${
-                        isDark ? 'hover:bg-dark-bg' : 'hover:bg-gray-100'
-                      }`}>
-                        <Paperclip className={`h-5 w-5 transition-colors ${
-                          isDark ? 'text-dark-muted' : 'text-gray-600'
-                        }`} />
-                      </button>
-                      <div className="flex-1 relative">
-                        <input
-                          type="text"
+                      <Button variant="text" size="small" className="min-w-0 p-2">
+                        <AttachFile className="h-5 w-5" />
+                      </Button>
+                      <div className="flex-1">
+                        <Input
                           value={newMessage}
                           onChange={(e) => setNewMessage(e.target.value)}
                           onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                           placeholder="Type your message..."
-                          className={`w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
-                            isDark 
-                              ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
-                              : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
-                          }`}
+                          variant="outlined"
+                          fullWidth
+                          endIcon={
+                            <Button variant="text" size="small" className="min-w-0 p-1">
+                              <EmojiEmotions className="h-5 w-5" />
+                            </Button>
+                          }
                         />
-                        <button className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded-full transition-colors ${
-                          isDark ? 'hover:bg-dark-bg' : 'hover:bg-gray-100'
-                        }`}>
-                          <Smile className={`h-5 w-5 transition-colors ${
-                            isDark ? 'text-dark-muted' : 'text-gray-600'
-                          }`} />
-                        </button>
                       </div>
-                      <button
+                      <Button
                         onClick={handleSendMessage}
                         disabled={!newMessage.trim()}
-                        className={`p-3 text-white rounded-2xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                          isDark 
-                            ? 'bg-lime hover:bg-dark-accent text-dark-surface' 
-                            : 'bg-asu-maroon hover:bg-asu-maroon-dark'
-                        }`}
+                        variant="contained"
+                        color="primary"
+                        size="small"
+                        className="min-w-0 p-3"
                       >
                         <Send className="h-5 w-5" />
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </>
@@ -612,22 +672,56 @@ export default function Messages() {
                 /* No Conversation Selected */
                 <div className="flex-1 flex items-center justify-center">
                   <div className="text-center">
-                    <MessageCircle className={`h-24 w-24 mx-auto mb-4 transition-colors ${
-                      isDark ? 'text-dark-muted' : 'text-gray-300'
-                    }`} />
-                    <h3 className={`text-xl font-medium mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-900'
-                    }`}>Select a conversation</h3>
-                    <p className={`transition-colors ${
-                      isDark ? 'text-dark-muted' : 'text-gray-500'
-                    }`}>Choose a conversation from the sidebar to start messaging</p>
+                    <div className={`w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center ${
+                      isDark ? 'bg-lime/20' : 'bg-asu-maroon/10'
+                    }`}>
+                      <Chat className={`w-12 h-12 ${
+                        isDark ? 'text-lime' : 'text-asu-maroon'
+                      }`} />
+                    </div>
+                    <Typography variant="h5" color="textPrimary" className="font-bold mb-4">
+                      Select a conversation
+                    </Typography>
+                    <Typography variant="body1" color="textSecondary" className="mb-6">
+                      Choose a conversation from the sidebar to start messaging
+                    </Typography>
+                    <Button 
+                      variant="outlined"
+                      color="primary"
+                      startIcon={<Add />}
+                    >
+                      Start New Conversation
+                    </Button>
                   </div>
                 </div>
               )}
             </div>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );
 }
+
+// Helper functions
+const getRoleIcon = (role: string) => {
+  switch (role) {
+    case 'student':
+      return <School className="h-3 w-3" />;
+    case 'employer':
+      return <Business className="h-3 w-3" />;
+    default:
+      return <Person className="h-3 w-3" />;
+  }
+};
+
+const getRoleColor = (role: string) => {
+  switch (role) {
+    case 'student':
+      return 'bg-blue-100 text-blue-800';
+    case 'employer':
+      return 'bg-green-100 text-green-800';
+    default:
+      return 'bg-gray-100 text-gray-800';
+  }
+};

@@ -3,7 +3,7 @@ import { useTheme } from '../../context/ThemeContext';
 
 interface BadgeProps {
   variant?: 'standard' | 'dot' | 'outlined';
-  color?: 'default' | 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
+  color?: 'default' | 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success' | 'standard';
   size?: 'small' | 'medium' | 'large';
   overlap?: 'circular' | 'rectangular';
   anchorOrigin?: {
@@ -51,6 +51,9 @@ const Badge: React.FC<BadgeProps> = ({
   const getColorClasses = () => {
     const colors = {
       default: isDark 
+        ? 'bg-gray-600 text-gray-100' 
+        : 'bg-gray-500 text-white',
+      standard: isDark 
         ? 'bg-gray-600 text-gray-100' 
         : 'bg-gray-500 text-white',
       primary: isDark 

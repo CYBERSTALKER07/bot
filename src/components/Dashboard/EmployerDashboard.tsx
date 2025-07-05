@@ -1,423 +1,522 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { useRef, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { gsap } from 'gsap';
 import { 
   Add,
-  People,
-  Visibility,
-  Message,
   TrendingUp,
-  CalendarToday,
-  LocationOn,
-  AccessTime,
-  Refresh,
+  People,
   Work,
-  Assessment,
-  Event,
-  Dashboard,
-  Business,
-  Assignment
+  Visibility,
+  Edit,
+  Delete,
+  MoreVert,
+  CheckCircle,
+  Schedule,
+  Star,
+  AutoAwesome,
+  LocalCafe,
+  Favorite
 } from '@mui/icons-material';
-import { useJobs } from '../../hooks/useJobs';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { useJobs } from '../../hooks/useJobs';
+import Typography from '../ui/Typography';
+import Button from '../ui/Button';
 import { Card } from '../ui/Card';
-import { Button } from '../ui/Button';
-// import { Badge } from '../ui/Badge';
+import Badge from '../ui/Badge';
 
 export default function EmployerDashboard() {
   const { user } = useAuth();
   const { isDark } = useTheme();
-  const { jobs, loading, error } = useJobs();
+  const { jobs } = useJobs();
+  const navigate = useNavigate();
+  const containerRef = useRef<HTMLDivElement>(null);
   
-  // Filter jobs for current employer
-  const myJobs = jobs.filter(job => job.employer_id === user?.id);
-  const totalApplications = 0; // Would come from applications table
-  const pendingApplications = 0; // Would come from applications table
+  const employerJobs = jobs.filter(job => job.employer_id === user?.id);
+  const activeJobs = employerJobs.filter(job => job.status === 'active');
+  const totalViews = employerJobs.reduce((sum, job) => sum + (job.views || 0), 0);
 
-  const stats = [
-    { 
-      title: 'Active Jobs', 
-      value: myJobs.length.toString(), 
-      change: '+2 this week', 
-      icon: <Work className="w-6 h-6" />,
-      color: 'primary'
-    },
-    { 
-      title: 'Total Applicants', 
-      value: '248', 
-      change: '+15 this week', 
-      icon: <People className="w-6 h-6" />,
-      color: 'success'
-    },
-    { 
-      title: 'Interviews Scheduled', 
-      value: '8', 
-      change: '+3 this week', 
-      icon: <Event className="w-6 h-6" />,
-      color: 'info'
-    },
-    { 
-      title: 'Hires Made', 
-      value: '5', 
-      change: '+1 this month', 
-      icon: <TrendingUp className="w-6 h-6" />,
-      color: 'warning'
-    },
-  ];
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Material Design entrance animations
+      gsap.fromTo('.dashboard-header', {
+        opacity: 0,
+        y: -30,
+        scale: 0.95
+      }, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.8,
+        ease: 'power2.out'
+      });
 
-  if (loading) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-center justify-center h-64">
-          <div className="flex flex-col items-center space-y-4">
-            <div className={`animate-spin rounded-full h-12 w-12 border-4 border-t-transparent ${
-              isDark ? 'border-lime' : 'border-asu-maroon'
-            }`}></div>
-            <p className={`text-lg font-medium ${
-              isDark ? 'text-dark-text' : 'text-gray-700'
-            }`}>Loading dashboard...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+      gsap.fromTo('.stat-card', {
+        opacity: 0,
+        y: 20,
+        scale: 0.95
+      }, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.6,
+        ease: 'power2.out',
+        stagger: 0.1,
+        delay: 0.3
+      });
 
-  if (error) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className={`p-6 rounded-2xl border-l-4 ${
-          isDark 
-            ? 'bg-red-900/20 border-red-500 text-red-300' 
-            : 'bg-red-50 border-red-400 text-red-800'
-        }`}>
-          <div className="flex items-center">
-            <div className={`p-2 rounded-full ${
-              isDark ? 'bg-red-500/20' : 'bg-red-100'
-            }`}>
-              <Assessment className="w-5 h-5" />
-            </div>
-            <div className="ml-3">
-              <h3 className="text-lg font-medium">Error Loading Dashboard</h3>
-              <p className="text-sm opacity-90">{error}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+      gsap.fromTo('.dashboard-content', {
+        opacity: 0,
+        y: 20
+      }, {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        ease: 'power2.out',
+        delay: 0.5
+      });
+
+      // Floating decorations
+      gsap.to('.dashboard-decoration', {
+        y: -8,
+        x: 4,
+        rotation: 360,
+        duration: 20,
+        repeat: -1,
+        ease: 'none'
+      });
+
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  const handlePostJob = () => {
+    navigate('/post-job');
+  };
+
+  const handleViewApplicants = (jobId: string) => {
+    navigate(`/applicants?job=${jobId}`);
+  };
+
+  const handleEditJob = (jobId: string) => {
+    navigate(`/job/${jobId}/edit`);
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className={`text-4xl font-bold mb-2 ${
-              isDark ? 'text-dark-text' : 'text-gray-900'
-            }`}>
-              Employer Dashboard
-            </h1>
-            <p className={`text-lg ${
-              isDark ? 'text-dark-muted' : 'text-gray-600'
-            }`}>
-              Manage your job postings and connect with talented ASU students
-            </p>
-          </div>
-          <Link
-            to="/post-job"
-            className={`mt-4 sm:mt-0 inline-flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-200 hover:scale-105 hover:shadow-lg ${
-              isDark 
-                ? 'bg-lime text-dark-surface hover:bg-lime/90 shadow-lg' 
-                : 'bg-asu-maroon text-white hover:bg-asu-maroon/90 shadow-lg'
-            }`}
-          >
-            <Add className="w-5 h-5 mr-2" />
-            Post New Job
-          </Link>
-        </div>
-      </div>
+    <div ref={containerRef} className={`min-h-screen relative ${
+      isDark ? 'bg-dark-bg' : 'bg-gray-50'
+    }`}>
+      {/* Decorative elements */}
+      <AutoAwesome className={`dashboard-decoration absolute top-20 right-20 h-5 w-5 ${
+        isDark ? 'text-lime/50' : 'text-asu-gold/50'
+      }`} />
+      <LocalCafe className={`dashboard-decoration absolute top-40 left-20 h-4 w-4 ${
+        isDark ? 'text-dark-accent/40' : 'text-asu-maroon/40'
+      }`} />
+      <Favorite className={`dashboard-decoration absolute bottom-32 right-1/3 h-4 w-4 ${
+        isDark ? 'text-lime/60' : 'text-asu-gold/60'
+      }`} />
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {stats.map((stat, index) => (
-          <Card key={index} className="p-6 hover:shadow-xl transition-all duration-300">
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <p className={`text-sm font-medium ${
-                  isDark ? 'text-dark-muted' : 'text-gray-600'
-                }`}>
-                  {stat.title}
-                </p>
-                <p className={`text-3xl font-bold mt-1 ${
-                  isDark ? 'text-dark-text' : 'text-gray-900'
-                }`}>
-                  {stat.value}
-                </p>
-                <p className={`text-sm mt-1 ${
-                  isDark ? 'text-green-400' : 'text-green-600'
-                }`}>
-                  {stat.change}
-                </p>
-              </div>
-              <div className={`p-3 rounded-full ${
-                isDark 
-                  ? 'bg-lime/20 text-lime' 
-                  : 'bg-asu-maroon/10 text-asu-maroon'
-              }`}>
-                {stat.icon}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="dashboard-header mb-12">
+          <Card className="overflow-hidden" elevation={2}>
+            <div className={`p-8 text-white relative ${
+              isDark 
+                ? 'bg-gradient-to-r from-dark-surface to-dark-bg' 
+                : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
+            }`}>
+              <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl ${
+                isDark ? 'bg-lime/10' : 'bg-white/10'
+              }`}></div>
+              <div className={`absolute bottom-0 left-0 w-24 h-24 rounded-full blur-xl ${
+                isDark ? 'bg-dark-accent/20' : 'bg-asu-gold/20'
+              }`}></div>
+              
+              <div className="relative z-10">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+                  <div>
+                    <Typography variant="h3" className="font-bold mb-2 text-white">
+                      Welcome back, {user?.name}!
+                    </Typography>
+                    <Typography variant="subtitle1" className={`${
+                      isDark ? 'text-dark-muted' : 'text-white/90'
+                    }`}>
+                      Manage your job postings and find the perfect candidates
+                    </Typography>
+                  </div>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    size="large"
+                    onClick={handlePostJob}
+                    className="mt-4 sm:mt-0 bg-white text-asu-maroon hover:bg-gray-100"
+                  >
+                    <Add className="mr-2" />
+                    Post New Job
+                  </Button>
+                </div>
+                
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
+                    <TrendingUp className="h-5 w-5" />
+                    <span className="text-sm">{totalViews} total views</span>
+                  </div>
+                  <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
+                    <Work className="h-5 w-5" />
+                    <span className="text-sm">{activeJobs.length} active jobs</span>
+                  </div>
+                  <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
+                    <People className="h-5 w-5" />
+                    <span className="text-sm">Premium employer</span>
+                  </div>
+                </div>
               </div>
             </div>
           </Card>
-        ))}
-      </div>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Job Postings */}
-        <Card className="overflow-hidden">
-          <div className={`p-6 border-b ${
-            isDark ? 'border-lime/20' : 'border-gray-200'
-          }`}>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <Card className="stat-card p-6" elevation={2}>
             <div className="flex items-center justify-between">
-              <h2 className={`text-xl font-semibold ${
-                isDark ? 'text-dark-text' : 'text-gray-900'
-              }`}>
-                Your Job Postings
-              </h2>
-              <Link
-                to="/post-job"
-                className={`text-sm font-medium transition-colors duration-200 ${
-                  isDark ? 'text-lime hover:text-lime/80' : 'text-asu-maroon hover:text-asu-maroon/80'
-                }`}
-              >
-                Post New Job
-              </Link>
-            </div>
-          </div>
-          <div className="p-6">
-            {myJobs.length === 0 ? (
-              <div className="text-center py-12">
-                <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${
-                  isDark ? 'bg-lime/20' : 'bg-asu-maroon/10'
-                }`}>
-                  <Work className={`w-8 h-8 ${
-                    isDark ? 'text-lime' : 'text-asu-maroon'
-                  }`} />
-                </div>
-                <h3 className={`text-xl font-medium mb-2 ${
-                  isDark ? 'text-dark-text' : 'text-gray-900'
-                }`}>
-                  No job postings yet
-                </h3>
-                <p className={`text-base mb-6 ${
-                  isDark ? 'text-dark-muted' : 'text-gray-600'
-                }`}>
-                  Start by posting your first job opportunity
-                </p>
-                <Link
-                  to="/post-job"
-                  className={`inline-flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-200 hover:scale-105 ${
-                    isDark 
-                      ? 'bg-lime text-dark-surface hover:bg-lime/90' 
-                      : 'bg-asu-maroon text-white hover:bg-asu-maroon/90'
-                  }`}
-                >
-                  <Add className="w-5 h-5 mr-2" />
-                  Post Your First Job
-                </Link>
+              <div>
+                <Typography variant="h4" color="primary" className="font-bold">
+                  {employerJobs.length}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  Total Jobs Posted
+                </Typography>
               </div>
-            ) : (
-              <div className="space-y-4">
-                {myJobs.map((job) => (
-                  <div key={job.id} className={`p-6 rounded-xl border transition-all duration-300 hover:shadow-md ${
-                    isDark 
-                      ? 'border-lime/20 bg-dark-surface hover:border-lime/40' 
-                      : 'border-gray-200 bg-white hover:border-gray-300'
-                  }`}>
-                    <div className="flex items-start justify-between mb-3">
-                      <h3 className={`text-lg font-semibold ${
-                        isDark ? 'text-dark-text' : 'text-gray-900'
-                      }`}>
-                        {job.title}
-                      </h3>
-                      <Badge 
-                        variant={job.type === 'internship' ? 'info' : job.type === 'full-time' ? 'success' : 'warning'}
-                        className="capitalize"
-                      >
-                        {job.type.replace('-', ' ')}
-                      </Badge>
-                    </div>
-                    <div className={`flex items-center space-x-4 text-sm mb-4 ${
-                      isDark ? 'text-dark-muted' : 'text-gray-600'
-                    }`}>
-                      <div className="flex items-center space-x-1">
-                        <LocationOn className="w-4 h-4" />
-                        <span>{job.location}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <CalendarToday className="w-4 h-4" />
-                        <span>Posted {new Date(job.posted_date).toLocaleDateString()}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className={`flex items-center space-x-1 text-sm ${
-                        isDark ? 'text-dark-muted' : 'text-gray-600'
-                      }`}>
-                        <People className="w-4 h-4" />
-                        <span>{job.applicants_count || 0} applicants</span>
-                      </div>
-                      <div className="flex space-x-3">
-                        <Link
-                          to={`/applicants?job=${job.id}`}
-                          className={`text-sm font-medium transition-colors duration-200 ${
-                            isDark ? 'text-lime hover:text-lime/80' : 'text-asu-maroon hover:text-asu-maroon/80'
-                          }`}
-                        >
-                          View Applicants
-                        </Link>
-                        <Link
-                          to={`/job/${job.id}/edit`}
-                          className={`text-sm font-medium transition-colors duration-200 ${
-                            isDark ? 'text-dark-muted hover:text-dark-text' : 'text-gray-500 hover:text-gray-700'
-                          }`}
-                        >
-                          Edit
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </Card>
-
-        {/* Recent Activity */}
-        <Card className="overflow-hidden">
-          <div className={`p-6 border-b ${
-            isDark ? 'border-lime/20' : 'border-gray-200'
-          }`}>
-            <h2 className={`text-xl font-semibold ${
-              isDark ? 'text-dark-text' : 'text-gray-900'
-            }`}>
-              Recent Activity
-            </h2>
-          </div>
-          <div className="p-6">
-            <div className="text-center py-12">
-              <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
                 isDark ? 'bg-lime/20' : 'bg-asu-maroon/10'
               }`}>
-                <Assessment className={`w-8 h-8 ${
+                <Work className={`h-6 w-6 ${
                   isDark ? 'text-lime' : 'text-asu-maroon'
                 }`} />
               </div>
-              <h3 className={`text-xl font-medium mb-2 ${
-                isDark ? 'text-dark-text' : 'text-gray-900'
-              }`}>
-                No recent activity
-              </h3>
-              <p className={`text-base ${
-                isDark ? 'text-dark-muted' : 'text-gray-600'
-              }`}>
-                Activity will appear here as students interact with your job postings
-              </p>
             </div>
-          </div>
-        </Card>
-      </div>
+          </Card>
 
-      {/* Quick Actions */}
-      <Card className="mt-8">
-        <div className="p-6">
-          <h2 className={`text-xl font-semibold mb-6 ${
-            isDark ? 'text-dark-text' : 'text-gray-900'
-          }`}>
-            Quick Actions
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link
-              to="/post-job"
-              className={`group flex items-center space-x-4 p-6 rounded-xl border transition-all duration-300 hover:shadow-lg hover:scale-105 ${
-                isDark 
-                  ? 'border-lime/20 hover:border-lime/40 bg-dark-surface' 
-                  : 'border-gray-200 hover:border-asu-maroon/30 bg-white'
-              }`}
-            >
-              <div className={`p-3 rounded-full ${
-                isDark ? 'bg-lime/20 text-lime' : 'bg-asu-maroon/10 text-asu-maroon'
-              }`}>
-                <Add className="w-6 h-6" />
-              </div>
+          <Card className="stat-card p-6" elevation={2}>
+            <div className="flex items-center justify-between">
               <div>
-                <h3 className={`font-semibold ${
-                  isDark ? 'text-dark-text' : 'text-gray-900'
-                }`}>
-                  Post a Job
-                </h3>
-                <p className={`text-sm ${
-                  isDark ? 'text-dark-muted' : 'text-gray-600'
-                }`}>
-                  Create a new job posting
-                </p>
+                <Typography variant="h4" color="primary" className="font-bold">
+                  {activeJobs.length}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  Active Jobs
+                </Typography>
               </div>
-            </Link>
-            
-            <Link
-              to="/applicants"
-              className={`group flex items-center space-x-4 p-6 rounded-xl border transition-all duration-300 hover:shadow-lg hover:scale-105 ${
-                isDark 
-                  ? 'border-lime/20 hover:border-lime/40 bg-dark-surface' 
-                  : 'border-gray-200 hover:border-asu-maroon/30 bg-white'
-              }`}
-            >
-              <div className={`p-3 rounded-full ${
-                isDark ? 'bg-lime/20 text-lime' : 'bg-asu-maroon/10 text-asu-maroon'
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                isDark ? 'bg-lime/20' : 'bg-green-100'
               }`}>
-                <People className="w-6 h-6" />
+                <CheckCircle className={`h-6 w-6 ${
+                  isDark ? 'text-lime' : 'text-green-600'
+                }`} />
               </div>
+            </div>
+          </Card>
+
+          <Card className="stat-card p-6" elevation={2}>
+            <div className="flex items-center justify-between">
               <div>
-                <h3 className={`font-semibold ${
-                  isDark ? 'text-dark-text' : 'text-gray-900'
-                }`}>
-                  Review Applicants
-                </h3>
-                <p className={`text-sm ${
-                  isDark ? 'text-dark-muted' : 'text-gray-600'
-                }`}>
-                  Manage applications
-                </p>
+                <Typography variant="h4" color="primary" className="font-bold">
+                  {totalViews}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  Total Views
+                </Typography>
               </div>
-            </Link>
-            
-            <Link
-              to="/messages"
-              className={`group flex items-center space-x-4 p-6 rounded-xl border transition-all duration-300 hover:shadow-lg hover:scale-105 ${
-                isDark 
-                  ? 'border-lime/20 hover:border-lime/40 bg-dark-surface' 
-                  : 'border-gray-200 hover:border-asu-maroon/30 bg-white'
-              }`}
-            >
-              <div className={`p-3 rounded-full ${
-                isDark ? 'bg-lime/20 text-lime' : 'bg-asu-maroon/10 text-asu-maroon'
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                isDark ? 'bg-lime/20' : 'bg-blue-100'
               }`}>
-                <Message className="w-6 h-6" />
+                <Visibility className={`h-6 w-6 ${
+                  isDark ? 'text-lime' : 'text-blue-600'
+                }`} />
               </div>
+            </div>
+          </Card>
+
+          <Card className="stat-card p-6" elevation={2}>
+            <div className="flex items-center justify-between">
               <div>
-                <h3 className={`font-semibold ${
-                  isDark ? 'text-dark-text' : 'text-gray-900'
-                }`}>
-                  Messages
-                </h3>
-                <p className={`text-sm ${
-                  isDark ? 'text-dark-muted' : 'text-gray-600'
-                }`}>
-                  Connect with students
-                </p>
+                <Typography variant="h4" color="primary" className="font-bold">
+                  0
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  Total Applications
+                </Typography>
               </div>
-            </Link>
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                isDark ? 'bg-lime/20' : 'bg-purple-100'
+              }`}>
+                <People className={`h-6 w-6 ${
+                  isDark ? 'text-lime' : 'text-purple-600'
+                }`} />
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Recent Jobs */}
+          <div className="lg:col-span-2">
+            <Card className="dashboard-content p-8" elevation={2}>
+              <div className="flex items-center justify-between mb-6">
+                <Typography variant="h5" color="textPrimary" className="font-bold">
+                  Recent Job Postings
+                </Typography>
+                <Button
+                  variant="text"
+                  color="primary"
+                  size="small"
+                  onClick={handlePostJob}
+                >
+                  <Add className="mr-1" />
+                  Post Job
+                </Button>
+              </div>
+              
+              {employerJobs.length === 0 ? (
+                <div className="text-center py-12">
+                  <Work className={`h-16 w-16 mx-auto mb-4 ${
+                    isDark ? 'text-dark-muted' : 'text-gray-400'
+                  }`} />
+                  <Typography variant="h6" color="textSecondary" className="mb-2">
+                    No jobs posted yet
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" className="mb-6">
+                    Start by posting your first job to attract top talent
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    onClick={handlePostJob}
+                  >
+                    <Add className="mr-2" />
+                    Post Your First Job
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {employerJobs.slice(0, 5).map((job) => (
+                    <div
+                      key={job.id}
+                      className={`p-4 rounded-lg border transition-all duration-200 hover:shadow-md ${
+                        isDark 
+                          ? 'border-dark-accent/20 bg-dark-surface hover:border-lime/30' 
+                          : 'border-gray-200 bg-white hover:border-asu-maroon/30'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3 mb-2">
+                            <Typography variant="h6" color="textPrimary" className="font-semibold">
+                              {job.title}
+                            </Typography>
+                            <Badge 
+                              variant="standard" 
+                              color={job.status === 'active' ? 'primary' : 'secondary'}
+                            >
+                              {job.status}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center space-x-4 text-sm mb-3">
+                            <span className={isDark ? 'text-dark-muted' : 'text-gray-600'}>
+                              {job.location}
+                            </span>
+                            <span className={isDark ? 'text-dark-muted' : 'text-gray-600'}>
+                              {job.type}
+                            </span>
+                            <span className={isDark ? 'text-dark-muted' : 'text-gray-600'}>
+                              {job.applicants_count || 0} applicants
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-4">
+                            <Button
+                              variant="text"
+                              color="primary"
+                              size="small"
+                              onClick={() => handleViewApplicants(job.id)}
+                            >
+                              View Applicants
+                            </Button>
+                            <Button
+                              variant="text"
+                              size="small"
+                              onClick={() => handleEditJob(job.id)}
+                              className={isDark ? 'text-dark-muted' : 'text-gray-600'}
+                            >
+                              <Edit className="mr-1" />
+                              Edit
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <div className="text-right">
+                            <Typography variant="body2" color="textSecondary">
+                              {job.views || 0} views
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary">
+                              {new Date(job.posted_date).toLocaleDateString()}
+                            </Typography>
+                          </div>
+                          <Button
+                            variant="text"
+                            size="small"
+                            className="p-2"
+                          >
+                            <MoreVert />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {employerJobs.length > 5 && (
+                    <div className="text-center pt-4">
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={() => navigate('/jobs')}
+                      >
+                        View All Jobs
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </Card>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="space-y-8">
+            <Card className="dashboard-content p-6" elevation={2}>
+              <Typography variant="h6" color="textPrimary" className="font-bold mb-6">
+                Quick Actions
+              </Typography>
+              <div className="space-y-4">
+                <Link 
+                  to="/post-job"
+                  className={`block p-4 rounded-lg border transition-all duration-200 hover:shadow-md ${
+                    isDark 
+                      ? 'border-dark-accent/20 bg-dark-surface hover:border-lime/30' 
+                      : 'border-gray-200 bg-white hover:border-asu-maroon/30'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      isDark ? 'bg-lime/20' : 'bg-asu-maroon/10'
+                    }`}>
+                      <Add className={`h-5 w-5 ${
+                        isDark ? 'text-lime' : 'text-asu-maroon'
+                      }`} />
+                    </div>
+                    <div>
+                      <Typography variant="body1" color="textPrimary" className="font-medium">
+                        Post New Job
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        Create a new job posting
+                      </Typography>
+                    </div>
+                  </div>
+                </Link>
+
+                <Link 
+                  to="/applicants"
+                  className={`block p-4 rounded-lg border transition-all duration-200 hover:shadow-md ${
+                    isDark 
+                      ? 'border-dark-accent/20 bg-dark-surface hover:border-lime/30' 
+                      : 'border-gray-200 bg-white hover:border-asu-maroon/30'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      isDark ? 'bg-lime/20' : 'bg-blue-100'
+                    }`}>
+                      <People className={`h-5 w-5 ${
+                        isDark ? 'text-lime' : 'text-blue-600'
+                      }`} />
+                    </div>
+                    <div>
+                      <Typography variant="body1" color="textPrimary" className="font-medium">
+                        View Applicants
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        Review job applications
+                      </Typography>
+                    </div>
+                  </div>
+                </Link>
+
+                <Link 
+                  to="/messages"
+                  className={`block p-4 rounded-lg border transition-all duration-200 hover:shadow-md ${
+                    isDark 
+                      ? 'border-dark-accent/20 bg-dark-surface hover:border-lime/30' 
+                      : 'border-gray-200 bg-white hover:border-asu-maroon/30'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      isDark ? 'bg-lime/20' : 'bg-green-100'
+                    }`}>
+                      <Star className={`h-5 w-5 ${
+                        isDark ? 'text-lime' : 'text-green-600'
+                      }`} />
+                    </div>
+                    <div>
+                      <Typography variant="body1" color="textPrimary" className="font-medium">
+                        Messages
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        Chat with candidates
+                      </Typography>
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            </Card>
+
+            {/* Tips */}
+            <Card className="p-6" elevation={2}>
+              <Typography variant="h6" color="textPrimary" className="font-bold mb-4">
+                Hiring Tips
+              </Typography>
+              <div className="space-y-3">
+                <div className="flex items-start space-x-3">
+                  <CheckCircle className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
+                    isDark ? 'text-lime' : 'text-green-500'
+                  }`} />
+                  <Typography variant="body2" color="textSecondary">
+                    Post detailed job descriptions to attract qualified candidates
+                  </Typography>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <CheckCircle className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
+                    isDark ? 'text-lime' : 'text-green-500'
+                  }`} />
+                  <Typography variant="body2" color="textSecondary">
+                    Include salary ranges to increase application rates
+                  </Typography>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <CheckCircle className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
+                    isDark ? 'text-lime' : 'text-green-500'
+                  }`} />
+                  <Typography variant="body2" color="textSecondary">
+                    Respond quickly to applications to secure top talent
+                  </Typography>
+                </div>
+              </div>
+            </Card>
           </div>
         </div>
-      </Card>
+      </div>
     </div>
   );
 }

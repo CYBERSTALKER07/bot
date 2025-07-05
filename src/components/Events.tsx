@@ -3,105 +3,102 @@ import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { 
-  Calendar, 
-  MapPin, 
-  Users, 
-  Clock, 
-  Video, 
-  Filter,
+  CalendarToday, 
+  LocationOn, 
+  People, 
+  AccessTime, 
+  VideoCall, 
+  FilterList,
   Search,
-  Plus,
-  ExternalLink,
+  Add,
+  OpenInNew,
+  BookmarkAdd,
   Bookmark,
-  BookmarkPlus,
   Star,
   TrendingUp,
-  Award,
-  Sparkles,
-  Coffee,
-  Heart,
-  Zap
-} from 'lucide-react';
+  EmojiEvents,
+  AutoAwesome,
+  LocalCafe,
+  Favorite,
+  Bolt,
+  Event,
+  Business,
+  School,
+  Work
+} from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
-import { Event } from '../types';
+import { useTheme } from '../context/ThemeContext';
+import { Event as EventType } from '../types';
+import Typography from './ui/Typography';
+import Button from './ui/Button';
+import Input from './ui/Input';
+import { Card, StatsCard } from './ui/Card';
+import Badge from './ui/Badge';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Events() {
   const { user } = useAuth();
+  const { isDark } = useTheme();
   const containerRef = useRef<HTMLDivElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const statsRef = useRef<HTMLDivElement>(null);
-  const filtersRef = useRef<HTMLDivElement>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [bookmarkedEvents, setBookmarkedEvents] = useState<Set<string>>(new Set());
 
   useEffect(() => {
+    if (!containerRef.current) return;
+
     const ctx = gsap.context(() => {
-      // Header entrance animation
-      gsap.fromTo(headerRef.current, {
+      // Material Design entrance animations
+      gsap.fromTo('.header-card', {
         opacity: 0,
-        y: -40,
-        scale: 0.95
+        y: -30,
+        scale: 0.98
       }, {
         opacity: 1,
         y: 0,
         scale: 1,
-        duration: 1.2,
-        ease: 'power3.out'
+        duration: 0.8,
+        ease: 'power2.out'
       });
 
-      // Stats cards entrance
-      gsap.fromTo('.stat-card', {
+      gsap.fromTo('.stats-card', {
         opacity: 0,
-        y: 30,
+        y: 20,
         scale: 0.9
       }, {
         opacity: 1,
         y: 0,
         scale: 1,
-        duration: 0.8,
+        duration: 0.6,
+        stagger: 0.1,
         ease: 'back.out(1.7)',
-        stagger: 0.15,
-        delay: 0.4
+        delay: 0.2
       });
 
-      // Event cards entrance animation
       gsap.fromTo('.event-card', {
         opacity: 0,
-        y: 40,
+        y: 30,
         scale: 0.95
       }, {
         opacity: 1,
         y: 0,
         scale: 1,
-        duration: 0.8,
-        ease: 'power3.out',
-        stagger: 0.1,
-        delay: 0.8
+        duration: 0.5,
+        stagger: 0.08,
+        ease: 'power2.out',
+        delay: 0.4
       });
 
       // Floating decorations
       gsap.to('.event-decoration', {
-        y: -8,
-        x: 4,
-        rotation: 360,
-        duration: 8,
+        y: -10,
+        x: 5,
+        rotation: 180,
+        duration: 15,
         repeat: -1,
         yoyo: true,
         ease: 'sine.inOut'
-      });
-
-      // Progress bar animations
-      gsap.fromTo('.progress-bar', {
-        width: '0%'
-      }, {
-        width: (_, target) => target.getAttribute('data-width'),
-        duration: 1.5,
-        ease: 'power2.out',
-        delay: 1.2,
-        stagger: 0.2
       });
 
     }, containerRef);
@@ -109,7 +106,7 @@ export default function Events() {
     return () => ctx.revert();
   }, []);
 
-  const events: Event[] = [
+  const events: EventType[] = [
     {
       id: '1',
       title: 'Tech Career Fair 2024',
@@ -212,379 +209,327 @@ export default function Events() {
       }
       return newSet;
     });
-
-    // Bookmark animation
-    gsap.to(`#bookmark-${eventId}`, {
-      scale: 1.3,
-      duration: 0.2,
-      yoyo: true,
-      repeat: 1,
-      ease: 'power2.out'
-    });
   };
 
-  const eventStats = {
-    total: events.length,
-    thisWeek: events.filter(event => {
-      const eventDate = new Date(event.start_date);
-      const now = new Date();
-      const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-      return eventDate >= now && eventDate <= weekFromNow;
-    }).length,
-    virtual: events.filter(event => event.type === 'workshop' || event.type === 'webinar').length,
-    registered: 3 // Mock registered events count
-  };
+  const eventStats = [
+    { 
+      title: 'Total Events', 
+      value: events.length.toString(), 
+      subtitle: 'Always growing',
+      icon: CalendarToday,
+      color: 'primary' as const,
+      trend: 'up' as const,
+      trendValue: 'Always growing'
+    },
+    { 
+      title: 'This Week', 
+      value: '5', 
+      subtitle: 'Don\'t miss out',
+      icon: AccessTime,
+      color: 'success' as const,
+      trend: 'up' as const,
+      trendValue: 'Don\'t miss out'
+    },
+    { 
+      title: 'Virtual Events', 
+      value: '2', 
+      subtitle: 'Join from anywhere',
+      icon: VideoCall,
+      color: 'info' as const,
+      trend: 'neutral' as const,
+      trendValue: 'Join from anywhere'
+    },
+    { 
+      title: 'My Registered', 
+      value: '3', 
+      subtitle: 'Ready to attend',
+      icon: Bookmark,
+      color: 'warning' as const,
+      trend: 'up' as const,
+      trendValue: 'Ready to attend'
+    },
+  ];
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-gray-50 to-white relative">
+    <div ref={containerRef} className={`min-h-screen relative ${
+      isDark ? 'bg-dark-bg' : 'bg-gray-50'
+    }`}>
       {/* Decorative elements */}
-      <div className="event-decoration absolute top-16 right-24 w-4 h-4 bg-asu-gold/40 rounded-full"></div>
-      <div className="event-decoration absolute top-32 left-16 w-3 h-3 bg-asu-maroon/30 rounded-full"></div>
-      <Sparkles className="event-decoration absolute top-24 left-1/4 h-5 w-5 text-asu-gold/60" />
-      <Coffee className="event-decoration absolute bottom-32 right-1/4 h-4 w-4 text-asu-maroon/50" />
-      <Heart className="event-decoration absolute bottom-20 left-1/3 h-4 w-4 text-asu-gold/70" />
+      <AutoAwesome className={`event-decoration absolute top-20 right-20 h-5 w-5 ${
+        isDark ? 'text-lime/50' : 'text-asu-gold/50'
+      }`} />
+      <LocalCafe className={`event-decoration absolute top-40 left-20 h-4 w-4 ${
+        isDark ? 'text-dark-accent/40' : 'text-asu-maroon/40'
+      }`} />
+      <Favorite className={`event-decoration absolute bottom-32 right-1/3 h-4 w-4 ${
+        isDark ? 'text-lime/60' : 'text-asu-gold/60'
+      }`} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div ref={headerRef} className="mb-12">
-          <div className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark rounded-3xl p-8 text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-asu-gold/20 rounded-full blur-xl"></div>
+        <Card className="header-card overflow-hidden mb-8" elevation={3}>
+          <div className={`p-8 text-white relative ${
+            isDark 
+              ? 'bg-gradient-to-r from-dark-surface to-dark-bg' 
+              : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
+          }`}>
+            <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl ${
+              isDark ? 'bg-lime/10' : 'bg-white/10'
+            }`}></div>
+            <div className={`absolute bottom-0 left-0 w-24 h-24 rounded-full blur-xl ${
+              isDark ? 'bg-dark-accent/20' : 'bg-asu-gold/20'
+            }`}></div>
+            
             <div className="relative z-10">
-              <h1 className="text-5xl font-bold mb-4 relative">
-                Career Events & Workshops 📅
-                <div className="absolute -top-3 -right-8 w-6 h-6 bg-asu-gold rounded-full"></div>
-              </h1>
-              <p className="text-xl text-white/90 mb-6 max-w-3xl">
-                Boost your career with networking events, workshops, and company sessions ✨
-              </p>
-              <div className="flex flex-wrap gap-4 text-sm">
+              <Typography variant="h3" className="font-bold mb-4 text-white">
+                Career Events & Workshops
+              </Typography>
+              <Typography variant="subtitle1" className={`mb-6 max-w-3xl ${
+                isDark ? 'text-dark-muted' : 'text-white/90'
+              }`}>
+                Boost your career with networking events, workshops, and company sessions
+              </Typography>
+              <div className="flex flex-wrap gap-4">
                 <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
                   <TrendingUp className="h-5 w-5" />
-                  <span>5 events this week 📈</span>
+                  <span>5 events this week</span>
                 </div>
                 <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-                  <Users className="h-5 w-5" />
-                  <span>1,000+ students attending 👥</span>
+                  <People className="h-5 w-5" />
+                  <span>1,000+ students attending</span>
                 </div>
                 <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
                   <Star className="h-5 w-5" />
-                  <span>Top companies participating 🌟</span>
+                  <span>Top companies participating</span>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </Card>
 
-        {/* Stats Dashboard */}
-        <div ref={statsRef} className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-          <div className="stat-card bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 p-6 relative overflow-hidden group"
-               style={{
-                 borderRadius: `${20 + Math.random() * 8}px ${24 + Math.random() * 6}px ${22 + Math.random() * 10}px ${18 + Math.random() * 8}px`,
-                 transform: `rotate(${Math.random() * 2 - 1}deg)`
-               }}>
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="relative z-10">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">Total Events</p>
-                  <p className="text-3xl font-bold text-gray-900">{events.length}</p>
-                </div>
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-400/20 to-blue-600/30 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg"
-                     style={{
-                       borderRadius: `${50 + Math.random() * 10}% ${45 + Math.random() * 15}% ${55 + Math.random() * 10}% ${50 + Math.random() * 12}%`
-                     }}>
-                  <Calendar className="h-6 w-6 text-blue-600" />
-                </div>
-              </div>
-              <div className="mt-4 flex items-center text-blue-600 text-sm bg-blue-50/80 backdrop-blur-sm rounded-full px-3 py-1 w-fit">
-                <TrendingUp className="h-4 w-4 mr-1" />
-                <span>Always growing 📈</span>
-              </div>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {eventStats.map((stat, index) => (
+            <div key={index} className="stats-card">
+              <StatsCard
+                title={stat.title}
+                value={stat.value}
+                icon={stat.icon}
+                subtitle={stat.subtitle}
+                color={stat.color}
+                trend={stat.trend}
+                trendValue={stat.trendValue}
+                delay={index * 0.1}
+                rotation={index % 2 === 0 ? -0.5 : 0.5}
+              />
             </div>
-          </div>
-
-          <div className="stat-card bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 p-6 relative overflow-hidden group"
-               style={{
-                 borderRadius: `${18 + Math.random() * 8}px ${22 + Math.random() * 6}px ${20 + Math.random() * 10}px ${16 + Math.random() * 8}px`,
-                 transform: `rotate(${Math.random() * 2 - 1}deg)`
-               }}>
-            <div className="absolute inset-0 bg-gradient-to-br from-green-400/10 to-green-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="relative z-10">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">This Week</p>
-                  <p className="text-3xl font-bold text-gray-900">5</p>
-                </div>
-                <div className="w-16 h-16 bg-gradient-to-br from-green-400/20 to-green-600/30 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg"
-                     style={{
-                       borderRadius: `${50 + Math.random() * 10}% ${45 + Math.random() * 15}% ${55 + Math.random() * 10}% ${50 + Math.random() * 12}%`
-                     }}>
-                  <Clock className="h-6 w-6 text-green-600" />
-                </div>
-              </div>
-              <div className="mt-4 flex items-center text-green-600 text-sm bg-green-50/80 backdrop-blur-sm rounded-full px-3 py-1 w-fit">
-                <Zap className="h-4 w-4 mr-1" />
-                <span>Don't miss out ⚡</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="stat-card bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 p-6 relative overflow-hidden group"
-               style={{
-                 borderRadius: `${20 + Math.random() * 8}px ${24 + Math.random() * 6}px ${22 + Math.random() * 10}px ${18 + Math.random() * 8}px`,
-                 transform: `rotate(${Math.random() * 2 - 1}deg)`
-               }}>
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-400/10 to-purple-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="relative z-10">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">Virtual Events</p>
-                  <p className="text-3xl font-bold text-gray-900">2</p>
-                </div>
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-400/20 to-purple-600/30 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg"
-                     style={{
-                       borderRadius: `${50 + Math.random() * 10}% ${45 + Math.random() * 15}% ${55 + Math.random() * 10}% ${50 + Math.random() * 12}%`
-                     }}>
-                  <Video className="h-6 w-6 text-purple-600" />
-                </div>
-              </div>
-              <div className="mt-4 flex items-center text-purple-600 text-sm bg-purple-50/80 backdrop-blur-sm rounded-full px-3 py-1 w-fit">
-                <Video className="h-4 w-4 mr-1" />
-                <span>Join from anywhere 💻</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="stat-card bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 p-6 relative overflow-hidden group"
-               style={{
-                 borderRadius: `${18 + Math.random() * 8}px ${22 + Math.random() * 6}px ${20 + Math.random() * 10}px ${16 + Math.random() * 8}px`,
-                 transform: `rotate(${Math.random() * 2 - 1}deg)`
-               }}>
-            <div className="absolute inset-0 bg-gradient-to-br from-asu-maroon/10 to-asu-maroon/25 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="relative z-10">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">My Registered</p>
-                  <p className="text-3xl font-bold text-gray-900">3</p>
-                </div>
-                <div className="w-16 h-16 bg-gradient-to-br from-asu-maroon/20 to-asu-maroon/40 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg"
-                     style={{
-                       borderRadius: `${50 + Math.random() * 10}% ${45 + Math.random() * 15}% ${55 + Math.random() * 10}% ${50 + Math.random() * 12}%`
-                     }}>
-                  <Bookmark className="h-6 w-6 text-asu-maroon" />
-                </div>
-              </div>
-              <div className="mt-4 flex items-center text-asu-maroon text-sm bg-asu-maroon/10 backdrop-blur-sm rounded-full px-3 py-1 w-fit">
-                <Clock className="h-4 w-4 mr-1" />
-                <span>Ready to attend 🎉</span>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
 
         {/* Filters */}
-        <div ref={filtersRef} className="bg-white/70 backdrop-blur-lg rounded-3xl shadow-xl p-8 mb-12 relative overflow-hidden"
-             style={{
-               background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)',
-               borderRadius: `${24 + Math.random() * 8}px ${28 + Math.random() * 6}px ${26 + Math.random() * 10}px ${22 + Math.random() * 8}px`
-             }}>
-          <div className="absolute inset-0 bg-gradient-to-br from-asu-maroon/3 via-transparent to-asu-gold/3" />
-          <div className="relative z-10">
-            <div className="flex flex-col lg:flex-row gap-6">
-              <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search for amazing events... 🔍"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 bg-white/80 backdrop-blur-sm rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md"
-                  style={{
-                    borderRadius: `${16 + Math.random() * 4}px ${20 + Math.random() * 4}px ${18 + Math.random() * 6}px ${14 + Math.random() * 4}px`
-                  }}
-                  aria-label="Search events"
-                />
+        <Card className="p-6 mb-8" elevation={2}>
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex-1">
+              <Input
+                placeholder="Search for amazing events..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                startIcon={<Search />}
+                variant="outlined"
+                fullWidth
+              />
+            </div>
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="flex items-center space-x-2">
+                <FilterList className={`h-5 w-5 ${
+                  isDark ? 'text-dark-muted' : 'text-gray-400'
+                }`} />
+                <select
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value)}
+                  className={`px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
+                    isDark 
+                      ? 'border-lime/20 bg-dark-bg text-dark-text focus:ring-lime' 
+                      : 'border-gray-300 bg-white text-gray-900 focus:ring-asu-maroon'
+                  }`}
+                >
+                  <option value="all">All Types</option>
+                  <option value="career_fair">Career Fairs</option>
+                  <option value="workshop">Workshops</option>
+                  <option value="info_session">Info Sessions</option>
+                  <option value="webinar">Webinars</option>
+                  <option value="networking">Networking</option>
+                </select>
               </div>
-              <div className="flex flex-wrap items-center gap-4">
-                <div className="flex items-center space-x-2">
-                  <Filter className="h-5 w-5 text-gray-400" />
-                  <select
-                    value={typeFilter}
-                    onChange={(e) => setTypeFilter(e.target.value)}
-                    className="px-4 py-4 bg-white/80 backdrop-blur-sm rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent shadow-inner cursor-pointer hover:shadow-md transition-all duration-200"
-                    style={{
-                      borderRadius: `${16 + Math.random() * 4}px ${20 + Math.random() * 4}px ${18 + Math.random() * 6}px ${14 + Math.random() * 4}px`
-                    }}
-                    aria-label="Filter by event type"
-                  >
-                    <option value="all">All Types 📋</option>
-                    <option value="career_fair">Career Fairs 🏢</option>
-                    <option value="workshop">Workshops 🛠️</option>
-                    <option value="info_session">Info Sessions 💬</option>
-                    <option value="webinar">Webinars 🎬</option>
-                    <option value="networking">Networking 🤝</option>
-                  </select>
-                </div>
-                {user?.role === 'employer' && (
-                  <Link
-                    to="/create-event"
-                    className="flex items-center space-x-2 bg-gradient-to-r from-asu-maroon/90 to-asu-maroon-dark/90 text-white px-6 py-4 rounded-2xl hover:shadow-lg transition-all duration-300 shadow-md backdrop-blur-sm"
-                    style={{
-                      borderRadius: `${16 + Math.random() * 4}px ${20 + Math.random() * 4}px ${18 + Math.random() * 6}px ${14 + Math.random() * 4}px`
-                    }}
-                  >
-                    <Plus className="h-5 w-5" />
-                    <span>Create Event ✨</span>
-                  </Link>
-                )}
-              </div>
+              {user?.role === 'employer' && (
+                <Button
+                  component={Link}
+                  to="/create-event"
+                  variant="contained"
+                  color="primary"
+                  startIcon={Add}
+                >
+                  Create Event
+                </Button>
+              )}
             </div>
           </div>
-        </div>
+        </Card>
 
         {/* Events Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredEvents.map((event, index) => (
-            <div key={event.id} className="event-card bg-white/85 backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden relative group"
-                 style={{
-                   background: 'linear-gradient(150deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
-                   borderRadius: `${20 + Math.random() * 10}px ${25 + Math.random() * 8}px ${22 + Math.random() * 12}px ${18 + Math.random() * 10}px`,
-                   transform: `rotate(${(index % 3 - 1) * 0.5}deg)`
-                 }}>
-              <div className="absolute inset-0 bg-gradient-to-br from-asu-maroon/3 via-transparent to-asu-gold/3 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              
-              <div className="p-8 relative z-10">
-                <div className="flex items-start justify-between mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredEvents.map((event) => (
+            <Card key={event.id} className="event-card overflow-hidden hover:shadow-lg transition-shadow" elevation={2}>
+              <div className="p-6">
+                <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-3">
-                    <div className={`p-3 rounded-2xl ${getEventTypeColor(event.type)} backdrop-blur-sm`}
-                         style={{
-                           borderRadius: `${12 + Math.random() * 6}px ${16 + Math.random() * 4}px ${14 + Math.random() * 8}px ${10 + Math.random() * 6}px`
-                         }}>
+                    <div className={`p-2 rounded-xl ${getEventTypeColor(event.type)}`}>
                       {getEventTypeIcon(event.type)}
                     </div>
-                    <span className={`px-4 py-2 rounded-full text-sm font-semibold ${getEventTypeColor(event.type)} backdrop-blur-sm`}>
-                      {event.type.replace('_', ' ').split(' ').map(word => 
-                        word.charAt(0).toUpperCase() + word.slice(1)
-                      ).join(' ')}
-                    </span>
-                    {event.type === 'workshop' && (
-                      <div className="px-3 py-1 bg-green-100/80 text-green-800 rounded-full text-xs font-medium backdrop-blur-sm">
-                        Virtual Workshop 💻
-                      </div>
-                    )}
-                    {event.type === 'webinar' && (
-                      <div className="px-3 py-1 bg-blue-100/80 text-blue-800 rounded-full text-xs font-medium backdrop-blur-sm">
-                        Webinar 🎥
-                      </div>
-                    )}
+                    <Badge 
+                      color={getEventTypeBadgeColor(event.type)}
+                      variant="standard"
+                      className="capitalize"
+                    >
+                      {event.type.replace('_', ' ')}
+                    </Badge>
                   </div>
-                  <button
-                    id={`bookmark-${event.id}`}
+                  <Button
+                    variant="text"
+                    size="small"
                     onClick={() => toggleBookmark(event.id)}
-                    className={`p-3 rounded-full transition-colors backdrop-blur-sm ${
-                      bookmarkedEvents.has(event.id)
-                        ? 'bg-asu-maroon text-white'
-                        : 'bg-white/60 text-gray-400 hover:text-asu-maroon'
-                    }`}
+                    className="min-w-0 p-2"
                   >
-                    {bookmarkedEvents.has(event.id) ? (
-                      <Bookmark className="h-5 w-5" />
-                    ) : (
-                      <BookmarkPlus className="h-5 w-5" />
-                    )}
-                  </button>
+                    {bookmarkedEvents.has(event.id) ? 
+                      <Bookmark className={`h-5 w-5 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} /> : 
+                      <BookmarkAdd className={`h-5 w-5 ${isDark ? 'text-dark-muted' : 'text-gray-400'}`} />
+                    }
+                  </Button>
                 </div>
 
-                <h3 className="text-2xl font-bold text-gray-900 mb-4 leading-tight hover:text-asu-maroon transition-colors cursor-pointer">
+                <Typography variant="h6" color="textPrimary" className="font-bold mb-3">
                   {event.title}
-                </h3>
+                </Typography>
                 
-                <p className="text-gray-600 text-sm mb-6 line-clamp-3 leading-relaxed opacity-90">
+                <Typography variant="body2" color="textSecondary" className="mb-4 line-clamp-3">
                   {event.description}
-                </p>
+                </Typography>
 
-                <div className="space-y-3 mb-6 text-sm text-gray-600">
-                  <div className="flex items-center space-x-3 bg-white/50 backdrop-blur-sm rounded-xl p-3">
-                    <Calendar className="h-4 w-4 text-asu-maroon" />
-                    <span className="font-medium">{new Date(event.start_date).toLocaleString('default', { month: 'short', day: 'numeric' })} at {new Date(event.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center space-x-2">
+                    <CalendarToday className={`h-4 w-4 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
+                    <Typography variant="caption" color="textSecondary">
+                      {new Date(event.start_date).toLocaleDateString()} at {new Date(event.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </Typography>
                   </div>
-                  <div className="flex items-center space-x-3 bg-white/50 backdrop-blur-sm rounded-xl p-3">
-                    {event.type === 'workshop' || event.type === 'webinar' ? <Video className="h-4 w-4 text-green-600" /> : <MapPin className="h-4 w-4 text-blue-600" />}
-                    <span className="font-medium">{event.type === 'workshop' || event.type === 'webinar' ? 'Online' : event.location}</span>
+                  <div className="flex items-center space-x-2">
+                    {event.virtual_link ? 
+                      <VideoCall className="h-4 w-4 text-green-600" /> : 
+                      <LocationOn className="h-4 w-4 text-blue-600" />
+                    }
+                    <Typography variant="caption" color="textSecondary">
+                      {event.virtual_link ? 'Online' : event.location}
+                    </Typography>
                   </div>
-                  <div className="flex items-center space-x-3 bg-white/50 backdrop-blur-sm rounded-xl p-3">
-                    <Users className="h-4 w-4 text-purple-600" />
-                    <span className="font-medium">{event.registered_count}/{event.capacity} attendees</span>
+                  <div className="flex items-center space-x-2">
+                    <People className="h-4 w-4 text-purple-600" />
+                    <Typography variant="caption" color="textSecondary">
+                      {event.registered_count}/{event.capacity} attendees
+                    </Typography>
                   </div>
                 </div>
 
-                <div className="mb-6">
+                <div className="mb-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700">Registration Progress</span>
-                    <span className="text-sm text-gray-500">
+                    <Typography variant="caption" color="textSecondary">
+                      Registration Progress
+                    </Typography>
+                    <Typography variant="caption" color="textSecondary">
                       {Math.round((event.registered_count / event.capacity) * 100)}%
-                    </span>
+                    </Typography>
                   </div>
-                  <div className="w-full bg-gray-200/80 backdrop-blur-sm rounded-full h-3 overflow-hidden">
+                  <div className={`w-full h-2 rounded-full overflow-hidden ${
+                    isDark ? 'bg-gray-700' : 'bg-gray-200'
+                  }`}>
                     <div 
-                      className="progress-bar bg-gradient-to-r from-asu-maroon to-asu-gold h-3 rounded-full transition-all duration-1000" 
-                      data-width={`${(event.registered_count / event.capacity) * 100}%`}
-                    ></div>
+                      className={`h-2 rounded-full transition-all duration-1000 ${
+                        isDark ? 'bg-lime' : 'bg-asu-maroon'
+                      }`}
+                      style={{ width: `${(event.registered_count / event.capacity) * 100}%` }}
+                    />
                   </div>
-                  <p className="text-xs text-gray-500 mt-2 font-medium">
-                    {event.capacity - event.registered_count} spots remaining ⏰
-                  </p>
+                  <Typography variant="caption" color="textSecondary" className="mt-1">
+                    {event.capacity - event.registered_count} spots remaining
+                  </Typography>
                 </div>
 
-                <div className="flex items-center space-x-2 mb-6 bg-asu-maroon/10 backdrop-blur-sm rounded-xl p-3">
-                  <Award className="h-4 w-4 text-asu-maroon" />
-                  <span className="text-sm text-gray-700 font-medium">Organized by {event.organizer_id}</span>
+                <div className="flex items-center space-x-2 mb-4">
+                  <EmojiEvents className={`h-4 w-4 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
+                  <Typography variant="caption" color="textSecondary">
+                    Organized by {event.organizer_id.replace('-', ' ')}
+                  </Typography>
                 </div>
 
-                <div className="flex space-x-3">
-                  <button className="flex-1 bg-gradient-to-r from-asu-maroon/90 to-asu-maroon-dark/90 text-white px-6 py-3 rounded-2xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md backdrop-blur-sm">
-                    Register Now 🚀
-                  </button>
-                  <button className="px-4 py-3 bg-white/60 backdrop-blur-sm border border-asu-maroon/30 text-asu-maroon rounded-2xl hover:bg-asu-maroon hover:text-white transition-all duration-300 flex items-center space-x-2">
-                    <ExternalLink className="h-4 w-4" />
-                    <span>Details</span>
-                  </button>
+                <div className="flex space-x-2">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    fullWidth
+                  >
+                    Register Now
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                    endIcon={<OpenInNew />}
+                    component={Link}
+                    to={`/events/${event.id}`}
+                  >
+                    Details
+                  </Button>
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
 
         {/* No events found state */}
         {filteredEvents.length === 0 && (
-          <div className="text-center py-16 bg-white/70 backdrop-blur-lg rounded-3xl shadow-xl"
-               style={{
-                 background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)',
-                 borderRadius: `${24 + Math.random() * 8}px ${28 + Math.random() * 6}px ${26 + Math.random() * 10}px ${22 + Math.random() * 8}px`
-               }}>
-            <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
-              <Search className="h-12 w-12 text-gray-400" />
+          <Card className="p-12 text-center">
+            <div className={`w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center ${
+              isDark ? 'bg-lime/20' : 'bg-asu-maroon/10'
+            }`}>
+              <Search className={`w-12 h-12 ${
+                isDark ? 'text-lime' : 'text-asu-maroon'
+              }`} />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">No events found</h3>
-            <p className="text-gray-600 mb-8 text-lg max-w-md mx-auto">
-              Try adjusting your search criteria or check back later for new events! 🔍
-            </p>
+            <Typography variant="h5" color="textPrimary" className="font-bold mb-4">
+              No events found
+            </Typography>
+            <Typography variant="body1" color="textSecondary" className="mb-6 max-w-md mx-auto">
+              Try adjusting your search criteria or check back later for new events!
+            </Typography>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button 
+              <Button 
+                variant="contained"
+                color="primary"
                 onClick={() => {
                   setSearchTerm('');
                   setTypeFilter('all');
                 }}
-                className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white px-8 py-4 rounded-2xl hover:shadow-xl transition-all duration-300 font-semibold shadow-lg"
               >
-                Clear Filters 🔄
-              </button>
-              <button className="border-2 border-asu-maroon text-asu-maroon px-8 py-4 rounded-2xl hover:bg-asu-maroon hover:text-white transition-all duration-300 font-semibold shadow-sm hover:shadow-md">
-                View All Events 📅
-              </button>
+                Clear Filters
+              </Button>
+              <Button 
+                variant="outlined"
+                color="primary"
+              >
+                View All Events
+              </Button>
             </div>
-          </div>
+          </Card>
         )}
       </div>
     </div>
@@ -609,19 +554,36 @@ const getEventTypeColor = (type: string) => {
   }
 };
 
+const getEventTypeBadgeColor = (type: string): 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' => {
+  switch (type) {
+    case 'career_fair':
+      return 'info';
+    case 'workshop':
+      return 'success';
+    case 'info_session':
+      return 'secondary';
+    case 'webinar':
+      return 'warning';
+    case 'networking':
+      return 'error';
+    default:
+      return 'primary';
+  }
+};
+
 const getEventTypeIcon = (type: string) => {
   switch (type) {
     case 'career_fair':
-      return <Users className="h-4 w-4" />;
+      return <People className="h-4 w-4" />;
     case 'workshop':
-      return <Award className="h-4 w-4" />;
+      return <Work className="h-4 w-4" />;
     case 'info_session':
-      return <ExternalLink className="h-4 w-4" />;
+      return <Business className="h-4 w-4" />;
     case 'webinar':
-      return <Video className="h-4 w-4" />;
+      return <VideoCall className="h-4 w-4" />;
     case 'networking':
       return <Star className="h-4 w-4" />;
     default:
-      return <Calendar className="h-4 w-4" />;
+      return <Event className="h-4 w-4" />;
   }
 };

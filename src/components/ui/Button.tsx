@@ -7,14 +7,15 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'contained' | 'outlined' | 'text' | 'fab';
   size?: 'small' | 'medium' | 'large';
   color?: 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info';
-  startIcon?: LucideIcon;
-  endIcon?: LucideIcon;
+  startIcon?: LucideIcon | React.ComponentType<React.SVGProps<SVGSVGElement>> | React.ReactElement;
+  endIcon?: LucideIcon | React.ComponentType<React.SVGProps<SVGSVGElement>> | React.ReactElement;
   loading?: boolean;
   fullWidth?: boolean;
   elevation?: number;
   disableElevation?: boolean;
   href?: string;
   component?: React.ElementType;
+  to?: string;
   children: React.ReactNode;
 }
 
@@ -30,6 +31,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   disableElevation = false,
   href,
   component,
+  to,
   className = '',
   children,
   disabled,
@@ -132,16 +134,37 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   const iconSize = size === 'small' ? 16 : size === 'medium' ? 20 : 24;
   const loadingSize = size === 'small' ? 16 : size === 'medium' ? 20 : 24;
 
+  const renderIcon = (Icon: typeof StartIcon, iconClassName: string) => {
+    if (!Icon) return null;
+    
+    // Handle React elements (JSX)
+    if (React.isValidElement(Icon)) {
+      return React.cloneElement(Icon as React.ReactElement<{className?: string}>, { 
+        className: iconClassName 
+      });
+    }
+    
+    // Handle React components (MUI icons, Lucide icons)
+    if (typeof Icon === 'function' || typeof Icon === 'object') {
+      const IconComponent = Icon as React.ComponentType<{className?: string; style?: React.CSSProperties}>;
+      return <IconComponent className={iconClassName} style={{ fontSize: iconSize }} />;
+    }
+    
+    return null;
+  };
+
   const Component = component || (href ? 'a' : 'button');
+  const componentProps = {
+    ref,
+    className: buttonClasses,
+    disabled: disabled || loading,
+    ...(href && { href }),
+    ...(to && { to }),
+    ...props
+  };
 
   return (
-    <Component
-      ref={ref}
-      className={buttonClasses}
-      disabled={disabled || loading}
-      href={href}
-      {...props}
-    >
+    <Component {...componentProps}>
       {loading ? (
         <CircularProgress 
           size={loadingSize} 
@@ -152,19 +175,13 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
           }`}
         />
       ) : StartIcon && (
-        <StartIcon 
-          size={iconSize} 
-          className={`mr-2 ${variant === 'fab' ? 'mr-0' : ''}`} 
-        />
+        renderIcon(StartIcon, `mr-2 ${variant === 'fab' ? 'mr-0' : ''}`)
       )}
       
       {variant !== 'fab' && children}
       
       {!loading && EndIcon && (
-        <EndIcon 
-          size={iconSize} 
-          className={`ml-2 ${variant === 'fab' ? 'ml-0' : ''}`} 
-        />
+        renderIcon(EndIcon, `ml-2 ${variant === 'fab' ? 'ml-0' : ''}`)
       )}
     </Component>
   );

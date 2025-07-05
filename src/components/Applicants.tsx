@@ -1,35 +1,58 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { 
-  User, 
+  Person, 
   Search, 
-  Filter, 
-  Eye, 
-  MessageSquare, 
+  FilterList, 
+  Visibility, 
+  Message, 
   CheckCircle, 
-  XCircle, 
-  Clock, 
-  Calendar, 
-  MapPin, 
-  Building2, 
+  Cancel, 
+  AccessTime, 
+  Event, 
+  LocationOn, 
+  Business, 
   Star, 
-  Heart, 
-  Coffee, 
-  Sparkles, 
+  Favorite, 
+  LocalCafe, 
+  AutoAwesome, 
   Download, 
-  ExternalLink, 
-  Mail, 
+  OpenInNew, 
+  Email, 
   Phone, 
-  FileText, 
-  Award, 
+  Description, 
+  EmojiEvents, 
   TrendingUp, 
-  Users, 
-  Briefcase 
-} from 'lucide-react';
-
-gsap.registerPlugin(ScrollTrigger);
+  People, 
+  Work,
+  School,
+  Grade,
+  Close,
+  ThumbUp,
+  ThumbDown,
+  StarRate,
+  WorkOutline,
+  SchoolOutlined,
+  LocationOnOutlined,
+  EmailOutlined,
+  PhoneOutlined,
+  DescriptionOutlined,
+  ViewList,
+  ViewModule,
+  Notifications,
+  Forum,
+  BookmarkBorder,
+  Schedule
+} from '@mui/icons-material';
+import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
+import Typography from './ui/Typography';
+import Button from './ui/Button';
+import Input from './ui/Input';
+import { Card, StatsCard } from './ui/Card';
+import Badge from './ui/Badge';
+import Avatar from './ui/Avatar';
 
 interface Applicant {
   id: string;
@@ -53,11 +76,9 @@ interface Applicant {
 }
 
 export default function Applicants() {
+  const { user } = useAuth();
+  const { isDark } = useTheme();
   const containerRef = useRef<HTMLDivElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const statsRef = useRef<HTMLDivElement>(null);
-  const filtersRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [jobFilter, setJobFilter] = useState('all');
@@ -72,8 +93,9 @@ export default function Applicants() {
       email: 'sarah.johnson@asu.edu',
       phone: '(480) 555-0123',
       location: 'Phoenix, AZ',
+      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150',
       resume_url: '/resumes/sarah-johnson.pdf',
-      cover_letter: 'I am excited to apply for the Software Engineer position. My experience with React and Node.js makes me a perfect fit...',
+      cover_letter: 'I am excited to apply for the Software Engineer position. My experience with React and Node.js makes me a perfect fit for this role. I have worked on several projects that demonstrate my ability to create scalable web applications.',
       skills: ['React', 'Node.js', 'TypeScript', 'Python', 'AWS'],
       experience_years: 2,
       education: 'Arizona State University - Computer Science',
@@ -90,8 +112,9 @@ export default function Applicants() {
       email: 'michael.chen@asu.edu',
       phone: '(480) 555-0456',
       location: 'Tempe, AZ',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
       resume_url: '/resumes/michael-chen.pdf',
-      cover_letter: 'As a passionate developer with experience in full-stack development, I believe I would be a valuable addition to your team...',
+      cover_letter: 'As a passionate developer with experience in full-stack development, I believe I would be a valuable addition to your team. My projects showcase my ability to work with modern technologies.',
       skills: ['JavaScript', 'React', 'MongoDB', 'Express', 'Docker'],
       experience_years: 1,
       education: 'Arizona State University - Software Engineering',
@@ -107,8 +130,9 @@ export default function Applicants() {
       name: 'Emily Rodriguez',
       email: 'emily.rodriguez@asu.edu',
       location: 'Scottsdale, AZ',
+      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150',
       resume_url: '/resumes/emily-rodriguez.pdf',
-      cover_letter: 'I am thrilled to apply for the Marketing Intern position. My creative background and analytical skills...',
+      cover_letter: 'I am thrilled to apply for the Marketing Intern position. My creative background and analytical skills make me an ideal candidate for this role.',
       skills: ['Marketing', 'Adobe Creative Suite', 'Social Media', 'Analytics', 'Content Creation'],
       experience_years: 1,
       education: 'Arizona State University - Marketing',
@@ -125,8 +149,9 @@ export default function Applicants() {
       email: 'david.park@asu.edu',
       phone: '(480) 555-0789',
       location: 'Mesa, AZ',
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
       resume_url: '/resumes/david-park.pdf',
-      cover_letter: 'With my strong background in data analysis and machine learning, I am excited to contribute to your data science team...',
+      cover_letter: 'With my strong background in data analysis and machine learning, I am excited to contribute to your data science team.',
       skills: ['Python', 'R', 'SQL', 'Machine Learning', 'Tableau', 'Pandas'],
       experience_years: 2,
       education: 'Arizona State University - Data Science',
@@ -146,41 +171,50 @@ export default function Applicants() {
   ];
 
   useEffect(() => {
+    if (!containerRef.current) return;
+
     const ctx = gsap.context(() => {
-      // Header entrance animation - more sophisticated
-      gsap.fromTo(headerRef.current, {
+      // Material Design entrance animations
+      gsap.fromTo('.header-card', {
         opacity: 0,
-        y: -80,
-        scale: 0.8,
-        rotation: 2
+        y: -30,
+        scale: 0.98
       }, {
         opacity: 1,
         y: 0,
         scale: 1,
-        rotation: 0,
-        duration: 1.5,
-        ease: 'elastic.out(1, 0.8)'
-      });
-
-      // Stats cards entrance with stagger
-      gsap.fromTo('.stat-card', {
-        opacity: 0,
-        y: 50,
-        scale: 0.7,
-        rotation: 5
-      }, {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        rotation: 0,
         duration: 0.8,
-        ease: 'back.out(1.7)',
-        stagger: 0.1,
-        delay: 0.3
+        ease: 'power2.out'
       });
 
-      // Filters entrance
-      gsap.fromTo(filtersRef.current, {
+      gsap.fromTo('.stats-card', {
+        opacity: 0,
+        y: 20,
+        scale: 0.9
+      }, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: 'back.out(1.7)',
+        delay: 0.2
+      });
+
+      gsap.fromTo('.filters-card', {
+        opacity: 0,
+        y: 30,
+        scale: 0.95
+      }, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.7,
+        ease: 'power2.out',
+        delay: 0.4
+      });
+
+      gsap.fromTo('.applicant-card', {
         opacity: 0,
         y: 40,
         scale: 0.9
@@ -188,107 +222,27 @@ export default function Applicants() {
         opacity: 1,
         y: 0,
         scale: 1,
-        duration: 1,
-        ease: 'power3.out',
+        duration: 0.6,
+        stagger: 0.1,
+        ease: 'back.out(1.7)',
         delay: 0.6
       });
 
-      // Applicant cards entrance with advanced stagger
-      gsap.fromTo('.applicant-card', {
-        opacity: 0,
-        y: 60,
-        scale: 0.8,
-        rotation: 3
-      }, {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        rotation: 0,
-        duration: 0.8,
-        ease: 'back.out(1.7)',
-        stagger: {
-          amount: 1.2,
-          grid: 'auto',
-          from: 'start'
-        },
-        delay: 0.9
-      });
-
-      // Floating decorations with different patterns
+      // Floating decorations
       gsap.to('.applicant-decoration', {
-        y: -15,
-        x: 8,
-        rotation: 360,
-        duration: 12,
+        y: -10,
+        x: 5,
+        rotation: 180,
+        duration: 15,
         repeat: -1,
         yoyo: true,
-        ease: 'sine.inOut',
-        stagger: {
-          amount: 2,
-          repeat: -1
-        }
-      });
-
-      // Rating stars animation
-      gsap.fromTo('.rating-star', {
-        scale: 0,
-        rotation: -180
-      }, {
-        scale: 1,
-        rotation: 0,
-        duration: 0.6,
-        ease: 'back.out(1.7)',
-        stagger: 0.05,
-        delay: 1.5
-      });
-
-      // Skills tags animation
-      gsap.fromTo('.skill-tag', {
-        opacity: 0,
-        scale: 0,
-        y: 20
-      }, {
-        opacity: 1,
-        scale: 1,
-        y: 0,
-        duration: 0.5,
-        ease: 'back.out(1.7)',
-        stagger: 0.03,
-        delay: 1.8
-      });
-
-      // Status badges animation
-      gsap.fromTo('.status-badge', {
-        scale: 0,
-        opacity: 0
-      }, {
-        scale: 1,
-        opacity: 1,
-        duration: 0.5,
-        ease: 'elastic.out(1, 0.8)',
-        stagger: 0.1,
-        delay: 2
+        ease: 'sine.inOut'
       });
 
     }, containerRef);
 
     return () => ctx.revert();
   }, []);
-
-  // Animation for view mode change
-  useEffect(() => {
-    if (contentRef.current) {
-      gsap.fromTo(contentRef.current, {
-        opacity: 0,
-        y: 20
-      }, {
-        opacity: 1,
-        y: 0,
-        duration: 0.5,
-        ease: 'power3.out'
-      });
-    }
-  }, [viewMode]);
 
   const filteredApplicants = applicants.filter(applicant => {
     const matchesSearch = applicant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -311,615 +265,640 @@ export default function Applicants() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'reviewed': return 'bg-blue-100 text-blue-800';
-      case 'shortlisted': return 'bg-purple-100 text-purple-800';
-      case 'rejected': return 'bg-red-100 text-red-800';
-      case 'hired': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'pending': return 'warning';
+      case 'reviewed': return 'info';
+      case 'shortlisted': return 'success';
+      case 'rejected': return 'error';
+      case 'hired': return 'success';
+      default: return 'standard';
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'pending': return <Clock className="h-4 w-4" />;
-      case 'reviewed': return <Eye className="h-4 w-4" />;
+      case 'pending': return <AccessTime className="h-4 w-4" />;
+      case 'reviewed': return <Visibility className="h-4 w-4" />;
       case 'shortlisted': return <Star className="h-4 w-4" />;
-      case 'rejected': return <XCircle className="h-4 w-4" />;
+      case 'rejected': return <Cancel className="h-4 w-4" />;
       case 'hired': return <CheckCircle className="h-4 w-4" />;
-      default: return <Clock className="h-4 w-4" />;
+      default: return <AccessTime className="h-4 w-4" />;
     }
   };
 
-  const updateApplicantStatus = (applicantId: string, newStatus: string) => {
-    // Enhanced status update animation
-    gsap.to(`#applicant-${applicantId}`, {
-      scale: 1.05,
-      duration: 0.2,
-      yoyo: true,
-      repeat: 1,
-      ease: 'power2.out',
-      onComplete: () => {
-        gsap.to(`#applicant-${applicantId} .status-badge`, {
-          scale: 1.2,
-          duration: 0.3,
-          yoyo: true,
-          repeat: 1,
-          ease: 'back.out(1.7)'
-        });
-      }
-    });
-  };
-
-  const handleViewApplicant = (applicant: Applicant) => {
-    setSelectedApplicant(applicant);
-    
-    // Modal entrance animation
-    setTimeout(() => {
-      gsap.fromTo('.modal-content', {
-        scale: 0.8,
-        opacity: 0,
-        y: 50
-      }, {
-        scale: 1,
-        opacity: 1,
-        y: 0,
-        duration: 0.5,
-        ease: 'back.out(1.7)'
-      });
-    }, 10);
-  };
-
-  const handleCloseModal = () => {
-    // Modal exit animation
-    gsap.to('.modal-content', {
-      scale: 0.8,
-      opacity: 0,
-      y: 50,
-      duration: 0.3,
-      ease: 'power2.out',
-      onComplete: () => setSelectedApplicant(null)
-    });
-  };
+  const applicantStats = [
+    { 
+      title: 'Total Applications', 
+      value: statusCounts.all.toString(), 
+      subtitle: 'All applicants',
+      icon: People,
+      color: 'primary' as const,
+      trend: 'up' as const,
+      trendValue: 'All applicants'
+    },
+    { 
+      title: 'Pending Review', 
+      value: statusCounts.pending.toString(), 
+      subtitle: 'Awaiting review',
+      icon: Schedule,
+      color: 'warning' as const,
+      trend: 'up' as const,
+      trendValue: 'Awaiting review'
+    },
+    { 
+      title: 'Shortlisted', 
+      value: statusCounts.shortlisted.toString(), 
+      subtitle: 'Top candidates',
+      icon: Star,
+      color: 'success' as const,
+      trend: 'up' as const,
+      trendValue: 'Top candidates'
+    },
+    { 
+      title: 'Hired', 
+      value: statusCounts.hired.toString(), 
+      subtitle: 'Successfully hired',
+      icon: EmojiEvents,
+      color: 'success' as const,
+      trend: 'up' as const,
+      trendValue: 'Successfully hired'
+    },
+  ];
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-gray-50 to-white relative">
-      {/* Enhanced decorative elements */}
-      <div className="applicant-decoration absolute top-16 right-24 w-4 h-4 bg-asu-gold/50 rounded-full"></div>
-      <div className="applicant-decoration absolute top-32 left-16 w-3 h-3 bg-asu-maroon/40 rounded-full"></div>
-      <Sparkles className="applicant-decoration absolute top-24 left-1/4 h-5 w-5 text-asu-gold/70" />
-      <Coffee className="applicant-decoration absolute bottom-32 right-1/4 h-4 w-4 text-asu-maroon/60" />
-      <Heart className="applicant-decoration absolute bottom-20 left-1/3 h-4 w-4 text-asu-gold/80" />
-      <Award className="applicant-decoration absolute top-1/2 right-12 h-3 w-3 text-asu-maroon/50" />
+    <div ref={containerRef} className={`min-h-screen relative ${
+      isDark ? 'bg-dark-bg' : 'bg-gray-50'
+    }`}>
+      {/* Decorative elements */}
+      <AutoAwesome className={`applicant-decoration absolute top-20 right-20 h-5 w-5 ${
+        isDark ? 'text-lime/50' : 'text-asu-gold/50'
+      }`} />
+      <LocalCafe className={`applicant-decoration absolute top-40 left-20 h-4 w-4 ${
+        isDark ? 'text-dark-accent/40' : 'text-asu-maroon/40'
+      }`} />
+      <Favorite className={`applicant-decoration absolute bottom-32 right-1/3 h-4 w-4 ${
+        isDark ? 'text-lime/60' : 'text-asu-gold/60'
+      }`} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Enhanced Header */}
-        <div ref={headerRef} className="mb-12">
-          <div className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark rounded-3xl p-8 text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-asu-gold/20 rounded-full blur-xl"></div>
+        {/* Header */}
+        <Card className="header-card overflow-hidden mb-8" elevation={3}>
+          <div className={`p-8 text-white relative ${
+            isDark 
+              ? 'bg-gradient-to-r from-dark-surface to-dark-bg' 
+              : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
+          }`}>
+            <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl ${
+              isDark ? 'bg-lime/10' : 'bg-white/10'
+            }`}></div>
+            <div className={`absolute bottom-0 left-0 w-24 h-24 rounded-full blur-xl ${
+              isDark ? 'bg-dark-accent/20' : 'bg-asu-gold/20'
+            }`}></div>
+            
             <div className="relative z-10">
-              <h1 className="text-5xl font-bold mb-4 relative">
-                Applicant Management 👥
-                <div className="absolute -top-3 -right-8 w-6 h-6 bg-asu-gold rounded-full"></div>
-              </h1>
-              <p className="text-xl text-white/90 mb-6 max-w-3xl">
-                Review and manage job applications from talented ASU students ✨
-              </p>
-              <div className="flex flex-wrap gap-4 text-sm">
+              <Typography variant="h3" className="font-bold mb-4 text-white">
+                Applicant Management
+              </Typography>
+              <Typography variant="subtitle1" className={`mb-6 max-w-3xl ${
+                isDark ? 'text-dark-muted' : 'text-white/90'
+              }`}>
+                Review and manage job applications from talented students
+              </Typography>
+              <div className="flex flex-wrap gap-4">
                 <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
                   <TrendingUp className="h-5 w-5" />
-                  <span>{applicants.length} total applications 📈</span>
+                  <span>{applicants.length} total applications</span>
                 </div>
                 <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-                  <Users className="h-5 w-5" />
-                  <span>{statusCounts.shortlisted} shortlisted candidates 🎯</span>
+                  <People className="h-5 w-5" />
+                  <span>{statusCounts.shortlisted} shortlisted</span>
                 </div>
                 <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
                   <CheckCircle className="h-5 w-5" />
-                  <span>{statusCounts.hired} hired successfully 🌟</span>
+                  <span>{statusCounts.hired} hired</span>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </Card>
 
-        {/* Enhanced Stats Cards */}
-        <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-6 gap-6 mb-12">
-          {Object.entries(statusCounts).map(([status, count], index) => (
-            <div 
-              key={status} 
-              className="stat-card bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer"
-              onMouseEnter={(e) => {
-                gsap.to(e.currentTarget, {
-                  scale: 1.05,
-                  y: -5,
-                  duration: 0.3,
-                  ease: 'power2.out'
-                });
-              }}
-              onMouseLeave={(e) => {
-                gsap.to(e.currentTarget, {
-                  scale: 1,
-                  y: 0,
-                  duration: 0.3,
-                  ease: 'power2.out'
-                });
-              }}
-            >
-              <div className="text-center">
-                <div className="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-asu-maroon/20 to-asu-gold/20 rounded-full flex items-center justify-center">
-                  {getStatusIcon(status)}
-                </div>
-                <div className="text-3xl font-bold text-gray-900 mb-2">{count}</div>
-                <div className="text-sm text-gray-600 font-medium capitalize">
-                  {status === 'all' ? 'Total 📋' : status + ' ' + (status === 'pending' ? '⏳' : status === 'reviewed' ? '👀' : status === 'shortlisted' ? '⭐' : status === 'hired' ? '🎉' : '❌')}
-                </div>
-              </div>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {applicantStats.map((stat, index) => (
+            <div key={index} className="stats-card">
+              <StatsCard
+                title={stat.title}
+                value={stat.value}
+                icon={stat.icon}
+                subtitle={stat.subtitle}
+                color={stat.color}
+                trend={stat.trend}
+                trendValue={stat.trendValue}
+                delay={index * 0.1}
+                rotation={index % 2 === 0 ? -0.5 : 0.5}
+              />
             </div>
           ))}
         </div>
 
-        {/* Enhanced Filters */}
-        <div ref={filtersRef} className="bg-gradient-to-r from-white to-gray-50 rounded-3xl shadow-lg border border-gray-100 p-8 mb-12">
-          <div className="flex flex-col lg:flex-row gap-6">
-            <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search for amazing talent... 🔍"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white shadow-inner transition-all duration-200 hover:shadow-md"
-              />
-            </div>
-            <div className="flex flex-wrap items-center gap-4">
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white shadow-inner cursor-pointer hover:shadow-md transition-all duration-200"
-              >
-                <option value="all">All Status 📋</option>
-                <option value="pending">Pending ⏳</option>
-                <option value="reviewed">Reviewed 👀</option>
-                <option value="shortlisted">Shortlisted ⭐</option>
-                <option value="rejected">Rejected ❌</option>
-                <option value="hired">Hired 🎉</option>
-              </select>
-              <select
-                value={jobFilter}
-                onChange={(e) => setJobFilter(e.target.value)}
-                className="px-4 py-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white shadow-inner cursor-pointer hover:shadow-md transition-all duration-200"
-              >
-                <option value="all">All Jobs 💼</option>
-                {jobs.map(job => (
-                  <option key={job.id} value={job.id}>{job.title}</option>
-                ))}
-              </select>
-              <div className="flex border-2 border-gray-200 rounded-2xl overflow-hidden bg-white shadow-inner">
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`px-6 py-4 font-semibold transition-all duration-300 ${viewMode === 'grid' ? 'bg-asu-maroon text-white shadow-lg' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-                >
-                  Grid View 📊
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`px-6 py-4 font-semibold transition-all duration-300 ${viewMode === 'list' ? 'bg-asu-maroon text-white shadow-lg' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-                >
-                  List View 📋
-                </button>
+        {/* Filters */}
+        <Card className="filters-card mb-8" elevation={2}>
+          <div className="p-6">
+            <div className="flex flex-col lg:flex-row gap-4">
+              <div className="flex-1">
+                <Input
+                  placeholder="Search applicants..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  startIcon={<Search />}
+                  variant="outlined"
+                  fullWidth
+                />
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Enhanced Applicants Content */}
-        <div ref={contentRef}>
-          {viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredApplicants.map((applicant, index) => (
-                <div
-                  key={applicant.id}
-                  id={`applicant-${applicant.id}`}
-                  className="applicant-card bg-white rounded-3xl shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer"
-                  onMouseEnter={(e) => {
-                    gsap.to(e.currentTarget, {
-                      scale: 1.02,
-                      y: -5,
-                      duration: 0.3,
-                      ease: 'power2.out'
-                    });
-                    gsap.to(e.currentTarget.querySelector('.applicant-avatar'), {
-                      scale: 1.1,
-                      duration: 0.3,
-                      ease: 'power2.out'
-                    });
-                  }}
-                  onMouseLeave={(e) => {
-                    gsap.to(e.currentTarget, {
-                      scale: 1,
-                      y: 0,
-                      duration: 0.3,
-                      ease: 'power2.out'
-                    });
-                    gsap.to(e.currentTarget.querySelector('.applicant-avatar'), {
-                      scale: 1,
-                      duration: 0.3,
-                      ease: 'power2.out'
-                    });
-                  }}
+              <div className="flex flex-wrap gap-3">
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className={`px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 ${
+                    isDark 
+                      ? 'bg-dark-surface border-lime/20 text-dark-text focus:ring-lime/50' 
+                      : 'bg-white border-gray-300 text-gray-900 focus:ring-asu-maroon/50'
+                  }`}
                 >
-                  <div className="p-8">
-                    <div className="flex items-center justify-between mb-6">
-                      <div className="flex items-center space-x-4">
-                        <div className="applicant-avatar w-16 h-16 bg-gradient-to-br from-asu-maroon to-asu-maroon-dark rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                          {applicant.name.charAt(0)}
-                        </div>
-                        <div>
-                          <h3 className="font-bold text-xl text-gray-900 mb-1">{applicant.name}</h3>
-                          <p className="text-sm text-asu-maroon font-semibold">{applicant.job_title}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`rating-star h-5 w-5 ${i < Math.floor(applicant.rating || 0) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="space-y-4 mb-6">
-                      <div className="flex items-center space-x-3 bg-gray-50 rounded-xl p-3">
-                        <MapPin className="h-4 w-4 text-gray-400" />
-                        <span className="text-sm text-gray-600 font-medium">{applicant.location}</span>
-                      </div>
-                      <div className="flex items-center space-x-3 bg-gray-50 rounded-xl p-3">
-                        <Calendar className="h-4 w-4 text-gray-400" />
-                        <span className="text-sm text-gray-600 font-medium">Applied {new Date(applicant.applied_date).toLocaleDateString()}</span>
-                      </div>
-                      <div className="flex items-center space-x-3 bg-gray-50 rounded-xl p-3">
-                        <Briefcase className="h-4 w-4 text-gray-400" />
-                        <span className="text-sm text-gray-600 font-medium">{applicant.experience_years} years experience</span>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {applicant.skills.slice(0, 3).map((skill, skillIndex) => (
-                        <span
-                          key={skillIndex}
-                          className="skill-tag px-4 py-2 bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white rounded-full text-sm font-medium shadow-md"
-                        >
-                          {skill}
-                        </span>
-                      ))}
-                      {applicant.skills.length > 3 && (
-                        <span className="skill-tag px-4 py-2 bg-gray-100 text-gray-500 rounded-full text-sm font-medium border border-gray-200">
-                          +{applicant.skills.length - 3} more
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex items-center justify-between mb-6">
-                      <div className={`status-badge flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-semibold shadow-md ${getStatusColor(applicant.status)}`}>
-                        {getStatusIcon(applicant.status)}
-                        <span className="capitalize">{applicant.status}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex space-x-3">
-                      <button
-                        onClick={() => handleViewApplicant(applicant)}
-                        className="flex-1 bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white px-6 py-3 rounded-2xl hover:shadow-lg transition-all duration-300 flex items-center justify-center space-x-2 font-semibold"
-                        onMouseEnter={(e) => {
-                          gsap.to(e.currentTarget, {
-                            scale: 1.05,
-                            duration: 0.2,
-                            ease: 'power2.out'
-                          });
-                        }}
-                        onMouseLeave={(e) => {
-                          gsap.to(e.currentTarget, {
-                            scale: 1,
-                            duration: 0.2,
-                            ease: 'power2.out'
-                          });
-                        }}
-                      >
-                        <Eye className="h-4 w-4" />
-                        <span>View Details</span>
-                      </button>
-                      <button 
-                        className="px-4 py-3 border-2 border-asu-maroon text-asu-maroon rounded-2xl hover:bg-asu-maroon hover:text-white transition-all duration-300 shadow-sm hover:shadow-md"
-                        onMouseEnter={(e) => {
-                          gsap.to(e.currentTarget, {
-                            scale: 1.1,
-                            duration: 0.2,
-                            ease: 'power2.out'
-                          });
-                        }}
-                        onMouseLeave={(e) => {
-                          gsap.to(e.currentTarget, {
-                            scale: 1,
-                            duration: 0.2,
-                            ease: 'power2.out'
-                          });
-                        }}
-                      >
-                        <MessageSquare className="h-4 w-4" />
-                      </button>
-                      <button 
-                        className="px-4 py-3 border-2 border-asu-maroon text-asu-maroon rounded-2xl hover:bg-asu-maroon hover:text-white transition-all duration-300 shadow-sm hover:shadow-md"
-                        onMouseEnter={(e) => {
-                          gsap.to(e.currentTarget, {
-                            scale: 1.1,
-                            duration: 0.2,
-                            ease: 'power2.out'
-                          });
-                        }}
-                        onMouseLeave={(e) => {
-                          gsap.to(e.currentTarget, {
-                            scale: 1,
-                            duration: 0.2,
-                            ease: 'power2.out'
-                          });
-                        }}
-                      >
-                        <Download className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
+                  <option value="all">All Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="reviewed">Reviewed</option>
+                  <option value="shortlisted">Shortlisted</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="hired">Hired</option>
+                </select>
+                <select
+                  value={jobFilter}
+                  onChange={(e) => setJobFilter(e.target.value)}
+                  className={`px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 ${
+                    isDark 
+                      ? 'bg-dark-surface border-lime/20 text-dark-text focus:ring-lime/50' 
+                      : 'bg-white border-gray-300 text-gray-900 focus:ring-asu-maroon/50'
+                  }`}
+                >
+                  <option value="all">All Jobs</option>
+                  {jobs.map(job => (
+                    <option key={job.id} value={job.id}>{job.title}</option>
+                  ))}
+                </select>
+                <div className="flex border rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`px-4 py-3 transition-colors ${
+                      viewMode === 'grid' 
+                        ? isDark 
+                          ? 'bg-lime text-dark-surface' 
+                          : 'bg-asu-maroon text-white'
+                        : isDark 
+                          ? 'bg-dark-surface text-dark-text hover:bg-dark-bg' 
+                          : 'bg-white text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    <ViewModule className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`px-4 py-3 transition-colors ${
+                      viewMode === 'list' 
+                        ? isDark 
+                          ? 'bg-lime text-dark-surface' 
+                          : 'bg-asu-maroon text-white'
+                        : isDark 
+                          ? 'bg-dark-surface text-dark-text hover:bg-dark-bg' 
+                          : 'bg-white text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    <ViewList className="h-5 w-5" />
+                  </button>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
-                    <tr>
-                      <th className="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Applicant 👤</th>
-                      <th className="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Job 💼</th>
-                      <th className="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Applied 📅</th>
-                      <th className="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Status 📊</th>
-                      <th className="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Rating ⭐</th>
-                      <th className="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Actions ⚡</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredApplicants.map((applicant) => (
-                      <tr 
-                        key={applicant.id} 
-                        className="hover:bg-gray-50 transition-colors cursor-pointer"
-                        onMouseEnter={(e) => {
-                          gsap.to(e.currentTarget, {
-                            backgroundColor: '#f9fafb',
-                            duration: 0.2,
-                            ease: 'power2.out'
-                          });
-                        }}
-                        onMouseLeave={(e) => {
-                          gsap.to(e.currentTarget, {
-                            backgroundColor: '#ffffff',
-                            duration: 0.2,
-                            ease: 'power2.out'
-                          });
-                        }}
-                      >
-                        <td className="px-8 py-6 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="w-12 h-12 bg-gradient-to-br from-asu-maroon to-asu-maroon-dark rounded-full flex items-center justify-center text-white font-bold">
-                              {applicant.name.charAt(0)}
-                            </div>
-                            <div className="ml-4">
-                              <div className="text-sm font-bold text-gray-900">{applicant.name}</div>
-                              <div className="text-sm text-gray-500">{applicant.email}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-8 py-6 whitespace-nowrap text-sm font-semibold text-gray-900">
-                          {applicant.job_title}
-                        </td>
-                        <td className="px-8 py-6 whitespace-nowrap text-sm text-gray-500 font-medium">
-                          {new Date(applicant.applied_date).toLocaleDateString()}
-                        </td>
-                        <td className="px-8 py-6 whitespace-nowrap">
-                          <div className={`status-badge inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(applicant.status)}`}>
-                            {getStatusIcon(applicant.status)}
-                            <span className="ml-2 capitalize">{applicant.status}</span>
-                          </div>
-                        </td>
-                        <td className="px-8 py-6 whitespace-nowrap">
-                          <div className="flex items-center">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`rating-star h-4 w-4 ${i < Math.floor(applicant.rating || 0) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
-                              />
-                            ))}
-                          </div>
-                        </td>
-                        <td className="px-8 py-6 whitespace-nowrap text-sm font-medium">
-                          <div className="flex space-x-3">
-                            <button
-                              onClick={() => handleViewApplicant(applicant)}
-                              className="text-asu-maroon hover:text-asu-maroon-dark p-2 rounded-full hover:bg-asu-maroon/10 transition-all duration-200"
-                            >
-                              <Eye className="h-5 w-5" />
-                            </button>
-                            <button className="text-asu-maroon hover:text-asu-maroon-dark p-2 rounded-full hover:bg-asu-maroon/10 transition-all duration-200">
-                              <MessageSquare className="h-5 w-5" />
-                            </button>
-                            <button className="text-asu-maroon hover:text-asu-maroon-dark p-2 rounded-full hover:bg-asu-maroon/10 transition-all duration-200">
-                              <Download className="h-5 w-5" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
               </div>
             </div>
-          )}
-        </div>
-
-        {filteredApplicants.length === 0 && (
-          <div className="text-center py-16 bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg border border-gray-100">
-            <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
-              <Users className="h-12 w-12 text-gray-400" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">No applicants found</h3>
-            <p className="text-gray-600 mb-8 text-lg max-w-md mx-auto">
-              No talented candidates match your current filters. Try adjusting your search! 🔍
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={() => {
-                  setSearchTerm('');
-                  setStatusFilter('all');
-                  setJobFilter('all');
-                }}
-                className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white px-8 py-4 rounded-2xl hover:shadow-xl transition-all duration-300 font-semibold shadow-lg"
-              >
-                Clear Filters 🔄
-              </button>
-              <button className="border-2 border-asu-maroon text-asu-maroon px-8 py-4 rounded-2xl hover:bg-asu-maroon hover:text-white transition-all duration-300 font-semibold shadow-sm hover:shadow-md">
-                Refresh Applications 🔄
-              </button>
-            </div>
           </div>
-        )}
-      </div>
+        </Card>
 
-      {/* Enhanced Applicant Detail Modal */}
-      {selectedApplicant && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="modal-content bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-gray-100">
-            <div className="p-8 border-b border-gray-200 bg-gradient-to-r from-asu-maroon/5 to-asu-gold/5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-6">
-                  <div className="w-20 h-20 bg-gradient-to-br from-asu-maroon to-asu-maroon-dark rounded-full flex items-center justify-center text-white font-bold text-3xl shadow-lg">
-                    {selectedApplicant.name.charAt(0)}
-                  </div>
-                  <div>
-                    <h2 className="text-3xl font-bold text-gray-900 mb-2">{selectedApplicant.name}</h2>
-                    <p className="text-asu-maroon font-semibold text-lg">{selectedApplicant.job_title}</p>
-                    <div className="flex items-center space-x-1 mt-2">
+        {/* Applicants Content */}
+        {viewMode === 'grid' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredApplicants.map((applicant, index) => (
+              <Card key={applicant.id} className="applicant-card" elevation={2}>
+                <div className="p-6">
+                  <div className="flex items-center mb-4">
+                    <Avatar
+                      src={applicant.avatar}
+                      alt={applicant.name}
+                      size="lg"
+                      fallback={applicant.name[0]}
+                    />
+                    <div className="ml-4 flex-1">
+                      <Typography variant="h6" color="textPrimary" className="font-semibold">
+                        {applicant.name}
+                      </Typography>
+                      <Typography variant="subtitle2" className={`${
+                        isDark ? 'text-lime' : 'text-asu-maroon'
+                      } font-medium`}>
+                        {applicant.job_title}
+                      </Typography>
+                    </div>
+                    <div className="flex items-center">
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
-                          className={`h-5 w-5 ${i < Math.floor(selectedApplicant.rating || 0) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+                          className={`h-4 w-4 ${
+                            i < Math.floor(applicant.rating || 0) 
+                              ? 'text-yellow-400' 
+                              : isDark ? 'text-dark-muted' : 'text-gray-300'
+                          }`}
                         />
                       ))}
-                      <span className="ml-2 text-gray-600 font-medium">({selectedApplicant.rating}/5.0)</span>
                     </div>
                   </div>
+
+                  <div className="space-y-3 mb-4">
+                    <div className="flex items-center space-x-2">
+                      <LocationOn className={`h-4 w-4 ${
+                        isDark ? 'text-dark-muted' : 'text-gray-400'
+                      }`} />
+                      <Typography variant="body2" color="textSecondary">
+                        {applicant.location}
+                      </Typography>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Event className={`h-4 w-4 ${
+                        isDark ? 'text-dark-muted' : 'text-gray-400'
+                      }`} />
+                      <Typography variant="body2" color="textSecondary">
+                        Applied {new Date(applicant.applied_date).toLocaleDateString()}
+                      </Typography>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Work className={`h-4 w-4 ${
+                        isDark ? 'text-dark-muted' : 'text-gray-400'
+                      }`} />
+                      <Typography variant="body2" color="textSecondary">
+                        {applicant.experience_years} years experience
+                      </Typography>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {applicant.skills.slice(0, 3).map((skill, skillIndex) => (
+                      <Badge key={skillIndex} variant="standard" color="primary" className="text-xs">
+                        {skill}
+                      </Badge>
+                    ))}
+                    {applicant.skills.length > 3 && (
+                      <Badge variant="standard" color="standard" className="text-xs">
+                        +{applicant.skills.length - 3} more
+                      </Badge>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between mb-4">
+                    <Badge variant="standard" color={getStatusColor(applicant.status)} className="flex items-center gap-1">
+                      {getStatusIcon(applicant.status)}
+                      <span className="capitalize">{applicant.status}</span>
+                    </Badge>
+                  </div>
+
+                  <div className="flex space-x-2">
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      onClick={() => setSelectedApplicant(applicant)}
+                      startIcon={<Visibility />}
+                      fullWidth
+                    >
+                      View Details
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      size="small"
+                      className="min-w-0"
+                    >
+                      <Message className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      size="small"
+                      className="min-w-0"
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-                <button
-                  onClick={handleCloseModal}
-                  className="p-3 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <XCircle className="h-6 w-6 text-gray-400" />
-                </button>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <Card elevation={2}>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className={`${
+                  isDark ? 'bg-dark-surface' : 'bg-gray-50'
+                }`}>
+                  <tr>
+                    <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">
+                      Applicant
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">
+                      Job
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">
+                      Applied
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">
+                      Rating
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className={`divide-y ${
+                  isDark ? 'divide-lime/20' : 'divide-gray-200'
+                }`}>
+                  {filteredApplicants.map((applicant) => (
+                    <tr key={applicant.id} className={`hover:${
+                      isDark ? 'bg-dark-surface' : 'bg-gray-50'
+                    } transition-colors`}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <Avatar
+                            src={applicant.avatar}
+                            alt={applicant.name}
+                            size="md"
+                            fallback={applicant.name[0]}
+                          />
+                          <div className="ml-4">
+                            <Typography variant="subtitle2" color="textPrimary" className="font-semibold">
+                              {applicant.name}
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary">
+                              {applicant.email}
+                            </Typography>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Typography variant="subtitle2" color="textPrimary" className="font-semibold">
+                          {applicant.job_title}
+                        </Typography>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Typography variant="body2" color="textSecondary">
+                          {new Date(applicant.applied_date).toLocaleDateString()}
+                        </Typography>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Badge variant="standard" color={getStatusColor(applicant.status)} className="flex items-center gap-1">
+                          {getStatusIcon(applicant.status)}
+                          <span className="capitalize">{applicant.status}</span>
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`h-4 w-4 ${
+                                i < Math.floor(applicant.rating || 0) 
+                                  ? 'text-yellow-400' 
+                                  : isDark ? 'text-dark-muted' : 'text-gray-300'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex space-x-2">
+                          <Button
+                            variant="text"
+                            size="small"
+                            onClick={() => setSelectedApplicant(applicant)}
+                            className="min-w-0"
+                          >
+                            <Visibility className="h-4 w-4" />
+                          </Button>
+                          <Button variant="text" size="small" className="min-w-0">
+                            <Message className="h-4 w-4" />
+                          </Button>
+                          <Button variant="text" size="small" className="min-w-0">
+                            <Download className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        )}
+
+        {filteredApplicants.length === 0 && (
+          <Card className="text-center py-16" elevation={2}>
+            <div className={`w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center ${
+              isDark ? 'bg-dark-surface' : 'bg-gray-100'
+            }`}>
+              <People className={`h-12 w-12 ${
+                isDark ? 'text-dark-muted' : 'text-gray-400'
+              }`} />
+            </div>
+            <Typography variant="h5" color="textPrimary" className="font-bold mb-4">
+              No applicants found
+            </Typography>
+            <Typography variant="body1" color="textSecondary" className="mb-6">
+              No applicants match your current filters. Try adjusting your search criteria.
+            </Typography>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                setSearchTerm('');
+                setStatusFilter('all');
+                setJobFilter('all');
+              }}
+            >
+              Clear Filters
+            </Button>
+          </Card>
+        )}
+      </div>
+
+      {/* Applicant Detail Modal */}
+      {selectedApplicant && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <Card className="max-w-4xl w-full max-h-[90vh] overflow-y-auto" elevation={4}>
+            <div className={`p-6 border-b flex items-center justify-between ${
+              isDark ? 'border-lime/20' : 'border-gray-200'
+            }`}>
+              <div className="flex items-center space-x-4">
+                <Avatar
+                  src={selectedApplicant.avatar}
+                  alt={selectedApplicant.name}
+                  size="xl"
+                  fallback={selectedApplicant.name[0]}
+                />
+                <div>
+                  <Typography variant="h4" color="textPrimary" className="font-bold">
+                    {selectedApplicant.name}
+                  </Typography>
+                  <Typography variant="subtitle1" className={`${
+                    isDark ? 'text-lime' : 'text-asu-maroon'
+                  } font-medium`}>
+                    {selectedApplicant.job_title}
+                  </Typography>
+                  <div className="flex items-center mt-2">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`h-5 w-5 ${
+                          i < Math.floor(selectedApplicant.rating || 0) 
+                            ? 'text-yellow-400' 
+                            : isDark ? 'text-dark-muted' : 'text-gray-300'
+                        }`}
+                      />
+                    ))}
+                    <Typography variant="body2" color="textSecondary" className="ml-2">
+                      ({selectedApplicant.rating}/5.0)
+                    </Typography>
+                  </div>
+                </div>
               </div>
+              <Button
+                variant="text"
+                onClick={() => setSelectedApplicant(null)}
+                className="min-w-0 p-2"
+              >
+                <Close className="h-6 w-6" />
+              </Button>
             </div>
             
-            <div className="p-8">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2">
-                  <div className="space-y-8">
-                    <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 border border-gray-100">
-                      <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                        <FileText className="h-5 w-5 mr-2 text-asu-maroon" />
-                        Cover Letter ✍️
-                      </h3>
-                      <p className="text-gray-700 leading-relaxed text-lg">{selectedApplicant.cover_letter}</p>
-                    </div>
-                    
-                    <div className="bg-gradient-to-r from-asu-maroon/5 to-asu-gold/5 rounded-2xl p-6 border border-gray-100">
-                      <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                        <Award className="h-5 w-5 mr-2 text-asu-maroon" />
-                        Skills & Expertise ⚡
-                      </h3>
-                      <div className="flex flex-wrap gap-3">
-                        {selectedApplicant.skills.map((skill, index) => (
-                          <span
-                            key={index}
-                            className="px-4 py-2 bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white rounded-full text-sm font-medium shadow-md"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
+            <div className="p-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 space-y-6">
+                  <div>
+                    <Typography variant="h6" color="textPrimary" className="font-semibold mb-3 flex items-center">
+                      <DescriptionOutlined className="h-5 w-5 mr-2" />
+                      Cover Letter
+                    </Typography>
+                    <Typography variant="body1" color="textSecondary" className="leading-relaxed">
+                      {selectedApplicant.cover_letter}
+                    </Typography>
+                  </div>
+                  
+                  <div>
+                    <Typography variant="h6" color="textPrimary" className="font-semibold mb-3 flex items-center">
+                      <EmojiEvents className="h-5 w-5 mr-2" />
+                      Skills & Expertise
+                    </Typography>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedApplicant.skills.map((skill, index) => (
+                        <Badge key={index} variant="standard" color="primary">
+                          {skill}
+                        </Badge>
+                      ))}
                     </div>
                   </div>
                 </div>
                 
-                <div className="space-y-6">
-                  <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 border border-gray-100 shadow-lg">
-                    <h3 className="font-bold text-gray-900 mb-4 flex items-center">
-                      <Mail className="h-5 w-5 mr-2 text-asu-maroon" />
-                      Contact Information 📞
-                    </h3>
-                    <div className="space-y-3">
-                      <div className="flex items-center space-x-3 bg-white rounded-xl p-3 border border-gray-100">
-                        <Mail className="h-4 w-4 text-gray-400" />
-                        <span className="text-sm text-gray-600 font-medium">{selectedApplicant.email}</span>
+                <div className="space-y-4">
+                  <div>
+                    <Typography variant="h6" color="textPrimary" className="font-semibold mb-3 flex items-center">
+                      <EmailOutlined className="h-5 w-5 mr-2" />
+                      Contact Information
+                    </Typography>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <Email className={`h-4 w-4 ${
+                          isDark ? 'text-dark-muted' : 'text-gray-400'
+                        }`} />
+                        <Typography variant="body2" color="textSecondary">
+                          {selectedApplicant.email}
+                        </Typography>
                       </div>
                       {selectedApplicant.phone && (
-                        <div className="flex items-center space-x-3 bg-white rounded-xl p-3 border border-gray-100">
-                          <Phone className="h-4 w-4 text-gray-400" />
-                          <span className="text-sm text-gray-600 font-medium">{selectedApplicant.phone}</span>
+                        <div className="flex items-center space-x-2">
+                          <Phone className={`h-4 w-4 ${
+                            isDark ? 'text-dark-muted' : 'text-gray-400'
+                          }`} />
+                          <Typography variant="body2" color="textSecondary">
+                            {selectedApplicant.phone}
+                          </Typography>
                         </div>
                       )}
-                      <div className="flex items-center space-x-3 bg-white rounded-xl p-3 border border-gray-100">
-                        <MapPin className="h-4 w-4 text-gray-400" />
-                        <span className="text-sm text-gray-600 font-medium">{selectedApplicant.location}</span>
+                      <div className="flex items-center space-x-2">
+                        <LocationOn className={`h-4 w-4 ${
+                          isDark ? 'text-dark-muted' : 'text-gray-400'
+                        }`} />
+                        <Typography variant="body2" color="textSecondary">
+                          {selectedApplicant.location}
+                        </Typography>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 border border-gray-100 shadow-lg">
-                    <h3 className="font-bold text-gray-900 mb-4 flex items-center">
-                      <Building2 className="h-5 w-5 mr-2 text-asu-maroon" />
-                      Education 🎓
-                    </h3>
-                    <div className="bg-white rounded-xl p-4 border border-gray-100">
-                      <p className="text-sm text-gray-700 font-medium">{selectedApplicant.education}</p>
-                      {selectedApplicant.gpa && (
-                        <p className="text-sm text-asu-maroon font-bold mt-2">GPA: {selectedApplicant.gpa}</p>
-                      )}
-                    </div>
+                  <div>
+                    <Typography variant="h6" color="textPrimary" className="font-semibold mb-3 flex items-center">
+                      <SchoolOutlined className="h-5 w-5 mr-2" />
+                      Education
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      {selectedApplicant.education}
+                    </Typography>
+                    {selectedApplicant.gpa && (
+                      <Typography variant="body2" className={`mt-1 ${
+                        isDark ? 'text-lime' : 'text-asu-maroon'
+                      } font-medium`}>
+                        GPA: {selectedApplicant.gpa}
+                      </Typography>
+                    )}
                   </div>
                   
-                  <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 border border-gray-100 shadow-lg">
-                    <h3 className="font-bold text-gray-900 mb-4">Experience 💼</h3>
-                    <div className="bg-white rounded-xl p-4 border border-gray-100">
-                      <p className="text-sm text-gray-700 font-medium">{selectedApplicant.experience_years} years of experience</p>
-                    </div>
+                  <div>
+                    <Typography variant="h6" color="textPrimary" className="font-semibold mb-3 flex items-center">
+                      <WorkOutline className="h-5 w-5 mr-2" />
+                      Experience
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      {selectedApplicant.experience_years} years of experience
+                    </Typography>
                   </div>
                   
-                  <div className="flex space-x-3">
-                    <button 
-                      className="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-4 rounded-2xl hover:shadow-lg transition-all duration-300 font-bold text-center"
-                      onClick={() => updateApplicantStatus(selectedApplicant.id, 'hired')}
+                  <div className="flex space-x-2">
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      startIcon={<ThumbUp />}
+                      className="flex-1"
                     >
-                      Accept 🎉
-                    </button>
-                    <button 
-                      className="flex-1 bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-4 rounded-2xl hover:shadow-lg transition-all duration-300 font-bold text-center"
-                      onClick={() => updateApplicantStatus(selectedApplicant.id, 'rejected')}
+                      Accept
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      startIcon={<ThumbDown />}
+                      className="flex-1"
                     >
-                      Reject ❌
-                    </button>
+                      Reject
+                    </Button>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       )}
     </div>

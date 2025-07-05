@@ -5,6 +5,7 @@ interface AvatarProps {
   src?: string;
   alt?: string;
   name?: string;
+  fallback?: string;
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   variant?: 'circle' | 'square' | 'rounded';
   fallbackIcon?: LucideIcon;
@@ -19,6 +20,7 @@ export default function Avatar({
   src,
   alt,
   name,
+  fallback,
   size = 'md',
   variant = 'circle',
   fallbackIcon: FallbackIcon = User,
@@ -99,9 +101,18 @@ export default function Avatar({
       );
     }
 
+    // Use fallback prop if provided
+    if (fallback) {
+      return (
+        <span className={`font-bold ${gradient ? 'text-white' : 'text-gray-600'}`}>
+          {fallback}
+        </span>
+      );
+    }
+
     if (name) {
       return (
-        <span className={`font-bold text-white ${gradient ? '' : 'text-gray-600'}`}>
+        <span className={`font-bold ${gradient ? 'text-white' : 'text-gray-600'}`}>
           {getInitials(name)}
         </span>
       );

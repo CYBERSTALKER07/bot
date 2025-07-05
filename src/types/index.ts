@@ -2,6 +2,8 @@ export interface User {
   id: string;
   email: string;
   role: 'student' | 'employer' | 'admin';
+  name?: string;
+  company?: string;
   profile?: StudentProfile | EmployerProfile | AdminProfile;
 }
 
@@ -62,6 +64,10 @@ export interface Job {
   deadline?: string;
   applicants_count?: number;
   employer_id: string;
+  status?: 'active' | 'inactive' | 'draft' | 'closed';
+  views?: number;
+  benefits?: string;
+  experience_level?: string;
   created_at: string;
   updated_at: string;
 }

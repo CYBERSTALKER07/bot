@@ -67,47 +67,58 @@ export default function StudentDashboard() {
 
   // Enhanced animations with Material Design principles
   useEffect(() => {
+    if (!containerRef.current) return;
+
     const ctx = gsap.context(() => {
       // Material Design stagger animation for stats cards
-      gsap.fromTo('.stats-card', {
-        scale: 0.8,
-        opacity: 0,
-        y: 40
-      }, {
-        scale: 1,
-        opacity: 1,
-        y: 0,
-        duration: 0.6,
-        stagger: 0.1,
-        ease: 'power2.out',
-        delay: 0.2
-      });
+      const statsCards = containerRef.current?.querySelectorAll('.stats-card');
+      if (statsCards && statsCards.length > 0) {
+        gsap.fromTo(statsCards, {
+          scale: 0.8,
+          opacity: 0,
+          y: 40
+        }, {
+          scale: 1,
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: 'power2.out',
+          delay: 0.2
+        });
+      }
 
       // Elegant job card animations
-      gsap.fromTo('.job-card', {
-        opacity: 0,
-        y: 30,
-        scale: 0.95
-      }, {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.5,
-        stagger: 0.08,
-        ease: 'power2.out',
-        delay: 0.4
-      });
+      const jobCards = containerRef.current?.querySelectorAll('.job-card');
+      if (jobCards && jobCards.length > 0) {
+        gsap.fromTo(jobCards, {
+          opacity: 0,
+          y: 30,
+          scale: 0.95
+        }, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.5,
+          stagger: 0.08,
+          ease: 'power2.out',
+          delay: 0.4
+        });
+      }
 
       // Floating decorative elements
-      gsap.to('.dashboard-sparkle', {
-        y: -10,
-        x: 5,
-        rotation: 180,
-        duration: 15,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut'
-      });
+      const decorations = containerRef.current?.querySelectorAll('.dashboard-sparkle');
+      if (decorations && decorations.length > 0) {
+        gsap.to(decorations, {
+          y: -10,
+          x: 5,
+          rotation: 180,
+          duration: 15,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut'
+        });
+      }
 
     }, containerRef);
 

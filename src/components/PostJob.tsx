@@ -3,26 +3,33 @@ import { useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { 
   Save, 
-  X, 
-  Plus, 
-  MapPin, 
-  Building2, 
-  DollarSign, 
-  Calendar, 
-  FileText, 
-  Users, 
-  Eye, 
+  Add, 
+  Visibility, 
+  LocationOn, 
+  Business, 
+  AttachMoney, 
+  CalendarToday, 
+  Description, 
+  People, 
   CheckCircle,
-  Sparkles,
-  Coffee,
-  Heart,
-  Zap,
+  AutoAwesome,
+  LocalCafe,
+  Favorite,
+  Bolt,
   Star,
   TrendingUp,
-  Award
-} from 'lucide-react';
+  EmojiEvents,
+  Close,
+  Work
+} from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import Typography from './ui/Typography';
+import Input from './ui/Input';
+import Button from './ui/Button';
+import { Card } from './ui/Card';
+import Badge from './ui/Badge';
+import Select from './ui/Select';
 
 export default function PostJob() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -56,96 +63,62 @@ export default function PostJob() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Header animation - scale from small to big
-      gsap.fromTo(headerRef.current, {
-        scale: 0.3,
+      // Material Design entrance animations
+      gsap.fromTo('.post-job-header', {
         opacity: 0,
-        y: -50,
-        rotation: -2
+        y: -30,
+        scale: 0.95
       }, {
-        scale: 1,
         opacity: 1,
         y: 0,
-        rotation: 0,
-        duration: 1.8,
-        ease: 'elastic.out(1, 0.6)'
+        scale: 1,
+        duration: 0.8,
+        ease: 'power2.out'
       });
 
-      // Form animation - scale from small and slide up
-      gsap.fromTo(formRef.current, {
-        scale: 0.5,
+      gsap.fromTo('.form-section', {
         opacity: 0,
-        y: 60
+        y: 20,
+        scale: 0.98
       }, {
-        scale: 1,
         opacity: 1,
         y: 0,
-        duration: 1.4,
-        ease: 'back.out(1.7)',
+        scale: 1,
+        duration: 0.6,
+        ease: 'power2.out',
+        stagger: 0.1,
         delay: 0.3
       });
 
-      // Form sections stagger animation - grow from tiny
-      gsap.fromTo('.form-section', {
-        scale: 0.2,
+      gsap.fromTo('.skill-chip', {
         opacity: 0,
-        y: 30
+        scale: 0.8,
+        y: 10
       }, {
-        scale: 1,
         opacity: 1,
+        scale: 1,
         y: 0,
-        duration: 1,
-        ease: 'elastic.out(1, 0.8)',
-        stagger: 0.15,
-        delay: 0.8
+        duration: 0.4,
+        ease: 'back.out(1.7)',
+        stagger: 0.05,
+        delay: 0.6
       });
 
-      // Skill tags animation - grow from tiny
-      gsap.fromTo('.skill-tag', {
-        scale: 0.1,
-        opacity: 0,
-        rotation: 180
-      }, {
-        scale: 1,
-        opacity: 1,
-        rotation: 0,
-        duration: 0.8,
-        ease: 'elastic.out(1, 0.7)',
-        stagger: 0.08,
-        delay: 1.5
-      });
-
-      // Floating decorations - always visible with proper opacity
-      gsap.set('.post-job-decoration', { opacity: 1 });
+      // Floating decorations
       gsap.to('.post-job-decoration', {
-        y: -12,
-        x: 6,
-        rotation: 360,
-        duration: 5,
+        y: -10,
+        x: 5,
+        rotation: 180,
+        duration: 15,
         repeat: -1,
         yoyo: true,
-        ease: 'power1.inOut'
+        ease: 'sine.inOut'
       });
-
-      // Preview animation when toggled
-      if (showPreview && previewRef.current) {
-        gsap.fromTo(previewRef.current, {
-          scale: 0.7,
-          opacity: 0,
-          x: 30
-        }, {
-          scale: 1,
-          opacity: 1,
-          x: 0,
-          duration: 1,
-          ease: 'back.out(1.7)'
-        });
-      }
 
     }, containerRef);
 
     return () => ctx.revert();
-  }, [showPreview]);
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -174,63 +147,84 @@ export default function PostJob() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
     console.log('Job posted:', formData);
-    
-    // Show success animation
-    gsap.to('.submit-btn', {
-      scale: 1.1,
-      duration: 0.3,
-      yoyo: true,
-      repeat: 1,
-      ease: 'power2.out'
-    });
-    
-    // Navigate after delay
-    setTimeout(() => {
-      navigate('/dashboard');
-    }, 1500);
+    navigate('/dashboard');
   };
 
+  const jobTypeOptions = [
+    { value: 'full-time', label: 'Full-time' },
+    { value: 'part-time', label: 'Part-time' },
+    { value: 'internship', label: 'Internship' },
+    { value: 'contract', label: 'Contract' }
+  ];
+
+  const experienceLevelOptions = [
+    { value: 'entry', label: 'Entry Level' },
+    { value: 'mid', label: 'Mid Level' },
+    { value: 'senior', label: 'Senior Level' }
+  ];
+
   return (
-    <div ref={containerRef} className={`min-h-screen bg-gradient-to-br ${isDark ? 'from-gray-900 to-black' : 'from-gray-50 to-white'} relative`}>
-      {/* Decorative elements - Fixed colors with proper opacity */}
-      <div className="post-job-decoration absolute top-16 right-24 w-4 h-4 bg-asu-gold rounded-full opacity-40"></div>
-      <div className="post-job-decoration absolute top-32 left-16 w-3 h-3 bg-asu-maroon rounded-full opacity-30"></div>
-      <Sparkles className="post-job-decoration absolute top-24 left-1/4 h-5 w-5 text-asu-gold opacity-60" />
-      <Coffee className="post-job-decoration absolute bottom-32 right-1/4 h-4 w-4 text-asu-maroon opacity-50" />
-      <Heart className="post-job-decoration absolute bottom-20 left-1/3 h-4 w-4 text-asu-gold opacity-70" />
+    <div ref={containerRef} className={`min-h-screen relative ${
+      isDark ? 'bg-dark-bg' : 'bg-gray-50'
+    }`}>
+      {/* Decorative elements */}
+      <div className={`post-job-decoration absolute top-16 right-24 w-4 h-4 rounded-full ${
+        isDark ? 'bg-lime/30' : 'bg-asu-gold/40'
+      }`}></div>
+      <AutoAwesome className={`post-job-decoration absolute top-24 left-1/4 h-5 w-5 ${
+        isDark ? 'text-lime/60' : 'text-asu-gold/60'
+      }`} />
+      <LocalCafe className={`post-job-decoration absolute bottom-32 right-1/4 h-4 w-4 ${
+        isDark ? 'text-dark-accent/50' : 'text-asu-maroon/50'
+      }`} />
+      <Favorite className={`post-job-decoration absolute bottom-20 left-1/3 h-4 w-4 ${
+        isDark ? 'text-lime/70' : 'text-asu-gold/70'
+      }`} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Enhanced Header */}
-        <div ref={headerRef} className="mb-12">
-          <div className={`bg-gradient-to-r ${isDark ? 'from-asu-maroon-dark to-asu-maroon' : 'from-asu-maroon to-asu-maroon-dark'} rounded-3xl p-8 text-white relative overflow-hidden transform`}>
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-asu-gold/20 rounded-full blur-xl"></div>
-            <div className="relative z-10">
-              <h1 className="text-5xl font-bold mb-4 relative">
-                Post a New Job 
-                <div className="absolute -top-3 -right-8 w-6 h-6 bg-asu-gold rounded-full animate-pulse"></div>
-              </h1>
-              <p className="text-xl text-white/90 mb-6 max-w-3xl">
-                Find the perfect candidates for your team. Create a compelling job posting that attracts top talent ✨
-              </p>
-              <div className="flex flex-wrap gap-4 text-sm">
-                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 transform rotate-1">
-                  <TrendingUp className="h-5 w-5" />
-                  <span>95% job fill rate 📈</span>
-                </div>
-                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 transform -rotate-1">
-                  <Users className="h-5 w-5" />
-                  <span>50,000+ active students 👥</span>
-                </div>
-                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 transform rotate-0.5">
-                  <Star className="h-5 w-5" />
-                  <span>Top quality candidates 🌟</span>
+        {/* Header */}
+        <div className="post-job-header mb-12">
+          <Card className="overflow-hidden" elevation={2}>
+            <div className={`p-8 text-white relative ${
+              isDark 
+                ? 'bg-gradient-to-r from-dark-surface to-dark-bg' 
+                : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
+            }`}>
+              <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl ${
+                isDark ? 'bg-lime/10' : 'bg-white/10'
+              }`}></div>
+              <div className={`absolute bottom-0 left-0 w-24 h-24 rounded-full blur-xl ${
+                isDark ? 'bg-dark-accent/20' : 'bg-asu-gold/20'
+              }`}></div>
+              
+              <div className="relative z-10">
+                <Typography variant="h3" className="font-bold mb-4 text-white">
+                  Post a New Job
+                </Typography>
+                <Typography variant="subtitle1" className={`max-w-3xl ${
+                  isDark ? 'text-dark-muted' : 'text-white/90'
+                }`}>
+                  Find the perfect candidates for your team. Create a compelling job posting that attracts top talent
+                </Typography>
+                
+                <div className="flex flex-wrap gap-4 mt-6">
+                  <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
+                    <TrendingUp className="h-5 w-5" />
+                    <span className="text-sm">95% job fill rate</span>
+                  </div>
+                  <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
+                    <People className="h-5 w-5" />
+                    <span className="text-sm">50,000+ active students</span>
+                  </div>
+                  <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
+                    <Star className="h-5 w-5" />
+                    <span className="text-sm">Top quality candidates</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -238,151 +232,95 @@ export default function PostJob() {
           <div className="lg:col-span-2">
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-8">
               {/* Job Details Section */}
-              <div className={`form-section rounded-3xl shadow-lg border p-8 transition-colors duration-300 ${
-                isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-100'
-              }`}>
+              <Card className="form-section p-8" elevation={2}>
                 <div className="flex items-center space-x-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-asu-maroon to-asu-maroon-dark rounded-full flex items-center justify-center">
-                    <FileText className="h-5 w-5 text-white" />
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    isDark ? 'bg-lime/20' : 'bg-asu-maroon/10'
+                  }`}>
+                    <Description className={`h-5 w-5 ${
+                      isDark ? 'text-lime' : 'text-asu-maroon'
+                    }`} />
                   </div>
-                  <h2 className={`text-2xl font-bold transition-colors ${
-                    isDark ? 'text-dark-text' : 'text-gray-900'
-                  }`}>Job Details 📋</h2>
+                  <Typography variant="h5" color="textPrimary" className="font-bold">
+                    Job Details
+                  </Typography>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
-                      Job Title *
-                    </label>
-                    <input
-                      type="text"
-                      name="title"
-                      value={formData.title}
-                      onChange={handleInputChange}
-                      required
-                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md ${
-                        isDark 
-                          ? 'border-lime/30 bg-dark-bg text-dark-text placeholder-dark-muted focus:ring-lime' 
-                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
-                      }`}
-                      placeholder="e.g., Software Engineering Intern"
-                    />
-                  </div>
+                  <Input
+                    label="Job Title"
+                    type="text"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="e.g., Software Engineering Intern"
+                    variant="outlined"
+                    fullWidth
+                  />
                   
-                  <div>
-                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
-                      Company *
-                    </label>
-                    <input
-                      type="text"
-                      name="company"
-                      value={formData.company}
-                      onChange={handleInputChange}
-                      required
-                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md ${
-                        isDark 
-                          ? 'border-lime/30 bg-dark-bg text-dark-text placeholder-dark-muted focus:ring-lime' 
-                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
-                      }`}
-                      placeholder="Your Company Name"
-                    />
-                  </div>
+                  <Input
+                    label="Company"
+                    type="text"
+                    name="company"
+                    value={formData.company}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="Your Company Name"
+                    variant="outlined"
+                    fullWidth
+                    startIcon={<Business />}
+                  />
                   
-                  <div>
-                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
-                      Location *
-                    </label>
-                    <input
-                      type="text"
-                      name="location"
-                      value={formData.location}
-                      onChange={handleInputChange}
-                      required
-                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md ${
-                        isDark 
-                          ? 'border-lime/30 bg-dark-bg text-dark-text placeholder-dark-muted focus:ring-lime' 
-                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
-                      }`}
-                      placeholder="e.g., Phoenix, AZ or Remote"
-                    />
-                  </div>
+                  <Input
+                    label="Location"
+                    type="text"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="e.g., Phoenix, AZ or Remote"
+                    variant="outlined"
+                    fullWidth
+                    startIcon={<LocationOn />}
+                  />
                   
-                  <div>
-                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
-                      Job Type *
-                    </label>
-                    <select
-                      name="type"
-                      value={formData.type}
-                      onChange={handleInputChange}
-                      required
-                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner cursor-pointer hover:shadow-md transition-all duration-200 ${
-                        isDark 
-                          ? 'border-lime/30 bg-dark-bg text-dark-text focus:ring-lime' 
-                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
-                      }`}
-                    >
-                      <option value="full-time">Full-time 💼</option>
-                      <option value="part-time">Part-time ⏰</option>
-                      <option value="internship">Internship 🎓</option>
-                      <option value="contract">Contract 📝</option>
-                    </select>
-                  </div>
+                  <Select
+                    label="Job Type"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleInputChange}
+                    options={jobTypeOptions}
+                    required
+                    variant="outlined"
+                    fullWidth
+                  />
                   
-                  <div>
-                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
-                      Experience Level
-                    </label>
-                    <select
-                      name="experience_level"
-                      value={formData.experience_level}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner cursor-pointer hover:shadow-md transition-all duration-200 ${
-                        isDark 
-                          ? 'border-lime/30 bg-dark-bg text-dark-text focus:ring-lime' 
-                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
-                      }`}
-                    >
-                      <option value="entry">Entry Level 🌱</option>
-                      <option value="mid">Mid Level 📈</option>
-                      <option value="senior">Senior Level 🏆</option>
-                    </select>
-                  </div>
+                  <Select
+                    label="Experience Level"
+                    name="experience_level"
+                    value={formData.experience_level}
+                    onChange={handleInputChange}
+                    options={experienceLevelOptions}
+                    variant="outlined"
+                    fullWidth
+                  />
                   
-                  <div>
-                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
-                      Salary Range
-                    </label>
-                    <input
-                      type="text"
-                      name="salary"
-                      value={formData.salary}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md ${
-                        isDark 
-                          ? 'border-lime/30 bg-dark-bg text-dark-text placeholder-dark-muted focus:ring-lime' 
-                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
-                      }`}
-                      placeholder="e.g., $60,000 - $80,000 or $25/hour"
-                    />
-                  </div>
+                  <Input
+                    label="Salary Range"
+                    type="text"
+                    name="salary"
+                    value={formData.salary}
+                    onChange={handleInputChange}
+                    placeholder="e.g., $60,000 - $80,000 or $25/hour"
+                    variant="outlined"
+                    fullWidth
+                    startIcon={<AttachMoney />}
+                  />
                 </div>
                 
                 <div className="mt-6">
-                  <label className="flex items-center space-x-3">
+                  <label className="flex items-center space-x-3 cursor-pointer">
                     <input
                       type="checkbox"
                       name="is_remote"
@@ -394,403 +332,411 @@ export default function PostJob() {
                           : 'text-asu-maroon border-gray-300 focus:ring-asu-maroon'
                       }`}
                     />
-                    <span className={`text-sm font-medium transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
-                      Remote work available 💻
-                    </span>
+                    <Typography variant="body2" color="textPrimary" className="font-medium">
+                      Remote work available
+                    </Typography>
                   </label>
                 </div>
-              </div>
+              </Card>
 
               {/* Description Section */}
-              <div className={`form-section rounded-3xl shadow-lg border p-8 transition-colors duration-300 ${
-                isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-100'
-              }`}>
+              <Card className="form-section p-8" elevation={2}>
                 <div className="flex items-center space-x-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
-                    <FileText className="h-5 w-5 text-white" />
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    isDark ? 'bg-lime/20' : 'bg-asu-maroon/10'
+                  }`}>
+                    <Description className={`h-5 w-5 ${
+                      isDark ? 'text-lime' : 'text-asu-maroon'
+                    }`} />
                   </div>
-                  <h2 className={`text-2xl font-bold transition-colors ${
-                    isDark ? 'text-dark-text' : 'text-gray-900'
-                  }`}>Job Description 📝</h2>
+                  <Typography variant="h5" color="textPrimary" className="font-bold">
+                    Job Description
+                  </Typography>
                 </div>
                 
                 <div className="space-y-6">
-                  <div>
-                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
-                      Job Description *
-                    </label>
-                    <textarea
-                      name="description"
-                      value={formData.description}
-                      onChange={handleInputChange}
-                      required
-                      rows={6}
-                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md resize-none ${
-                        isDark 
-                          ? 'border-lime/30 bg-dark-bg text-dark-text placeholder-dark-muted focus:ring-lime' 
-                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
-                      }`}
-                      placeholder="Describe the role, responsibilities, and what makes this opportunity exciting..."
-                    />
-                  </div>
+                  <Input
+                    label="Job Description"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    required
+                    multiline
+                    rows={6}
+                    placeholder="Describe the role, responsibilities, and what makes this opportunity exciting..."
+                    variant="outlined"
+                    fullWidth
+                  />
                   
-                  <div>
-                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
-                      Requirements *
-                    </label>
-                    <textarea
-                      name="requirements"
-                      value={formData.requirements}
-                      onChange={handleInputChange}
-                      required
-                      rows={4}
-                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md resize-none ${
-                        isDark 
-                          ? 'border-lime/30 bg-dark-bg text-dark-text placeholder-dark-muted focus:ring-lime' 
-                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
-                      }`}
-                      placeholder="List the required qualifications, skills, and experience..."
-                    />
-                  </div>
+                  <Input
+                    label="Requirements"
+                    name="requirements"
+                    value={formData.requirements}
+                    onChange={handleInputChange}
+                    required
+                    multiline
+                    rows={4}
+                    placeholder="List the required qualifications, skills, and experience..."
+                    variant="outlined"
+                    fullWidth
+                  />
                   
-                  <div>
-                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
-                      Benefits & Perks
-                    </label>
-                    <textarea
-                      name="benefits"
-                      value={formData.benefits}
-                      onChange={handleInputChange}
-                      rows={3}
-                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md resize-none ${
-                        isDark 
-                          ? 'border-lime/30 bg-dark-bg text-dark-text placeholder-dark-muted focus:ring-lime' 
-                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
-                      }`}
-                      placeholder="Health insurance, flexible hours, learning opportunities..."
-                    />
-                  </div>
+                  <Input
+                    label="Benefits & Perks"
+                    name="benefits"
+                    value={formData.benefits}
+                    onChange={handleInputChange}
+                    multiline
+                    rows={3}
+                    placeholder="Health insurance, flexible hours, learning opportunities..."
+                    variant="outlined"
+                    fullWidth
+                  />
                 </div>
-              </div>
+              </Card>
 
               {/* Skills Section */}
-              <div className={`form-section rounded-3xl shadow-lg border p-8 transition-colors duration-300 ${
-                isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-100'
-              }`}>
+              <Card className="form-section p-8" elevation={2}>
                 <div className="flex items-center space-x-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center">
-                    <Zap className="h-5 w-5 text-white" />
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    isDark ? 'bg-lime/20' : 'bg-asu-maroon/10'
+                  }`}>
+                    <Bolt className={`h-5 w-5 ${
+                      isDark ? 'text-lime' : 'text-asu-maroon'
+                    }`} />
                   </div>
-                  <h2 className={`text-2xl font-bold transition-colors ${
-                    isDark ? 'text-dark-text' : 'text-gray-900'
-                  }`}>Required Skills ⚡</h2>
+                  <Typography variant="h5" color="textPrimary" className="font-bold">
+                    Required Skills
+                  </Typography>
                 </div>
                 
                 <div className="space-y-4">
                   <div className="flex space-x-2">
-                    <input
-                      type="text"
+                    <Input
                       value={newSkill}
                       onChange={(e) => setNewSkill(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
-                      className={`flex-1 px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md ${
-                        isDark 
-                          ? 'border-lime/30 bg-dark-bg text-dark-text placeholder-dark-muted focus:ring-lime' 
-                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
-                      }`}
                       placeholder="Add a skill (e.g., JavaScript, Python, React...)"
+                      variant="outlined"
+                      className="flex-1"
                     />
-                    <button
+                    <Button
                       type="button"
+                      variant="contained"
+                      color="primary"
                       onClick={addSkill}
-                      className={`px-6 py-3 rounded-2xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md transform hover:scale-105 ${
-                        isDark 
-                          ? 'bg-gradient-to-r from-lime to-dark-accent text-dark-surface' 
-                          : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white'
-                      }`}
+                      size="large"
+                      className="px-6"
                     >
-                      <Plus className="h-5 w-5" />
-                    </button>
+                      <Add />
+                    </Button>
                   </div>
                   
                   <div className="flex flex-wrap gap-2">
                     {formData.skills.map((skill, index) => (
-                      <span
+                      <Badge
                         key={index}
-                        className={`skill-tag px-4 py-2 rounded-full font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center space-x-2 ${
-                          isDark 
-                            ? 'bg-gradient-to-r from-lime to-dark-accent text-dark-surface' 
-                            : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white'
-                        }`}
+                        className="skill-chip cursor-pointer"
+                        variant="filled"
+                        color="primary"
+                        onClick={() => removeSkill(skill)}
                       >
-                        <span>{skill}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeSkill(skill)}
-                          className="hover:text-red-200 transition-colors"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </span>
+                        {skill} ×
+                      </Badge>
                     ))}
                   </div>
                 </div>
-              </div>
+              </Card>
 
               {/* Additional Details */}
-              <div className={`form-section rounded-3xl shadow-lg border p-8 transition-colors duration-300 ${
-                isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-100'
-              }`}>
+              <Card className="form-section p-8" elevation={2}>
                 <div className="flex items-center space-x-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center">
-                    <Calendar className="h-5 w-5 text-white" />
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    isDark ? 'bg-lime/20' : 'bg-asu-maroon/10'
+                  }`}>
+                    <CalendarToday className={`h-5 w-5 ${
+                      isDark ? 'text-lime' : 'text-asu-maroon'
+                    }`} />
                   </div>
-                  <h2 className={`text-2xl font-bold transition-colors ${
-                    isDark ? 'text-dark-text' : 'text-gray-900'
-                  }`}>Additional Details 📅</h2>
+                  <Typography variant="h5" color="textPrimary" className="font-bold">
+                    Additional Details
+                  </Typography>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
-                      Application Deadline
-                    </label>
-                    <input
-                      type="date"
-                      name="deadline"
-                      value={formData.deadline}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md ${
-                        isDark 
-                          ? 'border-lime/30 bg-dark-bg text-dark-text focus:ring-lime' 
-                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
-                      }`}
-                    />
-                  </div>
+                  <Input
+                    label="Application Deadline"
+                    type="date"
+                    name="deadline"
+                    value={formData.deadline}
+                    onChange={handleInputChange}
+                    variant="outlined"
+                    fullWidth
+                  />
                   
-                  <div>
-                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
-                      Contact Email *
-                    </label>
-                    <input
-                      type="email"
-                      name="contact_email"
-                      value={formData.contact_email}
-                      onChange={handleInputChange}
-                      required
-                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md ${
-                        isDark 
-                          ? 'border-lime/30 bg-dark-bg text-dark-text placeholder-dark-muted focus:ring-lime' 
-                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
-                      }`}
-                      placeholder="hiring@company.com"
-                    />
-                  </div>
+                  <Input
+                    label="Contact Email"
+                    type="email"
+                    name="contact_email"
+                    value={formData.contact_email}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="hiring@company.com"
+                    variant="outlined"
+                    fullWidth
+                  />
                   
-                  <div className="md:col-span-2">
-                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
-                      Department
-                    </label>
-                    <input
-                      type="text"
-                      name="department"
-                      value={formData.department}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md ${
-                        isDark 
-                          ? 'border-lime/30 bg-dark-bg text-dark-text placeholder-dark-muted focus:ring-lime' 
-                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
-                      }`}
-                      placeholder="e.g., Engineering, Marketing, Sales..."
-                    />
-                  </div>
+                  <Input
+                    label="Department"
+                    type="text"
+                    name="department"
+                    value={formData.department}
+                    onChange={handleInputChange}
+                    placeholder="e.g., Engineering, Marketing, Sales..."
+                    variant="outlined"
+                    fullWidth
+                    className="md:col-span-2"
+                  />
                 </div>
-              </div>
+              </Card>
 
-              {/* Submit Button */}
+              {/* Submit Buttons */}
               <div className="flex justify-center space-x-4">
-                <button
+                <Button
                   type="button"
+                  variant="outlined"
+                  color="primary"
+                  size="large"
+                  startIcon={Visibility}
                   onClick={() => setShowPreview(!showPreview)}
-                  className={`flex items-center space-x-2 border-2 px-8 py-4 rounded-2xl transition-all duration-300 font-semibold shadow-sm hover:shadow-md transform hover:scale-105 ${
-                    isDark 
-                      ? 'border-lime text-lime hover:bg-lime hover:text-dark-surface' 
-                      : 'border-asu-maroon text-asu-maroon hover:bg-asu-maroon hover:text-white'
-                  }`}
+                  className="px-8"
                 >
-                  <Eye className="h-5 w-5" />
-                  <span>{showPreview ? 'Hide Preview' : 'Preview Job'}</span>
-                </button>
+                  {showPreview ? 'Hide Preview' : 'Preview Job'}
+                </Button>
                 
-                <button
+                <Button
                   type="submit"
-                  className={`submit-btn flex items-center space-x-2 px-8 py-4 rounded-2xl hover:shadow-xl transition-all duration-300 font-semibold shadow-lg transform hover:scale-105 ${
-                    isDark 
-                      ? 'bg-gradient-to-r from-lime to-dark-accent text-dark-surface' 
-                      : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white'
-                  }`}
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  startIcon={Save}
+                  className="px-8"
                 >
-                  <Save className="h-5 w-5" />
-                  <span>Post Job 🚀</span>
-                </button>
+                  Post Job
+                </Button>
               </div>
             </form>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-8">
-            {/* Tips */}
-            <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-8">
+            {/* Tips Card */}
+            <Card className="p-6" elevation={2}>
               <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-[#fc8c03] rounded-full flex items-center justify-center">
-                  <Award className="h-5 w-5 text-white" />
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  isDark ? 'bg-lime/20' : 'bg-asu-maroon/10'
+                }`}>
+                  <EmojiEvents className={`h-5 w-5 ${
+                    isDark ? 'text-lime' : 'text-asu-maroon'
+                  }`} />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900">Tips for Success 💡</h3>
+                <Typography variant="h6" color="textPrimary" className="font-bold">
+                  Tips for Success
+                </Typography>
               </div>
               
-              <div className="space-y-4 text-sm text-gray-600">
+              <div className="space-y-3">
                 <div className="flex items-start space-x-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                  <p>Write a clear, compelling job title that accurately reflects the role</p>
+                  <CheckCircle className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
+                    isDark ? 'text-lime' : 'text-green-500'
+                  }`} />
+                  <Typography variant="body2" color="textSecondary">
+                    Write a clear, compelling job title that accurately reflects the role
+                  </Typography>
                 </div>
                 <div className="flex items-start space-x-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                  <p>Include salary range to attract quality candidates</p>
+                  <CheckCircle className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
+                    isDark ? 'text-lime' : 'text-green-500'
+                  }`} />
+                  <Typography variant="body2" color="textSecondary">
+                    Include salary range to attract quality candidates
+                  </Typography>
                 </div>
                 <div className="flex items-start space-x-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                  <p>Be specific about required skills and experience</p>
+                  <CheckCircle className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
+                    isDark ? 'text-lime' : 'text-green-500'
+                  }`} />
+                  <Typography variant="body2" color="textSecondary">
+                    Be specific about required skills and experience
+                  </Typography>
                 </div>
                 <div className="flex items-start space-x-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                  <p>Highlight unique benefits and company culture</p>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                  <p>Use keywords that candidates search for</p>
+                  <CheckCircle className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
+                    isDark ? 'text-lime' : 'text-green-500'
+                  }`} />
+                  <Typography variant="body2" color="textSecondary">
+                    Highlight unique benefits and company culture
+                  </Typography>
                 </div>
               </div>
-            </div>
+            </Card>
 
-            {/* Stats */}
-            <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-8">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">Platform Stats 📊</h3>
+            {/* Stats Card */}
+            <Card className="p-6" elevation={2}>
+              <Typography variant="h6" color="textPrimary" className="font-bold mb-6">
+                Platform Stats
+              </Typography>
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Active Students</span>
-                  <span className="font-bold text-asu-maroon">50,000+</span>
+                  <Typography variant="body2" color="textSecondary">
+                    Active Students
+                  </Typography>
+                  <Typography variant="body2" color="primary" className="font-bold">
+                    50,000+
+                  </Typography>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Companies Hiring</span>
-                  <span className="font-bold text-asu-maroon">2,500+</span>
+                  <Typography variant="body2" color="textSecondary">
+                    Companies Hiring
+                  </Typography>
+                  <Typography variant="body2" color="primary" className="font-bold">
+                    2,500+
+                  </Typography>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Jobs Posted</span>
-                  <span className="font-bold text-asu-maroon">15,000+</span>
+                  <Typography variant="body2" color="textSecondary">
+                    Jobs Posted
+                  </Typography>
+                  <Typography variant="body2" color="primary" className="font-bold">
+                    15,000+
+                  </Typography>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Success Rate</span>
-                  <span className="font-bold text-asu-maroon">95%</span>
+                  <Typography variant="body2" color="textSecondary">
+                    Success Rate
+                  </Typography>
+                  <Typography variant="body2" color="primary" className="font-bold">
+                    95%
+                  </Typography>
                 </div>
               </div>
-            </div>
+            </Card>
           </div>
         </div>
 
         {/* Preview Modal */}
         {showPreview && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div ref={previewRef} className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-8">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">Job Preview</h2>
-                  <button
-                    onClick={() => setShowPreview(false)}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                  >
-                    <X className="h-6 w-6" />
-                  </button>
+            <Card ref={previewRef} className="max-w-4xl w-full max-h-[90vh] overflow-y-auto p-8" elevation={4}>
+              <div className="flex justify-between items-center mb-6">
+                <Typography variant="h4" color="textPrimary" className="font-bold">
+                  Job Preview
+                </Typography>
+                <Button
+                  variant="text"
+                  onClick={() => setShowPreview(false)}
+                  size="small"
+                  className="p-2"
+                >
+                  <Close />
+                </Button>
+              </div>
+              
+              {/* Job Preview Content */}
+              <div className="space-y-6">
+                <div className={`border-b pb-6 ${
+                  isDark ? 'border-gray-600' : 'border-gray-200'
+                }`}>
+                  <Typography variant="h3" color="textPrimary" className="font-bold mb-2">
+                    {formData.title || 'Job Title'}
+                  </Typography>
+                  <div className="flex flex-wrap gap-4">
+                    {formData.company && (
+                      <div className="flex items-center space-x-1">
+                        <Business className="h-4 w-4" />
+                        <Typography variant="body2" color="textSecondary">
+                          {formData.company}
+                        </Typography>
+                      </div>
+                    )}
+                    {formData.location && (
+                      <div className="flex items-center space-x-1">
+                        <LocationOn className="h-4 w-4" />
+                        <Typography variant="body2" color="textSecondary">
+                          {formData.location}
+                        </Typography>
+                      </div>
+                    )}
+                    <div className="flex items-center space-x-1">
+                      <Work className="h-4 w-4" />
+                      <Typography variant="body2" color="textSecondary">
+                        {formData.type}
+                      </Typography>
+                    </div>
+                    {formData.salary && (
+                      <div className="flex items-center space-x-1">
+                        <AttachMoney className="h-4 w-4" />
+                        <Typography variant="body2" color="textSecondary">
+                          {formData.salary}
+                        </Typography>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 
-                {/* Job Preview Content */}
-                <div className="space-y-6">
-                  <div className="border-b border-gray-200 pb-6">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">{formData.title || 'Job Title'}</h1>
-                    <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                      <div className="flex items-center space-x-1">
-                        <Building2 className="h-4 w-4" />
-                        <span>{formData.company || 'Company Name'}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <MapPin className="h-4 w-4" />
-                        <span>{formData.location || 'Location'}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Calendar className="h-4 w-4" />
-                        <span>{formData.type || 'Job Type'}</span>
-                      </div>
-                      {formData.salary && (
-                        <div className="flex items-center space-x-1">
-                          <DollarSign className="h-4 w-4" />
-                          <span>{formData.salary}</span>
-                        </div>
-                      )}
+                {formData.description && (
+                  <div>
+                    <Typography variant="h6" color="textPrimary" className="font-semibold mb-3">
+                      Job Description
+                    </Typography>
+                    <Typography variant="body1" color="textSecondary" className="whitespace-pre-wrap">
+                      {formData.description}
+                    </Typography>
+                  </div>
+                )}
+                
+                {formData.requirements && (
+                  <div>
+                    <Typography variant="h6" color="textPrimary" className="font-semibold mb-3">
+                      Requirements
+                    </Typography>
+                    <Typography variant="body1" color="textSecondary" className="whitespace-pre-wrap">
+                      {formData.requirements}
+                    </Typography>
+                  </div>
+                )}
+                
+                {formData.skills.length > 0 && (
+                  <div>
+                    <Typography variant="h6" color="textPrimary" className="font-semibold mb-3">
+                      Required Skills
+                    </Typography>
+                    <div className="flex flex-wrap gap-2">
+                      {formData.skills.map((skill, index) => (
+                        <Badge
+                          key={index}
+                          variant="filled"
+                          color="primary"
+                        >
+                          {skill}
+                        </Badge>
+                      ))}
                     </div>
                   </div>
-                  
-                  {formData.description && (
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Job Description</h3>
-                      <p className="text-gray-700 whitespace-pre-wrap">{formData.description}</p>
-                    </div>
-                  )}
-                  
-                  {formData.requirements && (
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Requirements</h3>
-                      <p className="text-gray-700 whitespace-pre-wrap">{formData.requirements}</p>
-                    </div>
-                  )}
-                  
-                  {formData.skills.length > 0 && (
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Required Skills</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {formData.skills.map((skill, index) => (
-                          <span
-                            key={index}
-                            className="bg-asu-maroon text-white px-3 py-1 rounded-full text-sm font-medium"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {formData.benefits && (
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Benefits</h3>
-                      <p className="text-gray-700 whitespace-pre-wrap">{formData.benefits}</p>
-                    </div>
-                  )}
-                </div>
+                )}
+                
+                {formData.benefits && (
+                  <div>
+                    <Typography variant="h6" color="textPrimary" className="font-semibold mb-3">
+                      Benefits
+                    </Typography>
+                    <Typography variant="body1" color="textSecondary" className="whitespace-pre-wrap">
+                      {formData.benefits}
+                    </Typography>
+                  </div>
+                )}
               </div>
-            </div>
+            </Card>
           </div>
         )}
       </div>
