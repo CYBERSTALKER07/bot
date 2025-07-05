@@ -107,16 +107,7 @@ export default function EmployerDashboard() {
     <div ref={containerRef} className={`min-h-screen relative ${
       isDark ? 'bg-dark-bg' : 'bg-gray-50'
     }`}>
-      {/* Decorative elements */}
-      <AutoAwesome className={`dashboard-decoration absolute top-20 right-20 h-5 w-5 ${
-        isDark ? 'text-lime/50' : 'text-asu-gold/50'
-      }`} />
-      <LocalCafe className={`dashboard-decoration absolute top-40 left-20 h-4 w-4 ${
-        isDark ? 'text-dark-accent/40' : 'text-asu-maroon/40'
-      }`} />
-      <Favorite className={`dashboard-decoration absolute bottom-32 right-1/3 h-4 w-4 ${
-        isDark ? 'text-lime/60' : 'text-asu-gold/60'
-      }`} />
+      {/* Remove decorative elements */}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}

@@ -12,7 +12,7 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   error?: string;
   icon?: LucideIcon;
-  options: SelectOption[];
+  options?: SelectOption[];
   variant?: 'default' | 'floating' | 'minimal';
   size?: 'sm' | 'md' | 'lg';
   fullWidth?: boolean;
@@ -23,12 +23,13 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(({
   label,
   error,
   icon: Icon,
-  options,
+  options = [],
   variant = 'default',
   size = 'md',
   fullWidth = true,
   animated = true,
   className = '',
+  children,
   ...props
 }, ref) => {
   const { isDark } = useTheme();
@@ -79,7 +80,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(({
           className={selectClasses}
           {...props}
         >
-          {options.map((option) => (
+          {children || options.map((option) => (
             <option key={option.value} value={option.value}>
               {option.emoji ? `${option.emoji} ${option.label}` : option.label}
             </option>

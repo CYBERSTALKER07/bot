@@ -328,16 +328,7 @@ export default function Applicants() {
     <div ref={containerRef} className={`min-h-screen relative ${
       isDark ? 'bg-dark-bg' : 'bg-gray-50'
     }`}>
-      {/* Decorative elements */}
-      <AutoAwesome className={`applicant-decoration absolute top-20 right-20 h-5 w-5 ${
-        isDark ? 'text-lime/50' : 'text-asu-gold/50'
-      }`} />
-      <LocalCafe className={`applicant-decoration absolute top-40 left-20 h-4 w-4 ${
-        isDark ? 'text-dark-accent/40' : 'text-asu-maroon/40'
-      }`} />
-      <Favorite className={`applicant-decoration absolute bottom-32 right-1/3 h-4 w-4 ${
-        isDark ? 'text-lime/60' : 'text-asu-gold/60'
-      }`} />
+      {/* Remove decorative elements */}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
@@ -546,22 +537,22 @@ export default function Applicants() {
 
                   <div className="flex flex-wrap gap-2 mb-4">
                     {applicant.skills.slice(0, 3).map((skill, skillIndex) => (
-                      <Badge key={skillIndex} variant="standard" color="primary" className="text-xs">
+                      <span key={skillIndex} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">
                         {skill}
-                      </Badge>
+                      </span>
                     ))}
                     {applicant.skills.length > 3 && (
-                      <Badge variant="standard" color="standard" className="text-xs">
+                      <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs font-medium">
                         +{applicant.skills.length - 3} more
-                      </Badge>
+                      </span>
                     )}
                   </div>
 
                   <div className="flex items-center justify-between mb-4">
-                    <Badge variant="standard" color={getStatusColor(applicant.status)} className="flex items-center gap-1">
+                    <div className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 ${getStatusColor(applicant.status)}`}>
                       {getStatusIcon(applicant.status)}
                       <span className="capitalize">{applicant.status}</span>
-                    </Badge>
+                    </div>
                   </div>
 
                   <div className="flex space-x-2">

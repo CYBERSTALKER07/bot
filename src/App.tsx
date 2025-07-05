@@ -22,6 +22,11 @@ import ResourceDetails from './components/ResourceDetails';
 import AdminDashboard from './components/Dashboard/AdminDashboard';
 import SplashScreen from './components/SplashScreen';
 import { Loader2 } from 'lucide-react';
+import MobileAppPage from './components/MobileAppPage';
+import ForStudentsPage from './components/ForStudentsPage';
+import ForEmployersPage from './components/ForEmployersPage';
+import CareerTipsPage from './components/CareerTipsPage';
+import WhosHiringPage from './components/WhosHiringPage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -97,6 +102,11 @@ function AppContent() {
       {user && <Navigation />}
       <Routes>
         <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage />} />
+        <Route path="/mobile-app" element={<MobileAppPage />} />
+        <Route path="/for-students" element={<ForStudentsPage />} />
+        <Route path="/for-employers" element={<ForEmployersPage />} />
+        <Route path="/career-tips" element={<CareerTipsPage />} />
+        <Route path="/whos-hiring" element={<WhosHiringPage />} />
         <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
         <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
         <Route path="/profile-setup" element={<ProtectedRoute><ProfileSetup /></ProtectedRoute>} />

@@ -26,18 +26,7 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
         ? 'bg-gradient-to-br from-dark-bg via-dark-surface to-gray-900' 
         : 'bg-gradient-to-br from-asu-maroon via-asu-maroon-dark to-gray-900'
     }`}>
-      {/* Material Design background elements */}
-      <div className="absolute inset-0">
-        <div className={`absolute top-16 left-8 w-32 h-32 rounded-full opacity-20 ${
-          isDark ? 'bg-lime' : 'bg-asu-gold'
-        }`}></div>
-        <div className={`absolute top-32 right-16 w-40 h-40 rounded-full opacity-10 ${
-          isDark ? 'bg-dark-accent' : 'bg-white'
-        }`}></div>
-        <div className={`absolute bottom-16 left-1/3 w-36 h-36 rounded-full opacity-15 ${
-          isDark ? 'bg-lime' : 'bg-asu-gold'
-        }`}></div>
-      </div>
+      {/* Remove all Material Design background elements */}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -226,11 +215,8 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
       <div className={`absolute bottom-8 left-1/2 transform -translate-x-1/2 ${
         isDark ? 'text-dark-text' : 'text-white'
       }`}>
-        <div className="flex flex-col items-center space-y-2">
-          <Typography variant="body2" className="font-medium">
-            Scroll for more ✨
-          </Typography>
-          <KeyboardArrowDown className="h-6 w-6" />
+        <div className="animate-bounce">
+          <KeyboardArrowDown className="h-8 w-8" />
         </div>
       </div>
     </section>

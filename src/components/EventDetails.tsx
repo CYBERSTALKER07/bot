@@ -207,12 +207,7 @@ This is your chance to make lasting connections and potentially land your dream 
 
   return (
     <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-gray-50 to-white relative">
-      {/* Decorative elements */}
-      <div className="event-decoration absolute top-16 right-24 w-4 h-4 bg-asu-gold/40 rounded-full"></div>
-      <div className="event-decoration absolute top-32 left-16 w-3 h-3 bg-asu-maroon/30 rounded-full"></div>
-      <Sparkles className="event-decoration absolute top-24 left-1/4 h-5 w-5 text-asu-gold/60" />
-      <Coffee className="event-decoration absolute bottom-32 right-1/4 h-4 w-4 text-asu-maroon/50" />
-      <Heart className="event-decoration absolute bottom-20 left-1/3 h-4 w-4 text-asu-gold/70" />
+      {/* Remove decorative elements */}
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back Button */}

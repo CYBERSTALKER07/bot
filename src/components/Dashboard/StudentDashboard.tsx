@@ -144,25 +144,8 @@ export default function StudentDashboard() {
 
   return (
     <div ref={containerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
-      {/* Decorative elements with Material Design flair */}
-      <div className={`float-decoration absolute top-10 right-20 w-4 h-4 rounded-full blur-sm ${
-        isDark ? 'bg-lime/30' : 'bg-asu-gold/30'
-      }`}></div>
-      <div className={`float-decoration absolute top-40 left-16 w-3 h-3 rounded-full blur-sm ${
-        isDark ? 'bg-dark-accent/20' : 'bg-asu-maroon/20'
-      }`}></div>
-      <AutoAwesome className={`dashboard-sparkle absolute top-20 left-1/4 h-5 w-5 ${
-        isDark ? 'text-lime/50' : 'text-asu-gold/50'
-      }`} />
-      <LocalCafe className={`dashboard-sparkle absolute top-60 right-1/3 h-4 w-4 ${
-        isDark ? 'text-dark-accent/40' : 'text-asu-maroon/40'
-      }`} />
-      <Favorite className={`dashboard-sparkle absolute bottom-20 left-1/3 h-4 w-4 ${
-        isDark ? 'text-lime/60' : 'text-asu-gold/60'
-      }`} />
-
       {/* Header */}
-      <div ref={headerRef} className="mb-8">
+      {/* <div ref={headerRef} className="mb-8">
         <div className={`rounded-3xl p-8 text-white mb-8 relative overflow-hidden transition-colors duration-300 ${
           isDark 
             ? 'bg-gradient-to-r from-dark-surface to-dark-bg' 
@@ -194,7 +177,7 @@ export default function StudentDashboard() {
             </Typography>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Stats Cards */}
       <div ref={statsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

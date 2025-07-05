@@ -104,17 +104,6 @@ export default function PostJob() {
         delay: 0.6
       });
 
-      // Floating decorations
-      gsap.to('.post-job-decoration', {
-        y: -10,
-        x: 5,
-        rotation: 180,
-        duration: 15,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut'
-      });
-
     }, containerRef);
 
     return () => ctx.revert();
@@ -168,20 +157,6 @@ export default function PostJob() {
     <div ref={containerRef} className={`min-h-screen relative ${
       isDark ? 'bg-dark-bg' : 'bg-gray-50'
     }`}>
-      {/* Decorative elements */}
-      <div className={`post-job-decoration absolute top-16 right-24 w-4 h-4 rounded-full ${
-        isDark ? 'bg-lime/30' : 'bg-asu-gold/40'
-      }`}></div>
-      <AutoAwesome className={`post-job-decoration absolute top-24 left-1/4 h-5 w-5 ${
-        isDark ? 'text-lime/60' : 'text-asu-gold/60'
-      }`} />
-      <LocalCafe className={`post-job-decoration absolute bottom-32 right-1/4 h-4 w-4 ${
-        isDark ? 'text-dark-accent/50' : 'text-asu-maroon/50'
-      }`} />
-      <Favorite className={`post-job-decoration absolute bottom-20 left-1/3 h-4 w-4 ${
-        isDark ? 'text-lime/70' : 'text-asu-gold/70'
-      }`} />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="post-job-header mb-12">

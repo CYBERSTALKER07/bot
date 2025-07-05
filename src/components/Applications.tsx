@@ -288,13 +288,10 @@ export default function Applications() {
   }
 
   return (
-    <div ref={containerRef} className={`min-h-screen ${isDark ? 'bg-gradient-to-br from-gray-900 to-gray-800' : 'bg-gradient-to-br from-gray-50 to-white'} relative`}>
-      {/* Enhanced decorative elements */}
-      <div className="application-decoration absolute top-16 right-24 w-4 h-4 bg-asu-gold/50 rounded-full"></div>
-      <div className="application-decoration absolute top-32 left-16 w-3 h-3 bg-asu-maroon/40 rounded-full"></div>
-      <Sparkles className="application-decoration absolute top-24 left-1/4 h-5 w-5 text-asu-gold/70" />
-      <Coffee className="application-decoration absolute bottom-32 right-1/4 h-4 w-4 text-asu-maroon/60" />
-      <Heart className="application-decoration absolute bottom-20 left-1/3 h-4 w-4 text-asu-gold/80" />
+    <div ref={containerRef} className={`min-h-screen relative ${
+      isDark ? 'bg-dark-bg' : 'bg-gray-50'
+    }`}>
+      {/* Remove decorative elements */}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Enhanced Header */}
