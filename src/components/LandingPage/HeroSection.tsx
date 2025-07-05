@@ -1,28 +1,155 @@
-import React, { useRef, forwardRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { gsap } from 'gsap';
 import { 
-  ArrowRight, 
+  GraduationCap, 
   Building2, 
-  Sparkles, 
-  Coffee, 
-  Heart, 
-  ChevronDown,
+  ArrowRight,
+  TrendingUp,
   Trophy,
   Zap,
-  TrendingUp,
+  Heart,
+  Sparkles,
+  Coffee,
+  ChevronDown,
   Smile
 } from 'lucide-react';
 
 interface HeroSectionProps {
-  className?: string;
+  heroRef: React.RefObject<HTMLDivElement>;
 }
 
-const HeroSection = forwardRef<HTMLDivElement, HeroSectionProps>(({ className = '' }, ref) => {
+export default function HeroSection({ heroRef }: HeroSectionProps) {
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Enhanced Hero Section Animations
+      const heroTl = gsap.timeline();
+      
+      heroTl.from('.hero-title', {
+        duration: 1.5,
+        y: 120,
+        opacity: 0,
+        ease: 'power4.out',
+        rotation: 5
+      })
+      .from('.hero-subtitle', {
+        duration: 1.2,
+        y: 60,
+        opacity: 0,
+        ease: 'power3.out'
+      }, '-=0.8')
+      .from('.hero-buttons', {
+        duration: 1,
+        y: 40,
+        opacity: 0,
+        scale: 0.9,
+        ease: 'back.out(1.7)'
+      }, '-=0.6')
+      .from('.hero-mockup', {
+        duration: 2,
+        scale: 0.7,
+        opacity: 0,
+        rotation: -10,
+        ease: 'power3.out'
+      }, '-=1.2')
+      .from('.hero-stats-card', {
+        duration: 0.8,
+        y: 30,
+        opacity: 0,
+        ease: 'power2.out',
+        stagger: 0.1
+      }, '-=0.5')
+      .from('.success-metric', {
+        duration: 1.2,
+        scale: 0.3,
+        opacity: 0,
+        ease: 'back.out(1.7)',
+        stagger: 0.15
+      }, '-=0.3')
+      .to('.success-metric', {
+        duration: 0.6,
+        scale: 1.1,
+        ease: 'power2.out'
+      })
+      .from('.floating-element', {
+        duration: 1.5,
+        scale: 0,
+        opacity: 0,
+        ease: 'elastic.out(1, 0.3)',
+        stagger: 0.2
+      }, '-=1');
+
+      // Enhanced floating animations
+      gsap.to('.float-1', {
+        y: -30,
+        x: 20,
+        rotation: 360,
+        duration: 4,
+        repeat: -1,
+        yoyo: true,
+        ease: 'power2.inOut'
+      });
+
+      gsap.to('.float-2', {
+        y: -25,
+        x: -15,
+        rotation: -180,
+        duration: 3.5,
+        repeat: -1,
+        yoyo: true,
+        ease: 'power2.inOut',
+        delay: 0.7
+      });
+
+      gsap.to('.float-3', {
+        y: -35,
+        x: 10,
+        rotation: 270,
+        duration: 4.5,
+        repeat: -1,
+        yoyo: true,
+        ease: 'power2.inOut',
+        delay: 1.2
+      });
+
+      // Sparkle animations
+      gsap.to('.sparkle', {
+        scale: 1.5,
+        opacity: 0.3,
+        duration: 1.5,
+        repeat: -1,
+        yoyo: true,
+        ease: 'power2.inOut',
+        stagger: 0.3
+      });
+
+      // Mouse follower effect for hero section
+      const heroSection = heroRef.current;
+      if (heroSection) {
+        const handleMouseMove = (e: MouseEvent) => {
+          const { clientX, clientY } = e;
+          const { offsetWidth, offsetHeight } = heroSection;
+          const xPos = (clientX / offsetWidth - 0.5) * 20;
+          const yPos = (clientY / offsetHeight - 0.5) * 20;
+
+          gsap.to('.hero-mockup', {
+            duration: 1,
+            x: xPos,
+            y: yPos,
+            ease: 'power2.out'
+          });
+        };
+
+        heroSection.addEventListener('mousemove', handleMouseMove);
+      }
+
+    });
+
+    return () => ctx.revert();
+  }, [heroRef]);
+
   return (
-    <section 
-      ref={ref}
-      className={`relative min-h-screen flex items-center justify-center bg-gradient-to-br from-asu-maroon via-asu-maroon-dark to-gray-900 overflow-hidden ${className}`}
-    >
+    <section ref={heroRef} className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-asu-maroon via-asu-maroon-dark to-gray-900 overflow-hidden">
       {/* Hand-drawn style background elements */}
       <div className="absolute inset-0">
         <div className="float-1 floating-element absolute top-16 left-8 w-28 h-28 bg-asu-gold/20 rounded-full blur-2xl transform rotate-12"></div>
@@ -121,8 +248,4 @@ const HeroSection = forwardRef<HTMLDivElement, HeroSectionProps>(({ className = 
       </div>
     </section>
   );
-});
-
-HeroSection.displayName = 'HeroSection';
-
-export default HeroSection;
+}
