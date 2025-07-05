@@ -13,10 +13,12 @@ import {
 } from 'lucide-react';
 import { useJobs } from '../../hooks/useJobs';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { StatsCard, Card } from '../ui/Card';
 
 export default function EmployerDashboard() {
   const { user } = useAuth();
+  const { isDark } = useTheme();
   const { jobs, loading, error } = useJobs();
   
   // Filter jobs for current employer
@@ -26,10 +28,10 @@ export default function EmployerDashboard() {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-300`}>
         <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-asu-maroon" />
-          <span className="ml-2 text-gray-700 font-medium">Loading dashboard...</span>
+          <Loader2 className={`h-8 w-8 animate-spin ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
+          <span className={`ml-2 font-medium ${isDark ? 'text-dark-text' : 'text-gray-700'}`}>Loading dashboard...</span>
         </div>
       </div>
     );
@@ -38,7 +40,11 @@ export default function EmployerDashboard() {
   if (error) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-red-50 border-2 border-red-200 text-red-800 px-4 py-3 rounded-md">
+        <div className={`border-2 px-4 py-3 rounded-md ${
+          isDark 
+            ? 'bg-red-900/20 border-red-500/30 text-red-300' 
+            : 'bg-red-50 border-red-200 text-red-800'
+        }`}>
           <strong>Error loading dashboard:</strong> {error}
         </div>
       </div>
@@ -51,12 +57,20 @@ export default function EmployerDashboard() {
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Employer Dashboard</h1>
-            <p className="text-gray-700">Manage your job postings and connect with talented ASU students</p>
+            <h1 className={`text-3xl font-bold mb-2 transition-colors duration-300 ${
+              isDark ? 'text-dark-text' : 'text-gray-900'
+            }`}>Employer Dashboard</h1>
+            <p className={`transition-colors duration-300 ${
+              isDark ? 'text-dark-muted' : 'text-gray-700'
+            }`}>Manage your job postings and connect with talented ASU students</p>
           </div>
           <Link
             to="/post-job"
-            className="mt-4 sm:mt-0 bg-asu-maroon text-white px-6 py-3 rounded-md hover:bg-asu-maroon-dark transition-colors flex items-center space-x-2 font-medium"
+            className={`mt-4 sm:mt-0 px-6 py-3 rounded-md transition-all duration-300 flex items-center space-x-2 font-medium ${
+              isDark 
+                ? 'bg-lime text-dark-surface hover:bg-dark-accent' 
+                : 'bg-asu-maroon text-white hover:bg-asu-maroon-dark'
+            }`}
           >
             <Plus className="h-5 w-5" />
             <span>Post New Job</span>
@@ -107,12 +121,18 @@ export default function EmployerDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Recent Job Postings */}
         <Card className="transform rotate-0.5" delay={1}>
-          <div className="p-6 border-b border-gray-200">
+          <div className={`p-6 border-b transition-colors duration-300 ${
+            isDark ? 'border-lime/20' : 'border-gray-200'
+          }`}>
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-gray-900">Your Job Postings</h2>
+              <h2 className={`text-xl font-semibold transition-colors duration-300 ${
+                isDark ? 'text-dark-text' : 'text-gray-900'
+              }`}>Your Job Postings</h2>
               <Link
                 to="/post-job"
-                className="text-asu-maroon hover:text-asu-maroon-dark text-sm font-medium"
+                className={`text-sm font-medium transition-colors duration-300 ${
+                  isDark ? 'text-lime hover:text-dark-accent' : 'text-asu-maroon hover:text-asu-maroon-dark'
+                }`}
               >
                 Post New Job
               </Link>
@@ -121,12 +141,22 @@ export default function EmployerDashboard() {
           <div className="p-6">
             {myJobs.length === 0 ? (
               <div className="text-center py-8">
-                <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No job postings yet</h3>
-                <p className="text-gray-600 mb-4">Start by posting your first job opportunity</p>
+                <Users className={`h-12 w-12 mx-auto mb-4 ${
+                  isDark ? 'text-dark-muted' : 'text-gray-400'
+                }`} />
+                <h3 className={`text-lg font-medium mb-2 ${
+                  isDark ? 'text-dark-text' : 'text-gray-900'
+                }`}>No job postings yet</h3>
+                <p className={`mb-4 ${
+                  isDark ? 'text-dark-muted' : 'text-gray-600'
+                }`}>Start by posting your first job opportunity</p>
                 <Link
                   to="/post-job"
-                  className="bg-asu-maroon text-white px-4 py-2 rounded-md hover:bg-asu-maroon-dark transition-colors font-medium"
+                  className={`px-4 py-2 rounded-md font-medium transition-colors duration-300 ${
+                    isDark 
+                      ? 'bg-lime text-dark-surface hover:bg-dark-accent' 
+                      : 'bg-asu-maroon text-white hover:bg-asu-maroon-dark'
+                  }`}
                 >
                   Post Your First Job
                 </Link>
@@ -134,18 +164,28 @@ export default function EmployerDashboard() {
             ) : (
               <div className="space-y-4">
                 {myJobs.map((job) => (
-                  <div key={job.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                  <div key={job.id} className={`border rounded-lg p-4 hover:shadow-md transition-all duration-300 ${
+                    isDark 
+                      ? 'border-lime/20 bg-dark-bg/50 hover:border-lime/40' 
+                      : 'border-gray-200 hover:bg-gray-50'
+                  }`}>
                     <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold text-gray-900">{job.title}</h3>
+                      <h3 className={`font-semibold ${
+                        isDark ? 'text-dark-text' : 'text-gray-900'
+                      }`}>{job.title}</h3>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        job.type === 'internship' ? 'bg-blue-100 text-blue-800' :
-                        job.type === 'full-time' ? 'bg-green-100 text-green-800' :
-                        'bg-yellow-100 text-yellow-800'
+                        job.type === 'internship' 
+                          ? isDark ? 'bg-blue-500/20 text-blue-300' : 'bg-blue-100 text-blue-800'
+                          : job.type === 'full-time' 
+                          ? isDark ? 'bg-green-500/20 text-green-300' : 'bg-green-100 text-green-800'
+                          : isDark ? 'bg-yellow-500/20 text-yellow-300' : 'bg-yellow-100 text-yellow-800'
                       }`}>
                         {job.type.replace('-', ' ')}
                       </span>
                     </div>
-                    <div className="flex items-center space-x-4 text-sm text-gray-700 mb-3">
+                    <div className={`flex items-center space-x-4 text-sm mb-3 ${
+                      isDark ? 'text-dark-muted' : 'text-gray-700'
+                    }`}>
                       <div className="flex items-center space-x-1">
                         <MapPin className="h-4 w-4" />
                         <span>{job.location}</span>
@@ -156,20 +196,26 @@ export default function EmployerDashboard() {
                       </div>
                     </div>
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-1 text-sm text-gray-600">
+                      <div className={`flex items-center space-x-1 text-sm ${
+                        isDark ? 'text-dark-muted' : 'text-gray-600'
+                      }`}>
                         <Users className="h-4 w-4" />
                         <span>{job.applicants_count || 0} applicants</span>
                       </div>
                       <div className="flex space-x-2">
                         <Link
                           to={`/applicants?job=${job.id}`}
-                          className="text-asu-maroon hover:text-asu-maroon-dark text-sm font-medium"
+                          className={`text-sm font-medium transition-colors duration-300 ${
+                            isDark ? 'text-lime hover:text-dark-accent' : 'text-asu-maroon hover:text-asu-maroon-dark'
+                          }`}
                         >
                           View Applicants
                         </Link>
                         <Link
                           to={`/job/${job.id}/edit`}
-                          className="text-gray-600 hover:text-gray-900 text-sm font-medium"
+                          className={`text-sm font-medium transition-colors duration-300 ${
+                            isDark ? 'text-dark-muted hover:text-dark-text' : 'text-gray-600 hover:text-gray-900'
+                          }`}
                         >
                           Edit
                         </Link>
@@ -184,14 +230,24 @@ export default function EmployerDashboard() {
 
         {/* Recent Activity */}
         <Card className="transform -rotate-0.5" delay={1.2}>
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">Recent Activity</h2>
+          <div className={`p-6 border-b transition-colors duration-300 ${
+            isDark ? 'border-lime/20' : 'border-gray-200'
+          }`}>
+            <h2 className={`text-xl font-semibold transition-colors duration-300 ${
+              isDark ? 'text-dark-text' : 'text-gray-900'
+            }`}>Recent Activity</h2>
           </div>
           <div className="p-6">
             <div className="text-center py-8">
-              <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No recent activity</h3>
-              <p className="text-gray-600">Activity will appear here as students interact with your job postings</p>
+              <MessageSquare className={`h-12 w-12 mx-auto mb-4 ${
+                isDark ? 'text-dark-muted' : 'text-gray-400'
+              }`} />
+              <h3 className={`text-lg font-medium mb-2 ${
+                isDark ? 'text-dark-text' : 'text-gray-900'
+              }`}>No recent activity</h3>
+              <p className={`${
+                isDark ? 'text-dark-muted' : 'text-gray-600'
+              }`}>Activity will appear here as students interact with your job postings</p>
             </div>
           </div>
         </Card>
@@ -200,38 +256,52 @@ export default function EmployerDashboard() {
       {/* Quick Actions */}
       <Card className="mt-8 transform rotate-0.3" delay={1.4}>
         <div className="p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
+          <h2 className={`text-xl font-semibold mb-4 transition-colors duration-300 ${
+            isDark ? 'text-dark-text' : 'text-gray-900'
+          }`}>Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link
               to="/post-job"
-              className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              className={`flex items-center space-x-3 p-4 border rounded-lg transition-all duration-300 ${
+                isDark 
+                  ? 'border-lime/20 hover:border-lime/40 hover:bg-dark-bg/50' 
+                  : 'border-gray-200 hover:bg-gray-50'
+              }`}
             >
-              <Plus className="h-6 w-6 text-asu-maroon" />
+              <Plus className={`h-6 w-6 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
               <div>
-                <h3 className="font-medium text-gray-900">Post a Job</h3>
-                <p className="text-sm text-gray-600">Create a new job posting</p>
+                <h3 className={`font-medium ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>Post a Job</h3>
+                <p className={`text-sm ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>Create a new job posting</p>
               </div>
             </Link>
             
             <Link
               to="/applicants"
-              className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              className={`flex items-center space-x-3 p-4 border rounded-lg transition-all duration-300 ${
+                isDark 
+                  ? 'border-lime/20 hover:border-lime/40 hover:bg-dark-bg/50' 
+                  : 'border-gray-200 hover:bg-gray-50'
+              }`}
             >
-              <Users className="h-6 w-6 text-asu-maroon" />
+              <Users className={`h-6 w-6 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
               <div>
-                <h3 className="font-medium text-gray-900">Review Applicants</h3>
-                <p className="text-sm text-gray-600">Manage applications</p>
+                <h3 className={`font-medium ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>Review Applicants</h3>
+                <p className={`text-sm ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>Manage applications</p>
               </div>
             </Link>
             
             <Link
               to="/messages"
-              className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              className={`flex items-center space-x-3 p-4 border rounded-lg transition-all duration-300 ${
+                isDark 
+                  ? 'border-lime/20 hover:border-lime/40 hover:bg-dark-bg/50' 
+                  : 'border-gray-200 hover:bg-gray-50'
+              }`}
             >
-              <MessageSquare className="h-6 w-6 text-asu-maroon" />
+              <MessageSquare className={`h-6 w-6 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
               <div>
-                <h3 className="font-medium text-gray-900">Messages</h3>
-                <p className="text-sm text-gray-600">Connect with students</p>
+                <h3 className={`font-medium ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>Messages</h3>
+                <p className={`text-sm ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>Connect with students</p>
               </div>
             </Link>
           </div>

@@ -301,7 +301,7 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
             }`}></div>
             
             {/* Hand-drawn style success metrics */}
-            <div className={`absolute bottom-6 left-6 backdrop-blur-sm rounded-xl p-4 shadow-lg transform rotate-3 ${
+            <div className={`hero-stats-card success-metric absolute bottom-6 left-6 backdrop-blur-sm rounded-xl p-4 shadow-lg transform rotate-3 ${
               isDark ? 'bg-dark-surface/98' : 'bg-white/98'
             }`}>
               <div className="text-center">
@@ -314,7 +314,7 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
               </div>
             </div>
             
-            <div className={`absolute top-6 left-6 backdrop-blur-sm rounded-xl p-4 shadow-lg transform -rotate-2 ${
+            <div className={`hero-stats-card success-metric absolute top-6 left-6 backdrop-blur-sm rounded-xl p-4 shadow-lg transform -rotate-2 ${
               isDark ? 'bg-dark-surface/98' : 'bg-white/98'
             }`}>
               <div className="text-center">

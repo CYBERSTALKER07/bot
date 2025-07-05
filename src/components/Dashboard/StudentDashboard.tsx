@@ -14,6 +14,7 @@ import {
   Heart
 } from 'lucide-react';
 import { useJobs } from '../../hooks/useJobs';
+import { useTheme } from '../../context/ThemeContext';
 import { StatsCard, JobCard } from '../ui/Card';
 
 // Register GSAP plugins
@@ -25,6 +26,7 @@ export default function StudentDashboard() {
   const containerRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const filtersRef = useRef<HTMLDivElement>(null);
+  const { isDark } = useTheme();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
@@ -90,10 +92,14 @@ export default function StudentDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center">
-        <div className="flex items-center space-x-3 bg-white rounded-full px-8 py-4 shadow-lg border transform rotate-1">
-          <Loader2 className="h-6 w-6 animate-spin text-asu-maroon" />
-          <span className="text-gray-700 font-medium">Finding amazing opportunities... ✨</span>
+      <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 ${
+        isDark ? 'bg-gradient-to-br from-dark-bg to-dark-surface' : 'bg-gradient-to-br from-gray-50 to-white'
+      }`}>
+        <div className={`flex items-center space-x-3 rounded-full px-8 py-4 shadow-lg border transform rotate-1 ${
+          isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-200'
+        }`}>
+          <Loader2 className={`h-6 w-6 animate-spin ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
+          <span className={`font-medium ${isDark ? 'text-dark-text' : 'text-gray-700'}`}>Finding amazing opportunities... ✨</span>
         </div>
       </div>
     );
@@ -102,32 +108,60 @@ export default function StudentDashboard() {
   return (
     <div ref={containerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
       {/* Decorative elements */}
-      <div className="float-decoration absolute top-10 right-20 w-4 h-4 bg-asu-gold/30 rounded-full blur-sm"></div>
-      <div className="float-decoration absolute top-40 left-16 w-3 h-3 bg-asu-maroon/20 rounded-full blur-sm"></div>
-      <Sparkles className="dashboard-sparkle absolute top-20 left-1/4 h-5 w-5 text-asu-gold/50" />
-      <Coffee className="dashboard-sparkle absolute top-60 right-1/3 h-4 w-4 text-asu-maroon/40" />
-      <Heart className="dashboard-sparkle absolute bottom-20 left-1/3 h-4 w-4 text-asu-gold/60" />
+      <div className={`float-decoration absolute top-10 right-20 w-4 h-4 rounded-full blur-sm ${
+        isDark ? 'bg-lime/30' : 'bg-asu-gold/30'
+      }`}></div>
+      <div className={`float-decoration absolute top-40 left-16 w-3 h-3 rounded-full blur-sm ${
+        isDark ? 'bg-dark-accent/20' : 'bg-asu-maroon/20'
+      }`}></div>
+      <Sparkles className={`dashboard-sparkle absolute top-20 left-1/4 h-5 w-5 ${
+        isDark ? 'text-lime/50' : 'text-asu-gold/50'
+      }`} />
+      <Coffee className={`dashboard-sparkle absolute top-60 right-1/3 h-4 w-4 ${
+        isDark ? 'text-dark-accent/40' : 'text-asu-maroon/40'
+      }`} />
+      <Heart className={`dashboard-sparkle absolute bottom-20 left-1/3 h-4 w-4 ${
+        isDark ? 'text-lime/60' : 'text-asu-gold/60'
+      }`} />
 
       {/* Header */}
       <div ref={headerRef} className="mb-8">
-        <div className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark rounded-3xl p-8 text-white relative overflow-hidden transform -rotate-0.5">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-asu-gold/20 rounded-full blur-xl"></div>
+        <div className={`rounded-3xl p-8 text-white relative overflow-hidden transform -rotate-0.5 transition-colors duration-300 ${
+          isDark 
+            ? 'bg-gradient-to-r from-dark-surface to-dark-bg' 
+            : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
+        }`}>
+          <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl ${
+            isDark ? 'bg-lime/10' : 'bg-white/10'
+          }`}></div>
+          <div className={`absolute bottom-0 left-0 w-24 h-24 rounded-full blur-xl ${
+            isDark ? 'bg-dark-accent/20' : 'bg-asu-gold/20'
+          }`}></div>
           <div className="relative z-10">
-            <h1 className="text-4xl font-bold mb-2 transform rotate-0.5 text-white">Welcome Back! 👋</h1>
-            <p className="text-xl text-white/90 mb-4">Ready to find your next amazing opportunity? 🚀</p>
+            <h1 className={`text-4xl font-bold mb-2 transform rotate-0.5 ${
+              isDark ? 'text-dark-text' : 'text-white'
+            }`}>Welcome Back! 👋</h1>
+            <p className={`text-xl mb-4 ${
+              isDark ? 'text-dark-muted' : 'text-white/90'
+            }`}>Ready to find your next amazing opportunity? 🚀</p>
             <div className="flex flex-wrap gap-4 text-sm">
-              <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 transform rotate-1">
-                <TrendingUp className="h-5 w-5 text-white" />
-                <span className="text-white font-medium">52 new jobs this week! 📈</span>
+              <div className={`flex items-center space-x-2 backdrop-blur-sm rounded-full px-4 py-2 transform rotate-1 ${
+                isDark ? 'bg-lime/20' : 'bg-white/20'
+              }`}>
+                <TrendingUp className={`h-5 w-5 ${isDark ? 'text-lime' : 'text-white'}`} />
+                <span className={`font-medium ${isDark ? 'text-lime' : 'text-white'}`}>52 new jobs this week! 📈</span>
               </div>
-              <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 transform -rotate-1">
-                <Award className="h-5 w-5 text-white" />
-                <span className="text-white font-medium">95% placement rate 🏆</span>
+              <div className={`flex items-center space-x-2 backdrop-blur-sm rounded-full px-4 py-2 transform -rotate-1 ${
+                isDark ? 'bg-lime/20' : 'bg-white/20'
+              }`}>
+                <Award className={`h-5 w-5 ${isDark ? 'text-lime' : 'text-white'}`} />
+                <span className={`font-medium ${isDark ? 'text-lime' : 'text-white'}`}>95% placement rate 🏆</span>
               </div>
-              <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 transform rotate-0.5">
-                <Star className="h-5 w-5 text-white" />
-                <span className="text-white font-medium">Top companies hiring 🌟</span>
+              <div className={`flex items-center space-x-2 backdrop-blur-sm rounded-full px-4 py-2 transform rotate-0.5 ${
+                isDark ? 'bg-lime/20' : 'bg-white/20'
+              }`}>
+                <Star className={`h-5 w-5 ${isDark ? 'text-lime' : 'text-white'}`} />
+                <span className={`font-medium ${isDark ? 'text-lime' : 'text-white'}`}>Top companies hiring 🌟</span>
               </div>
             </div>
           </div>
@@ -175,26 +209,40 @@ export default function StudentDashboard() {
       </div>
 
       {/* Filters */}
-      <div ref={filtersRef} className="bg-gradient-to-r from-white to-gray-50 rounded-3xl shadow-lg border-2 border-gray-100 p-6 mb-8 transform rotate-0.3">
+      <div ref={filtersRef} className={`rounded-3xl shadow-lg border-2 p-6 mb-8 transform rotate-0.3 transition-colors duration-300 ${
+        isDark 
+          ? 'bg-gradient-to-r from-dark-surface to-dark-bg border-lime/20' 
+          : 'bg-gradient-to-r from-white to-gray-50 border-gray-100'
+      }`}>
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
+            <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 ${
+              isDark ? 'text-dark-muted' : 'text-gray-500'
+            }`} />
             <input
               type="text"
               placeholder="Search for your dream job... 🔍"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-asu-maroon bg-white shadow-inner transition-all duration-200 hover:shadow-md text-gray-900 placeholder-gray-500"
+              className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:outline-none focus:ring-2 shadow-inner transition-all duration-200 hover:shadow-md placeholder-opacity-75 ${
+                isDark 
+                  ? 'border-lime/20 focus:ring-lime focus:border-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
+                  : 'border-gray-200 focus:ring-asu-maroon focus:border-asu-maroon bg-white text-gray-900 placeholder-gray-500'
+              }`}
               aria-label="Search jobs"
             />
           </div>
           <div className="flex flex-wrap gap-4">
             <div className="flex items-center space-x-2">
-              <MapPin className="h-5 w-5 text-gray-500" />
+              <MapPin className={`h-5 w-5 ${isDark ? 'text-dark-muted' : 'text-gray-500'}`} />
               <select
                 value={locationFilter}
                 onChange={(e) => setLocationFilter(e.target.value)}
-                className="px-4 py-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-asu-maroon bg-white shadow-inner cursor-pointer hover:shadow-md transition-all duration-200 text-gray-900"
+                className={`px-4 py-4 border-2 rounded-2xl focus:outline-none focus:ring-2 shadow-inner cursor-pointer hover:shadow-md transition-all duration-200 ${
+                  isDark 
+                    ? 'border-lime/20 focus:ring-lime focus:border-lime bg-dark-bg text-dark-text' 
+                    : 'border-gray-200 focus:ring-asu-maroon focus:border-asu-maroon bg-white text-gray-900'
+                }`}
                 aria-label="Filter by location"
               >
                 <option value="">All Locations 🌍</option>
@@ -205,11 +253,15 @@ export default function StudentDashboard() {
               </select>
             </div>
             <div className="flex items-center space-x-2">
-              <Filter className="h-5 w-5 text-gray-500" />
+              <Filter className={`h-5 w-5 ${isDark ? 'text-dark-muted' : 'text-gray-500'}`} />
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="px-4 py-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-asu-maroon bg-white shadow-inner cursor-pointer hover:shadow-md transition-all duration-200 text-gray-900"
+                className={`px-4 py-4 border-2 rounded-2xl focus:outline-none focus:ring-2 shadow-inner cursor-pointer hover:shadow-md transition-all duration-200 ${
+                  isDark 
+                    ? 'border-lime/20 focus:ring-lime focus:border-lime bg-dark-bg text-dark-text' 
+                    : 'border-gray-200 focus:ring-asu-maroon focus:border-asu-maroon bg-white text-gray-900'
+                }`}
                 aria-label="Filter by job type"
               >
                 <option value="">All Types 📋</option>
@@ -239,12 +291,22 @@ export default function StudentDashboard() {
       </div>
 
       {filteredJobs.length === 0 && (
-        <div className="text-center py-12 bg-white rounded-xl shadow-lg border-2 border-gray-100">
-          <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Search className="h-12 w-12 text-gray-400" />
+        <div className={`text-center py-12 rounded-xl shadow-lg border-2 transition-colors duration-300 ${
+          isDark 
+            ? 'bg-dark-surface border-lime/20' 
+            : 'bg-white border-gray-100'
+        }`}>
+          <div className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 ${
+            isDark ? 'bg-dark-bg' : 'bg-gray-100'
+          }`}>
+            <Search className={`h-12 w-12 ${isDark ? 'text-dark-muted' : 'text-gray-400'}`} />
           </div>
-          <h3 className="text-2xl font-semibold text-gray-900 mb-3">No jobs found</h3>
-          <p className="text-gray-600 mb-6 max-w-md mx-auto">
+          <h3 className={`text-2xl font-semibold mb-3 ${
+            isDark ? 'text-dark-text' : 'text-gray-900'
+          }`}>No jobs found</h3>
+          <p className={`mb-6 max-w-md mx-auto ${
+            isDark ? 'text-dark-muted' : 'text-gray-600'
+          }`}>
             Try adjusting your search criteria or check back later for new opportunities.
           </p>
           <button 
@@ -253,7 +315,11 @@ export default function StudentDashboard() {
               setLocationFilter('');
               setTypeFilter('');
             }}
-            className="bg-asu-maroon text-white px-6 py-3 rounded-lg hover:bg-asu-maroon-dark transition-colors font-medium"
+            className={`px-6 py-3 rounded-lg transition-colors font-medium ${
+              isDark 
+                ? 'bg-lime text-dark-surface hover:bg-dark-accent' 
+                : 'bg-asu-maroon text-white hover:bg-asu-maroon-dark'
+            }`}
           >
             Clear Filters
           </button>

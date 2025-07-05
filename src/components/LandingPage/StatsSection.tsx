@@ -65,11 +65,11 @@ export default function StatsSection({ statsRef }: StatsSectionProps) {
   return (
     <section ref={statsRef} className={`py-24 relative overflow-hidden transition-colors duration-300 ${
       isDark 
-        ? 'bg-gradient-to-r from-dark-surface via-dark-bg to-dark-surface' 
+        ? 'bg-gradient-to-r from-dark-bg via-dark-surface to-dark-bg' 
         : 'bg-gradient-to-r from-asu-maroon via-asu-maroon-dark to-asu-maroon'
     }`}>
       <div className={`absolute inset-0 ${
-        isDark ? 'bg-dark-bg/10' : 'bg-black/10'
+        isDark ? 'bg-dark-surface/10' : 'bg-black/10'
       }`}></div>
       <div className="absolute top-0 left-0 w-full h-full">
         <div className={`absolute top-12 left-12 w-32 h-32 rounded-full blur-3xl ${
