@@ -10,7 +10,9 @@ import {
   CheckCircle, 
   TrendingUp, 
   Group,
-  School
+  School,
+  RocketLaunch,
+  ArrowForward
 } from '@mui/icons-material';
 import { CircularProgress } from '@mui/material';
 import { useAuth } from '../../context/AuthContext';
@@ -69,38 +71,12 @@ export default function Login() {
               <School className={`h-8 w-8 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
             </div>
             <Typography variant="h3" color="textPrimary" className="font-bold mb-3">
-              Welcome Back
+              Welcome to ASU Handshake
             </Typography>
             <Typography variant="subtitle1" color="textSecondary">
-              Sign in to continue your career journey
+              Sign in to your account to access amazing career opportunities
             </Typography>
           </div>
-
-          {/* Role Selection Card */}
-          <Card className="p-2 mb-8" variant="outlined">
-            <div className="flex">
-              <Button
-                variant={role === 'student' ? 'contained' : 'text'}
-                color="primary"
-                startIcon={Person}
-                fullWidth
-                onClick={() => setRole('student')}
-                className="flex-1 mr-1"
-              >
-                Student
-              </Button>
-              <Button
-                variant={role === 'employer' ? 'contained' : 'text'}
-                color="primary"
-                startIcon={Business}
-                fullWidth
-                onClick={() => setRole('employer')}
-                className="flex-1 ml-1"
-              >
-                Employer
-              </Button>
-            </div>
-          </Card>
 
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -110,7 +86,7 @@ export default function Login() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
+              placeholder="Enter your ASU email"
               variant="outlined"
               fullWidth
             />
@@ -165,127 +141,99 @@ export default function Login() {
               </Link>
             </Typography>
           </div>
+
+          <div className="mt-4 text-center">
+            <Typography variant="body2" color="textSecondary" className="text-center">
+              By signing in, you agree to our terms of service and privacy policy. 
+              Welcome to the ASU career community! 🎓
+            </Typography>
+          </div>
         </div>
       </div>
 
-      {/* Right Side - Hero */}
-      <div className="hidden lg:block relative w-0 flex-1">
-        <div className={`absolute inset-0 transition-colors duration-300 ${
-          isDark 
-            ? 'bg-gradient-to-br from-dark-surface via-dark-bg to-dark-surface' 
-            : 'bg-gradient-to-br from-asu-maroon via-asu-maroon-dark to-asu-maroon'
-        }`}>
-          <div className={`absolute inset-0 ${
-            isDark ? 'bg-lime/5' : 'bg-black/20'
-          } flex flex-col justify-center items-center p-12`}>
-            <div className="text-center max-w-md">
+      {/* Right Side - Hero Content */}
+      <div className={`hidden lg:flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 ${
+        isDark 
+          ? 'bg-gradient-to-br from-dark-surface via-dark-bg to-gray-900' 
+          : 'bg-gradient-to-br from-asu-maroon via-asu-maroon-dark to-gray-900'
+      }`}>
+        <div className="mx-auto max-w-md text-center">
+          <div className={`inline-flex items-center justify-center w-24 h-24 rounded-full mb-6 ${
+            isDark ? 'bg-lime/20' : 'bg-asu-gold/20'
+          }`}>
+            <EmojiEvents className={`h-12 w-12 ${isDark ? 'text-lime' : 'text-asu-gold'}`} />
+          </div>
+          <Typography 
+            variant="h3" 
+            className={`font-bold mb-4 ${isDark ? 'text-dark-text' : 'text-white'}`}
+          >
+            Your Career Journey Starts Here! 🚀
+          </Typography>
+          <Typography 
+            variant="h6" 
+            className={`mb-8 ${isDark ? 'text-dark-muted' : 'text-gray-200'}`}
+          >
+            Connect with amazing companies, find your dream internship, and launch your career at Arizona State University's most comprehensive job platform! ✨
+          </Typography>
+          
+          {/* Success Stats */}
+          <div className="grid grid-cols-2 gap-4 mb-8">
+            <Card 
+              className={`p-4 ${isDark ? 'bg-dark-surface' : 'bg-white/10'}`}
+              variant="outlined"
+            >
               <Typography 
-                variant="h3" 
-                className={`font-bold mb-6 leading-tight ${
-                  isDark ? 'text-dark-text' : 'text-white'
-                }`}
+                variant="h4" 
+                className={`font-bold ${isDark ? 'text-lime' : 'text-asu-gold'}`}
               >
-                Welcome Back to <span className={`${
-                  isDark ? 'text-lime' : 'text-asu-gold'
-                }`}>ASU Handshake</span>
+                15k+
               </Typography>
               <Typography 
-                variant="subtitle1" 
-                className={`mb-8 leading-relaxed ${
-                  isDark ? 'text-dark-muted' : 'text-white/90'
-                }`}
+                variant="body2" 
+                className={`${isDark ? 'text-dark-muted' : 'text-gray-300'}`}
               >
-                Continue building your career with Arizona State University's premier job platform
+                Happy Students 😊
               </Typography>
-
-              {/* Success Statistics */}
-              <div className="space-y-4">
-                <Card className={`backdrop-blur-xl border ${
-                  isDark 
-                    ? 'bg-dark-surface/15 border-lime/30' 
-                    : 'bg-white/15 border-white/30'
-                }`}>
-                  <div className="flex items-center space-x-4 p-6">
-                    <div className={`w-14 h-14 rounded-full flex items-center justify-center ${
-                      isDark ? 'bg-lime' : 'bg-asu-gold'
-                    }`}>
-                      <CheckCircle className={`h-8 w-8 ${
-                        isDark ? 'text-dark-surface' : 'text-asu-maroon'
-                      }`} />
-                    </div>
-                    <div className="text-left">
-                      <Typography 
-                        variant="h4" 
-                        className={`font-bold ${
-                          isDark ? 'text-dark-text' : 'text-white'
-                        }`}
-                      >
-                        95%
-                      </Typography>
-                      <Typography 
-                        variant="caption" 
-                        className={isDark ? 'text-dark-muted' : 'text-white/70'}
-                      >
-                        Student Success Rate
-                      </Typography>
-                    </div>
-                  </div>
-                </Card>
-
-                <Card className={`backdrop-blur-xl border ${
-                  isDark 
-                    ? 'bg-dark-surface/15 border-lime/30' 
-                    : 'bg-white/15 border-white/30'
-                }`}>
-                  <div className="flex items-center space-x-4 p-6">
-                    <div className={`w-14 h-14 rounded-full flex items-center justify-center ${
-                      isDark ? 'bg-lime' : 'bg-asu-gold'
-                    }`}>
-                      <TrendingUp className={`h-8 w-8 ${
-                        isDark ? 'text-dark-surface' : 'text-asu-maroon'
-                      }`} />
-                    </div>
-                    <div className="text-left">
-                      <Typography 
-                        variant="h4" 
-                        className={`font-bold ${
-                          isDark ? 'text-dark-text' : 'text-white'
-                        }`}
-                      >
-                        15,000+
-                      </Typography>
-                      <Typography 
-                        variant="caption" 
-                        className={isDark ? 'text-dark-muted' : 'text-white/70'}
-                      >
-                        Active Users
-                      </Typography>
-                    </div>
-                  </div>
-                </Card>
-              </div>
-            </div>
-
-            {/* Achievement Badge */}
-            <Card className={`absolute bottom-8 left-8 shadow-xl ${
-              isDark ? 'bg-dark-surface/98' : 'bg-white/95'
-            }`}>
-              <div className="flex items-center space-x-3 p-4">
-                <EmojiEvents className={`h-6 w-6 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
-                <Typography variant="body2" className="font-bold">
-                  Trusted by ASU Students
-                </Typography>
-              </div>
             </Card>
-
-            {/* Floating badge */}
-            <div className={`absolute top-8 right-8 rounded-full p-3 shadow-lg ${
-              isDark ? 'bg-lime/90' : 'bg-asu-gold/90'
-            }`}>
-              <AutoAwesome className={`h-6 w-6 ${
-                isDark ? 'text-dark-surface' : 'text-asu-maroon'
-              }`} />
-            </div>
+            <Card 
+              className={`p-4 ${isDark ? 'bg-dark-surface' : 'bg-white/10'}`}
+              variant="outlined"
+            >
+              <Typography 
+                variant="h4" 
+                className={`font-bold ${isDark ? 'text-lime' : 'text-asu-gold'}`}
+              >
+                2.5k+
+              </Typography>
+              <Typography 
+                variant="body2" 
+                className={`${isDark ? 'text-dark-muted' : 'text-gray-300'}`}
+              >
+                Dream Jobs 💼
+              </Typography>
+            </Card>
+          </div>
+          
+          {/* Call to Action */}
+          <div className="space-y-4">
+            <Typography 
+              variant="h6" 
+              className={`font-medium ${isDark ? 'text-dark-text' : 'text-white'}`}
+            >
+              Ready to join the ASU career community? 🌟
+            </Typography>
+            <Button
+              component={Link}
+              to="/register"
+              variant="contained"
+              color="primary"
+              size="large"
+              className="shadow-lg hover:shadow-xl transition-shadow duration-200"
+              startIcon={<RocketLaunch />}
+              endIcon={<ArrowForward />}
+            >
+              Create Your Account 🎯
+            </Button>
           </div>
         </div>
       </div>

@@ -62,7 +62,7 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
                 isDark ? 'text-dark-muted' : 'text-gray-200'
               }`}
             >
-              Connect with amazing companies, find your dream internship, and launch your career at Arizona State University's most comprehensive job platform! 🌟
+              Connect with amazing companies, find your dream internship, and launch your career at Auckland University of Technology's most comprehensive job platform! 🌟
             </Typography>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
