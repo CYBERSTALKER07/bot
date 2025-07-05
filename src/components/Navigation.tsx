@@ -366,7 +366,6 @@ export default function Navigation() {
               >
                 <LogOut className="h-5 w-5" />
                 <span className="font-medium">Sign Out</span>
-                <span className="text-lg">👋</span>
               </button>
             </div>
           </div>
@@ -602,11 +601,11 @@ export default function Navigation() {
             </div>
             <div className="space-y-2">
               <div className="p-3 bg-asu-maroon/10 rounded-xl">
-                <p className="text-xs text-gray-800 font-medium">New job match found! 🎉</p>
+                <p className="text-xs text-gray-800 font-medium">New job match found!</p>
                 <p className="text-xs text-gray-600 mt-1">2 minutes ago</p>
               </div>
               <div className="p-3 bg-blue-50 rounded-xl">
-                <p className="text-xs text-gray-800 font-medium">Message from recruiter 💬</p>
+                <p className="text-xs text-gray-800 font-medium">Message from recruiter</p>
                 <p className="text-xs text-gray-600 mt-1">1 hour ago</p>
               </div>
             </div>
@@ -645,14 +644,13 @@ export default function Navigation() {
               {!isCollapsed && (
                 <>
                   <span className="font-medium">Sign Out</span>
-                  <span className="text-lg">👋</span>
                 </>
               )}
             </button>
             {/* Tooltip for collapsed state */}
             {isCollapsed && (
               <div className="absolute left-full ml-3 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white px-3 py-2 rounded-lg text-sm font-medium opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50">
-                Sign Out 👋
+                Sign Out
                 <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-800 rotate-45"></div>
               </div>
             )}
