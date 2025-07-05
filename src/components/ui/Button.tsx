@@ -1,89 +1,68 @@
 import React from 'react';
 import { LucideIcon } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
-interface ButtonProps {
-  children: React.ReactNode;
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'success';
-  size?: 'sm' | 'md' | 'lg' | 'xl';
-  className?: string;
-  disabled?: boolean;
-  loading?: boolean;
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+  size?: 'sm' | 'md' | 'lg';
   icon?: LucideIcon;
   iconPosition?: 'left' | 'right';
-  onClick?: () => void;
-  type?: 'button' | 'submit' | 'reset';
+  loading?: boolean;
   fullWidth?: boolean;
-  animated?: boolean;
+  children: React.ReactNode;
 }
 
 export default function Button({
-  children,
   variant = 'primary',
   size = 'md',
-  className = '',
-  disabled = false,
-  loading = false,
   icon: Icon,
   iconPosition = 'left',
-  onClick,
-  type = 'button',
+  loading = false,
   fullWidth = false,
-  animated = true,
+  className = '',
+  children,
+  disabled,
   ...props
 }: ButtonProps) {
-  const baseClasses = "inline-flex items-center justify-center font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
-  
+  const baseClasses = "inline-flex items-center justify-center font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95";
+
   const variantClasses = {
-    primary: "bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white hover:shadow-xl focus:ring-asu-maroon border border-transparent",
-    secondary: "bg-gradient-to-r from-asu-gold to-yellow-300 text-asu-maroon hover:shadow-xl focus:ring-asu-gold border border-transparent",
-    outline: "border-2 border-asu-maroon text-asu-maroon hover:bg-asu-maroon hover:text-white focus:ring-asu-maroon",
-    ghost: "text-asu-maroon hover:bg-asu-maroon/10 focus:ring-asu-maroon border border-transparent",
-    danger: "bg-gradient-to-r from-red-500 to-red-600 text-white hover:shadow-xl focus:ring-red-500 border border-transparent",
-    success: "bg-gradient-to-r from-green-500 to-green-600 text-white hover:shadow-xl focus:ring-green-500 border border-transparent"
+    primary: "bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white hover:shadow-lg focus:ring-asu-maroon dark:from-lime dark:to-dark-accent dark:text-dark-surface dark:focus:ring-lime",
+    secondary: "bg-gradient-to-r from-asu-gold to-asu-gold-dark text-white hover:shadow-lg focus:ring-asu-gold dark:from-dark-accent dark:to-lime dark:text-dark-surface dark:focus:ring-lime",
+    outline: "border-2 border-asu-maroon text-asu-maroon hover:bg-asu-maroon hover:text-white focus:ring-asu-maroon dark:border-lime dark:text-lime dark:hover:bg-lime dark:hover:text-dark-surface dark:focus:ring-lime",
+    ghost: "text-asu-maroon hover:bg-asu-maroon/10 focus:ring-asu-maroon dark:text-lime dark:hover:bg-lime/10 dark:focus:ring-lime",
+    danger: "bg-gradient-to-r from-red-500 to-red-600 text-white hover:shadow-lg focus:ring-red-500 dark:from-red-600 dark:to-red-700 dark:focus:ring-red-600"
   };
 
   const sizeClasses = {
     sm: "px-3 py-2 text-sm rounded-lg",
-    md: "px-4 py-3 text-base rounded-xl",
-    lg: "px-6 py-4 text-lg rounded-2xl",
-    xl: "px-8 py-5 text-xl rounded-3xl"
+    md: "px-6 py-3 text-base rounded-xl",
+    lg: "px-8 py-4 text-lg rounded-2xl"
   };
 
-  const animationClasses = animated ? "transform hover:scale-105 hover:-translate-y-1" : "";
-  const widthClasses = fullWidth ? "w-full" : "";
-
-  const buttonClasses = `
-    ${baseClasses}
-    ${variantClasses[variant]}
-    ${sizeClasses[size]}
-    ${animationClasses}
-    ${widthClasses}
-    ${className}
-  `.trim().replace(/\s+/g, ' ');
+  const LoadingSpinner = () => (
+    <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent"></div>
+  );
 
   return (
     <button
-      type={type}
-      onClick={onClick}
+      className={cn(
+        baseClasses,
+        variantClasses[variant],
+        sizeClasses[size],
+        fullWidth && 'w-full',
+        className
+      )}
       disabled={disabled || loading}
-      className={buttonClasses}
       {...props}
     >
-      {loading && (
-        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
+      {loading && <LoadingSpinner />}
+      {!loading && Icon && iconPosition === 'left' && (
+        <Icon className={cn('h-5 w-5', children && 'mr-2')} />
       )}
-      
-      {Icon && iconPosition === 'left' && !loading && (
-        <Icon className={`${children ? 'mr-2' : ''} h-5 w-5`} />
-      )}
-      
-      {children}
-      
-      {Icon && iconPosition === 'right' && !loading && (
-        <Icon className={`${children ? 'ml-2' : ''} h-5 w-5`} />
+      {!loading && children}
+      {!loading && Icon && iconPosition === 'right' && (
+        <Icon className={cn('h-5 w-5', children && 'ml-2')} />
       )}
     </button>
   );

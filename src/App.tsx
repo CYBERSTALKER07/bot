@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import Navigation from './components/Navigation';
 import LandingPage from './components/LandingPage';
 import Login from './components/Auth/Login';
@@ -27,10 +28,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-dark-bg flex items-center justify-center transition-colors duration-300">
         <div className="flex items-center space-x-2">
-          <Loader2 className="h-6 w-6 animate-spin text-asu-maroon" />
-          <span className="text-gray-600">Loading...</span>
+          <Loader2 className="h-6 w-6 animate-spin text-asu-maroon dark:text-lime" />
+          <span className="text-gray-600 dark:text-dark-muted">Loading...</span>
         </div>
       </div>
     );
@@ -44,10 +45,10 @@ function DashboardRouter() {
   
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-dark-bg flex items-center justify-center transition-colors duration-300">
         <div className="flex items-center space-x-2">
-          <Loader2 className="h-6 w-6 animate-spin text-asu-maroon" />
-          <span className="text-gray-600">Loading...</span>
+          <Loader2 className="h-6 w-6 animate-spin text-asu-maroon dark:text-lime" />
+          <span className="text-gray-600 dark:text-dark-muted">Loading...</span>
         </div>
       </div>
     );
@@ -82,17 +83,17 @@ function AppContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-dark-bg flex items-center justify-center transition-colors duration-300">
         <div className="flex items-center space-x-2">
-          <Loader2 className="h-6 w-6 animate-spin text-asu-maroon" />
-          <span className="text-gray-600">Loading...</span>
+          <Loader2 className="h-6 w-6 animate-spin text-asu-maroon dark:text-lime" />
+          <span className="text-gray-600 dark:text-dark-muted">Loading...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-dark-bg transition-colors duration-300">
       {user && <Navigation />}
       <Routes>
         <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage />} />
@@ -124,11 +125,13 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppContent />
-      </Router>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

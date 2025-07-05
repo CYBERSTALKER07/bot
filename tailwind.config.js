@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  darkMode: 'class', // Enable dark mode with class strategy
   theme: {
     extend: {
       colors: {
@@ -21,6 +22,14 @@ export default {
         aqua: '#AADED9', // HEX (Pantone 9501 C)
         cream: '#F0EFE3', // HEX
         lime: '#E3FF70', // HEX (Pantone 930 C)
+        
+        // Dark theme specific colors
+        'dark-bg': '#001B1A', // Darker deep green for backgrounds
+        'dark-surface': '#003432', // Deep green for surfaces
+        'dark-accent': '#E3FF70', // Lime for accents
+        'dark-text': '#F0F9FF', // Light text for dark mode
+        'dark-muted': '#94A3B8', // Muted text for dark mode
+        
         gray: {
           50: '#F9FAFB',
           100: '#F3F4F6',

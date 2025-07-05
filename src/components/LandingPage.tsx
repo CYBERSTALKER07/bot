@@ -13,11 +13,14 @@ import CareerPathSection from './LandingPage/CareerPathSection';
 import TestimonialsSection from './LandingPage/TestimonialsSection';
 import DemoSection from './LandingPage/DemoSection';
 import CTASection from './LandingPage/CTASection';
+import { useTheme } from '../context/ThemeContext';
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
 
 export default function LandingPage() {
+  const { isDark } = useTheme();
+  
   // Refs for each section
   const heroRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
@@ -47,7 +50,11 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 overflow-x-hidden">
+    <div className={`min-h-screen overflow-x-hidden transition-colors duration-300 ${
+      isDark 
+        ? 'bg-gradient-to-b from-dark-bg to-dark-surface' 
+        : 'bg-gradient-to-b from-white to-gray-50'
+    }`}>
       {/* Navigation */}
       <Navigation onScrollToSection={scrollToSection} />
 

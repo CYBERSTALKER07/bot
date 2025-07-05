@@ -1,5 +1,6 @@
 import React, { forwardRef } from 'react';
 import { ChevronDown, LucideIcon } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 
 interface SelectOption {
   value: string;
@@ -30,6 +31,8 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(({
   className = '',
   ...props
 }, ref) => {
+  const { isDark } = useTheme();
+
   const baseClasses = "transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-asu-maroon border-2 cursor-pointer appearance-none";
   
   const variantClasses = {
