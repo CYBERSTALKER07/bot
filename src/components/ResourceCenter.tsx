@@ -22,8 +22,10 @@ import {
   BookmarkPlus
 } from 'lucide-react';
 import { Resource } from '../types';
+import { useTheme } from '../context/ThemeContext';
 
 export default function ResourceCenter() {
+  const { theme } = useTheme();
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
@@ -151,34 +153,66 @@ export default function ResourceCenter() {
   };
 
   const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'article':
-        return 'bg-blue-100 text-blue-800';
-      case 'video':
-        return 'bg-red-100 text-red-800';
-      case 'template':
-        return 'bg-green-100 text-green-800';
-      case 'guide':
-        return 'bg-purple-100 text-purple-800';
-      case 'faq':
-        return 'bg-yellow-100 text-yellow-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+    if (theme === 'dark') {
+      switch (type) {
+        case 'article':
+          return 'bg-blue-900 text-blue-300';
+        case 'video':
+          return 'bg-red-900 text-red-300';
+        case 'template':
+          return 'bg-green-900 text-green-300';
+        case 'guide':
+          return 'bg-purple-900 text-purple-300';
+        case 'faq':
+          return 'bg-yellow-900 text-yellow-300';
+        default:
+          return 'bg-gray-700 text-gray-300';
+      }
+    } else {
+      switch (type) {
+        case 'article':
+          return 'bg-blue-100 text-blue-800';
+        case 'video':
+          return 'bg-red-100 text-red-800';
+        case 'template':
+          return 'bg-green-100 text-green-800';
+        case 'guide':
+          return 'bg-purple-100 text-purple-800';
+        case 'faq':
+          return 'bg-yellow-100 text-yellow-800';
+        default:
+          return 'bg-gray-100 text-gray-800';
+      }
     }
   };
 
   const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'resume':
-        return 'bg-blue-50 text-blue-700';
-      case 'interview':
-        return 'bg-green-50 text-green-700';
-      case 'career_planning':
-        return 'bg-purple-50 text-purple-700';
-      case 'networking':
-        return 'bg-pink-50 text-pink-700';
-      default:
-        return 'bg-gray-50 text-gray-700';
+    if (theme === 'dark') {
+      switch (category) {
+        case 'resume':
+          return 'bg-blue-900 text-blue-300';
+        case 'interview':
+          return 'bg-green-900 text-green-300';
+        case 'career_planning':
+          return 'bg-purple-900 text-purple-300';
+        case 'networking':
+          return 'bg-pink-900 text-pink-300';
+        default:
+          return 'bg-gray-700 text-gray-300';
+      }
+    } else {
+      switch (category) {
+        case 'resume':
+          return 'bg-blue-50 text-blue-700';
+        case 'interview':
+          return 'bg-green-50 text-green-700';
+        case 'career_planning':
+          return 'bg-purple-50 text-purple-700';
+        case 'networking':
+          return 'bg-pink-50 text-pink-700';
+        default:
+          return 'bg-gray-50 text-gray-700';
+      }
     }
   };
 
@@ -232,7 +266,7 @@ export default function ResourceCenter() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white relative">
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Decorative elements */}
       <div className="absolute top-16 right-24 w-4 h-4 bg-asu-gold/40 rounded-full"></div>
       <div className="absolute top-32 left-16 w-3 h-3 bg-asu-maroon/30 rounded-full"></div>
@@ -240,311 +274,187 @@ export default function ResourceCenter() {
       <Coffee className="absolute bottom-32 right-1/4 h-4 w-4 text-asu-maroon/50" />
       <Heart className="absolute bottom-20 left-1/3 h-4 w-4 text-asu-gold/70" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
-        <div className="mb-12 text-center">
-          <div className="relative inline-block">
-            <h1 className="text-5xl font-bold text-gray-900 mb-4 relative">
-              Resource Center 📚
-              <div className="absolute -top-3 -right-8 w-6 h-6 bg-gradient-to-r from-asu-gold to-yellow-400 rounded-full"></div>
-            </h1>
-            <div className="w-32 h-1 bg-gradient-to-r from-asu-maroon to-asu-gold mx-auto mb-6 rounded-full"></div>
-          </div>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Unlock your career potential with our curated collection of guides, templates, and expert resources 🚀
+        <div className="mb-8">
+          <h1 className={`text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'} mb-2`}>
+            Resource Center
+          </h1>
+          <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+            Comprehensive career resources to help you succeed
           </p>
         </div>
 
-        {/* Stats Dashboard */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">Total Resources</p>
-                <p className="text-3xl font-bold text-gray-900">{resourceStats.total}</p>
-              </div>
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center">
-                <BookOpen className="h-6 w-6 text-blue-600" />
-              </div>
-            </div>
-            <div className="mt-4 flex items-center text-blue-600 text-sm bg-blue-50 rounded-full px-3 py-1 w-fit">
-              <TrendingUp className="h-4 w-4 mr-1" />
-              <span>Always growing 📈</span>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">Popular This Week</p>
-                <p className="text-3xl font-bold text-gray-900">{resourceStats.popular}</p>
-              </div>
-              <div className="w-12 h-12 bg-gradient-to-br from-red-100 to-red-200 rounded-full flex items-center justify-center">
-                <Star className="h-6 w-6 text-red-600" />
-              </div>
-            </div>
-            <div className="mt-4 flex items-center text-red-600 text-sm bg-red-50 rounded-full px-3 py-1 w-fit">
-              <Zap className="h-4 w-4 mr-1" />
-              <span>Trending 🔥</span>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">New This Week</p>
-                <p className="text-3xl font-bold text-gray-900">{resourceStats.thisWeek}</p>
-              </div>
-              <div className="w-12 h-12 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center">
-                <Award className="h-6 w-6 text-green-600" />
-              </div>
-            </div>
-            <div className="mt-4 flex items-center text-green-600 text-sm bg-green-50 rounded-full px-3 py-1 w-fit">
-              <Sparkles className="h-4 w-4 mr-1" />
-              <span>Fresh content ✨</span>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">Total Downloads</p>
-                <p className="text-3xl font-bold text-gray-900">{resourceStats.downloads.toLocaleString()}</p>
-              </div>
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-purple-200 rounded-full flex items-center justify-center">
-                <Download className="h-6 w-6 text-purple-600" />
-              </div>
-            </div>
-            <div className="mt-4 flex items-center text-purple-600 text-sm bg-purple-50 rounded-full px-3 py-1 w-fit">
-              <Users className="h-4 w-4 mr-1" />
-              <span>Students helped 🎉</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Featured Section */}
-        <div className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark rounded-3xl p-8 mb-12 text-white relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-asu-gold/20 rounded-full blur-xl"></div>
-          <div className="relative z-10">
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="px-4 py-2 bg-white/20 rounded-full text-sm font-medium">
-                    🌟 Featured Resource
-                  </div>
-                  <div className="px-3 py-1 bg-asu-gold rounded-full text-asu-maroon text-sm font-bold">
-                    Most Popular
-                  </div>
-                </div>
-                <h2 className="text-3xl font-bold mb-3">Ultimate Resume Template for Tech Students</h2>
-                <p className="text-gray-200 mb-6 text-lg leading-relaxed max-w-2xl">
-                  Get started with our most popular resume template, specifically designed for ASU students in technology fields. 
-                  Downloaded by 500+ students and proven to get interviews! ⚡
-                </p>
-                <div className="flex flex-wrap gap-4 mb-6">
-                  <div className="flex items-center space-x-2 text-sm bg-white/10 rounded-full px-3 py-1">
-                    <Download className="h-4 w-4" />
-                    <span>500+ downloads</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-sm bg-white/10 rounded-full px-3 py-1">
-                    <Star className="h-4 w-4" />
-                    <span>4.9/5 rating</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-sm bg-white/10 rounded-full px-3 py-1">
-                    <Users className="h-4 w-4" />
-                    <span>ATS-friendly</span>
-                  </div>
-                </div>
-                <div className="flex space-x-4">
-                  <button
-                    onClick={() => handleResourceClick(resources[0])}
-                    className="bg-white text-asu-maroon px-8 py-3 rounded-2xl hover:bg-gray-100 transition-all duration-300 flex items-center space-x-2 font-semibold shadow-lg hover:shadow-xl"
-                  >
-                    <Download className="h-5 w-5" />
-                    <span>Download Template</span>
-                  </button>
-                  <button className="border-2 border-white text-white px-6 py-3 rounded-2xl hover:bg-white hover:text-asu-maroon transition-all duration-300 flex items-center space-x-2 font-semibold">
-                    <Share2 className="h-4 w-4" />
-                    <span>Share</span>
-                  </button>
-                </div>
-              </div>
-              <div className="hidden lg:block ml-8">
-                <div className="w-48 h-48 bg-white/20 rounded-3xl flex items-center justify-center backdrop-blur-sm border border-white/30">
-                  <FileText className="h-24 w-24 text-white" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Filters */}
-        <div className="bg-gradient-to-r from-white to-gray-50 rounded-3xl shadow-lg border border-gray-100 p-8 mb-12">
-          <div className="flex flex-col lg:flex-row gap-6">
+        {/* Search and Filters */}
+        <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm p-6 mb-8`}>
+          <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Search className={`absolute left-3 top-3 h-5 w-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
               <input
                 type="text"
-                placeholder="Search for career resources... 🔍"
+                placeholder="Search resources..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white shadow-inner transition-all duration-200 hover:shadow-md"
+                className={`w-full pl-10 pr-4 py-2 border ${
+                  theme === 'dark' 
+                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400' 
+                    : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
               />
             </div>
-            <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center space-x-2">
-                <Filter className="h-5 w-5 text-gray-400" />
-                <select
-                  value={categoryFilter}
-                  onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="px-4 py-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white shadow-inner cursor-pointer hover:shadow-md transition-all duration-200"
-                >
-                  {categories.map(category => (
-                    <option key={category.value} value={category.value}>
-                      {category.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div className="flex gap-4">
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                className={`px-4 py-2 border ${
+                  theme === 'dark' 
+                    ? 'border-gray-600 bg-gray-700 text-white' 
+                    : 'border-gray-300 bg-white text-gray-900'
+                } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+              >
+                <option value="all">All Categories</option>
+                <option value="resume">Resume & CV</option>
+                <option value="interview">Interview Prep</option>
+                <option value="career_planning">Career Planning</option>
+                <option value="networking">Networking</option>
+              </select>
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="px-4 py-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white shadow-inner cursor-pointer hover:shadow-md transition-all duration-200"
+                className={`px-4 py-2 border ${
+                  theme === 'dark' 
+                    ? 'border-gray-600 bg-gray-700 text-white' 
+                    : 'border-gray-300 bg-white text-gray-900'
+                } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
               >
-                {types.map(type => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
+                <option value="all">All Types</option>
+                <option value="article">Articles</option>
+                <option value="video">Videos</option>
+                <option value="template">Templates</option>
+                <option value="guide">Guides</option>
+                <option value="faq">FAQs</option>
               </select>
             </div>
           </div>
         </div>
 
+        {/* Results Count */}
+        <div className="mb-6">
+          <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+            Showing {filteredResources.length} of {resources.length} resources
+          </p>
+        </div>
+
         {/* Resources Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredResources.map((resource) => (
-            <div key={resource.id} className="bg-white rounded-3xl shadow-lg border border-gray-100 hover:shadow-2xl transition-shadow overflow-hidden">
-              <div className="p-8">
+            <div
+              key={resource.id}
+              className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden`}
+            >
+              <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <div className={`p-3 rounded-2xl ${getTypeColor(resource.type)}`}>
+                  <div className="flex items-center gap-2">
+                    <div className={`p-2 rounded-lg ${getTypeColor(resource.type)}`}>
                       {getTypeIcon(resource.type)}
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getTypeColor(resource.type)}`}>
-                      {formatType(resource.type)}
-                    </span>
+                    <div>
+                      <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getTypeColor(resource.type)}`}>
+                        {formatType(resource.type)}
+                      </span>
+                    </div>
                   </div>
                   <button
                     onClick={() => toggleBookmark(resource.id)}
-                    className={`p-3 rounded-full transition-colors ${
+                    className={`p-2 rounded-lg transition-colors ${
                       bookmarkedResources.has(resource.id)
-                        ? 'bg-asu-maroon text-white'
-                        : 'bg-gray-100 text-gray-400 hover:text-asu-maroon'
+                        ? 'text-yellow-500 hover:text-yellow-600'
+                        : theme === 'dark'
+                        ? 'text-gray-400 hover:text-gray-300'
+                        : 'text-gray-400 hover:text-gray-600'
                     }`}
                   >
-                    {bookmarkedResources.has(resource.id) ? (
-                      <Bookmark className="h-5 w-5" />
-                    ) : (
-                      <BookmarkPlus className="h-5 w-5" />
-                    )}
+                    <Bookmark className={`h-5 w-5 ${bookmarkedResources.has(resource.id) ? 'fill-current' : ''}`} />
                   </button>
                 </div>
 
-                <h3 className="text-xl font-bold text-gray-900 mb-3 leading-tight hover:text-asu-maroon transition-colors cursor-pointer">
+                <h3 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   {resource.title}
                 </h3>
-                
-                <p className="text-gray-600 text-sm mb-6 line-clamp-3 leading-relaxed">
+                <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mb-4 line-clamp-3`}>
                   {resource.description}
                 </p>
 
-                <div className="flex items-center justify-between mb-6">
-                  <span className={`px-4 py-2 rounded-full text-sm font-medium ${getCategoryColor(resource.category)}`}>
-                    {formatCategory(resource.category)}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(resource.category)}`}>
+                    {resource.category.replace('_', ' ')}
                   </span>
-                  <div className="flex items-center space-x-2 text-xs text-gray-500">
-                    <Clock className="h-3 w-3" />
-                    <span>{new Date(resource.created_at).toLocaleDateString()}</span>
-                  </div>
+                  {resource.tags && resource.tags.slice(0, 2).map((tag, index) => (
+                    <span
+                      key={index}
+                      className={`inline-block px-2 py-1 text-xs rounded-full ${
+                        theme === 'dark' 
+                          ? 'bg-gray-700 text-gray-300' 
+                          : 'bg-gray-100 text-gray-600'
+                      }`}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                  {resource.tags && resource.tags.length > 2 && (
+                    <span className={`inline-block px-2 py-1 text-xs rounded-full ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 text-gray-300' 
+                        : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      +{resource.tags.length - 2} more
+                    </span>
+                  )}
                 </div>
 
-                {resource.tags && (
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {resource.tags.slice(0, 3).map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-600 rounded-full text-xs font-medium hover:from-gray-200 hover:to-gray-300 transition-all duration-200 cursor-pointer"
-                      >
-                        #{tag}
-                      </span>
-                    ))}
-                    {resource.tags.length > 3 && (
-                      <span className="px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-medium">
-                        +{resource.tags.length - 3} more ✨
-                      </span>
-                    )}
-                  </div>
-                )}
-
-                <div className="flex space-x-3">
-                  {resource.content ? (
-                    <button className="flex-1 border-2 border-asu-maroon text-asu-maroon px-6 py-3 rounded-2xl hover:bg-asu-maroon hover:text-white transition-all duration-300 flex items-center justify-center space-x-2 font-semibold shadow-sm hover:shadow-md">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4 text-sm text-gray-500">
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-4 w-4" />
+                      <span>{new Date(resource.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
                       <Eye className="h-4 w-4" />
-                      <span>Read Guide</span>
+                      <span>145</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button className={`p-2 rounded-lg transition-colors ${
+                      theme === 'dark' 
+                        ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700' 
+                        : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                    }`}>
+                      <Share2 className="h-4 w-4" />
                     </button>
-                  ) : (
-                    <button
-                      onClick={() => handleResourceClick(resource)}
-                      className="flex-1 bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white px-6 py-3 rounded-2xl hover:shadow-lg transition-all duration-300 flex items-center justify-center space-x-2 font-semibold shadow-md"
-                    >
-                      {resource.type === 'video' ? (
-                        <>
-                          <Video className="h-4 w-4" />
-                          <span>Watch Video</span>
-                        </>
-                      ) : (
-                        <>
-                          <Download className="h-4 w-4" />
-                          <span>Download</span>
-                        </>
-                      )}
+                    <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                      {resource.type === 'video' ? 'Watch' : 'View'}
                     </button>
-                  )}
-                  <button className="px-4 py-3 border border-gray-300 text-gray-600 rounded-2xl hover:bg-gray-50 transition-colors flex items-center justify-center">
-                    <Share2 className="h-4 w-4" />
-                  </button>
+                  </div>
                 </div>
               </div>
             </div>
           ))}
         </div>
 
+        {/* Empty State */}
         {filteredResources.length === 0 && (
-          <div className="text-center py-16 bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg border border-gray-100">
-            <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
-              <Search className="h-12 w-12 text-gray-400" />
+          <div className="text-center py-12">
+            <div className={`w-16 h-16 mx-auto mb-4 rounded-full ${
+              theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'
+            } flex items-center justify-center`}>
+              <Search className={`h-8 w-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">No resources found</h3>
-            <p className="text-gray-600 mb-8 text-lg max-w-md mx-auto">
-              Try adjusting your search criteria or explore our featured resources! 🔍
+            <h3 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'} mb-2`}>
+              No resources found
+            </h3>
+            <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+              Try adjusting your search terms or filters
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button 
-                onClick={() => {
-                  setSearchTerm('');
-                  setCategoryFilter('all');
-                  setTypeFilter('all');
-                }}
-                className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white px-8 py-4 rounded-2xl hover:shadow-xl transition-all duration-300 font-semibold shadow-lg"
-              >
-                Clear Filters 🔄
-              </button>
-              <button className="border-2 border-asu-maroon text-asu-maroon px-8 py-4 rounded-2xl hover:bg-asu-maroon hover:text-white transition-all duration-300 font-semibold shadow-sm hover:shadow-md">
-                Browse All Resources 📚
-              </button>
-            </div>
           </div>
         )}
       </div>

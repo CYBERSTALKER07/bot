@@ -27,6 +27,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 interface Message {
   id: string;
@@ -57,6 +58,7 @@ interface Conversation {
 
 export default function Messages() {
   const { user } = useAuth();
+  const { isDark } = useTheme();
   const containerRef = useRef<HTMLDivElement>(null);
   const conversationsRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef<HTMLDivElement>(null);
@@ -265,36 +267,60 @@ export default function Messages() {
   const getRoleColor = (role: string) => {
     switch (role) {
       case 'student':
-        return 'bg-blue-100 text-blue-800';
+        return isDark ? 'bg-blue-900/30 text-blue-300' : 'bg-blue-100 text-blue-800';
       case 'employer':
-        return 'bg-green-100 text-green-800';
+        return isDark ? 'bg-green-900/30 text-green-300' : 'bg-green-100 text-green-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-800';
     }
   };
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-gray-50 to-white relative">
+    <div ref={containerRef} className={`min-h-screen relative transition-colors duration-300 ${
+      isDark ? 'bg-gradient-to-br from-dark-bg to-dark-surface' : 'bg-gradient-to-br from-gray-50 to-white'
+    }`}>
       {/* Decorative elements */}
-      <div className="messages-decoration absolute top-16 right-24 w-4 h-4 bg-asu-gold/40 rounded-full"></div>
-      <div className="messages-decoration absolute top-32 left-16 w-3 h-3 bg-asu-maroon/30 rounded-full"></div>
-      <Sparkles className="messages-decoration absolute top-24 left-1/4 h-5 w-5 text-asu-gold/60" />
-      <Coffee className="messages-decoration absolute bottom-32 right-1/4 h-4 w-4 text-asu-maroon/50" />
-      <Heart className="messages-decoration absolute bottom-20 left-1/3 h-4 w-4 text-asu-gold/70" />
+      <div className={`messages-decoration absolute top-16 right-24 w-4 h-4 rounded-full ${
+        isDark ? 'bg-lime/40' : 'bg-asu-gold/40'
+      }`}></div>
+      <div className={`messages-decoration absolute top-32 left-16 w-3 h-3 rounded-full ${
+        isDark ? 'bg-lime/30' : 'bg-asu-maroon/30'
+      }`}></div>
+      <Sparkles className={`messages-decoration absolute top-24 left-1/4 h-5 w-5 ${
+        isDark ? 'text-lime/60' : 'text-asu-gold/60'
+      }`} />
+      <Coffee className={`messages-decoration absolute bottom-32 right-1/4 h-4 w-4 ${
+        isDark ? 'text-lime/50' : 'text-asu-maroon/50'
+      }`} />
+      <Heart className={`messages-decoration absolute bottom-20 left-1/3 h-4 w-4 ${
+        isDark ? 'text-lime/70' : 'text-asu-gold/70'
+      }`} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Messages</h1>
-          <p className="text-gray-600">Connect with students and employers</p>
+          <h1 className={`text-3xl font-bold mb-2 transition-colors ${
+            isDark ? 'text-dark-text' : 'text-gray-900'
+          }`}>Messages</h1>
+          <p className={`transition-colors ${
+            isDark ? 'text-dark-muted' : 'text-gray-600'
+          }`}>Connect with students and employers</p>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
+        <div className={`rounded-3xl shadow-lg border overflow-hidden transition-colors duration-300 ${
+          isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-100'
+        }`}>
           <div className="flex h-[700px]">
             {/* Conversations Sidebar */}
-            <div ref={conversationsRef} className="w-1/3 border-r border-gray-200 flex flex-col">
+            <div ref={conversationsRef} className={`w-1/3 border-r flex flex-col transition-colors duration-300 ${
+              isDark ? 'border-lime/20' : 'border-gray-200'
+            }`}>
               {/* Search and Filter */}
-              <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-asu-maroon to-asu-maroon-dark">
+              <div className={`p-4 border-b transition-colors duration-300 ${
+                isDark 
+                  ? 'border-lime/20 bg-gradient-to-r from-lime to-dark-accent' 
+                  : 'border-gray-200 bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
+              }`}>
                 <div className="relative mb-4">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/70" />
                   <input
@@ -325,8 +351,18 @@ export default function Messages() {
                   <div
                     key={conversation.id}
                     onClick={() => setSelectedConversation(conversation.id)}
-                    className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${
-                      selectedConversation === conversation.id ? 'bg-asu-maroon/5 border-l-4 border-l-asu-maroon' : ''
+                    className={`p-4 border-b cursor-pointer transition-colors ${
+                      isDark 
+                        ? `border-lime/10 hover:bg-dark-bg ${
+                            selectedConversation === conversation.id 
+                              ? 'bg-lime/5 border-l-4 border-l-lime' 
+                              : ''
+                          }`
+                        : `border-gray-100 hover:bg-gray-50 ${
+                            selectedConversation === conversation.id 
+                              ? 'bg-asu-maroon/5 border-l-4 border-l-asu-maroon' 
+                              : ''
+                          }`
                     }`}
                   >
                     <div className="flex items-start space-x-3">
@@ -338,8 +374,12 @@ export default function Messages() {
                             className="w-12 h-12 rounded-full object-cover"
                           />
                         ) : (
-                          <div className="w-12 h-12 rounded-full bg-asu-maroon/20 flex items-center justify-center">
-                            <User className="h-6 w-6 text-asu-maroon" />
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                            isDark ? 'bg-lime/20' : 'bg-asu-maroon/20'
+                          }`}>
+                            <User className={`h-6 w-6 ${
+                              isDark ? 'text-lime' : 'text-asu-maroon'
+                            }`} />
                           </div>
                         )}
                         <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center ${getRoleColor(conversation.participant_role)}`}>
@@ -348,8 +388,12 @@ export default function Messages() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
-                          <h3 className="font-semibold text-gray-900 truncate">{conversation.participant_name}</h3>
-                          <span className="text-xs text-gray-500">
+                          <h3 className={`font-semibold truncate transition-colors ${
+                            isDark ? 'text-dark-text' : 'text-gray-900'
+                          }`}>{conversation.participant_name}</h3>
+                          <span className={`text-xs transition-colors ${
+                            isDark ? 'text-dark-muted' : 'text-gray-500'
+                          }`}>
                             {new Date(conversation.last_message_time).toLocaleTimeString([], { 
                               hour: '2-digit', 
                               minute: '2-digit' 
@@ -358,17 +402,27 @@ export default function Messages() {
                         </div>
                         {conversation.job_title && (
                           <div className="flex items-center space-x-1 mb-1">
-                            <Briefcase className="h-3 w-3 text-gray-400" />
-                            <span className="text-xs text-gray-500 truncate">{conversation.job_title}</span>
+                            <Briefcase className={`h-3 w-3 transition-colors ${
+                              isDark ? 'text-dark-muted' : 'text-gray-400'
+                            }`} />
+                            <span className={`text-xs truncate transition-colors ${
+                              isDark ? 'text-dark-muted' : 'text-gray-500'
+                            }`}>{conversation.job_title}</span>
                           </div>
                         )}
-                        <p className="text-sm text-gray-600 truncate">{conversation.last_message}</p>
+                        <p className={`text-sm truncate transition-colors ${
+                          isDark ? 'text-dark-muted' : 'text-gray-600'
+                        }`}>{conversation.last_message}</p>
                         {conversation.unread_count > 0 && (
                           <div className="flex items-center justify-between mt-2">
-                            <span className="text-xs text-gray-500">
+                            <span className={`text-xs transition-colors ${
+                              isDark ? 'text-dark-muted' : 'text-gray-500'
+                            }`}>
                               {conversation.unread_count} unread
                             </span>
-                            <div className="w-2 h-2 bg-asu-maroon rounded-full"></div>
+                            <div className={`w-2 h-2 rounded-full ${
+                              isDark ? 'bg-lime' : 'bg-asu-maroon'
+                            }`}></div>
                           </div>
                         )}
                       </div>
@@ -383,7 +437,11 @@ export default function Messages() {
               {selectedConversation && currentConversation ? (
                 <>
                   {/* Chat Header */}
-                  <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-white to-gray-50">
+                  <div className={`p-4 border-b transition-colors duration-300 ${
+                    isDark 
+                      ? 'border-lime/20 bg-gradient-to-r from-dark-surface to-dark-bg' 
+                      : 'border-gray-200 bg-gradient-to-r from-white to-gray-50'
+                  }`}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <div className="relative">
@@ -394,8 +452,12 @@ export default function Messages() {
                               className="w-10 h-10 rounded-full object-cover"
                             />
                           ) : (
-                            <div className="w-10 h-10 rounded-full bg-asu-maroon/20 flex items-center justify-center">
-                              <User className="h-5 w-5 text-asu-maroon" />
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                              isDark ? 'bg-lime/20' : 'bg-asu-maroon/20'
+                            }`}>
+                              <User className={`h-5 w-5 ${
+                                isDark ? 'text-lime' : 'text-asu-maroon'
+                              }`} />
                             </div>
                           )}
                           <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center ${getRoleColor(currentConversation.participant_role)}`}>
@@ -403,24 +465,42 @@ export default function Messages() {
                           </div>
                         </div>
                         <div>
-                          <h3 className="font-semibold text-gray-900">{currentConversation.participant_name}</h3>
+                          <h3 className={`font-semibold transition-colors ${
+                            isDark ? 'text-dark-text' : 'text-gray-900'
+                          }`}>{currentConversation.participant_name}</h3>
                           {currentConversation.job_title && (
                             <div className="flex items-center space-x-1">
-                              <Briefcase className="h-3 w-3 text-gray-400" />
-                              <span className="text-xs text-gray-500">{currentConversation.job_title}</span>
+                              <Briefcase className={`h-3 w-3 transition-colors ${
+                                isDark ? 'text-dark-muted' : 'text-gray-400'
+                              }`} />
+                              <span className={`text-xs transition-colors ${
+                                isDark ? 'text-dark-muted' : 'text-gray-500'
+                              }`}>{currentConversation.job_title}</span>
                             </div>
                           )}
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                          <Phone className="h-5 w-5 text-gray-600" />
+                        <button className={`p-2 rounded-full transition-colors ${
+                          isDark ? 'hover:bg-dark-bg' : 'hover:bg-gray-100'
+                        }`}>
+                          <Phone className={`h-5 w-5 transition-colors ${
+                            isDark ? 'text-dark-muted' : 'text-gray-600'
+                          }`} />
                         </button>
-                        <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                          <Video className="h-5 w-5 text-gray-600" />
+                        <button className={`p-2 rounded-full transition-colors ${
+                          isDark ? 'hover:bg-dark-bg' : 'hover:bg-gray-100'
+                        }`}>
+                          <Video className={`h-5 w-5 transition-colors ${
+                            isDark ? 'text-dark-muted' : 'text-gray-600'
+                          }`} />
                         </button>
-                        <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                          <MoreHorizontal className="h-5 w-5 text-gray-600" />
+                        <button className={`p-2 rounded-full transition-colors ${
+                          isDark ? 'hover:bg-dark-bg' : 'hover:bg-gray-100'
+                        }`}>
+                          <MoreHorizontal className={`h-5 w-5 transition-colors ${
+                            isDark ? 'text-dark-muted' : 'text-gray-600'
+                          }`} />
                         </button>
                       </div>
                     </div>
@@ -436,14 +516,24 @@ export default function Messages() {
                         <div
                           className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
                             message.sender_id === user?.id
-                              ? 'bg-asu-maroon text-white rounded-br-md'
-                              : 'bg-gray-100 text-gray-900 rounded-bl-md'
+                              ? isDark
+                                ? 'bg-lime text-dark-surface rounded-br-md'
+                                : 'bg-asu-maroon text-white rounded-br-md'
+                              : isDark
+                                ? 'bg-dark-bg text-dark-text rounded-bl-md'
+                                : 'bg-gray-100 text-gray-900 rounded-bl-md'
                           }`}
                         >
                           <p className="text-sm">{message.content}</p>
                           <div className="flex items-center justify-between mt-2">
                             <span className={`text-xs ${
-                              message.sender_id === user?.id ? 'text-white/70' : 'text-gray-500'
+                              message.sender_id === user?.id 
+                                ? isDark 
+                                  ? 'text-dark-surface/70' 
+                                  : 'text-white/70'
+                                : isDark 
+                                  ? 'text-dark-muted' 
+                                  : 'text-gray-500'
                             }`}>
                               {new Date(message.timestamp).toLocaleTimeString([], { 
                                 hour: '2-digit', 
@@ -453,9 +543,13 @@ export default function Messages() {
                             {message.sender_id === user?.id && (
                               <div className="ml-2">
                                 {message.read ? (
-                                  <CheckCheck className="h-4 w-4 text-white/70" />
+                                  <CheckCheck className={`h-4 w-4 ${
+                                    isDark ? 'text-dark-surface/70' : 'text-white/70'
+                                  }`} />
                                 ) : (
-                                  <Check className="h-4 w-4 text-white/70" />
+                                  <Check className={`h-4 w-4 ${
+                                    isDark ? 'text-dark-surface/70' : 'text-white/70'
+                                  }`} />
                                 )}
                               </div>
                             )}
@@ -466,10 +560,18 @@ export default function Messages() {
                   </div>
 
                   {/* Message Input */}
-                  <div className="p-4 border-t border-gray-200 bg-gradient-to-r from-white to-gray-50">
+                  <div className={`p-4 border-t transition-colors duration-300 ${
+                    isDark 
+                      ? 'border-lime/20 bg-gradient-to-r from-dark-surface to-dark-bg' 
+                      : 'border-gray-200 bg-gradient-to-r from-white to-gray-50'
+                  }`}>
                     <div className="flex items-center space-x-3">
-                      <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                        <Paperclip className="h-5 w-5 text-gray-600" />
+                      <button className={`p-2 rounded-full transition-colors ${
+                        isDark ? 'hover:bg-dark-bg' : 'hover:bg-gray-100'
+                      }`}>
+                        <Paperclip className={`h-5 w-5 transition-colors ${
+                          isDark ? 'text-dark-muted' : 'text-gray-600'
+                        }`} />
                       </button>
                       <div className="flex-1 relative">
                         <input
@@ -478,16 +580,28 @@ export default function Messages() {
                           onChange={(e) => setNewMessage(e.target.value)}
                           onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                           placeholder="Type your message..."
-                          className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent"
+                          className={`w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
+                            isDark 
+                              ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
+                              : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
+                          }`}
                         />
-                        <button className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded-full hover:bg-gray-100 transition-colors">
-                          <Smile className="h-5 w-5 text-gray-600" />
+                        <button className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded-full transition-colors ${
+                          isDark ? 'hover:bg-dark-bg' : 'hover:bg-gray-100'
+                        }`}>
+                          <Smile className={`h-5 w-5 transition-colors ${
+                            isDark ? 'text-dark-muted' : 'text-gray-600'
+                          }`} />
                         </button>
                       </div>
                       <button
                         onClick={handleSendMessage}
                         disabled={!newMessage.trim()}
-                        className="p-3 bg-asu-maroon text-white rounded-2xl hover:bg-asu-maroon-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className={`p-3 text-white rounded-2xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                          isDark 
+                            ? 'bg-lime hover:bg-dark-accent text-dark-surface' 
+                            : 'bg-asu-maroon hover:bg-asu-maroon-dark'
+                        }`}
                       >
                         <Send className="h-5 w-5" />
                       </button>
@@ -498,9 +612,15 @@ export default function Messages() {
                 /* No Conversation Selected */
                 <div className="flex-1 flex items-center justify-center">
                   <div className="text-center">
-                    <MessageCircle className="h-24 w-24 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-xl font-medium text-gray-900 mb-2">Select a conversation</h3>
-                    <p className="text-gray-500">Choose a conversation from the sidebar to start messaging</p>
+                    <MessageCircle className={`h-24 w-24 mx-auto mb-4 transition-colors ${
+                      isDark ? 'text-dark-muted' : 'text-gray-300'
+                    }`} />
+                    <h3 className={`text-xl font-medium mb-2 transition-colors ${
+                      isDark ? 'text-dark-text' : 'text-gray-900'
+                    }`}>Select a conversation</h3>
+                    <p className={`transition-colors ${
+                      isDark ? 'text-dark-muted' : 'text-gray-500'
+                    }`}>Choose a conversation from the sidebar to start messaging</p>
                   </div>
                 </div>
               )}

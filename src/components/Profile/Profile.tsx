@@ -31,6 +31,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -99,6 +100,7 @@ interface Certification {
 
 export default function Profile() {
   const { user } = useAuth();
+  const { isDark } = useTheme();
   const containerRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const tabsRef = useRef<HTMLDivElement>(null);
@@ -348,27 +350,51 @@ export default function Profile() {
   const isEmployer = user?.role === 'employer';
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+    <div ref={containerRef} className={`min-h-screen transition-colors duration-300 ${
+      isDark 
+        ? 'bg-gradient-to-br from-dark-bg to-dark-surface' 
+        : 'bg-gradient-to-br from-gray-50 to-white'
+    }`}>
       {/* Decorative elements */}
-      <div className="profile-decoration absolute top-20 right-20 w-4 h-4 bg-asu-gold/40 rounded-full"></div>
-      <div className="profile-decoration absolute top-40 left-20 w-3 h-3 bg-asu-maroon/30 rounded-full"></div>
-      <Sparkles className="profile-decoration absolute top-32 left-1/4 h-5 w-5 text-asu-gold/60" />
-      <Coffee className="profile-decoration absolute bottom-32 right-1/3 h-4 w-4 text-asu-maroon/50" />
+      <div className={`profile-decoration absolute top-20 right-20 w-4 h-4 rounded-full transition-colors ${
+        isDark ? 'bg-lime/40' : 'bg-asu-gold/40'
+      }`}></div>
+      <div className={`profile-decoration absolute top-40 left-20 w-3 h-3 rounded-full transition-colors ${
+        isDark ? 'bg-dark-accent/30' : 'bg-asu-maroon/30'
+      }`}></div>
+      <Sparkles className={`profile-decoration absolute top-32 left-1/4 h-5 w-5 transition-colors ${
+        isDark ? 'text-lime/60' : 'text-asu-gold/60'
+      }`} />
+      <Coffee className={`profile-decoration absolute bottom-32 right-1/3 h-4 w-4 transition-colors ${
+        isDark ? 'text-dark-accent/50' : 'text-asu-maroon/50'
+      }`} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div ref={headerRef} className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark rounded-3xl p-8 text-white mb-8 relative overflow-hidden">
+        <div ref={headerRef} className={`rounded-3xl p-8 text-white mb-8 relative overflow-hidden transition-colors duration-300 ${
+          isDark 
+            ? 'bg-gradient-to-r from-dark-surface to-dark-accent' 
+            : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
+        }`}>
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-asu-gold/20 rounded-full blur-xl"></div>
+          <div className={`absolute bottom-0 left-0 w-24 h-24 rounded-full blur-xl transition-colors ${
+            isDark ? 'bg-lime/20' : 'bg-asu-gold/20'
+          }`}></div>
           
           <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between">
             <div className="flex items-center space-x-6">
               <div className="relative">
-                <div className="profile-avatar w-24 h-24 bg-gradient-to-br from-asu-gold to-yellow-300 rounded-full flex items-center justify-center text-4xl font-bold text-asu-maroon shadow-2xl">
+                <div className={`profile-avatar w-24 h-24 rounded-full flex items-center justify-center text-4xl font-bold shadow-2xl transition-colors ${
+                  isDark 
+                    ? 'bg-gradient-to-br from-lime to-dark-accent text-dark-surface' 
+                    : 'bg-gradient-to-br from-asu-gold to-yellow-300 text-asu-maroon'
+                }`}>
                   {profileData.name.charAt(0) || '👤'}
                 </div>
                 <button 
-                  className="absolute -bottom-2 -right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300"
+                  className={`absolute -bottom-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 ${
+                    isDark ? 'bg-dark-surface' : 'bg-white'
+                  }`}
                   onClick={() => {
                     gsap.to('.profile-avatar', {
                       scale: 1.1,
@@ -379,7 +405,9 @@ export default function Profile() {
                     });
                   }}
                 >
-                  <Camera className="h-4 w-4 text-asu-maroon" />
+                  <Camera className={`h-4 w-4 ${
+                    isDark ? 'text-lime' : 'text-asu-maroon'
+                  }`} />
                 </button>
               </div>
               
@@ -431,8 +459,10 @@ export default function Profile() {
         </div>
 
         {/* Navigation Tabs */}
-        <div ref={tabsRef} className="bg-white rounded-2xl shadow-lg border mb-8 overflow-hidden">
-          <div className="flex flex-wrap border-b">
+        <div ref={tabsRef} className={`rounded-2xl shadow-lg border mb-8 overflow-hidden transition-colors duration-300 ${
+          isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-200'
+        }`}>
+          <div className="flex flex-wrap border-b border-inherit">
             {[
               { id: 'overview', label: 'Overview', icon: User, emoji: '👤' },
               { id: 'experience', label: 'Experience', icon: Briefcase, emoji: '💼' },
@@ -448,8 +478,12 @@ export default function Profile() {
                   onClick={() => handleTabChange(tab.id)}
                   className={`profile-tab flex items-center space-x-3 px-6 py-4 font-medium transition-all duration-300 ${
                     activeTab === tab.id
-                      ? 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white shadow-lg'
-                      : 'text-gray-600 hover:text-asu-maroon hover:bg-asu-maroon/5'
+                      ? isDark 
+                        ? 'bg-gradient-to-r from-lime to-dark-accent text-dark-surface shadow-lg' 
+                        : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white shadow-lg'
+                      : isDark 
+                        ? 'text-dark-muted hover:text-lime hover:bg-lime/5' 
+                        : 'text-gray-600 hover:text-asu-maroon hover:bg-asu-maroon/5'
                   }`}
                   onMouseEnter={() => {
                     if (activeTab !== tab.id) {
@@ -484,9 +518,13 @@ export default function Profile() {
           {/* Main Content */}
           <div ref={contentRef} className="lg:col-span-2">
             {activeTab === 'overview' && (
-              <div className="tab-content bg-white rounded-2xl shadow-lg border p-8">
+              <div className={`tab-content rounded-2xl shadow-lg border p-8 transition-colors duration-300 ${
+                isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-200'
+              }`}>
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+                  <h2 className={`text-2xl font-bold flex items-center transition-colors ${
+                    isDark ? 'text-dark-text' : 'text-gray-900'
+                  }`}>
                     <User className="h-6 w-6 mr-2" />
                     About Me 👋
                   </h2>
@@ -497,36 +535,60 @@ export default function Profile() {
                     value={profileData.bio}
                     onChange={(e) => setProfileData(prev => ({...prev, bio: e.target.value}))}
                     placeholder="Tell us about yourself..."
-                    className="edit-field w-full h-32 p-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent resize-none"
+                    className={`edit-field w-full h-32 p-4 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent resize-none transition-colors ${
+                      isDark 
+                        ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
+                        : 'border-gray-200 focus:ring-asu-maroon focus:border-transparent bg-white text-gray-900'
+                    }`}
                   />
                 ) : (
-                  <p className="text-gray-600 leading-relaxed text-lg">
+                  <p className={`leading-relaxed text-lg transition-colors ${
+                    isDark ? 'text-dark-muted' : 'text-gray-600'
+                  }`}>
                     {profileData.bio || 'Passionate ASU student pursuing excellence in technology and innovation. Always eager to learn new skills and take on challenging projects that make a real impact! ✨'}
                   </p>
                 )}
 
                 {isEmployer && (
-                  <div className="mt-8 p-6 bg-gradient-to-r from-asu-maroon/5 to-asu-gold/5 rounded-2xl">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">Company Information 🏢</h3>
+                  <div className={`mt-8 p-6 rounded-2xl transition-colors ${
+                    isDark 
+                      ? 'bg-gradient-to-r from-lime/5 to-dark-accent/5' 
+                      : 'bg-gradient-to-r from-asu-maroon/5 to-asu-gold/5'
+                  }`}>
+                    <h3 className={`text-xl font-bold mb-4 transition-colors ${
+                      isDark ? 'text-dark-text' : 'text-gray-900'
+                    }`}>Company Information 🏢</h3>
                     {isEditing ? (
                       <div className="space-y-4">
                         <input
                           value={profileData.company_name}
                           onChange={(e) => setProfileData(prev => ({...prev, company_name: e.target.value}))}
                           placeholder="Company Name"
-                          className="edit-field w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-asu-maroon"
+                          className={`edit-field w-full p-4 border-2 rounded-xl focus:outline-none focus:ring-2 transition-colors ${
+                            isDark 
+                              ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
+                              : 'border-gray-200 focus:ring-asu-maroon bg-white text-gray-900'
+                          }`}
                         />
                         <textarea
                           value={profileData.company_description}
                           onChange={(e) => setProfileData(prev => ({...prev, company_description: e.target.value}))}
                           placeholder="Company Description"
-                          className="edit-field w-full h-24 p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-asu-maroon resize-none"
+                          className={`edit-field w-full h-24 p-4 border-2 rounded-xl focus:outline-none focus:ring-2 resize-none transition-colors ${
+                            isDark 
+                              ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
+                              : 'border-gray-200 focus:ring-asu-maroon bg-white text-gray-900'
+                          }`}
                         />
                         <div className="grid grid-cols-2 gap-4">
                           <select
                             value={profileData.company_size}
                             onChange={(e) => setProfileData(prev => ({...prev, company_size: e.target.value}))}
-                            className="edit-field p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-asu-maroon"
+                            className={`edit-field p-4 border-2 rounded-xl focus:outline-none focus:ring-2 transition-colors ${
+                              isDark 
+                                ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text' 
+                                : 'border-gray-200 focus:ring-asu-maroon bg-white text-gray-900'
+                            }`}
                           >
                             <option value="">Company Size</option>
                             <option value="1-10">1-10 employees</option>
@@ -539,12 +601,18 @@ export default function Profile() {
                             value={profileData.industry}
                             onChange={(e) => setProfileData(prev => ({...prev, industry: e.target.value}))}
                             placeholder="Industry"
-                            className="edit-field p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-asu-maroon"
+                            className={`edit-field p-4 border-2 rounded-xl focus:outline-none focus:ring-2 transition-colors ${
+                              isDark 
+                                ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
+                                : 'border-gray-200 focus:ring-asu-maroon bg-white text-gray-900'
+                            }`}
                           />
                         </div>
                       </div>
                     ) : (
-                      <div className="space-y-3">
+                      <div className={`space-y-3 transition-colors ${
+                        isDark ? 'text-dark-text' : 'text-gray-900'
+                      }`}>
                         <p><strong>Company:</strong> {profileData.company_name || 'Tech Solutions Inc.'}</p>
                         <p><strong>Description:</strong> {profileData.company_description || 'Leading technology company'}</p>
                         <p><strong>Size:</strong> {profileData.company_size || '51-200 employees'}</p>
@@ -557,9 +625,13 @@ export default function Profile() {
             )}
 
             {activeTab === 'skills' && (
-              <div className="tab-content bg-white rounded-2xl shadow-lg border p-8">
+              <div className={`tab-content rounded-2xl shadow-lg border p-8 transition-colors duration-300 ${
+                isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-200'
+              }`}>
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+                  <h2 className={`text-2xl font-bold flex items-center transition-colors ${
+                    isDark ? 'text-dark-text' : 'text-gray-900'
+                  }`}>
                     <Zap className="h-6 w-6 mr-2" />
                     Skills & Expertise ⚡
                   </h2>
@@ -569,7 +641,11 @@ export default function Profile() {
                         const skill = prompt('Enter a skill:');
                         if (skill) addSkill(skill);
                       }}
-                      className="bg-asu-maroon text-white px-4 py-2 rounded-xl hover:bg-asu-maroon-dark transition-colors flex items-center space-x-2"
+                      className={`px-4 py-2 rounded-xl transition-colors flex items-center space-x-2 ${
+                        isDark 
+                          ? 'bg-lime text-dark-surface hover:bg-dark-accent' 
+                          : 'bg-asu-maroon text-white hover:bg-asu-maroon-dark'
+                      }`}
                       onMouseEnter={() => {
                         gsap.to(event?.currentTarget, {
                           scale: 1.05,
@@ -593,7 +669,9 @@ export default function Profile() {
                 
                 <div className="flex flex-wrap gap-3">
                   {profileData.skills.length === 0 ? (
-                    <p className="text-gray-500 text-center w-full py-8">
+                    <p className={`text-center w-full py-8 transition-colors ${
+                      isDark ? 'text-dark-muted' : 'text-gray-500'
+                    }`}>
                       No skills added yet. {isEditing && "Click 'Add Skill' to get started! 🚀"}
                     </p>
                   ) : (
@@ -601,7 +679,11 @@ export default function Profile() {
                       <div
                         key={index}
                         data-skill={skill}
-                        className="skill-tag bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white px-4 py-2 rounded-full font-medium shadow-lg hover:shadow-xl transition-shadow flex items-center space-x-2"
+                        className={`skill-tag text-white px-4 py-2 rounded-full font-medium shadow-lg hover:shadow-xl transition-shadow flex items-center space-x-2 ${
+                          isDark 
+                            ? 'bg-gradient-to-r from-lime to-dark-accent' 
+                            : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
+                        }`}
                         onMouseEnter={() => {
                           gsap.to(event?.currentTarget, {
                             scale: 1.05,
@@ -635,17 +717,27 @@ export default function Profile() {
 
             {/* Placeholder for other tabs */}
             {activeTab !== 'overview' && activeTab !== 'skills' && (
-              <div className="tab-content bg-white rounded-2xl shadow-lg border p-8">
+              <div className={`tab-content rounded-2xl shadow-lg border p-8 transition-colors duration-300 ${
+                isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-200'
+              }`}>
                 <div className="text-center py-12">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                  <h3 className={`text-2xl font-bold mb-4 transition-colors ${
+                    isDark ? 'text-dark-text' : 'text-gray-900'
+                  }`}>
                     {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Section
                   </h3>
-                  <p className="text-gray-600 mb-6">
+                  <p className={`mb-6 transition-colors ${
+                    isDark ? 'text-dark-muted' : 'text-gray-600'
+                  }`}>
                     This section is under development. Coming soon! 🚀
                   </p>
                   <div className="flex justify-center">
-                    <div className="w-16 h-16 bg-asu-maroon/10 rounded-full flex items-center justify-center">
-                      <Award className="h-8 w-8 text-asu-maroon" />
+                    <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors ${
+                      isDark ? 'bg-lime/10' : 'bg-asu-maroon/10'
+                    }`}>
+                      <Award className={`h-8 w-8 ${
+                        isDark ? 'text-lime' : 'text-asu-maroon'
+                      }`} />
                     </div>
                   </div>
                 </div>
@@ -656,30 +748,50 @@ export default function Profile() {
           {/* Sidebar */}
           <div ref={sidebarRef} className="space-y-6">
             {/* Contact Information */}
-            <div className="bg-white rounded-2xl shadow-lg border p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+            <div className={`rounded-2xl shadow-lg border p-6 transition-colors duration-300 ${
+              isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-200'
+            }`}>
+              <h3 className={`text-xl font-bold mb-4 flex items-center transition-colors ${
+                isDark ? 'text-dark-text' : 'text-gray-900'
+              }`}>
                 <Phone className="h-5 w-5 mr-2" />
                 Contact Info 📞
               </h3>
               <div className="space-y-3">
                 <div className="contact-link flex items-center space-x-3">
-                  <Mail className="h-4 w-4 text-gray-400" />
-                  <span className="text-gray-600">{profileData.email}</span>
+                  <Mail className={`h-4 w-4 ${
+                    isDark ? 'text-dark-muted' : 'text-gray-400'
+                  }`} />
+                  <span className={`transition-colors ${
+                    isDark ? 'text-dark-muted' : 'text-gray-600'
+                  }`}>{profileData.email}</span>
                 </div>
                 <div className="contact-link flex items-center space-x-3">
-                  <Phone className="h-4 w-4 text-gray-400" />
-                  <span className="text-gray-600">{profileData.phone || '(480) 555-0123'}</span>
+                  <Phone className={`h-4 w-4 ${
+                    isDark ? 'text-dark-muted' : 'text-gray-400'
+                  }`} />
+                  <span className={`transition-colors ${
+                    isDark ? 'text-dark-muted' : 'text-gray-600'
+                  }`}>{profileData.phone || '(480) 555-0123'}</span>
                 </div>
                 <div className="contact-link flex items-center space-x-3">
-                  <MapPin className="h-4 w-4 text-gray-400" />
-                  <span className="text-gray-600">{profileData.location || 'Phoenix, AZ'}</span>
+                  <MapPin className={`h-4 w-4 ${
+                    isDark ? 'text-dark-muted' : 'text-gray-400'
+                  }`} />
+                  <span className={`transition-colors ${
+                    isDark ? 'text-dark-muted' : 'text-gray-600'
+                  }`}>{profileData.location || 'Phoenix, AZ'}</span>
                 </div>
               </div>
             </div>
 
             {/* Links */}
-            <div className="bg-white rounded-2xl shadow-lg border p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+            <div className={`rounded-2xl shadow-lg border p-6 transition-colors duration-300 ${
+              isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-200'
+            }`}>
+              <h3 className={`text-xl font-bold mb-4 flex items-center transition-colors ${
+                isDark ? 'text-dark-text' : 'text-gray-900'
+              }`}>
                 <LinkIcon className="h-5 w-5 mr-2" />
                 Links 🔗
               </h3>
@@ -690,7 +802,9 @@ export default function Profile() {
                       href={profileData.portfolio_url || '#'} 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className="contact-link flex items-center space-x-3 text-asu-maroon hover:text-asu-maroon-dark transition-colors"
+                      className={`contact-link flex items-center space-x-3 transition-colors ${
+                        isDark ? 'text-lime hover:text-dark-accent' : 'text-asu-maroon hover:text-asu-maroon-dark'
+                      }`}
                       onMouseEnter={() => {
                         gsap.to(event?.currentTarget, {
                           x: 5,
@@ -713,7 +827,9 @@ export default function Profile() {
                       href={profileData.github_url || '#'} 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className="contact-link flex items-center space-x-3 text-asu-maroon hover:text-asu-maroon-dark transition-colors"
+                      className={`contact-link flex items-center space-x-3 transition-colors ${
+                        isDark ? 'text-lime hover:text-dark-accent' : 'text-asu-maroon hover:text-asu-maroon-dark'
+                      }`}
                       onMouseEnter={() => {
                         gsap.to(event?.currentTarget, {
                           x: 5,
@@ -738,7 +854,9 @@ export default function Profile() {
                   href={profileData.linkedin_url || '#'} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="contact-link flex items-center space-x-3 text-asu-maroon hover:text-asu-maroon-dark transition-colors"
+                  className={`contact-link flex items-center space-x-3 transition-colors ${
+                    isDark ? 'text-lime hover:text-dark-accent' : 'text-asu-maroon hover:text-asu-maroon-dark'
+                  }`}
                   onMouseEnter={() => {
                     gsap.to(event?.currentTarget, {
                       x: 5,
@@ -762,7 +880,9 @@ export default function Profile() {
                     href={profileData.website || '#'} 
                     target="_blank" 
                     rel="noopener noreferrer" 
-                    className="contact-link flex items-center space-x-3 text-asu-maroon hover:text-asu-maroon-dark transition-colors"
+                    className={`contact-link flex items-center space-x-3 transition-colors ${
+                      isDark ? 'text-lime hover:text-dark-accent' : 'text-asu-maroon hover:text-asu-maroon-dark'
+                    }`}
                     onMouseEnter={() => {
                       gsap.to(event?.currentTarget, {
                         x: 5,
@@ -786,7 +906,11 @@ export default function Profile() {
             </div>
 
             {/* Stats */}
-            <div className="bg-gradient-to-br from-asu-maroon to-asu-maroon-dark rounded-2xl p-6 text-white">
+            <div className={`rounded-2xl p-6 text-white transition-colors duration-300 ${
+              isDark 
+                ? 'bg-gradient-to-br from-dark-surface to-dark-accent' 
+                : 'bg-gradient-to-br from-asu-maroon to-asu-maroon-dark'
+            }`}>
               <h3 className="text-xl font-bold mb-4 flex items-center">
                 <TrendingUp className="h-5 w-5 mr-2" />
                 Profile Stats 📊

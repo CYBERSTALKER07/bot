@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Save, Loader2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { supabase } from '../../lib/supabase';
 
 export default function ProfileSetup() {
   const { user, updateProfile } = useAuth();
+  const { isDark } = useTheme();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -132,282 +134,401 @@ export default function ProfileSetup() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-lg shadow p-8">
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-gray-900">Complete Your Profile</h1>
-            <p className="text-gray-600 mt-2">
-              Help us personalize your experience by completing your profile information.
+    <div className={`min-h-screen transition-colors duration-300 ${
+      isDark ? 'bg-dark-bg' : 'bg-gray-50'
+    }`}>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className={`shadow-2xl rounded-2xl overflow-hidden border transition-colors duration-300 ${
+          isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-200'
+        }`}>
+          <div className={`px-8 py-6 border-b transition-colors duration-300 ${
+            isDark ? 'border-lime/20' : 'border-gray-200'
+          }`}>
+            <h1 className={`text-3xl font-bold transition-colors ${
+              isDark ? 'text-dark-text' : 'text-gray-900'
+            }`}>Complete Your Profile</h1>
+            <p className={`mt-2 text-lg transition-colors ${
+              isDark ? 'text-dark-muted' : 'text-gray-600'
+            }`}>
+              {user?.role === 'student' 
+                ? 'Tell us about yourself to get personalized job recommendations'
+                : 'Share your company information to attract top talent'
+              }
             </p>
           </div>
 
-          {error && (
-            <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
-              {error}
-            </div>
-          )}
+          <div className="px-8 py-6">
+            {error && (
+              <div className={`mb-6 border px-4 py-3 rounded-md transition-colors ${
+                isDark 
+                  ? 'bg-red-900/20 border-red-500/30 text-red-300' 
+                  : 'bg-red-50 border-red-200 text-red-700'
+              }`}>
+                {error}
+              </div>
+            )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {user.role === 'student' ? (
-              <>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={studentProfile.full_name}
-                    onChange={(e) => setStudentProfile(prev => ({ ...prev, full_name: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {user?.role === 'student' ? (
+                <>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Major *
+                    <label className={`block text-sm font-medium mb-2 transition-colors ${
+                      isDark ? 'text-dark-text' : 'text-gray-700'
+                    }`}>
+                      Full Name *
                     </label>
-                    <select
-                      required
-                      value={studentProfile.major}
-                      onChange={(e) => setStudentProfile(prev => ({ ...prev, major: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
-                    >
-                      <option value="">Select your major</option>
-                      {majors.map(major => (
-                        <option key={major} value={major}>{major}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Graduation Year *
-                    </label>
-                    <select
-                      required
-                      value={studentProfile.graduation_year}
-                      onChange={(e) => setStudentProfile(prev => ({ ...prev, graduation_year: parseInt(e.target.value) }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
-                    >
-                      {Array.from({ length: 6 }, (_, i) => new Date().getFullYear() + i).map(year => (
-                        <option key={year} value={year}>{year}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    GPA (Optional)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    max="4"
-                    value={studentProfile.gpa}
-                    onChange={(e) => setStudentProfile(prev => ({ ...prev, gpa: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
-                    placeholder="3.50"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Skills
-                  </label>
-                  <div className="flex gap-2 mb-2">
                     <input
                       type="text"
-                      value={skillInput}
-                      onChange={(e) => setSkillInput(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
-                      placeholder="Add a skill (e.g., JavaScript, Python)"
+                      required
+                      value={studentProfile.full_name}
+                      onChange={(e) => setStudentProfile(prev => ({ ...prev, full_name: e.target.value }))}
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
+                        isDark 
+                          ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
+                          : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
+                      }`}
                     />
-                    <button
-                      type="button"
-                      onClick={addSkill}
-                      className="px-4 py-2 bg-aut-maroon text-white rounded-md hover:bg-aut-maroon-dark transition-colors"
-                    >
-                      Add
-                    </button>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {studentProfile.skills.map(skill => (
-                      <span
-                        key={skill}
-                        className="bg-aut-maroon/10 text-aut-maroon px-3 py-1 rounded-full text-sm flex items-center gap-1"
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className={`block text-sm font-medium mb-2 transition-colors ${
+                        isDark ? 'text-dark-text' : 'text-gray-700'
+                      }`}>
+                        Major *
+                      </label>
+                      <select
+                        required
+                        value={studentProfile.major}
+                        onChange={(e) => setStudentProfile(prev => ({ ...prev, major: e.target.value }))}
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
+                          isDark 
+                            ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text' 
+                            : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
+                        }`}
                       >
-                        {skill}
-                        <button
-                          type="button"
-                          onClick={() => removeSkill(skill)}
-                          className="text-aut-maroon hover:text-aut-maroon-dark"
+                        <option value="">Select your major</option>
+                        {majors.map(major => (
+                          <option key={major} value={major}>{major}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className={`block text-sm font-medium mb-2 transition-colors ${
+                        isDark ? 'text-dark-text' : 'text-gray-700'
+                      }`}>
+                        Graduation Year *
+                      </label>
+                      <select
+                        required
+                        value={studentProfile.graduation_year}
+                        onChange={(e) => setStudentProfile(prev => ({ ...prev, graduation_year: parseInt(e.target.value) }))}
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
+                          isDark 
+                            ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text' 
+                            : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
+                        }`}
+                      >
+                        {Array.from({ length: 6 }, (_, i) => new Date().getFullYear() + i).map(year => (
+                          <option key={year} value={year}>{year}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 transition-colors ${
+                      isDark ? 'text-dark-text' : 'text-gray-700'
+                    }`}>
+                      GPA (Optional)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="4"
+                      value={studentProfile.gpa}
+                      onChange={(e) => setStudentProfile(prev => ({ ...prev, gpa: e.target.value }))}
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
+                        isDark 
+                          ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
+                          : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
+                      }`}
+                      placeholder="3.50"
+                    />
+                  </div>
+
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 transition-colors ${
+                      isDark ? 'text-dark-text' : 'text-gray-700'
+                    }`}>
+                      Skills
+                    </label>
+                    <div className="flex gap-2 mb-2">
+                      <input
+                        type="text"
+                        value={skillInput}
+                        onChange={(e) => setSkillInput(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
+                        className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
+                          isDark 
+                            ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
+                            : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
+                        }`}
+                        placeholder="Add a skill (e.g., JavaScript, Python)"
+                      />
+                      <button
+                        type="button"
+                        onClick={addSkill}
+                        className={`px-4 py-2 text-white rounded-md transition-colors ${
+                          isDark 
+                            ? 'bg-lime hover:bg-dark-accent focus:ring-lime text-dark-surface' 
+                            : 'bg-asu-maroon hover:bg-asu-maroon-dark focus:ring-asu-maroon'
+                        }`}
+                      >
+                        Add
+                      </button>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {studentProfile.skills.map((skill, index) => (
+                        <span
+                          key={index}
+                          className={`px-3 py-1 text-sm rounded-full flex items-center gap-2 transition-colors ${
+                            isDark 
+                              ? 'bg-lime/20 text-lime' 
+                              : 'bg-asu-maroon/10 text-asu-maroon'
+                          }`}
                         >
-                          ×
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Bio
-                  </label>
-                  <textarea
-                    rows={4}
-                    value={studentProfile.bio}
-                    onChange={(e) => setStudentProfile(prev => ({ ...prev, bio: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
-                    placeholder="Tell employers about yourself, your interests, and career goals..."
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Website/Portfolio (Optional)
-                  </label>
-                  <input
-                    type="url"
-                    value={studentProfile.website}
-                    onChange={(e) => setStudentProfile(prev => ({ ...prev, website: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
-                    placeholder="https://yourportfolio.com"
-                  />
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Company Name *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={employerProfile.company_name}
-                      onChange={(e) => setEmployerProfile(prev => ({ ...prev, company_name: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Your Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={employerProfile.full_name}
-                      onChange={(e) => setEmployerProfile(prev => ({ ...prev, full_name: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Industry *
-                    </label>
-                    <select
-                      required
-                      value={employerProfile.industry}
-                      onChange={(e) => setEmployerProfile(prev => ({ ...prev, industry: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
-                    >
-                      <option value="">Select industry</option>
-                      {industries.map(industry => (
-                        <option key={industry} value={industry}>{industry}</option>
+                          {skill}
+                          <button
+                            type="button"
+                            onClick={() => setStudentProfile(prev => ({
+                              ...prev,
+                              skills: prev.skills.filter((_, i) => i !== index)
+                            }))}
+                            className={`hover:opacity-75 transition-opacity ${
+                              isDark ? 'text-lime' : 'text-asu-maroon'
+                            }`}
+                          >
+                            ×
+                          </button>
+                        </span>
                       ))}
-                    </select>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Company Size *
-                    </label>
-                    <select
-                      required
-                      value={employerProfile.company_size}
-                      onChange={(e) => setEmployerProfile(prev => ({ ...prev, company_size: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
-                    >
-                      <option value="">Select company size</option>
-                      {companySizes.map(size => (
-                        <option key={size} value={size}>{size}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Your Title *
+                    <label className={`block text-sm font-medium mb-2 transition-colors ${
+                      isDark ? 'text-dark-text' : 'text-gray-700'
+                    }`}>
+                      Bio
                     </label>
-                    <input
-                      type="text"
-                      required
-                      value={employerProfile.contact_title}
-                      onChange={(e) => setEmployerProfile(prev => ({ ...prev, contact_title: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
-                      placeholder="e.g., Talent Acquisition Manager"
+                    <textarea
+                      rows={4}
+                      value={studentProfile.bio}
+                      onChange={(e) => setStudentProfile(prev => ({ ...prev, bio: e.target.value }))}
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
+                        isDark 
+                          ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
+                          : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
+                      }`}
+                      placeholder="Tell employers about yourself, your interests, and career goals..."
                     />
                   </div>
+
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Website
+                    <label className={`block text-sm font-medium mb-2 transition-colors ${
+                      isDark ? 'text-dark-text' : 'text-gray-700'
+                    }`}>
+                      Website/Portfolio (Optional)
                     </label>
                     <input
                       type="url"
-                      value={employerProfile.website}
-                      onChange={(e) => setEmployerProfile(prev => ({ ...prev, website: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
-                      placeholder="https://company.com"
+                      value={studentProfile.website}
+                      onChange={(e) => setStudentProfile(prev => ({ ...prev, website: e.target.value }))}
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
+                        isDark 
+                          ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
+                          : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
+                      }`}
+                      placeholder="https://yourportfolio.com"
                     />
                   </div>
-                </div>
+                </>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className={`block text-sm font-medium mb-2 transition-colors ${
+                        isDark ? 'text-dark-text' : 'text-gray-700'
+                      }`}>
+                        Company Name *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={employerProfile.company_name}
+                        onChange={(e) => setEmployerProfile(prev => ({ ...prev, company_name: e.target.value }))}
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
+                          isDark 
+                            ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text' 
+                            : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
+                        }`}
+                      />
+                    </div>
+                    <div>
+                      <label className={`block text-sm font-medium mb-2 transition-colors ${
+                        isDark ? 'text-dark-text' : 'text-gray-700'
+                      }`}>
+                        Your Full Name *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={employerProfile.full_name}
+                        onChange={(e) => setEmployerProfile(prev => ({ ...prev, full_name: e.target.value }))}
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
+                          isDark 
+                            ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text' 
+                            : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
+                        }`}
+                      />
+                    </div>
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Company Description *
-                  </label>
-                  <textarea
-                    rows={4}
-                    required
-                    value={employerProfile.bio}
-                    onChange={(e) => setEmployerProfile(prev => ({ ...prev, bio: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:border-transparent"
-                    placeholder="Describe your company, culture, and what makes it a great place to work..."
-                  />
-                </div>
-              </>
-            )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className={`block text-sm font-medium mb-2 transition-colors ${
+                        isDark ? 'text-dark-text' : 'text-gray-700'
+                      }`}>
+                        Industry *
+                      </label>
+                      <select
+                        required
+                        value={employerProfile.industry}
+                        onChange={(e) => setEmployerProfile(prev => ({ ...prev, industry: e.target.value }))}
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
+                          isDark 
+                            ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text' 
+                            : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
+                        }`}
+                      >
+                        <option value="">Select industry</option>
+                        {industries.map(industry => (
+                          <option key={industry} value={industry}>{industry}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className={`block text-sm font-medium mb-2 transition-colors ${
+                        isDark ? 'text-dark-text' : 'text-gray-700'
+                      }`}>
+                        Company Size *
+                      </label>
+                      <select
+                        required
+                        value={employerProfile.company_size}
+                        onChange={(e) => setEmployerProfile(prev => ({ ...prev, company_size: e.target.value }))}
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
+                          isDark 
+                            ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text' 
+                            : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
+                        }`}
+                      >
+                        <option value="">Select company size</option>
+                        {companySizes.map(size => (
+                          <option key={size} value={size}>{size}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
 
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                disabled={loading}
-                className="bg-aut-maroon text-white px-8 py-3 rounded-md hover:bg-aut-maroon-dark focus:outline-none focus:ring-2 focus:ring-aut-maroon focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    <span>Saving...</span>
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-5 w-5" />
-                    <span>Complete Profile</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className={`block text-sm font-medium mb-2 transition-colors ${
+                        isDark ? 'text-dark-text' : 'text-gray-700'
+                      }`}>
+                        Your Title *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={employerProfile.contact_title}
+                        onChange={(e) => setEmployerProfile(prev => ({ ...prev, contact_title: e.target.value }))}
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
+                          isDark 
+                            ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text' 
+                            : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
+                        }`}
+                      />
+                    </div>
+                    <div>
+                      <label className={`block text-sm font-medium mb-2 transition-colors ${
+                        isDark ? 'text-dark-text' : 'text-gray-700'
+                      }`}>
+                        Website (Optional)
+                      </label>
+                      <input
+                        type="url"
+                        value={employerProfile.website}
+                        onChange={(e) => setEmployerProfile(prev => ({ ...prev, website: e.target.value }))}
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
+                          isDark 
+                            ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
+                            : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
+                        }`}
+                        placeholder="https://yourcompany.com"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 transition-colors ${
+                      isDark ? 'text-dark-text' : 'text-gray-700'
+                    }`}>
+                      Company Description *
+                    </label>
+                    <textarea
+                      rows={4}
+                      required
+                      value={employerProfile.bio}
+                      onChange={(e) => setEmployerProfile(prev => ({ ...prev, bio: e.target.value }))}
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
+                        isDark 
+                          ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
+                          : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
+                      }`}
+                      placeholder="Describe your company, culture, and what makes it a great place to work..."
+                    />
+                  </div>
+                </>
+              )}
+
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`px-8 py-3 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2 ${
+                    isDark 
+                      ? 'bg-lime hover:bg-dark-accent focus:ring-lime text-dark-surface' 
+                      : 'bg-asu-maroon hover:bg-asu-maroon-dark focus:ring-asu-maroon'
+                  }`}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-5 w-5" />
+                      <span>Complete Profile</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
