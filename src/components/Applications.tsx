@@ -1,32 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
 import { Link } from 'react-router-dom';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useTheme } from '../context/ThemeContext';
 import { 
   Search, 
   Filter, 
+  Eye, 
+  MessageSquare, 
   Calendar, 
   MapPin, 
   Building2, 
-  Clock, 
-  Eye, 
-  FileText, 
-  Download,
-  Star,
-  AlertCircle,
-  CheckCircle,
-  XCircle,
-  Loader2,
-  MessageSquare,
-  ArrowRight,
+  Star, 
+  Heart, 
+  Coffee, 
+  Sparkles, 
+  ChevronRight,
+  Clock,
+  User,
   Briefcase,
-  TrendingUp,
-  Award,
-  BookOpen,
-  Target,
-  Users,
-  Zap
+  CheckCircle,
+  XCircle
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface Application {
   id: string;
@@ -48,6 +46,7 @@ interface Application {
 
 export default function Applications() {
   const { user } = useAuth();
+  const { isDark } = useTheme();
   const containerRef = useRef<HTMLDivElement>(null);
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
@@ -289,280 +288,311 @@ export default function Applications() {
   }
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-gray-50 to-white relative">
-      {/* Decorative elements */}
-      <div className="applications-decoration absolute top-20 right-20 w-4 h-4 bg-asu-gold/40 rounded-full"></div>
-      <div className="applications-decoration absolute top-40 left-20 w-3 h-3 bg-asu-maroon/30 rounded-full"></div>
-      <Briefcase className="applications-decoration absolute top-32 right-1/4 h-6 w-6 text-asu-gold/60" />
-      <Target className="applications-decoration absolute bottom-40 left-1/4 h-5 w-5 text-asu-maroon/50" />
-      <Award className="applications-decoration absolute bottom-32 right-1/3 h-5 w-5 text-asu-gold/70" />
+    <div ref={containerRef} className={`min-h-screen ${isDark ? 'bg-gradient-to-br from-gray-900 to-gray-800' : 'bg-gradient-to-br from-gray-50 to-white'} relative`}>
+      {/* Enhanced decorative elements */}
+      <div className="application-decoration absolute top-16 right-24 w-4 h-4 bg-asu-gold/50 rounded-full"></div>
+      <div className="application-decoration absolute top-32 left-16 w-3 h-3 bg-asu-maroon/40 rounded-full"></div>
+      <Sparkles className="application-decoration absolute top-24 left-1/4 h-5 w-5 text-asu-gold/70" />
+      <Coffee className="application-decoration absolute bottom-32 right-1/4 h-4 w-4 text-asu-maroon/60" />
+      <Heart className="application-decoration absolute bottom-20 left-1/3 h-4 w-4 text-asu-gold/80" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="applications-header mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">My Applications 📋</h1>
-          <p className="text-gray-600">Track your job applications and their status</p>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 transform hover:scale-105 transition-transform">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Total</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-              </div>
-              <Users className="h-8 w-8 text-asu-maroon" />
-            </div>
-          </div>
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 transform hover:scale-105 transition-transform">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Pending</p>
-                <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
-              </div>
-              <Clock className="h-8 w-8 text-yellow-600" />
-            </div>
-          </div>
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 transform hover:scale-105 transition-transform">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Reviewed</p>
-                <p className="text-2xl font-bold text-blue-600">{stats.reviewed}</p>
-              </div>
-              <Eye className="h-8 w-8 text-blue-600" />
-            </div>
-          </div>
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 transform hover:scale-105 transition-transform">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Interview</p>
-                <p className="text-2xl font-bold text-purple-600">{stats.interview}</p>
-              </div>
-              <MessageSquare className="h-8 w-8 text-purple-600" />
-            </div>
-          </div>
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 transform hover:scale-105 transition-transform">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Accepted</p>
-                <p className="text-2xl font-bold text-green-600">{stats.accepted}</p>
-              </div>
-              <CheckCircle className="h-8 w-8 text-green-600" />
-            </div>
-          </div>
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 transform hover:scale-105 transition-transform">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Rejected</p>
-                <p className="text-2xl font-bold text-red-600">{stats.rejected}</p>
-              </div>
-              <XCircle className="h-8 w-8 text-red-600" />
-            </div>
-          </div>
-        </div>
-
-        {/* Filters */}
-        <div className="applications-filters bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-gray-100 mb-8 relative overflow-hidden"
-             style={{
-               background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
-               borderRadius: `${24 + Math.random() * 8}px ${28 + Math.random() * 6}px ${26 + Math.random() * 10}px ${22 + Math.random() * 8}px`
-             }}>
-          <div className="absolute inset-0 bg-gradient-to-br from-asu-maroon/3 via-transparent to-asu-gold/3" />
-          <div className="relative z-10">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-              <div className="flex-1 max-w-md">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search applications... 🔍"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-white/80 backdrop-blur-sm rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md"
-                    style={{
-                      borderRadius: `${16 + Math.random() * 4}px ${20 + Math.random() * 4}px ${18 + Math.random() * 6}px ${14 + Math.random() * 4}px`
-                    }}
-                  />
+        {/* Enhanced Header */}
+        <div ref={headerRef} className="mb-12">
+          <div className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark rounded-3xl p-8 text-white relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-asu-gold/20 rounded-full blur-xl"></div>
+            <div className="relative z-10">
+              <h1 className="text-5xl font-bold mb-4 relative">
+                My Applications 📋
+                <div className="absolute -top-3 -right-8 w-6 h-6 bg-asu-gold rounded-full"></div>
+              </h1>
+              <p className="text-xl text-white/90 mb-6 max-w-3xl">
+                Track your job applications and stay updated on your application status ✨
+              </p>
+              <div className="flex flex-wrap gap-4 text-sm">
+                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
+                  <Briefcase className="h-5 w-5" />
+                  <span>{applications.length} total applications 📊</span>
+                </div>
+                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
+                  <Clock className="h-5 w-5" />
+                  <span>{applications.filter(app => app.status === 'pending').length} pending applications ⏳</span>
+                </div>
+                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
+                  <CheckCircle className="h-5 w-5" />
+                  <span>{applications.filter(app => app.status === 'accepted').length} accepted applications 🎉</span>
                 </div>
               </div>
-              <div className="flex items-center space-x-4">
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value as any)}
-                  className="px-4 py-3 bg-white/80 backdrop-blur-sm rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent shadow-inner cursor-pointer hover:shadow-md transition-all duration-200"
-                  style={{
-                    borderRadius: `${16 + Math.random() * 4}px ${20 + Math.random() * 4}px ${18 + Math.random() * 6}px ${14 + Math.random() * 4}px`
-                  }}
-                >
-                  <option value="all">All Status 📋</option>
-                  <option value="pending">Pending ⏳</option>
-                  <option value="reviewed">Reviewed 👀</option>
-                  <option value="interview">Interview 💬</option>
-                  <option value="accepted">Accepted ✅</option>
-                  <option value="rejected">Rejected ❌</option>
-                </select>
-                <select
-                  value={typeFilter}
-                  onChange={(e) => setTypeFilter(e.target.value as any)}
-                  className="px-4 py-3 bg-white/80 backdrop-blur-sm rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent shadow-inner cursor-pointer hover:shadow-md transition-all duration-200"
-                  style={{
-                    borderRadius: `${16 + Math.random() * 4}px ${20 + Math.random() * 4}px ${18 + Math.random() * 6}px ${14 + Math.random() * 4}px`
-                  }}
-                >
-                  <option value="all">All Types 📝</option>
-                  <option value="internship">Internship 🎓</option>
-                  <option value="full-time">Full-time 💼</option>
-                  <option value="part-time">Part-time ⏰</option>
-                </select>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
-                  className="px-4 py-3 bg-white/80 backdrop-blur-sm rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent shadow-inner cursor-pointer hover:shadow-md transition-all duration-200"
-                  style={{
-                    borderRadius: `${16 + Math.random() * 4}px ${20 + Math.random() * 4}px ${18 + Math.random() * 6}px ${14 + Math.random() * 4}px`
-                  }}
-                >
-                  <option value="date">Sort by Date 📅</option>
-                  <option value="status">Sort by Status 🔄</option>
-                  <option value="company">Sort by Company 🏢</option>
-                </select>
-              </div>
             </div>
           </div>
         </div>
 
-        {/* Applications List */}
-        <div className="space-y-6">
-          {sortedApplications.map((application, index) => (
-            <div key={application.id} className="application-card bg-white/85 backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden relative group"
-                 style={{
-                   background: 'linear-gradient(150deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
-                   borderRadius: `${20 + Math.random() * 10}px ${25 + Math.random() * 8}px ${22 + Math.random() * 12}px ${18 + Math.random() * 10}px`,
-                   transform: `rotate(${(index % 3 - 1) * 0.3}deg)`
-                 }}>
-              <div className="absolute inset-0 bg-gradient-to-br from-asu-maroon/3 via-transparent to-asu-gold/3 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              
-              <div className="p-8 relative z-10">
-                <div className="flex flex-col lg:flex-row lg:items-center gap-6">
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center space-x-4">
-                        <div 
-                          className="w-16 h-16 bg-gradient-to-br from-asu-maroon/80 to-asu-maroon-dark shadow-lg flex items-center justify-center text-white font-bold text-xl"
-                          style={{
-                            borderRadius: `${15 + Math.random() * 8}px ${20 + Math.random() * 6}px ${18 + Math.random() * 10}px ${14 + Math.random() * 8}px`,
-                            transform: `rotate(${index % 2 === 0 ? 3 : -3}deg)`
-                          }}
-                        >
-                          {application.company_name.charAt(0)}
-                        </div>
-                        <div>
-                          <h3 className="text-2xl font-bold text-gray-900 mb-2 hover:text-asu-maroon transition-colors cursor-pointer">
-                            {application.job_title}
-                          </h3>
-                          <div className="flex items-center space-x-4 text-sm text-gray-600">
-                            <div className="flex items-center space-x-2">
-                              <Building2 className="h-4 w-4" />
-                              <span className="font-medium">{application.company_name}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap gap-3 mb-4">
-                      <div className="flex items-center space-x-2 bg-white/60 backdrop-blur-sm rounded-full px-3 py-1.5">
-                        <MapPin className="h-4 w-4 text-blue-600" />
-                        <span className="font-medium">{application.location}</span>
-                      </div>
-                      <div className="flex items-center space-x-2 bg-white/60 backdrop-blur-sm rounded-full px-3 py-1.5">
-                        <Calendar className="h-4 w-4 text-green-600" />
-                        <span className="font-medium">Applied {new Date(application.applied_date).toLocaleDateString()}</span>
-                      </div>
-                      <span className={`px-4 py-2 rounded-full text-sm font-medium ${getTypeColor(application.type)} backdrop-blur-sm`}>
-                        {application.type} {application.type === 'internship' ? '🎓' : application.type === 'full-time' ? '💼' : '⏰'}
-                      </span>
-                    </div>
-
-                    {application.description && (
-                      <p className="text-gray-700 text-sm mb-4 line-clamp-2 leading-relaxed opacity-90">
-                        {application.description}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="flex flex-col items-end space-y-3">
-                    <div className="flex items-center space-x-3">
-                      <span className={`flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-semibold border backdrop-blur-sm ${getStatusColor(application.status)}`}>
-                        {getStatusIcon(application.status)}
-                        <span>{application.status.charAt(0).toUpperCase() + application.status.slice(1)}</span>
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      {application.salary_range && (
-                        <p className="text-lg font-bold text-gray-900 mb-1">{application.salary_range}</p>
-                      )}
-                      <p className="text-sm text-gray-600">
-                        Updated {new Date(application.last_updated).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
+        {/* Enhanced Stats Cards */}
+        <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+          {Object.entries(statusCounts).map(([status, count], index) => (
+            <div 
+              key={status} 
+              className={`stat-card ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} rounded-2xl shadow-lg border p-6 hover:shadow-xl transition-all duration-300 cursor-pointer`}
+              // ...existing mouse events...
+            >
+              <div className="text-center">
+                <div className="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-asu-maroon/20 to-asu-gold/20 rounded-full flex items-center justify-center">
+                  {getStatusIcon(status)}
                 </div>
-
-                <div className="flex space-x-4 mt-6">
-                  <Link
-                    to={`/job/${application.job_id}`}
-                    className="flex items-center space-x-2 bg-gradient-to-r from-asu-maroon/90 to-asu-maroon-dark/90 text-white px-6 py-3 rounded-2xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md backdrop-blur-sm"
-                  >
-                    <Eye className="h-4 w-4" />
-                    <span>View Job Details</span>
-                  </Link>
-                  {application.status === 'interview' && (
-                    <button className="flex items-center space-x-2 border-2 border-purple-500 text-purple-600 px-6 py-3 rounded-2xl hover:bg-purple-500 hover:text-white transition-all duration-300 font-semibold backdrop-blur-sm">
-                      <Users className="h-4 w-4" />
-                      <span>Interview Details</span>
-                    </button>
-                  )}
-                  <button className="flex items-center space-x-2 border-2 border-gray-300 text-gray-600 px-6 py-3 rounded-2xl hover:bg-gray-100 transition-all duration-300 font-semibold backdrop-blur-sm">
-                    <FileText className="h-4 w-4" />
-                    <span>Add Notes</span>
-                  </button>
+                <div className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-2`}>{count}</div>
+                <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'} font-medium capitalize`}>
+                  {status === 'all' ? 'Total 📋' : status + ' ' + (status === 'pending' ? '⏳' : status === 'accepted' ? '🎉' : status === 'rejected' ? '❌' : '👀')}
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {filteredApplications.length === 0 && (
-          <div className="text-center py-16 bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg border border-gray-100">
-            <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
-              <Search className="h-12 w-12 text-gray-400" />
+        {/* Enhanced Filters */}
+        <div ref={filtersRef} className={`${isDark ? 'bg-gradient-to-r from-gray-800 to-gray-700 border-gray-600' : 'bg-gradient-to-r from-white to-gray-50 border-gray-100'} rounded-3xl shadow-lg border p-8 mb-12`}>
+          <div className="flex flex-col lg:flex-row gap-6">
+            <div className="flex-1 relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search applications... 🔍"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className={`w-full pl-12 pr-4 py-4 border-2 ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-200 bg-white text-gray-900'} rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md`}
+              />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">No applications found</h3>
-            <p className="text-gray-600 mb-8 text-lg max-w-md mx-auto">
-              Try adjusting your search criteria or start applying to more positions! 🚀
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button 
-                onClick={() => {
-                  setSearchTerm('');
-                  setStatusFilter('all');
-                }}
-                className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white px-8 py-4 rounded-2xl hover:shadow-xl transition-all duration-300 font-semibold shadow-lg"
+            <div className="flex flex-wrap items-center gap-4">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className={`px-4 py-4 border-2 ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-200 bg-white text-gray-900'} rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent shadow-inner cursor-pointer hover:shadow-md transition-all duration-200`}
               >
-                Clear Filters 🔄
-              </button>
-              <Link
-                to="/jobs"
-                className="border-2 border-asu-maroon text-asu-maroon px-8 py-4 rounded-2xl hover:bg-asu-maroon hover:text-white transition-all duration-300 font-semibold shadow-sm hover:shadow-md"
+                <option value="all">All Status 📋</option>
+                <option value="pending">Pending ⏳</option>
+                <option value="accepted">Accepted 🎉</option>
+                <option value="rejected">Rejected ❌</option>
+                <option value="interview">Interview 👀</option>
+              </select>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className={`px-4 py-4 border-2 ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-200 bg-white text-gray-900'} rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent shadow-inner cursor-pointer hover:shadow-md transition-all duration-200`}
               >
-                Browse Jobs 🔍
-              </Link>
+                <option value="date">Sort by Date 📅</option>
+                <option value="company">Sort by Company 🏢</option>
+                <option value="status">Sort by Status 📊</option>
+              </select>
             </div>
           </div>
-        )}
+        </div>
+
+        {/* Enhanced Applications List */}
+        <div ref={contentRef} className="space-y-6">
+          {filteredApplications.map((application, index) => (
+            <div
+              key={application.id}
+              className={`application-card ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} rounded-3xl shadow-lg border hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer`}
+              // ...existing mouse events...
+            >
+              <div className="p-8">
+                <div className="flex items-start justify-between mb-6">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-16 h-16 bg-gradient-to-br from-asu-maroon to-asu-maroon-dark rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                      {application.company.charAt(0)}
+                    </div>
+                    <div>
+                      <h3 className={`font-bold text-xl ${isDark ? 'text-white' : 'text-gray-900'} mb-1`}>{application.job_title}</h3>
+                      <p className="text-asu-maroon font-semibold text-lg">{application.company_name}</p>
+                      <div className="flex items-center space-x-4 mt-2">
+                        <div className="flex items-center space-x-1">
+                          <MapPin className="h-4 w-4 text-gray-400" />
+                          <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{application.location}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <Calendar className="h-4 w-4 text-gray-400" />
+                          <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Applied {new Date(application.applied_date).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <div className={`status-badge px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(application.status)}`}>
+                      <div className="flex items-center space-x-2">
+                        {getStatusIcon(application.status)}
+                        <span className="capitalize">{application.status}</span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleViewApplication(application)}
+                      className={`p-3 ${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'} rounded-full transition-colors duration-200`}
+                    >
+                      <Eye className="h-5 w-5 text-gray-500" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className={`${isDark ? 'bg-gray-700' : 'bg-gray-50'} rounded-2xl p-6 mb-6`}>
+                  <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
+                    {application.description}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {application.requirements.slice(0, 4).map((req, reqIndex) => (
+                    <span
+                      key={reqIndex}
+                      className="requirement-tag px-4 py-2 bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white rounded-full text-sm font-medium shadow-md"
+                    >
+                      {req}
+                    </span>
+                  ))}
+                  {application.requirements.length > 4 && (
+                    <span className={`px-4 py-2 ${isDark ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-600'} rounded-full text-sm font-medium`}>
+                      +{application.requirements.length - 4} more
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-600">
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2">
+                      <Building2 className="h-4 w-4 text-gray-400" />
+                      <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{application.type}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Star className="h-4 w-4 text-yellow-400" />
+                      <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{application.salary_range}</span>
+                    </div>
+                  </div>
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => handleViewApplication(application)}
+                      className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white rounded-full hover:shadow-lg transition-all duration-200 font-semibold"
+                    >
+                      <Eye className="h-4 w-4" />
+                      <span>View Details</span>
+                    </button>
+                    <button
+                      onClick={() => handleMessage(application)}
+                      className={`flex items-center space-x-2 px-6 py-3 ${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'} rounded-full transition-all duration-200 font-semibold`}
+                    >
+                      <MessageSquare className="h-4 w-4" />
+                      <span>Message</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
+
+      {/* Enhanced Modal */}
+      {selectedApplication && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className={`modal-content ${isDark ? 'bg-gray-800' : 'bg-white'} rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto`}>
+            <div className="p-8">
+              <div className="flex items-start justify-between mb-8">
+                <div className="flex items-center space-x-4">
+                  <div className="w-20 h-20 bg-gradient-to-br from-asu-maroon to-asu-maroon-dark rounded-full flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+                    {selectedApplication.company.charAt(0)}
+                  </div>
+                  <div>
+                    <h2 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-2`}>{selectedApplication.job_title}</h2>
+                    <p className="text-asu-maroon font-semibold text-xl">{selectedApplication.company_name}</p>
+                    <div className="flex items-center space-x-4 mt-2">
+                      <div className="flex items-center space-x-1">
+                        <MapPin className="h-4 w-4 text-gray-400" />
+                        <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{selectedApplication.location}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Calendar className="h-4 w-4 text-gray-400" />
+                        <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Applied {new Date(selectedApplication.applied_date).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <div className={`status-badge px-6 py-3 rounded-full text-sm font-semibold ${getStatusColor(selectedApplication.status)}`}>
+                    <div className="flex items-center space-x-2">
+                      {getStatusIcon(selectedApplication.status)}
+                      <span className="capitalize">{selectedApplication.status}</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleCloseModal}
+                    className={`p-3 ${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'} rounded-full transition-colors duration-200`}
+                  >
+                    <XCircle className="h-6 w-6 text-gray-500" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div>
+                  <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>Job Description</h3>
+                  <div className={`${isDark ? 'bg-gray-700' : 'bg-gray-50'} rounded-2xl p-6 mb-6`}>
+                    <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
+                      {selectedApplication.description}
+                    </p>
+                  </div>
+
+                  <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>Requirements</h3>
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {selectedApplication.requirements.map((req, reqIndex) => (
+                      <span
+                        key={reqIndex}
+                        className="requirement-tag px-4 py-2 bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white rounded-full text-sm font-medium shadow-md"
+                      >
+                        {req}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>Application Details</h3>
+                  <div className={`${isDark ? 'bg-gray-700' : 'bg-gray-50'} rounded-2xl p-6 space-y-4`}>
+                    <div className="flex justify-between items-center">
+                      <span className={`font-semibold ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Job Type:</span>
+                      <span className={`${isDark ? 'text-white' : 'text-gray-900'}`}>{selectedApplication.type}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className={`font-semibold ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Salary:</span>
+                      <span className={`${isDark ? 'text-white' : 'text-gray-900'}`}>{selectedApplication.salary_range}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className={`font-semibold ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Application Date:</span>
+                      <span className={`${isDark ? 'text-white' : 'text-gray-900'}`}>{new Date(selectedApplication.applied_date).toLocaleDateString()}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className={`font-semibold ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Status:</span>
+                      <span className="capitalize">{selectedApplication.status}</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 space-y-4">
+                    <button
+                      onClick={() => handleMessage(selectedApplication)}
+                      className="w-full flex items-center justify-center space-x-2 px-6 py-4 bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white rounded-full hover:shadow-lg transition-all duration-200 font-semibold"
+                    >
+                      <MessageSquare className="h-5 w-5" />
+                      <span>Send Message</span>
+                    </button>
+                    <button
+                      onClick={handleCloseModal}
+                      className={`w-full flex items-center justify-center space-x-2 px-6 py-4 ${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'} rounded-full transition-all duration-200 font-semibold`}
+                    >
+                      <span>Close</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

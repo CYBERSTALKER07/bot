@@ -1,69 +1,193 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { LucideIcon } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { CircularProgress } from '@mui/material';
+import { useTheme } from '../../context/ThemeContext';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
-  size?: 'sm' | 'md' | 'lg';
-  icon?: LucideIcon;
-  iconPosition?: 'left' | 'right';
+  variant?: 'contained' | 'outlined' | 'text' | 'fab';
+  size?: 'small' | 'medium' | 'large';
+  color?: 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info';
+  startIcon?: LucideIcon;
+  endIcon?: LucideIcon;
   loading?: boolean;
   fullWidth?: boolean;
+  elevation?: number;
+  disableElevation?: boolean;
+  href?: string;
+  component?: React.ElementType;
   children: React.ReactNode;
 }
 
-export default function Button({
-  variant = 'primary',
-  size = 'md',
-  icon: Icon,
-  iconPosition = 'left',
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
+  variant = 'contained',
+  size = 'medium',
+  color = 'primary',
+  startIcon: StartIcon,
+  endIcon: EndIcon,
   loading = false,
   fullWidth = false,
+  elevation = 2,
+  disableElevation = false,
+  href,
+  component,
   className = '',
   children,
   disabled,
   ...props
-}: ButtonProps) {
-  const baseClasses = "inline-flex items-center justify-center font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95";
-
-  const variantClasses = {
-    primary: "bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white hover:shadow-lg focus:ring-asu-maroon dark:from-lime dark:to-dark-accent dark:text-dark-surface dark:focus:ring-lime",
-    secondary: "bg-gradient-to-r from-asu-gold to-asu-gold-dark text-white hover:shadow-lg focus:ring-asu-gold dark:from-dark-accent dark:to-lime dark:text-dark-surface dark:focus:ring-lime",
-    outline: "border-2 border-asu-maroon text-asu-maroon hover:bg-asu-maroon hover:text-white focus:ring-asu-maroon dark:border-lime dark:text-lime dark:hover:bg-lime dark:hover:text-dark-surface dark:focus:ring-lime",
-    ghost: "text-asu-maroon hover:bg-asu-maroon/10 focus:ring-asu-maroon dark:text-lime dark:hover:bg-lime/10 dark:focus:ring-lime",
-    danger: "bg-gradient-to-r from-red-500 to-red-600 text-white hover:shadow-lg focus:ring-red-500 dark:from-red-600 dark:to-red-700 dark:focus:ring-red-600"
-  };
+}, ref) => {
+  const { isDark } = useTheme();
+  
+  const baseClasses = `
+    inline-flex items-center justify-center font-medium transition-all duration-200 
+    focus:outline-none focus:ring-2 focus:ring-offset-2 
+    disabled:opacity-50 disabled:cursor-not-allowed
+    transform hover:scale-105 active:scale-95
+  `;
 
   const sizeClasses = {
-    sm: "px-3 py-2 text-sm rounded-lg",
-    md: "px-6 py-3 text-base rounded-xl",
-    lg: "px-8 py-4 text-lg rounded-2xl"
+    small: 'px-3 py-1.5 text-sm rounded-lg min-h-[32px]',
+    medium: 'px-4 py-2 text-base rounded-xl min-h-[40px]',
+    large: 'px-6 py-3 text-lg rounded-2xl min-h-[48px]'
   };
 
-  const LoadingSpinner = () => (
-    <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent"></div>
-  );
+  const getColorClasses = () => {
+    const colors = {
+      primary: {
+        contained: isDark 
+          ? 'bg-lime text-dark-surface hover:bg-lime/90 focus:ring-lime shadow-lg hover:shadow-xl'
+          : 'bg-asu-maroon text-white hover:bg-asu-maroon/90 focus:ring-asu-maroon shadow-lg hover:shadow-xl',
+        outlined: isDark
+          ? 'border-2 border-lime text-lime hover:bg-lime/10 focus:ring-lime'
+          : 'border-2 border-asu-maroon text-asu-maroon hover:bg-asu-maroon/10 focus:ring-asu-maroon',
+        text: isDark
+          ? 'text-lime hover:bg-lime/10 focus:ring-lime'
+          : 'text-asu-maroon hover:bg-asu-maroon/10 focus:ring-asu-maroon',
+        fab: isDark
+          ? 'bg-lime text-dark-surface hover:bg-lime/90 focus:ring-lime shadow-lg hover:shadow-xl rounded-full'
+          : 'bg-asu-maroon text-white hover:bg-asu-maroon/90 focus:ring-asu-maroon shadow-lg hover:shadow-xl rounded-full'
+      },
+      secondary: {
+        contained: isDark 
+          ? 'bg-dark-accent text-dark-surface hover:bg-dark-accent/90 focus:ring-dark-accent shadow-lg hover:shadow-xl'
+          : 'bg-asu-gold text-white hover:bg-asu-gold/90 focus:ring-asu-gold shadow-lg hover:shadow-xl',
+        outlined: isDark
+          ? 'border-2 border-dark-accent text-dark-accent hover:bg-dark-accent/10 focus:ring-dark-accent'
+          : 'border-2 border-asu-gold text-asu-gold hover:bg-asu-gold/10 focus:ring-asu-gold',
+        text: isDark
+          ? 'text-dark-accent hover:bg-dark-accent/10 focus:ring-dark-accent'
+          : 'text-asu-gold hover:bg-asu-gold/10 focus:ring-asu-gold',
+        fab: isDark
+          ? 'bg-dark-accent text-dark-surface hover:bg-dark-accent/90 focus:ring-dark-accent shadow-lg hover:shadow-xl rounded-full'
+          : 'bg-asu-gold text-white hover:bg-asu-gold/90 focus:ring-asu-gold shadow-lg hover:shadow-xl rounded-full'
+      },
+      success: {
+        contained: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 shadow-lg hover:shadow-xl',
+        outlined: 'border-2 border-green-600 text-green-600 hover:bg-green-50 focus:ring-green-500',
+        text: 'text-green-600 hover:bg-green-50 focus:ring-green-500',
+        fab: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 shadow-lg hover:shadow-xl rounded-full'
+      },
+      error: {
+        contained: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 shadow-lg hover:shadow-xl',
+        outlined: 'border-2 border-red-600 text-red-600 hover:bg-red-50 focus:ring-red-500',
+        text: 'text-red-600 hover:bg-red-50 focus:ring-red-500',
+        fab: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 shadow-lg hover:shadow-xl rounded-full'
+      },
+      warning: {
+        contained: 'bg-amber-600 text-white hover:bg-amber-700 focus:ring-amber-500 shadow-lg hover:shadow-xl',
+        outlined: 'border-2 border-amber-600 text-amber-600 hover:bg-amber-50 focus:ring-amber-500',
+        text: 'text-amber-600 hover:bg-amber-50 focus:ring-amber-500',
+        fab: 'bg-amber-600 text-white hover:bg-amber-700 focus:ring-amber-500 shadow-lg hover:shadow-xl rounded-full'
+      },
+      info: {
+        contained: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 shadow-lg hover:shadow-xl',
+        outlined: 'border-2 border-blue-600 text-blue-600 hover:bg-blue-50 focus:ring-blue-500',
+        text: 'text-blue-600 hover:bg-blue-50 focus:ring-blue-500',
+        fab: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 shadow-lg hover:shadow-xl rounded-full'
+      }
+    };
+
+    return colors[color][variant] || colors.primary[variant];
+  };
+
+  const elevationClasses = !disableElevation && variant === 'contained' 
+    ? `shadow-${elevation === 1 ? 'sm' : elevation === 2 ? 'md' : 'lg'} hover:shadow-xl`
+    : '';
+
+  const widthClasses = fullWidth ? 'w-full' : '';
+  
+  const fabClasses = variant === 'fab' 
+    ? 'w-14 h-14 rounded-full p-0' 
+    : '';
+
+  const buttonClasses = `
+    ${baseClasses}
+    ${sizeClasses[size]}
+    ${getColorClasses()}
+    ${elevationClasses}
+    ${widthClasses}
+    ${fabClasses}
+    ${className}
+  `.trim().replace(/\s+/g, ' ');
+
+  const iconSize = size === 'small' ? 16 : size === 'medium' ? 20 : 24;
+  const loadingSize = size === 'small' ? 16 : size === 'medium' ? 20 : 24;
+
+  const Component = component || (href ? 'a' : 'button');
 
   return (
-    <button
-      className={cn(
-        baseClasses,
-        variantClasses[variant],
-        sizeClasses[size],
-        fullWidth && 'w-full',
-        className
-      )}
+    <Component
+      ref={ref}
+      className={buttonClasses}
       disabled={disabled || loading}
+      href={href}
       {...props}
     >
-      {loading && <LoadingSpinner />}
-      {!loading && Icon && iconPosition === 'left' && (
-        <Icon className={cn('h-5 w-5', children && 'mr-2')} />
+      {loading ? (
+        <CircularProgress 
+          size={loadingSize} 
+          className={`mr-2 ${
+            variant === 'contained' 
+              ? 'text-current' 
+              : isDark ? 'text-lime' : 'text-asu-maroon'
+          }`}
+        />
+      ) : StartIcon && (
+        <StartIcon 
+          size={iconSize} 
+          className={`mr-2 ${variant === 'fab' ? 'mr-0' : ''}`} 
+        />
       )}
-      {!loading && children}
-      {!loading && Icon && iconPosition === 'right' && (
-        <Icon className={cn('h-5 w-5', children && 'ml-2')} />
+      
+      {variant !== 'fab' && children}
+      
+      {!loading && EndIcon && (
+        <EndIcon 
+          size={iconSize} 
+          className={`ml-2 ${variant === 'fab' ? 'ml-0' : ''}`} 
+        />
       )}
-    </button>
+    </Component>
   );
-}
+});
+
+Button.displayName = 'Button';
+
+export default Button;
+
+// Predefined button variants for common use cases
+export const MaterialButton = {
+  Primary: (props: Omit<ButtonProps, 'variant' | 'color'>) => 
+    <Button variant="contained" color="primary" {...props} />,
+  
+  Secondary: (props: Omit<ButtonProps, 'variant' | 'color'>) => 
+    <Button variant="contained" color="secondary" {...props} />,
+  
+  Outlined: (props: Omit<ButtonProps, 'variant'>) => 
+    <Button variant="outlined" {...props} />,
+  
+  Text: (props: Omit<ButtonProps, 'variant'>) => 
+    <Button variant="text" {...props} />,
+  
+  FAB: (props: Omit<ButtonProps, 'variant'>) => 
+    <Button variant="fab" {...props} />,
+};

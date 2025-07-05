@@ -22,6 +22,7 @@ import {
   Award
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 export default function PostJob() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -31,6 +32,7 @@ export default function PostJob() {
   
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isDark } = useTheme();
   
   const [showPreview, setShowPreview] = useState(false);
   const [formData, setFormData] = useState({
@@ -191,7 +193,7 @@ export default function PostJob() {
   };
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-gray-50 to-white relative">
+    <div ref={containerRef} className={`min-h-screen bg-gradient-to-br ${isDark ? 'from-gray-900 to-black' : 'from-gray-50 to-white'} relative`}>
       {/* Decorative elements - Fixed colors with proper opacity */}
       <div className="post-job-decoration absolute top-16 right-24 w-4 h-4 bg-asu-gold rounded-full opacity-40"></div>
       <div className="post-job-decoration absolute top-32 left-16 w-3 h-3 bg-asu-maroon rounded-full opacity-30"></div>
@@ -202,7 +204,7 @@ export default function PostJob() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Enhanced Header */}
         <div ref={headerRef} className="mb-12">
-          <div className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark rounded-3xl p-8 text-white relative overflow-hidden transform">
+          <div className={`bg-gradient-to-r ${isDark ? 'from-asu-maroon-dark to-asu-maroon' : 'from-asu-maroon to-asu-maroon-dark'} rounded-3xl p-8 text-white relative overflow-hidden transform`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-asu-gold/20 rounded-full blur-xl"></div>
             <div className="relative z-10">
@@ -236,17 +238,23 @@ export default function PostJob() {
           <div className="lg:col-span-2">
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-8">
               {/* Job Details Section */}
-              <div className="form-section bg-white rounded-3xl shadow-lg border border-gray-100 p-8">
+              <div className={`form-section rounded-3xl shadow-lg border p-8 transition-colors duration-300 ${
+                isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-100'
+              }`}>
                 <div className="flex items-center space-x-3 mb-6">
                   <div className="w-10 h-10 bg-gradient-to-br from-asu-maroon to-asu-maroon-dark rounded-full flex items-center justify-center">
                     <FileText className="h-5 w-5 text-white" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900">Job Details 📋</h2>
+                  <h2 className={`text-2xl font-bold transition-colors ${
+                    isDark ? 'text-dark-text' : 'text-gray-900'
+                  }`}>Job Details 📋</h2>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
+                      isDark ? 'text-dark-text' : 'text-gray-700'
+                    }`}>
                       Job Title *
                     </label>
                     <input
@@ -255,13 +263,19 @@ export default function PostJob() {
                       value={formData.title}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white shadow-inner transition-all duration-200 hover:shadow-md"
+                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md ${
+                        isDark 
+                          ? 'border-lime/30 bg-dark-bg text-dark-text placeholder-dark-muted focus:ring-lime' 
+                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
+                      }`}
                       placeholder="e.g., Software Engineering Intern"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
+                      isDark ? 'text-dark-text' : 'text-gray-700'
+                    }`}>
                       Company *
                     </label>
                     <input
@@ -270,13 +284,19 @@ export default function PostJob() {
                       value={formData.company}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white shadow-inner transition-all duration-200 hover:shadow-md"
+                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md ${
+                        isDark 
+                          ? 'border-lime/30 bg-dark-bg text-dark-text placeholder-dark-muted focus:ring-lime' 
+                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
+                      }`}
                       placeholder="Your Company Name"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
+                      isDark ? 'text-dark-text' : 'text-gray-700'
+                    }`}>
                       Location *
                     </label>
                     <input
@@ -285,13 +305,19 @@ export default function PostJob() {
                       value={formData.location}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white shadow-inner transition-all duration-200 hover:shadow-md"
+                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md ${
+                        isDark 
+                          ? 'border-lime/30 bg-dark-bg text-dark-text placeholder-dark-muted focus:ring-lime' 
+                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
+                      }`}
                       placeholder="e.g., Phoenix, AZ or Remote"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
+                      isDark ? 'text-dark-text' : 'text-gray-700'
+                    }`}>
                       Job Type *
                     </label>
                     <select
@@ -299,7 +325,11 @@ export default function PostJob() {
                       value={formData.type}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white shadow-inner cursor-pointer hover:shadow-md transition-all duration-200"
+                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner cursor-pointer hover:shadow-md transition-all duration-200 ${
+                        isDark 
+                          ? 'border-lime/30 bg-dark-bg text-dark-text focus:ring-lime' 
+                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
+                      }`}
                     >
                       <option value="full-time">Full-time 💼</option>
                       <option value="part-time">Part-time ⏰</option>
@@ -309,14 +339,20 @@ export default function PostJob() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
+                      isDark ? 'text-dark-text' : 'text-gray-700'
+                    }`}>
                       Experience Level
                     </label>
                     <select
                       name="experience_level"
                       value={formData.experience_level}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white shadow-inner cursor-pointer hover:shadow-md transition-all duration-200"
+                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner cursor-pointer hover:shadow-md transition-all duration-200 ${
+                        isDark 
+                          ? 'border-lime/30 bg-dark-bg text-dark-text focus:ring-lime' 
+                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
+                      }`}
                     >
                       <option value="entry">Entry Level 🌱</option>
                       <option value="mid">Mid Level 📈</option>
@@ -325,7 +361,9 @@ export default function PostJob() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
+                      isDark ? 'text-dark-text' : 'text-gray-700'
+                    }`}>
                       Salary Range
                     </label>
                     <input
@@ -333,7 +371,11 @@ export default function PostJob() {
                       name="salary"
                       value={formData.salary}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white shadow-inner transition-all duration-200 hover:shadow-md"
+                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md ${
+                        isDark 
+                          ? 'border-lime/30 bg-dark-bg text-dark-text placeholder-dark-muted focus:ring-lime' 
+                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
+                      }`}
                       placeholder="e.g., $60,000 - $80,000 or $25/hour"
                     />
                   </div>
@@ -346,9 +388,15 @@ export default function PostJob() {
                       name="is_remote"
                       checked={formData.is_remote}
                       onChange={handleInputChange}
-                      className="w-5 h-5 text-asu-maroon rounded border-2 border-gray-300 focus:ring-asu-maroon focus:ring-2"
+                      className={`w-5 h-5 rounded border-2 focus:ring-2 ${
+                        isDark 
+                          ? 'text-lime border-lime/30 focus:ring-lime' 
+                          : 'text-asu-maroon border-gray-300 focus:ring-asu-maroon'
+                      }`}
                     />
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className={`text-sm font-medium transition-colors ${
+                      isDark ? 'text-dark-text' : 'text-gray-700'
+                    }`}>
                       Remote work available 💻
                     </span>
                   </label>
@@ -356,17 +404,23 @@ export default function PostJob() {
               </div>
 
               {/* Description Section */}
-              <div className="form-section bg-white rounded-3xl shadow-lg border border-gray-100 p-8">
+              <div className={`form-section rounded-3xl shadow-lg border p-8 transition-colors duration-300 ${
+                isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-100'
+              }`}>
                 <div className="flex items-center space-x-3 mb-6">
                   <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
                     <FileText className="h-5 w-5 text-white" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900">Job Description 📝</h2>
+                  <h2 className={`text-2xl font-bold transition-colors ${
+                    isDark ? 'text-dark-text' : 'text-gray-900'
+                  }`}>Job Description 📝</h2>
                 </div>
                 
                 <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
+                      isDark ? 'text-dark-text' : 'text-gray-700'
+                    }`}>
                       Job Description *
                     </label>
                     <textarea
@@ -375,13 +429,19 @@ export default function PostJob() {
                       onChange={handleInputChange}
                       required
                       rows={6}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white shadow-inner transition-all duration-200 hover:shadow-md resize-none"
+                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md resize-none ${
+                        isDark 
+                          ? 'border-lime/30 bg-dark-bg text-dark-text placeholder-dark-muted focus:ring-lime' 
+                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
+                      }`}
                       placeholder="Describe the role, responsibilities, and what makes this opportunity exciting..."
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
+                      isDark ? 'text-dark-text' : 'text-gray-700'
+                    }`}>
                       Requirements *
                     </label>
                     <textarea
@@ -390,13 +450,19 @@ export default function PostJob() {
                       onChange={handleInputChange}
                       required
                       rows={4}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white shadow-inner transition-all duration-200 hover:shadow-md resize-none"
+                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md resize-none ${
+                        isDark 
+                          ? 'border-lime/30 bg-dark-bg text-dark-text placeholder-dark-muted focus:ring-lime' 
+                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
+                      }`}
                       placeholder="List the required qualifications, skills, and experience..."
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
+                      isDark ? 'text-dark-text' : 'text-gray-700'
+                    }`}>
                       Benefits & Perks
                     </label>
                     <textarea
@@ -404,7 +470,11 @@ export default function PostJob() {
                       value={formData.benefits}
                       onChange={handleInputChange}
                       rows={3}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white shadow-inner transition-all duration-200 hover:shadow-md resize-none"
+                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md resize-none ${
+                        isDark 
+                          ? 'border-lime/30 bg-dark-bg text-dark-text placeholder-dark-muted focus:ring-lime' 
+                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
+                      }`}
                       placeholder="Health insurance, flexible hours, learning opportunities..."
                     />
                   </div>
@@ -412,12 +482,16 @@ export default function PostJob() {
               </div>
 
               {/* Skills Section */}
-              <div className="form-section bg-white rounded-3xl shadow-lg border border-gray-100 p-8">
+              <div className={`form-section rounded-3xl shadow-lg border p-8 transition-colors duration-300 ${
+                isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-100'
+              }`}>
                 <div className="flex items-center space-x-3 mb-6">
                   <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center">
                     <Zap className="h-5 w-5 text-white" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900">Required Skills ⚡</h2>
+                  <h2 className={`text-2xl font-bold transition-colors ${
+                    isDark ? 'text-dark-text' : 'text-gray-900'
+                  }`}>Required Skills ⚡</h2>
                 </div>
                 
                 <div className="space-y-4">
@@ -427,13 +501,21 @@ export default function PostJob() {
                       value={newSkill}
                       onChange={(e) => setNewSkill(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
-                      className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white shadow-inner transition-all duration-200 hover:shadow-md"
+                      className={`flex-1 px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md ${
+                        isDark 
+                          ? 'border-lime/30 bg-dark-bg text-dark-text placeholder-dark-muted focus:ring-lime' 
+                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
+                      }`}
                       placeholder="Add a skill (e.g., JavaScript, Python, React...)"
                     />
                     <button
                       type="button"
                       onClick={addSkill}
-                      className="px-6 py-3 bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white rounded-2xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md transform hover:scale-105"
+                      className={`px-6 py-3 rounded-2xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md transform hover:scale-105 ${
+                        isDark 
+                          ? 'bg-gradient-to-r from-lime to-dark-accent text-dark-surface' 
+                          : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white'
+                      }`}
                     >
                       <Plus className="h-5 w-5" />
                     </button>
@@ -443,7 +525,11 @@ export default function PostJob() {
                     {formData.skills.map((skill, index) => (
                       <span
                         key={index}
-                        className="skill-tag bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white px-4 py-2 rounded-full font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center space-x-2"
+                        className={`skill-tag px-4 py-2 rounded-full font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center space-x-2 ${
+                          isDark 
+                            ? 'bg-gradient-to-r from-lime to-dark-accent text-dark-surface' 
+                            : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white'
+                        }`}
                       >
                         <span>{skill}</span>
                         <button
@@ -460,17 +546,23 @@ export default function PostJob() {
               </div>
 
               {/* Additional Details */}
-              <div className="form-section bg-white rounded-3xl shadow-lg border border-gray-100 p-8">
+              <div className={`form-section rounded-3xl shadow-lg border p-8 transition-colors duration-300 ${
+                isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-100'
+              }`}>
                 <div className="flex items-center space-x-3 mb-6">
                   <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center">
                     <Calendar className="h-5 w-5 text-white" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900">Additional Details 📅</h2>
+                  <h2 className={`text-2xl font-bold transition-colors ${
+                    isDark ? 'text-dark-text' : 'text-gray-900'
+                  }`}>Additional Details 📅</h2>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
+                      isDark ? 'text-dark-text' : 'text-gray-700'
+                    }`}>
                       Application Deadline
                     </label>
                     <input
@@ -478,12 +570,18 @@ export default function PostJob() {
                       name="deadline"
                       value={formData.deadline}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white shadow-inner transition-all duration-200 hover:shadow-md"
+                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md ${
+                        isDark 
+                          ? 'border-lime/30 bg-dark-bg text-dark-text focus:ring-lime' 
+                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
+                      }`}
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
+                      isDark ? 'text-dark-text' : 'text-gray-700'
+                    }`}>
                       Contact Email *
                     </label>
                     <input
@@ -492,13 +590,19 @@ export default function PostJob() {
                       value={formData.contact_email}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white shadow-inner transition-all duration-200 hover:shadow-md"
+                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md ${
+                        isDark 
+                          ? 'border-lime/30 bg-dark-bg text-dark-text placeholder-dark-muted focus:ring-lime' 
+                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
+                      }`}
                       placeholder="hiring@company.com"
                     />
                   </div>
                   
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className={`block text-sm font-semibold mb-2 transition-colors ${
+                      isDark ? 'text-dark-text' : 'text-gray-700'
+                    }`}>
                       Department
                     </label>
                     <input
@@ -506,7 +610,11 @@ export default function PostJob() {
                       name="department"
                       value={formData.department}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-asu-maroon focus:border-transparent bg-white shadow-inner transition-all duration-200 hover:shadow-md"
+                      className={`w-full px-4 py-3 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent shadow-inner transition-all duration-200 hover:shadow-md ${
+                        isDark 
+                          ? 'border-lime/30 bg-dark-bg text-dark-text placeholder-dark-muted focus:ring-lime' 
+                          : 'border-gray-200 bg-white text-gray-900 focus:ring-asu-maroon'
+                      }`}
                       placeholder="e.g., Engineering, Marketing, Sales..."
                     />
                   </div>
@@ -518,7 +626,11 @@ export default function PostJob() {
                 <button
                   type="button"
                   onClick={() => setShowPreview(!showPreview)}
-                  className="flex items-center space-x-2 border-2 border-asu-maroon text-asu-maroon px-8 py-4 rounded-2xl hover:bg-asu-maroon hover:text-white transition-all duration-300 font-semibold shadow-sm hover:shadow-md transform hover:scale-105"
+                  className={`flex items-center space-x-2 border-2 px-8 py-4 rounded-2xl transition-all duration-300 font-semibold shadow-sm hover:shadow-md transform hover:scale-105 ${
+                    isDark 
+                      ? 'border-lime text-lime hover:bg-lime hover:text-dark-surface' 
+                      : 'border-asu-maroon text-asu-maroon hover:bg-asu-maroon hover:text-white'
+                  }`}
                 >
                   <Eye className="h-5 w-5" />
                   <span>{showPreview ? 'Hide Preview' : 'Preview Job'}</span>
@@ -526,7 +638,11 @@ export default function PostJob() {
                 
                 <button
                   type="submit"
-                  className="submit-btn flex items-center space-x-2 bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white px-8 py-4 rounded-2xl hover:shadow-xl transition-all duration-300 font-semibold shadow-lg transform hover:scale-105"
+                  className={`submit-btn flex items-center space-x-2 px-8 py-4 rounded-2xl hover:shadow-xl transition-all duration-300 font-semibold shadow-lg transform hover:scale-105 ${
+                    isDark 
+                      ? 'bg-gradient-to-r from-lime to-dark-accent text-dark-surface' 
+                      : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white'
+                  }`}
                 >
                   <Save className="h-5 w-5" />
                   <span>Post Job 🚀</span>

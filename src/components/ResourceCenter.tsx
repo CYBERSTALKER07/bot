@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { gsap } from 'gsap';
 import { 
   FileText, 
   Video, 
@@ -25,11 +26,56 @@ import { Resource } from '../types';
 import { useTheme } from '../context/ThemeContext';
 
 export default function ResourceCenter() {
-  const { theme } = useTheme();
+  const { isDark } = useTheme();
+  const containerRef = useRef<HTMLDivElement>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
   const [bookmarkedResources, setBookmarkedResources] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const ctx = gsap.context(() => {
+      // Main container animation
+      gsap.fromTo(containerRef.current, {
+        opacity: 0,
+        y: 30
+      }, {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        ease: 'power3.out'
+      });
+
+      // Floating decorations
+      gsap.to('.resource-decoration', {
+        y: -15,
+        x: 10,
+        rotation: 360,
+        duration: 20,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
+      });
+
+      // Stagger animation for resource cards
+      gsap.fromTo('.resource-card', {
+        opacity: 0,
+        y: 50
+      }, {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: 'power3.out',
+        delay: 0.3
+      });
+
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
 
   // Mock resources data with enhanced content
   const resources: Resource[] = [
@@ -153,18 +199,18 @@ export default function ResourceCenter() {
   };
 
   const getTypeColor = (type: string) => {
-    if (theme === 'dark') {
+    if (isDark) {
       switch (type) {
         case 'article':
-          return 'bg-blue-900 text-blue-300';
+          return 'bg-blue-900/30 text-blue-300';
         case 'video':
-          return 'bg-red-900 text-red-300';
+          return 'bg-red-900/30 text-red-300';
         case 'template':
-          return 'bg-green-900 text-green-300';
+          return 'bg-green-900/30 text-green-300';
         case 'guide':
-          return 'bg-purple-900 text-purple-300';
+          return 'bg-purple-900/30 text-purple-300';
         case 'faq':
-          return 'bg-yellow-900 text-yellow-300';
+          return 'bg-yellow-900/30 text-yellow-300';
         default:
           return 'bg-gray-700 text-gray-300';
       }
@@ -187,23 +233,23 @@ export default function ResourceCenter() {
   };
 
   const getCategoryColor = (category: string) => {
-    if (theme === 'dark') {
+    if (isDark) {
       switch (category) {
         case 'resume':
-          return 'bg-blue-900 text-blue-300';
+          return 'bg-lime/20 text-lime';
         case 'interview':
-          return 'bg-green-900 text-green-300';
+          return 'bg-green-900/30 text-green-300';
         case 'career_planning':
-          return 'bg-purple-900 text-purple-300';
+          return 'bg-purple-900/30 text-purple-300';
         case 'networking':
-          return 'bg-pink-900 text-pink-300';
+          return 'bg-pink-900/30 text-pink-300';
         default:
           return 'bg-gray-700 text-gray-300';
       }
     } else {
       switch (category) {
         case 'resume':
-          return 'bg-blue-50 text-blue-700';
+          return 'bg-asu-maroon/10 text-asu-maroon';
         case 'interview':
           return 'bg-green-50 text-green-700';
         case 'career_planning':
@@ -266,51 +312,71 @@ export default function ResourceCenter() {
   };
 
   return (
-    <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
+    <div ref={containerRef} className={`min-h-screen relative transition-colors duration-300 ${
+      isDark ? 'bg-gradient-to-br from-dark-bg to-dark-surface' : 'bg-gradient-to-br from-gray-50 to-white'
+    }`}>
       {/* Decorative elements */}
-      <div className="absolute top-16 right-24 w-4 h-4 bg-asu-gold/40 rounded-full"></div>
-      <div className="absolute top-32 left-16 w-3 h-3 bg-asu-maroon/30 rounded-full"></div>
-      <Sparkles className="absolute top-24 left-1/4 h-5 w-5 text-asu-gold/60" />
-      <Coffee className="absolute bottom-32 right-1/4 h-4 w-4 text-asu-maroon/50" />
-      <Heart className="absolute bottom-20 left-1/3 h-4 w-4 text-asu-gold/70" />
+      <div className={`resource-decoration absolute top-16 right-24 w-4 h-4 rounded-full ${
+        isDark ? 'bg-lime/40' : 'bg-asu-gold/40'
+      }`}></div>
+      <div className={`resource-decoration absolute top-32 left-16 w-3 h-3 rounded-full ${
+        isDark ? 'bg-lime/30' : 'bg-asu-maroon/30'
+      }`}></div>
+      <Sparkles className={`resource-decoration absolute top-24 left-1/4 h-5 w-5 ${
+        isDark ? 'text-lime/60' : 'text-asu-gold/60'
+      }`} />
+      <Coffee className={`resource-decoration absolute bottom-32 right-1/4 h-4 w-4 ${
+        isDark ? 'text-lime/50' : 'text-asu-maroon/50'
+      }`} />
+      <Heart className={`resource-decoration absolute bottom-20 left-1/3 h-4 w-4 ${
+        isDark ? 'text-lime/70' : 'text-asu-gold/70'
+      }`} />
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className={`text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'} mb-2`}>
+          <h1 className={`text-3xl font-bold mb-2 transition-colors ${
+            isDark ? 'text-dark-text' : 'text-gray-900'
+          }`}>
             Resource Center
           </h1>
-          <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+          <p className={`text-lg transition-colors ${
+            isDark ? 'text-dark-muted' : 'text-gray-600'
+          }`}>
             Comprehensive career resources to help you succeed
           </p>
         </div>
 
         {/* Search and Filters */}
-        <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm p-6 mb-8`}>
+        <div className={`rounded-xl shadow-lg p-6 mb-8 transition-colors duration-300 ${
+          isDark ? 'bg-dark-surface border border-lime/20' : 'bg-white border border-gray-100'
+        }`}>
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className={`absolute left-3 top-3 h-5 w-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
+              <Search className={`absolute left-3 top-3 h-5 w-5 transition-colors ${
+                isDark ? 'text-dark-muted' : 'text-gray-400'
+              }`} />
               <input
                 type="text"
                 placeholder="Search resources..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className={`w-full pl-10 pr-4 py-2 border ${
-                  theme === 'dark' 
-                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400' 
-                    : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
+                  isDark 
+                    ? 'border-lime/20 bg-dark-bg text-dark-text placeholder-dark-muted focus:ring-lime' 
+                    : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:ring-asu-maroon'
+                }`}
               />
             </div>
             <div className="flex gap-4">
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className={`px-4 py-2 border ${
-                  theme === 'dark' 
-                    ? 'border-gray-600 bg-gray-700 text-white' 
-                    : 'border-gray-300 bg-white text-gray-900'
-                } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                className={`px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
+                  isDark 
+                    ? 'border-lime/20 bg-dark-bg text-dark-text focus:ring-lime' 
+                    : 'border-gray-300 bg-white text-gray-900 focus:ring-asu-maroon'
+                }`}
               >
                 <option value="all">All Categories</option>
                 <option value="resume">Resume & CV</option>
@@ -321,11 +387,11 @@ export default function ResourceCenter() {
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className={`px-4 py-2 border ${
-                  theme === 'dark' 
-                    ? 'border-gray-600 bg-gray-700 text-white' 
-                    : 'border-gray-300 bg-white text-gray-900'
-                } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                className={`px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
+                  isDark 
+                    ? 'border-lime/20 bg-dark-bg text-dark-text focus:ring-lime' 
+                    : 'border-gray-300 bg-white text-gray-900 focus:ring-asu-maroon'
+                }`}
               >
                 <option value="all">All Types</option>
                 <option value="article">Articles</option>
@@ -340,7 +406,9 @@ export default function ResourceCenter() {
 
         {/* Results Count */}
         <div className="mb-6">
-          <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+          <p className={`text-sm transition-colors ${
+            isDark ? 'text-dark-muted' : 'text-gray-600'
+          }`}>
             Showing {filteredResources.length} of {resources.length} resources
           </p>
         </div>
@@ -350,7 +418,9 @@ export default function ResourceCenter() {
           {filteredResources.map((resource) => (
             <div
               key={resource.id}
-              className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden`}
+              className={`resource-card rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group ${
+                isDark ? 'bg-dark-surface border border-lime/20' : 'bg-white border border-gray-100'
+              }`}
             >
               <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
@@ -368,20 +438,22 @@ export default function ResourceCenter() {
                     onClick={() => toggleBookmark(resource.id)}
                     className={`p-2 rounded-lg transition-colors ${
                       bookmarkedResources.has(resource.id)
-                        ? 'text-yellow-500 hover:text-yellow-600'
-                        : theme === 'dark'
-                        ? 'text-gray-400 hover:text-gray-300'
-                        : 'text-gray-400 hover:text-gray-600'
+                        ? isDark ? 'text-lime hover:text-lime/80' : 'text-asu-gold hover:text-asu-gold/80'
+                        : isDark ? 'text-dark-muted hover:text-dark-text' : 'text-gray-400 hover:text-gray-600'
                     }`}
                   >
                     <Bookmark className={`h-5 w-5 ${bookmarkedResources.has(resource.id) ? 'fill-current' : ''}`} />
                   </button>
                 </div>
 
-                <h3 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                <h3 className={`text-lg font-semibold mb-2 transition-colors ${
+                  isDark ? 'text-dark-text' : 'text-gray-900'
+                }`}>
                   {resource.title}
                 </h3>
-                <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mb-4 line-clamp-3`}>
+                <p className={`text-sm mb-4 line-clamp-3 transition-colors ${
+                  isDark ? 'text-dark-muted' : 'text-gray-600'
+                }`}>
                   {resource.description}
                 </p>
 
@@ -392,20 +464,16 @@ export default function ResourceCenter() {
                   {resource.tags && resource.tags.slice(0, 2).map((tag, index) => (
                     <span
                       key={index}
-                      className={`inline-block px-2 py-1 text-xs rounded-full ${
-                        theme === 'dark' 
-                          ? 'bg-gray-700 text-gray-300' 
-                          : 'bg-gray-100 text-gray-600'
+                      className={`inline-block px-2 py-1 text-xs rounded-full transition-colors ${
+                        isDark ? 'bg-dark-bg text-dark-muted' : 'bg-gray-100 text-gray-600'
                       }`}
                     >
                       {tag}
                     </span>
                   ))}
                   {resource.tags && resource.tags.length > 2 && (
-                    <span className={`inline-block px-2 py-1 text-xs rounded-full ${
-                      theme === 'dark' 
-                        ? 'bg-gray-700 text-gray-300' 
-                        : 'bg-gray-100 text-gray-600'
+                    <span className={`inline-block px-2 py-1 text-xs rounded-full transition-colors ${
+                      isDark ? 'bg-dark-bg text-dark-muted' : 'bg-gray-100 text-gray-600'
                     }`}>
                       +{resource.tags.length - 2} more
                     </span>
@@ -413,7 +481,9 @@ export default function ResourceCenter() {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
+                  <div className={`flex items-center gap-4 text-sm transition-colors ${
+                    isDark ? 'text-dark-muted' : 'text-gray-500'
+                  }`}>
                     <div className="flex items-center gap-1">
                       <Clock className="h-4 w-4" />
                       <span>{new Date(resource.created_at).toLocaleDateString()}</span>
@@ -425,13 +495,17 @@ export default function ResourceCenter() {
                   </div>
                   <div className="flex gap-2">
                     <button className={`p-2 rounded-lg transition-colors ${
-                      theme === 'dark' 
-                        ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700' 
+                      isDark 
+                        ? 'text-dark-muted hover:text-dark-text hover:bg-dark-bg' 
                         : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
                     }`}>
                       <Share2 className="h-4 w-4" />
                     </button>
-                    <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                    <button className={`px-4 py-2 rounded-lg transition-colors text-sm font-medium text-white ${
+                      isDark 
+                        ? 'bg-lime hover:bg-dark-accent' 
+                        : 'bg-asu-maroon hover:bg-asu-maroon-dark'
+                    }`}>
                       {resource.type === 'video' ? 'Watch' : 'View'}
                     </button>
                   </div>
@@ -444,16 +518,20 @@ export default function ResourceCenter() {
         {/* Empty State */}
         {filteredResources.length === 0 && (
           <div className="text-center py-12">
-            <div className={`w-16 h-16 mx-auto mb-4 rounded-full ${
-              theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'
-            } flex items-center justify-center`}>
-              <Search className={`h-8 w-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
+            <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center transition-colors ${
+              isDark ? 'bg-dark-surface' : 'bg-gray-100'
+            }`}>
+              <FileText className={`h-8 w-8 transition-colors ${
+                isDark ? 'text-dark-muted' : 'text-gray-400'
+              }`} />
             </div>
-            <h3 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'} mb-2`}>
-              No resources found
-            </h3>
-            <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              Try adjusting your search terms or filters
+            <h3 className={`text-xl font-medium mb-2 transition-colors ${
+              isDark ? 'text-dark-text' : 'text-gray-900'
+            }`}>No resources found</h3>
+            <p className={`transition-colors ${
+              isDark ? 'text-dark-muted' : 'text-gray-500'
+            }`}>
+              Try adjusting your search or filters
             </p>
           </div>
         )}
