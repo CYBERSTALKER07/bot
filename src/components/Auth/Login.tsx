@@ -50,7 +50,7 @@ export default function Login() {
       await login(email, password, role);
       navigate('/dashboard');
     } catch (err) {
-      setError('Invalid credentials. Try: student@asu.edu or employer@intel.com');
+      setError('Invalid credentials. Try: student@aut.edu or employer@intel.com');
     } finally {
       setLoading(false);
     }
@@ -66,12 +66,12 @@ export default function Login() {
           {/* Header */}
           <div className="text-center mb-8">
             <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${
-              isDark ? 'bg-lime/20' : 'bg-asu-maroon/10'
+              isDark ? 'bg-lime/20' : 'bg-aut-maroon/10'
             }`}>
-              <School className={`h-8 w-8 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
+              <School className={`h-8 w-8 ${isDark ? 'text-lime' : 'text-aut-maroon'}`} />
             </div>
             <Typography variant="h3" color="textPrimary" className="font-bold mb-3">
-              Welcome to ASU Handshake
+              Welcome to AUT Handshake
             </Typography>
             <Typography variant="subtitle1" color="textSecondary">
               Sign in to your account to access amazing career opportunities
@@ -86,7 +86,7 @@ export default function Login() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your ASU email"
+              placeholder="Enter your AUT email"
               variant="outlined"
               fullWidth
             />
@@ -134,7 +134,7 @@ export default function Login() {
               <Link 
                 to="/register" 
                 className={`font-medium transition-colors duration-300 ${
-                  isDark ? 'text-lime hover:text-dark-accent' : 'text-asu-maroon hover:text-asu-maroon/80'
+                  isDark ? 'text-lime hover:text-dark-accent' : 'text-aut-maroon hover:text-aut-maroon/80'
                 }`}
               >
                 Sign up
@@ -145,7 +145,7 @@ export default function Login() {
           <div className="mt-4 text-center">
             <Typography variant="body2" color="textSecondary" className="text-center">
               By signing in, you agree to our terms of service and privacy policy. 
-              Welcome to the ASU career community! 🎓
+              Welcome to the AUT career community! 🎓
             </Typography>
           </div>
         </div>
@@ -155,13 +155,13 @@ export default function Login() {
       <div className={`hidden lg:flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 ${
         isDark 
           ? 'bg-gradient-to-br from-dark-surface via-dark-bg to-gray-900' 
-          : 'bg-gradient-to-br from-asu-maroon via-asu-maroon-dark to-gray-900'
+          : 'bg-gradient-to-br from-aut-maroon via-aut-maroon-dark to-gray-900'
       }`}>
         <div className="mx-auto max-w-md text-center">
           <div className={`inline-flex items-center justify-center w-24 h-24 rounded-full mb-6 ${
-            isDark ? 'bg-lime/20' : 'bg-asu-gold/20'
+            isDark ? 'bg-lime/20' : 'bg-aut-gold/20'
           }`}>
-            <EmojiEvents className={`h-12 w-12 ${isDark ? 'text-lime' : 'text-asu-gold'}`} />
+            <EmojiEvents className={`h-12 w-12 ${isDark ? 'text-lime' : 'text-aut-gold'}`} />
           </div>
           <Typography 
             variant="h3" 
@@ -184,7 +184,7 @@ export default function Login() {
             >
               <Typography 
                 variant="h4" 
-                className={`font-bold ${isDark ? 'text-lime' : 'text-asu-gold'}`}
+                className={`font-bold ${isDark ? 'text-lime' : 'text-aut-gold'}`}
               >
                 15k+
               </Typography>
@@ -201,7 +201,7 @@ export default function Login() {
             >
               <Typography 
                 variant="h4" 
-                className={`font-bold ${isDark ? 'text-lime' : 'text-asu-gold'}`}
+                className={`font-bold ${isDark ? 'text-lime' : 'text-aut-gold'}`}
               >
                 2.5k+
               </Typography>
@@ -220,7 +220,7 @@ export default function Login() {
               variant="h6" 
               className={`font-medium ${isDark ? 'text-dark-text' : 'text-white'}`}
             >
-              Ready to join the ASU career community? 🌟
+              Ready to join the AUT career community? 🌟
             </Typography>
             <Button
               component={Link}

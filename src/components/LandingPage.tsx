@@ -84,13 +84,13 @@ export default function LandingPage() {
       {/* Material Design decorative elements */}
       <div className="fixed inset-0 pointer-events-none z-10">
         <div className={`absolute top-20 right-1/4 w-2 h-2 rounded-full ${
-          isDark ? 'bg-lime/30' : 'bg-asu-maroon/30'
+          isDark ? 'bg-lime/30' : 'bg-aut-maroon/30'
         }`} />
         <div className={`absolute top-1/3 left-1/5 w-1 h-1 rounded-full ${
-          isDark ? 'bg-dark-accent/25' : 'bg-asu-gold/25'
+          isDark ? 'bg-dark-accent/25' : 'bg-aut-gold/25'
         }`} />
         <div className={`absolute top-2/3 right-1/3 w-1.5 h-1.5 rounded-full ${
-          isDark ? 'bg-lime/20' : 'bg-asu-maroon/20'
+          isDark ? 'bg-lime/20' : 'bg-aut-maroon/20'
         }`} />
       </div>
 
@@ -133,16 +133,16 @@ export default function LandingPage() {
             <div className="p-8 space-y-6">
               <div className="flex justify-center">
                 <img 
-                  src="/asu-logo.png" 
-                  alt="ASU Logo" 
+                  src="/aut-logo.png" 
+                  alt="AUT Logo" 
                   className="h-12 w-auto opacity-80"
                 />
               </div>
               <Typography variant="h6" color="textPrimary" className="font-bold">
-                Arizona State University Career Services
+                Auckland University of Technology Career Services
               </Typography>
               <Typography variant="body1" color="textSecondary">
-                Connecting Sun Devils with their dream careers since 1885
+                Connecting AUT students with their dream careers since 2000
               </Typography>
               <div className="flex justify-center space-x-4 pt-4">
                 <Button variant="text" size="small" color="primary">Privacy Policy</Button>
@@ -150,7 +150,7 @@ export default function LandingPage() {
                 <Button variant="text" size="small" color="primary">Contact Us</Button>
               </div>
               <Typography variant="caption" color="textSecondary">
-                © 2024 Arizona State University. All rights reserved.
+                © 2024 Auckland University of Technology. All rights reserved.
               </Typography>
             </div>
           </Card>
