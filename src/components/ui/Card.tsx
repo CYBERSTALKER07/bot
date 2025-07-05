@@ -14,7 +14,11 @@ import {
   Star
 } from '@mui/icons-material';
 import { useTheme } from '../../context/ThemeContext';
-// import { cn } from '../../lib/utils';
+
+// Simple cn utility function to combine class names
+const cn = (...classes: (string | undefined | null | false)[]): string => {
+  return classes.filter(Boolean).join(' ');
+};
 
 interface CardProps {
   children: React.ReactNode;
@@ -102,10 +106,10 @@ export const Card: React.FC<CardProps> = ({
   const baseClasses = "rounded-xl transition-all duration-300";
 
   const variantClasses = {
-    default: "bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-600 shadow-sm",
-    elevated: "bg-white dark:bg-dark-surface shadow-lg hover:shadow-xl border border-gray-100 dark:border-gray-700",
-    outlined: "bg-white dark:bg-dark-surface border-2 border-gray-200 dark:border-gray-600",
-    glass: "bg-white/80 dark:bg-dark-surface/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-600/50 shadow-lg"
+    default: isDark ? "bg-dark-surface border border-lime/20 shadow-sm" : "bg-white border border-gray-200 shadow-sm",
+    elevated: isDark ? "bg-dark-surface shadow-lg hover:shadow-xl border border-lime/30" : "bg-white shadow-lg hover:shadow-xl border border-gray-100",
+    outlined: isDark ? "bg-dark-surface border-2 border-lime/40" : "bg-white border-2 border-gray-200",
+    glass: isDark ? "bg-dark-surface/80 backdrop-blur-sm border border-lime/20 shadow-lg" : "bg-white/80 backdrop-blur-sm border border-gray-200/50 shadow-lg"
   };
 
   const paddingClasses = {

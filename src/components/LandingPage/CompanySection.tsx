@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useTheme } from '../../context/ThemeContext';
 
 const companyLogos = [
   { 
@@ -55,12 +56,12 @@ const companyLogos = [
   },
   { 
     name: 'Uber', 
-    logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDI0QzE4LjYyNzQgMjQgMjQgMTguNjI3NCAyNCAxMkMyNCA1LjM3MjU4IDE4LjYyNzQgMCAxMiAwQzUuMzcyNTggMCAwIDUuMzcyNTggMCAxMkMwIDE4LjYyNzQgNS4zNzI1OCAyNCAxMiAyNFoiIGZpbGw9IiMwMDAwMDAiLz4KPHBhdGggZD0iTTEyIDIwQzE2LjQxODMgMjAgMjAgMTYuNDE4MyAyMCAxMkMyMCA3LjU4MTcyIDE2LjQxODMgNCAxMiA0QzcuNTgxNzIgNCA0IDcuNTgxNzIgNCAxMkM0IDE2LjQxODMgNy41ODE3MiAyMCAxMiAyMFoiIGZpbGw9IiNGRkZGRkYiLz4KPC9zdmc+',
+    logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1zbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDI0QzE4LjYyNzQgMjQgMjQgMTguNjI3NCAyNCAxMkMyNCA1LjM3MjU4IDE4LjYyNzQgMCAxMiAwQzUuMzcyNTggMCAwIDUuMzcyNTggMCAxMkMwIDE4LjYyNzQgNS4zNzI1OCAyNCAxMiAyNFoiIGZpbGw9IiMwMDAwMDAiLz4KPHBhdGggZD0iTTEyIDIwQzE2LjQxODMgMjAgMjAgMTYuNDE4MyAyMCAxMkMyMCA3LjU4MTcyIDE2LjQxODMgNCAxMiA0QzcuNTgxNzIgNCA0IDcuNTgxNzIgNCAxMkM0IDE2LjQxODMgNy41ODE3MiAyMCAxMiAyMFoiIGZpbGw9IiNGRkZGRkYiLz4KPC9zdmc+',
     color: '#000000'
   },
   { 
     name: 'Airbnb', 
-    logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDI0YzAgMC0xLjItLjctMi40LTJDNy4yIDIwIDQgMTYgNCAxMi44IDQgOC4yIDcuNiA0LjQgMTIgNC40czggMy44IDggOC40YzAgMy4yLTMuMiA3LjItNS42IDkuNkMxMy4yIDIzLjMgMTIgMjQgMTIgMjRaIiBmaWxsPSIjRkY1QTVGIi8+Cjwvc3ZnPg==',
+    logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1zbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDI0YzAgMC0xLjItLjctMi40LTJDNy4yIDIwIDQgMTYgNCAxMi44IDQgOC4yIDcuNiA0LjQgMTIgNC40czggMy44IDggOC40YzAgMy4yLTMuMiA3LjItNS42IDkuNkMxMy4yIDIzLjMgMTIgMjQgMTIgMjRaIiBmaWxsPSIjRkY1QTVGIi8+Cjwvc3ZnPg==',
     color: '#FF5A5F'
   }
 ];
@@ -70,6 +71,8 @@ interface CompanySectionProps {
 }
 
 export default function CompanySection({ companiesRef }: CompanySectionProps) {
+  const { isDark } = useTheme();
+
   useEffect(() => {
     const ctx = gsap.context(() => {
       // Enhanced company logos animation
@@ -150,20 +153,36 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
   }, [companiesRef]);
 
   return (
-    <section ref={companiesRef} className="py-20 bg-gradient-to-b from-gray-50 to-white overflow-hidden relative">
-      <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-transparent via-asu-maroon/30 to-transparent transform -skew-x-12"></div>
+    <section ref={companiesRef} className={`py-20 overflow-hidden relative transition-colors duration-300 ${
+      isDark 
+        ? 'bg-gradient-to-b from-dark-surface to-dark-bg' 
+        : 'bg-gradient-to-b from-gray-50 to-white'
+    }`}>
+      <div className={`absolute top-0 left-0 w-full h-2 transform -skew-x-12 ${
+        isDark 
+          ? 'bg-gradient-to-r from-transparent via-lime/30 to-transparent' 
+          : 'bg-gradient-to-r from-transparent via-asu-maroon/30 to-transparent'
+      }`}></div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-16">
-        <h2 className="text-reveal text-4xl md:text-5xl font-bold text-gray-900 mb-6 transform -rotate-1">
+        <h2 className={`text-reveal text-4xl md:text-5xl font-bold mb-6 transform -rotate-1 transition-colors duration-300 ${
+          isDark ? 'text-dark-text' : 'text-gray-900'
+        }`}>
           Trusted by Amazing Companies 🏢
         </h2>
-        <p className="text-reveal text-xl text-gray-600 max-w-2xl mx-auto transform rotate-0.5">
+        <p className={`text-reveal text-xl max-w-2xl mx-auto transform rotate-0.5 transition-colors duration-300 ${
+          isDark ? 'text-dark-muted' : 'text-gray-600'
+        }`}>
           Join thousands of students who've found their dream jobs with these incredible companies! 🌟
         </p>
       </div>
       <div className="relative">
         <div className="company-scroll flex space-x-16 items-center">
           {[...companyLogos, ...companyLogos].map((company, index) => (
-            <div key={index} className={`company-logo flex-shrink-0 bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-110 hover:-translate-y-2 border-2 border-gray-100 ${index % 2 === 0 ? 'rotate-1' : '-rotate-1'}`}>
+            <div key={index} className={`company-logo flex-shrink-0 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-110 hover:-translate-y-2 border-2 ${
+              isDark 
+                ? 'bg-dark-surface border-lime/20 hover:border-lime/40' 
+                : 'bg-white border-gray-100'
+            } ${index % 2 === 0 ? 'rotate-1' : '-rotate-1'}`}>
               <div className="flex items-center space-x-4">
                 <img 
                   src={company.logo} 
@@ -171,14 +190,24 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
                   className="w-12 h-12 object-contain filter hover:saturate-150 transition-all duration-300"
                   style={{ filter: `drop-shadow(0 4px 6px ${company.color}20)` }}
                 />
-                <span className="company-name font-bold text-xl text-gray-800">{company.name}</span>
+                <span className={`company-name font-bold text-xl transition-colors duration-300 ${
+                  isDark ? 'text-dark-text' : 'text-gray-800'
+                }`}>{company.name}</span>
               </div>
             </div>
           ))}
         </div>
         
-        <div className="absolute left-0 top-0 w-32 h-full bg-gradient-to-r from-white to-transparent z-10"></div>
-        <div className="absolute right-0 top-0 w-32 h-full bg-gradient-to-l from-white to-transparent z-10"></div>
+        <div className={`absolute left-0 top-0 w-32 h-full z-10 ${
+          isDark 
+            ? 'bg-gradient-to-r from-dark-surface to-transparent' 
+            : 'bg-gradient-to-r from-white to-transparent'
+        }`}></div>
+        <div className={`absolute right-0 top-0 w-32 h-full z-10 ${
+          isDark 
+            ? 'bg-gradient-to-l from-dark-surface to-transparent' 
+            : 'bg-gradient-to-l from-white to-transparent'
+        }`}></div>
       </div>
     </section>
   );

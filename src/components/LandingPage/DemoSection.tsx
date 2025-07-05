@@ -9,12 +9,15 @@ import {
   MessageSquare, 
   TrendingUp 
 } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 
 interface DemoSectionProps {
   demoRef: React.RefObject<HTMLDivElement>;
 }
 
 export default function DemoSection({ demoRef }: DemoSectionProps) {
+  const { isDark } = useTheme();
+
   useEffect(() => {
     const ctx = gsap.context(() => {
       // Enhanced demo section with parallax
@@ -37,48 +40,82 @@ export default function DemoSection({ demoRef }: DemoSectionProps) {
   }, [demoRef]);
 
   return (
-    <section ref={demoRef} className="relative py-24 bg-gradient-to-r from-asu-maroon via-asu-maroon-dark to-asu-maroon overflow-hidden">
-      <div className="demo-bg absolute inset-0 bg-black/20"></div>
+    <section ref={demoRef} className={`relative py-24 overflow-hidden transition-colors duration-300 ${
+      isDark 
+        ? 'bg-gradient-to-r from-dark-surface via-dark-bg to-dark-surface' 
+        : 'bg-gradient-to-r from-asu-maroon via-asu-maroon-dark to-asu-maroon'
+    }`}>
+      <div className={`demo-bg absolute inset-0 ${
+        isDark ? 'bg-dark-bg/20' : 'bg-black/20'
+      }`}></div>
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-asu-gold/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
+        <div className={`absolute top-1/4 left-1/4 w-64 h-64 rounded-full blur-3xl ${
+          isDark ? 'bg-lime/10' : 'bg-asu-gold/10'
+        }`}></div>
+        <div className={`absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full blur-3xl ${
+          isDark ? 'bg-dark-accent/5' : 'bg-white/5'
+        }`}></div>
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center text-white mb-16">
+        <div className={`text-center mb-16 ${
+          isDark ? 'text-dark-text' : 'text-white'
+        }`}>
           <h2 className="text-reveal text-5xl md:text-6xl font-bold mb-8">
             See ASU Handshake in Action
           </h2>
-          <p className="text-reveal text-2xl mb-8 text-gray-200 max-w-3xl mx-auto leading-relaxed">
+          <p className={`text-reveal text-2xl mb-8 max-w-3xl mx-auto leading-relaxed ${
+            isDark ? 'text-dark-muted' : 'text-gray-200'
+          }`}>
             Experience our intuitive platform designed specifically for ASU students and employers
           </p>
         </div>
 
         {/* Demo Image/Screenshot */}
         <div className="relative max-w-6xl mx-auto">
-          <div className="relative bg-white/10 backdrop-blur-xl rounded-3xl p-4 border border-white/20 shadow-2xl">
+          <div className={`relative backdrop-blur-xl rounded-3xl p-4 border shadow-2xl transition-colors duration-300 ${
+            isDark 
+              ? 'bg-dark-surface/10 border-lime/20' 
+              : 'bg-white/10 border-white/20'
+          }`}>
             {/* Browser Chrome */}
-            <div className="flex items-center space-x-2 mb-4 p-4 bg-white/20 rounded-t-2xl">
+            <div className={`flex items-center space-x-2 mb-4 p-4 rounded-t-2xl ${
+              isDark ? 'bg-dark-surface/20' : 'bg-white/20'
+            }`}>
               <div className="flex space-x-2">
                 <div className="w-3 h-3 bg-red-400 rounded-full"></div>
                 <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
                 <div className="w-3 h-3 bg-green-400 rounded-full"></div>
               </div>
-              <div className="flex-1 bg-white/20 rounded-full px-4 py-1 ml-4">
-                <span className="text-white/70 text-sm">asu-handshake.com/dashboard</span>
+              <div className={`flex-1 rounded-full px-4 py-1 ml-4 ${
+                isDark ? 'bg-dark-surface/20' : 'bg-white/20'
+              }`}>
+                <span className={`text-sm ${
+                  isDark ? 'text-dark-muted/70' : 'text-white/70'
+                }`}>asu-handshake.com/dashboard</span>
               </div>
             </div>
 
             {/* Demo Dashboard Content */}
-            <div className="bg-white rounded-2xl p-8 min-h-[500px]">
+            <div className={`rounded-2xl p-8 min-h-[500px] transition-colors duration-300 ${
+              isDark ? 'bg-dark-surface' : 'bg-white'
+            }`}>
               {/* Header */}
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center space-x-3">
-                  <GraduationCap className="h-8 w-8 text-asu-maroon" />
-                  <span className="font-bold text-xl text-gray-900">ASU Handshake</span>
+                  <GraduationCap className={`h-8 w-8 ${
+                    isDark ? 'text-lime' : 'text-asu-maroon'
+                  }`} />
+                  <span className={`font-bold text-xl ${
+                    isDark ? 'text-dark-text' : 'text-gray-900'
+                  }`}>ASU Handshake</span>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <div className="w-8 h-8 bg-asu-maroon rounded-full"></div>
-                  <span className="text-gray-700 font-medium">Sarah Johnson</span>
+                  <div className={`w-8 h-8 rounded-full ${
+                    isDark ? 'bg-lime' : 'bg-asu-maroon'
+                  }`}></div>
+                  <span className={`font-medium ${
+                    isDark ? 'text-dark-text' : 'text-gray-700'
+                  }`}>Sarah Johnson</span>
                 </div>
               </div>
 
@@ -86,15 +123,27 @@ export default function DemoSection({ demoRef }: DemoSectionProps) {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Job Listings */}
                 <div className="lg:col-span-2">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Recommended for You</h2>
+                  <h2 className={`text-2xl font-bold mb-6 ${
+                    isDark ? 'text-dark-text' : 'text-gray-900'
+                  }`}>Recommended for You</h2>
                   <div className="space-y-4">
                     {/* Job Card 1 */}
-                    <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-shadow">
+                    <div className={`rounded-xl p-6 border hover:shadow-lg transition-shadow ${
+                      isDark 
+                        ? 'bg-dark-bg border-lime/20 hover:border-lime/40' 
+                        : 'bg-gray-50 border-gray-200'
+                    }`}>
                       <div className="flex items-start justify-between mb-4">
                         <div>
-                          <h3 className="font-bold text-lg text-gray-900">Software Engineering Intern</h3>
-                          <p className="text-asu-maroon font-medium">Google</p>
-                          <p className="text-gray-600 text-sm">Mountain View, CA</p>
+                          <h3 className={`font-bold text-lg ${
+                            isDark ? 'text-dark-text' : 'text-gray-900'
+                          }`}>Software Engineering Intern</h3>
+                          <p className={`font-medium ${
+                            isDark ? 'text-lime' : 'text-asu-maroon'
+                          }`}>Google</p>
+                          <p className={`text-sm ${
+                            isDark ? 'text-dark-muted' : 'text-gray-600'
+                          }`}>Mountain View, CA</p>
                         </div>
                         <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
                           98% Match
@@ -106,33 +155,48 @@ export default function DemoSection({ demoRef }: DemoSectionProps) {
                         <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Machine Learning</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-600 text-sm">Posted 2 days ago</span>
-                        <button className="bg-asu-maroon text-white px-4 py-2 rounded-lg text-sm font-medium">
+                        <span className={`text-sm ${
+                          isDark ? 'text-dark-muted' : 'text-gray-600'
+                        }`}>Posted 2 days ago</span>
+                        <button className={`px-4 py-2 rounded-lg text-sm font-medium text-white ${
+                          isDark ? 'bg-lime' : 'bg-asu-maroon'
+                        }`}>
                           Quick Apply
                         </button>
                       </div>
                     </div>
 
                     {/* Job Card 2 */}
-                    <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                    <div className={`rounded-xl p-6 border ${
+                      isDark 
+                        ? 'bg-dark-bg border-lime/20' 
+                        : 'bg-gray-50 border-gray-200'
+                    }`}>
                       <div className="flex items-start justify-between mb-4">
                         <div>
-                          <h3 className="font-bold text-lg text-gray-900">Data Science Intern</h3>
-                          <p className="text-asu-maroon font-medium">Microsoft</p>
-                          <p className="text-gray-600 text-sm">Seattle, WA</p>
+                          <h3 className={`font-bold text-lg ${
+                            isDark ? 'text-dark-text' : 'text-gray-900'
+                          }`}>Data Science Intern</h3>
+                          <p className={`font-medium ${
+                            isDark ? 'text-lime' : 'text-asu-maroon'
+                          }`}>Microsoft</p>
+                          <p className={`text-sm ${
+                            isDark ? 'text-dark-muted' : 'text-gray-600'
+                          }`}>Redmond, WA</p>
                         </div>
-                        <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-                          95% Match
+                        <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                          92% Match
                         </span>
                       </div>
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">Python</span>
-                        <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">SQL</span>
-                        <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">Statistics</span>
-                      </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-600 text-sm">Posted 1 week ago</span>
-                        <button className="border border-asu-maroon text-asu-maroon px-4 py-2 rounded-lg text-sm font-medium">
+                        <span className={`text-sm ${
+                          isDark ? 'text-dark-muted' : 'text-gray-600'
+                        }`}>Posted 1 week ago</span>
+                        <button className={`border px-4 py-2 rounded-lg text-sm font-medium ${
+                          isDark 
+                            ? 'border-lime text-lime hover:bg-lime hover:text-dark-surface' 
+                            : 'border-asu-maroon text-asu-maroon'
+                        }`}>
                           View Details
                         </button>
                       </div>
@@ -143,52 +207,86 @@ export default function DemoSection({ demoRef }: DemoSectionProps) {
                 {/* Sidebar */}
                 <div className="space-y-6">
                   {/* Profile Completion */}
-                  <div className="bg-gradient-to-br from-asu-maroon to-asu-maroon-dark rounded-xl p-6 text-white">
+                  <div className={`rounded-xl p-6 text-white ${
+                    isDark 
+                      ? 'bg-gradient-to-br from-lime to-dark-accent' 
+                      : 'bg-gradient-to-br from-asu-maroon to-asu-maroon-dark'
+                  }`}>
                     <h3 className="font-bold mb-3">Profile Strength</h3>
                     <div className="w-full bg-white/20 rounded-full h-2 mb-3">
-                      <div className="bg-asu-gold h-2 rounded-full" style={{ width: '85%' }}></div>
+                      <div className={`h-2 rounded-full ${
+                        isDark ? 'bg-dark-surface' : 'bg-asu-gold'
+                      }`} style={{ width: '85%' }}></div>
                     </div>
-                    <p className="text-sm text-gray-200 mb-4">85% Complete - Add portfolio to boost visibility</p>
-                    <button className="bg-white text-asu-maroon px-4 py-2 rounded-lg text-sm font-medium w-full">
+                    <p className={`text-sm mb-4 ${
+                      isDark ? 'text-dark-surface/90' : 'text-gray-200'
+                    }`}>85% Complete - Add portfolio to boost visibility</p>
+                    <button className={`text-sm font-medium w-full px-4 py-2 rounded-lg ${
+                      isDark 
+                        ? 'bg-dark-surface text-lime' 
+                        : 'bg-white text-asu-maroon'
+                    }`}>
                       Complete Profile
                     </button>
                   </div>
 
                   {/* Quick Stats */}
-                  <div className="bg-gray-50 rounded-xl p-6">
-                    <h3 className="font-bold text-gray-900 mb-4">Your Activity</h3>
+                  <div className={`rounded-xl p-6 ${
+                    isDark ? 'bg-dark-bg' : 'bg-gray-50'
+                  }`}>
+                    <h3 className={`font-bold mb-4 ${
+                      isDark ? 'text-dark-text' : 'text-gray-900'
+                    }`}>Your Activity</h3>
                     <div className="space-y-3">
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Applications Sent</span>
-                        <span className="font-bold text-asu-maroon">12</span>
+                        <span className={isDark ? 'text-dark-muted' : 'text-gray-600'}>Applications Sent</span>
+                        <span className={`font-bold ${
+                          isDark ? 'text-lime' : 'text-asu-maroon'
+                        }`}>12</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Profile Views</span>
-                        <span className="font-bold text-asu-maroon">47</span>
+                        <span className={isDark ? 'text-dark-muted' : 'text-gray-600'}>Profile Views</span>
+                        <span className={`font-bold ${
+                          isDark ? 'text-lime' : 'text-asu-maroon'
+                        }`}>47</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Messages</span>
-                        <span className="font-bold text-asu-maroon">3</span>
+                        <span className={isDark ? 'text-dark-muted' : 'text-gray-600'}>Messages</span>
+                        <span className={`font-bold ${
+                          isDark ? 'text-lime' : 'text-asu-maroon'
+                        }`}>3</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Upcoming Events */}
-                  <div className="bg-gray-50 rounded-xl p-6">
-                    <h3 className="font-bold text-gray-900 mb-4">Upcoming Events</h3>
+                  <div className={`rounded-xl p-6 ${
+                    isDark ? 'bg-dark-bg' : 'bg-gray-50'
+                  }`}>
+                    <h3 className={`font-bold mb-4 ${
+                      isDark ? 'text-dark-text' : 'text-gray-900'
+                    }`}>Upcoming Events</h3>
                     <div className="space-y-3">
                       <div className="flex items-center space-x-3">
-                        <div className="w-2 h-2 bg-asu-maroon rounded-full"></div>
+                        <div className={`w-2 h-2 rounded-full ${
+                          isDark ? 'bg-lime' : 'bg-asu-maroon'
+                        }`}></div>
                         <div>
                           <p className="font-medium text-sm">Tech Career Fair</p>
-                          <p className="text-xs text-gray-600">Tomorrow, 10 AM</p>
+                          <p className={`text-xs ${
+                            isDark ? 'text-dark-muted' : 'text-gray-600'
+                          }`}>Tomorrow, 10 AM</p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-3">
-                        <div className="w-2 h-2 bg-asu-gold rounded-full"></div>
+                        <div className={`w-2 h-2 rounded-full ${
+                          isDark ? 'bg-dark-accent' : 'bg-asu-gold'
+                        }`}></div>
                         <div>
                           <p className="font-medium text-sm">Resume Workshop</p>
-                          <p className="text-xs text-gray-600">Friday, 2 PM</p>
+                          <p className={`text-xs ${
+                            isDark ? 'text-dark-muted' : 'text-gray-600'
+                          }`}>Friday, 2 PM</p>
                         </div>
                       </div>
                     </div>
@@ -199,43 +297,91 @@ export default function DemoSection({ demoRef }: DemoSectionProps) {
           </div>
 
           {/* Floating elements around demo */}
-          <div className="absolute -top-8 -left-8 w-16 h-16 bg-asu-gold/20 rounded-full blur-lg animate-pulse"></div>
-          <div className="absolute -bottom-8 -right-8 w-20 h-20 bg-white/10 rounded-full blur-lg animate-pulse"></div>
-          <div className="absolute top-1/2 -left-12 w-12 h-12 bg-asu-maroon/20 rounded-full blur-lg animate-pulse"></div>
+          <div className={`absolute -top-8 -left-8 w-16 h-16 rounded-full blur-lg animate-pulse ${
+            isDark ? 'bg-lime/20' : 'bg-asu-gold/20'
+          }`}></div>
+          <div className={`absolute -bottom-8 -right-8 w-20 h-20 rounded-full blur-lg animate-pulse ${
+            isDark ? 'bg-dark-accent/10' : 'bg-white/10'
+          }`}></div>
+          <div className={`absolute top-1/2 -left-12 w-12 h-12 rounded-full blur-lg animate-pulse ${
+            isDark ? 'bg-lime/20' : 'bg-asu-maroon/20'
+          }`}></div>
         </div>
 
         {/* Demo Features */}
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-            <div className="w-12 h-12 bg-asu-gold rounded-full flex items-center justify-center mx-auto mb-4">
-              <Zap className="h-6 w-6 text-asu-maroon" />
+          <div className={`backdrop-blur-lg rounded-2xl p-6 border transition-colors duration-300 ${
+            isDark 
+              ? 'bg-dark-surface/10 border-lime/20' 
+              : 'bg-white/10 border-white/20'
+          }`}>
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${
+              isDark ? 'bg-lime' : 'bg-asu-gold'
+            }`}>
+              <Zap className={`h-6 w-6 ${
+                isDark ? 'text-dark-surface' : 'text-asu-maroon'
+              }`} />
             </div>
-            <h3 className="font-bold text-white mb-2">Instant Matching</h3>
-            <p className="text-gray-200 text-sm">AI algorithms match you with relevant opportunities in real-time</p>
+            <h3 className={`font-bold mb-2 ${
+              isDark ? 'text-dark-text' : 'text-white'
+            }`}>Instant Matching</h3>
+            <p className={`text-sm ${
+              isDark ? 'text-dark-muted' : 'text-gray-200'
+            }`}>AI algorithms match you with relevant opportunities in real-time</p>
           </div>
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-            <div className="w-12 h-12 bg-asu-gold rounded-full flex items-center justify-center mx-auto mb-4">
-              <MessageSquare className="h-6 w-6 text-asu-maroon" />
+          <div className={`backdrop-blur-lg rounded-2xl p-6 border transition-colors duration-300 ${
+            isDark 
+              ? 'bg-dark-surface/10 border-lime/20' 
+              : 'bg-white/10 border-white/20'
+          }`}>
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${
+              isDark ? 'bg-lime' : 'bg-asu-gold'
+            }`}>
+              <MessageSquare className={`h-6 w-6 ${
+                isDark ? 'text-dark-surface' : 'text-asu-maroon'
+              }`} />
             </div>
-            <h3 className="font-bold text-white mb-2">Direct Communication</h3>
-            <p className="text-gray-200 text-sm">Message employers directly without intermediaries</p>
+            <h3 className={`font-bold mb-2 ${
+              isDark ? 'text-dark-text' : 'text-white'
+            }`}>Direct Communication</h3>
+            <p className={`text-sm ${
+              isDark ? 'text-dark-muted' : 'text-gray-200'
+            }`}>Message employers directly without intermediaries</p>
           </div>
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-            <div className="w-12 h-12 bg-asu-gold rounded-full flex items-center justify-center mx-auto mb-4">
-              <TrendingUp className="h-6 w-6 text-asu-maroon" />
+          <div className={`backdrop-blur-lg rounded-2xl p-6 border transition-colors duration-300 ${
+            isDark 
+              ? 'bg-dark-surface/10 border-lime/20' 
+              : 'bg-white/10 border-white/20'
+          }`}>
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${
+              isDark ? 'bg-lime' : 'bg-asu-gold'
+            }`}>
+              <TrendingUp className={`h-6 w-6 ${
+                isDark ? 'text-dark-surface' : 'text-asu-maroon'
+              }`} />
             </div>
-            <h3 className="font-bold text-white mb-2">Track Progress</h3>
-            <p className="text-gray-200 text-sm">Monitor your applications and optimize your success rate</p>
+            <h3 className={`font-bold mb-2 ${
+              isDark ? 'text-dark-text' : 'text-white'
+            }`}>Track Progress</h3>
+            <p className={`text-sm ${
+              isDark ? 'text-dark-muted' : 'text-gray-200'
+            }`}>Monitor your applications and optimize your success rate</p>
           </div>
         </div>
 
         {/* CTA for Demo */}
         <div className="text-center mt-12">
-          <Link to="/register?role=student" className="inline-flex items-center bg-asu-gold text-asu-maroon px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl">
+          <Link to="/register?role=student" className={`inline-flex items-center px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl ${
+            isDark 
+              ? 'bg-lime text-dark-surface hover:bg-dark-accent' 
+              : 'bg-asu-gold text-asu-maroon hover:bg-yellow-300'
+          }`}>
             Try It Free Today
             <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
-          <p className="text-gray-300 mt-4 text-sm">No credit card required • Setup in under 2 minutes</p>
+          <p className={`mt-4 text-sm ${
+            isDark ? 'text-dark-muted' : 'text-gray-300'
+          }`}>No credit card required • Setup in under 2 minutes</p>
         </div>
       </div>
     </section>
