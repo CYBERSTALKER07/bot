@@ -51,7 +51,7 @@ export default function EventDetails() {
     const mockEvent: Event = {
       id: id || '1',
       title: 'Tech Career Fair 2024',
-      description: 'Connect with top tech companies including Google, Microsoft, Apple, Amazon, and Meta. This premier career fair brings together the most innovative companies in technology with talented ASU students. Discover internship opportunities, full-time positions, and networking possibilities that could shape your future career.',
+      description: 'Connect with top tech companies including Google, Microsoft, Apple, Amazon, and Meta. This premier career fair brings together the most innovative companies in technology with talented AUT American University of Technology in Tashkent students. Discover internship opportunities, full-time positions, and networking possibilities that could shape your future career.',
       long_description: `Join us for the largest tech career fair of the year! This event features:
 
 • **Company Presentations**: Learn about company culture, values, and career paths
@@ -89,7 +89,7 @@ This is your chance to make lasting connections and potentially land your dream 
       type: 'career_fair',
       date: '2024-02-15',
       time: '10:00 AM - 4:00 PM',
-      location: 'ASU Tempe Campus - Memorial Union',
+      location: 'AUT Tashkent Campus - Main Building',
       is_virtual: false,
       virtual_link: null,
       attendees_count: 450,

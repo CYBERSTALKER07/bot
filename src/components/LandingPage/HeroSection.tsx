@@ -42,7 +42,7 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
                   ? 'bg-gradient-to-r from-lime via-dark-accent to-lime' 
                   : 'bg-gradient-to-r from-asu-gold via-yellow-300 to-asu-gold'
               }`}>
-                Starts Here ✨
+                Starts Here
               </span>
             </Typography>
             <Typography 
@@ -51,7 +51,7 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
                 isDark ? 'text-dark-muted' : 'text-gray-200'
               }`}
             >
-              Connect with amazing companies, find your dream internship, and launch your career at Auckland University of Technology's most comprehensive job platform! 🌟
+              Connect with amazing companies, find your dream internship, and launch your career at Auckland University of Technology's most comprehensive job platform!
             </Typography>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
@@ -64,7 +64,7 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
                 startIcon={<RocketLaunch />}
                 endIcon={<ArrowForward />}
               >
-                Find My Dream Job 🚀
+                Find My Dream Job
               </Button>
               <Button
                 component={Link}
@@ -84,7 +84,7 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
                   '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' }
                 }}
               >
-                Post Amazing Jobs 💼
+                Post Amazing Jobs
               </Button>
             </div>
           </div>
@@ -106,7 +106,9 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
                   : 'bg-gradient-to-br from-white to-gray-50'
               }`}>
                 <div className="text-center p-8">
-                  <div className="text-8xl mb-6">🎓</div>
+                  <div className="w-20 h-20 bg-gradient-to-br from-asu-maroon to-asu-gold rounded-full flex items-center justify-center mx-auto mb-6">
+                    <EmojiEvents className="h-10 w-10 text-white" />
+                  </div>
                   <Card 
                     className={`${isDark ? 'bg-dark-surface' : 'bg-white'}`}
                     elevation={2}
@@ -125,7 +127,7 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
                         color="textSecondary"
                         className="mb-4"
                       >
-                        Starts Right Here! 🌟
+                        Starts Right Here!
                       </Typography>
                       <Typography 
                         variant="body2" 
@@ -177,7 +179,7 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
                   color="textSecondary"
                   className="font-medium"
                 >
-                  Happy Students 😊
+                  Happy Students
                 </Typography>
               </div>
             </Card>
@@ -203,7 +205,7 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
                   color="textSecondary"
                   className="font-medium"
                 >
-                  Dream Jobs 💼
+                  Dream Jobs
                 </Typography>
               </div>
             </Card>

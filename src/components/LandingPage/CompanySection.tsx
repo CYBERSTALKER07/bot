@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useTheme } from '../../context/ThemeContext';
+import { Typography } from '@mui/material';
 
 const companyLogos = [
   { 
@@ -281,16 +282,24 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
           : 'bg-gradient-to-r from-transparent via-asu-maroon/30 to-transparent'
       }`}></div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-16">
-        <h2 className={`text-reveal text-4xl md:text-5xl font-bold mb-6 transform -rotate-1 transition-colors duration-300 ${
-          isDark ? 'text-dark-text' : 'text-gray-900'
-        }`}>
-          Trusted by Amazing Companies 🏢
-        </h2>
-        <p className={`text-reveal text-xl max-w-2xl mx-auto transform rotate-0.5 transition-colors duration-300 ${
-          isDark ? 'text-dark-muted' : 'text-gray-600'
-        }`}>
-          Join thousands of students who've found their dream jobs with these incredible companies! 🌟
-        </p>
+        <Typography 
+          variant="h2" 
+          className={`text-reveal text-4xl md:text-5xl font-bold mb-6 transform -rotate-1 transition-colors duration-300 ${
+            isDark ? 'text-dark-text' : 'text-gray-900'
+          }`}
+          align="center"
+        >
+          Trusted by Amazing Companies
+        </Typography>
+        <Typography 
+          variant="subtitle1" 
+          className={`text-reveal text-xl max-w-2xl mx-auto transform rotate-0.5 transition-colors duration-300 ${
+            isDark ? 'text-dark-muted' : 'text-gray-600'
+          }`}
+          align="center"
+        >
+          Join thousands of students who've found their dream jobs with these incredible companies!
+        </Typography>
       </div>
 
       {/* First Row - Existing company logos */}

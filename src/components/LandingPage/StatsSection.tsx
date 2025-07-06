@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useTheme } from '../../context/ThemeContext';
-import Typography from '../ui/Typography';
+import { Typography } from '@mui/material';
 import { useScrollTrigger, useScrollTriggerStagger } from '../../hooks/useScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);

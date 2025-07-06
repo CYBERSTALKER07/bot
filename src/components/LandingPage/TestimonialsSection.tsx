@@ -1,597 +1,601 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { 
   Star,
-  FormatQuote,
-  School,
+  Verified,
+  LocationOn,
   Business,
-  TrendingUp,
-  ChevronLeft,
-  ChevronRight,
-  FiberManualRecord,
-  Check,
-  Reply,
   ThumbUp,
-  Favorite,
-  MoreVert,
-  AttachFile,
-  EmojiEmotions
+  ChatBubbleOutline,
+  ShareOutlined
 } from '@mui/icons-material';
 import { useTheme } from '../../context/ThemeContext';
 import { Card } from '../ui/Card';
 import Typography from '../ui/Typography';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useScrollTrigger, useScrollTriggerStagger } from '../../hooks/useScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface TestimonialsSectionProps {
   testimonialsRef: React.RefObject<HTMLDivElement>;
 }
 
+interface TestimonialCard {
+  id: number;
+  name: string;
+  avatar: string;
+  role: string;
+  company: string;
+  location: string;
+  message: string;
+  rating: number;
+  likes: number;
+  comments: number;
+  verified: boolean;
+  category: 'internship' | 'job' | 'networking' | 'mentorship' | 'career_fair';
+  height: 'short' | 'medium' | 'tall';
+}
+
 export default function TestimonialsSection({ testimonialsRef }: TestimonialsSectionProps) {
   const { isDark } = useTheme();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [currentConversation, setCurrentConversation] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [showTypingIndicator, setShowTypingIndicator] = useState(false);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const statsRef = useRef<HTMLDivElement>(null);
+  const [visibleCards, setVisibleCards] = useState(12);
 
-  const conversations = [
+  const testimonials: TestimonialCard[] = [
     {
       id: 1,
-      title: "Student Success Story",
-      subtitle: "Microsoft Internship",
-      participants: ["Sarah Johnson", "Career Advisor"],
-      messages: [
-        {
-          id: 1,
-          sender: "Sarah Johnson",
-          avatar: "👩‍💻",
-          role: "CS Student • ASU",
-          message: "Hi! I just wanted to share some amazing news - I got the Microsoft internship! 🎉",
-          timestamp: "2:14 PM",
-          isUser: false,
-          type: "incoming",
-          reactions: [{ emoji: "🎊", count: 5 }, { emoji: "👏", count: 3 }],
-          status: "delivered"
-        },
-        {
-          id: 2,
-          sender: "Career Advisor",
-          avatar: "👨‍🏫",
-          role: "ASU Career Center",
-          message: "That's fantastic, Sarah! Congratulations! 🎊 Tell us more about your experience.",
-          timestamp: "2:15 PM",
-          isUser: true,
-          type: "outgoing",
-          status: "read"
-        },
-        {
-          id: 3,
-          sender: "Sarah Johnson",
-          avatar: "👩‍💻",
-          role: "CS Student • ASU",
-          message: "The platform made it so easy to connect with recruiters and showcase my projects. Found my dream internship within 2 weeks! Highly recommend to all Sun Devils! 🚀",
-          timestamp: "2:16 PM",
-          isUser: false,
-          type: "incoming",
-          reactions: [{ emoji: "🔥", count: 8 }, { emoji: "💪", count: 4 }],
-          status: "delivered"
-        },
-        {
-          id: 4,
-          sender: "Sarah Johnson",
-          avatar: "👩‍💻",
-          role: "CS Student • ASU",
-          message: "They even helped me negotiate my salary and provided interview prep resources. Game changer! 💰",
-          timestamp: "2:17 PM",
-          isUser: false,
-          type: "incoming",
-          status: "delivered"
-        }
-      ]
+      name: "Sarah Johnson",
+      avatar: "SJ",
+      role: "Software Engineering Intern",
+      company: "Google",
+      location: "Mountain View, CA",
+      message: "AUT Handshake completely transformed my job search! I landed my dream internship at Google within 2 weeks. The platform's AI matching was spot-on, and the career resources were incredibly helpful. The interview prep sessions gave me the confidence I needed. 10/10 would recommend to every AUT student!",
+      rating: 5,
+      likes: 127,
+      comments: 23,
+      verified: true,
+      category: 'internship',
+      height: 'tall'
     },
     {
       id: 2,
-      title: "Employer Partnership",
-      subtitle: "Adobe Recruitment",
-      participants: ["David Kim", "ASU Recruiter"],
-      messages: [
-        {
-          id: 1,
-          sender: "David Kim",
-          avatar: "👨‍💼",
-          role: "Senior HR Manager • Adobe",
-          message: "Thank you for reaching out! I am going to sign up for a time to meet with you.",
-          timestamp: "11:30 AM",
-          isUser: false,
-          type: "incoming",
-          status: "delivered"
-        },
-        {
-          id: 2,
-          sender: "ASU Recruiter",
-          avatar: "🔱",
-          role: "ASU Handshake Team",
-          message: "Perfect! Looking forward to discussing our partnership opportunities.",
-          timestamp: "11:31 AM",
-          isUser: true,
-          type: "outgoing",
-          status: "read"
-        },
-        {
-          id: 3,
-          sender: "David Kim",
-          avatar: "👨‍💼",
-          role: "Senior HR Manager • Adobe",
-          message: "We've hired 15+ ASU students through this platform this year alone. The quality of candidates is outstanding, and the process is seamless. Perfect for finding top talent! 🎯",
-          timestamp: "11:45 AM",
-          isUser: false,
-          type: "incoming",
-          reactions: [{ emoji: "🙌", count: 12 }, { emoji: "⭐", count: 7 }],
-          status: "delivered"
-        },
-        {
-          id: 4,
-          sender: "David Kim",
-          avatar: "👨‍💼",
-          role: "Senior HR Manager • Adobe",
-          message: "Just approved 5 more positions exclusively for ASU students. Ready to post them!",
-          timestamp: "11:46 AM",
-          isUser: false,
-          type: "incoming",
-          status: "delivered"
-        }
-      ]
+      name: "Marcus Chen",
+      avatar: "MC",
+      role: "Business Analyst",
+      company: "McKinsey & Company",
+      location: "New York, NY",
+      message: "The networking events through AUT Handshake opened doors I never knew existed. Connected with an alumnus who became my mentor and helped me secure my position at McKinsey. The platform's alumni network is unmatched!",
+      rating: 5,
+      likes: 89,
+      comments: 15,
+      verified: true,
+      category: 'networking',
+      height: 'medium'
     },
     {
       id: 3,
-      title: "Career Fair Success",
-      subtitle: "Tesla Connection",
-      participants: ["Emily Rodriguez", "Tesla Recruiter"],
-      messages: [
-        {
-          id: 1,
-          sender: "Tesla Recruiter",
-          avatar: "🏢",
-          role: "Engineering Recruiter • Tesla",
-          message: "Hi Emily! We'll be on campus for the Engineering & Data Career Fair in Tempe, AZ on Friday, Jan 20. Stop by booth #15 to network and explore opportunities with us! ⚡",
-          timestamp: "9:00 AM",
-          isUser: false,
-          type: "incoming",
-          status: "delivered"
-        },
-        {
-          id: 2,
-          sender: "Emily Rodriguez",
-          avatar: "👩‍🔬",
-          role: "Engineering Student • ASU",
-          message: "Amazing! I'll definitely be there. Really excited about Tesla's mission. 🚗",
-          timestamp: "9:05 AM",
-          isUser: true,
-          type: "outgoing",
-          status: "read"
-        },
-        {
-          id: 3,
-          sender: "Emily Rodriguez",
-          avatar: "👩‍🔬",
-          role: "Engineering Student • ASU",
-          message: "Update: Just finished my Tesla internship! As a first-generation college student, I didn't know where to start. This platform guided me through everything and now I have a full-time offer! 💪",
-          timestamp: "6 months later...",
-          isUser: true,
-          type: "outgoing",
-          reactions: [{ emoji: "🚀", count: 15 }, { emoji: "🙌", count: 9 }],
-          status: "read"
-        },
-        {
-          id: 4,
-          sender: "Tesla Recruiter",
-          avatar: "🏢",
-          role: "Engineering Recruiter • Tesla",
-          message: "So proud of your journey, Emily! Welcome to the Tesla family! 🎉",
-          timestamp: "Just now",
-          isUser: false,
-          type: "incoming",
-          status: "delivered"
-        }
-      ]
+      name: "Emily Rodriguez",
+      avatar: "ER",
+      role: "Data Scientist",
+      company: "Tesla",
+      location: "Austin, TX",
+      message: "From career fair to full-time offer in 3 months! The Tesla recruiters I met through AUT Handshake were amazing. They guided me through the entire process. Now I'm working on autonomous driving tech!",
+      rating: 5,
+      likes: 156,
+      comments: 31,
+      verified: true,
+      category: 'career_fair',
+      height: 'medium'
     },
     {
       id: 4,
-      title: "Networking Success",
-      subtitle: "LinkedIn Connection",
-      participants: ["Marcus Thompson", "Alumni Mentor"],
-      messages: [
-        {
-          id: 1,
-          sender: "Marcus Thompson",
-          avatar: "👨‍💼",
-          role: "Business Student • ASU",
-          message: "Hi! I saw your profile and noticed we're both ASU alumni. Would love to connect and learn about your experience at Goldman Sachs.",
-          timestamp: "3:22 PM",
-          isUser: true,
-          type: "outgoing",
-          status: "read"
-        },
-        {
-          id: 2,
-          sender: "Alumni Mentor",
-          avatar: "👔",
-          role: "VP • Goldman Sachs • ASU '18",
-          message: "Absolutely! Always happy to help fellow Sun Devils. Let's set up a call this week.",
-          timestamp: "3:45 PM",
-          isUser: false,
-          type: "incoming",
-          status: "delivered"
-        },
-        {
-          id: 3,
-          sender: "Marcus Thompson",
-          avatar: "👨‍💼",
-          role: "Business Student • ASU",
-          message: "Just got the Goldman Sachs internship! Thank you so much for the mentorship and referral. This platform's alumni network is incredible! 🏆",
-          timestamp: "2 weeks later",
-          isUser: true,
-          type: "outgoing",
-          reactions: [{ emoji: "🔥", count: 20 }, { emoji: "💯", count: 12 }],
-          status: "read"
-        }
-      ]
+      name: "David Kim",
+      avatar: "DK",
+      role: "Marketing Manager",
+      company: "Adobe",
+      location: "San Francisco, CA",
+      message: "The resume review feature was a game-changer! Got personalized feedback that helped me stand out. Landed 3 interviews in one week!",
+      rating: 5,
+      likes: 73,
+      comments: 12,
+      verified: true,
+      category: 'job',
+      height: 'short'
+    },
+    {
+      id: 5,
+      name: "Aisha Patel",
+      avatar: "AP",
+      role: "UX Designer",
+      company: "Apple",
+      location: "Cupertino, CA",
+      message: "The mentorship program connected me with a senior designer at Apple. Their guidance was invaluable in preparing for my interviews. I'm now part of the iOS design team, working on features used by millions! The support system at AUT is incredible.",
+      rating: 5,
+      likes: 201,
+      comments: 45,
+      verified: true,
+      category: 'mentorship',
+      height: 'tall'
+    },
+    {
+      id: 6,
+      name: "Jordan Williams",
+      avatar: "JW",
+      role: "DevOps Engineer",
+      company: "Microsoft",
+      location: "Seattle, WA",
+      message: "The technical interview prep workshops were phenomenal. Practiced with real engineers and got feedback that helped me ace my Microsoft interviews!",
+      rating: 5,
+      likes: 94,
+      comments: 18,
+      verified: true,
+      category: 'internship',
+      height: 'medium'
+    },
+    {
+      id: 7,
+      name: "Isabella Garcia",
+      avatar: "IG",
+      role: "Product Manager",
+      company: "Meta",
+      location: "Menlo Park, CA",
+      message: "Connected with 5 different companies through the platform. The personalized job recommendations were incredibly accurate. Now I'm building products that impact billions of users!",
+      rating: 5,
+      likes: 118,
+      comments: 27,
+      verified: true,
+      category: 'job',
+      height: 'medium'
+    },
+    {
+      id: 8,
+      name: "Alex Thompson",
+      avatar: "AT",
+      role: "Full Stack Developer",
+      company: "Airbnb",
+      location: "San Francisco, CA",
+      message: "The coding bootcamp partnerships were amazing! Upskilled and landed my first tech job at Airbnb. The career transition support was exactly what I needed.",
+      rating: 5,
+      likes: 87,
+      comments: 14,
+      verified: true,
+      category: 'career_fair',
+      height: 'medium'
+    },
+    {
+      id: 9,
+      name: "Priya Sharma",
+      avatar: "PS",
+      role: "Research Scientist",
+      company: "Amazon",
+      location: "Seattle, WA",
+      message: "The research opportunities board helped me find my perfect match at Amazon Lab126. Working on cutting-edge AI research that will shape the future!",
+      rating: 5,
+      likes: 142,
+      comments: 22,
+      verified: true,
+      category: 'internship',
+      height: 'short'
+    },
+    {
+      id: 10,
+      name: "Ryan Martinez",
+      avatar: "RM",
+      role: "Creative Director",
+      company: "Netflix",
+      location: "Los Angeles, CA",
+      message: "The creative portfolio reviews were incredibly helpful. Got feedback from industry professionals that helped me refine my work. Now I'm creating content for Netflix originals! The creative community on AUT Handshake is supportive and inspiring.",
+      rating: 5,
+      likes: 176,
+      comments: 38,
+      verified: true,
+      category: 'networking',
+      height: 'tall'
+    },
+    {
+      id: 11,
+      name: "Zoe Chang",
+      avatar: "ZC",
+      role: "Cybersecurity Analyst",
+      company: "IBM",
+      location: "Austin, TX",
+      message: "The cybersecurity bootcamp through AUT Handshake was intensive but worth every minute. Landed my dream job at IBM Security!",
+      rating: 5,
+      likes: 91,
+      comments: 16,
+      verified: true,
+      category: 'job',
+      height: 'medium'
+    },
+    {
+      id: 12,
+      name: "Carlos Mendoza",
+      avatar: "CM",
+      role: "Solutions Architect",
+      company: "Salesforce",
+      location: "San Francisco, CA",
+      message: "The cloud computing certification programs were excellent. Earned my AWS and Azure certs, then got recruited by Salesforce!",
+      rating: 5,
+      likes: 105,
+      comments: 19,
+      verified: true,
+      category: 'career_fair',
+      height: 'short'
+    },
+    {
+      id: 13,
+      name: "Maya Singh",
+      avatar: "MS",
+      role: "Financial Analyst",
+      company: "Goldman Sachs",
+      location: "New York, NY",
+      message: "The finance career track program was exactly what I needed. Connected with Goldman Sachs recruiters and now I'm working on major deals! The mentorship from AUT alumni made all the difference.",
+      rating: 5,
+      likes: 134,
+      comments: 29,
+      verified: true,
+      category: 'mentorship',
+      height: 'tall'
+    },
+    {
+      id: 14,
+      name: "Tyler Brooks",
+      avatar: "TB",
+      role: "Machine Learning Engineer",
+      company: "NVIDIA",
+      location: "Santa Clara, CA",
+      message: "The AI/ML specialization program through AUT Handshake gave me the skills I needed to land my role at NVIDIA. Now I'm working on the next generation of AI chips!",
+      rating: 5,
+      likes: 168,
+      comments: 33,
+      verified: true,
+      category: 'internship',
+      height: 'medium'
+    },
+    {
+      id: 15,
+      name: "Sofia Petrov",
+      avatar: "SP",
+      role: "Aerospace Engineer",
+      company: "SpaceX",
+      location: "Hawthorne, CA",
+      message: "From AUT to SpaceX! The aerospace career fair connected me with SpaceX engineers. Now I'm working on missions to Mars! The technical workshops were incredible.",
+      rating: 5,
+      likes: 256,
+      comments: 52,
+      verified: true,
+      category: 'career_fair',
+      height: 'tall'
+    },
+    {
+      id: 16,
+      name: "Kevin O'Connor",
+      avatar: "KO",
+      role: "Biotech Researcher",
+      company: "Moderna",
+      location: "Cambridge, MA",
+      message: "The biotech industry connections through AUT Handshake were amazing. Joined Moderna's vaccine research team straight out of college!",
+      rating: 5,
+      likes: 189,
+      comments: 41,
+      verified: true,
+      category: 'networking',
+      height: 'medium'
+    },
+    {
+      id: 17,
+      name: "Jasmine Lee",
+      avatar: "JL",
+      role: "Game Designer",
+      company: "Epic Games",
+      location: "Cary, NC",
+      message: "The gaming industry workshops were fantastic! Connected with Epic Games through a virtual career fair. Now I'm working on Fortnite!",
+      rating: 5,
+      likes: 147,
+      comments: 28,
+      verified: true,
+      category: 'job',
+      height: 'short'
+    },
+    {
+      id: 18,
+      name: "Ahmed Hassan",
+      avatar: "AH",
+      role: "Sustainability Engineer",
+      company: "Tesla Energy",
+      location: "Austin, TX",
+      message: "The green technology track helped me find my passion in sustainable energy. Now I'm designing solar panel systems at Tesla Energy! The environmental focus at AUT prepared me perfectly.",
+      rating: 5,
+      likes: 123,
+      comments: 25,
+      verified: true,
+      category: 'mentorship',
+      height: 'tall'
     }
   ];
 
-  const nextConversation = () => {
-    if (isAnimating) return;
-    setIsAnimating(true);
-    
-    const nextIndex = (currentConversation + 1) % conversations.length;
-    
-    // Show typing indicator before transition
-    setShowTypingIndicator(true);
-    setTimeout(() => setShowTypingIndicator(false), 1000);
-    
-    // Animate out current conversation
-    gsap.to(containerRef.current?.children[currentConversation], {
-      opacity: 0,
-      x: -50,
-      duration: 0.5,
-      ease: "power2.out",
-      onComplete: () => {
-        setCurrentConversation(nextIndex);
+  // Dynamic header animation with real-time scroll response
+  useScrollTrigger(headerRef, (element, progress) => {
+    gsap.set(element, {
+      opacity: progress,
+      y: (1 - progress) * 60,
+      scale: 0.9 + (progress * 0.1),
+      rotationY: (1 - progress) * 8,
+      ease: 'none'
+    });
+  }, { 
+    start: 'top 100%', 
+    end: 'bottom 90%',
+    scrub: 1.5 
+  });
+
+  // Dynamic stats animation with real-time counter updates
+  useScrollTriggerStagger(statsRef, '.stat-card', (elements, progress) => {
+    elements.forEach((element, index) => {
+      const delay = index * 0.1;
+      const elementProgress = Math.max(0, Math.min(1, (progress - delay) / (1 - delay)));
+      
+      // Real-time animations that respond to scroll direction
+      gsap.set(element, {
+        opacity: elementProgress,
+        y: (1 - elementProgress) * 100,
+        scale: 0.8 + (elementProgress * 0.2),
+        rotationX: (1 - elementProgress) * 20,
+        ease: 'none'
+      });
+
+      // Real-time number counter for stats
+      const numberElement = element.querySelector('.stat-number');
+      if (numberElement && elementProgress > 0) {
+        const targetValue = parseInt(numberElement.getAttribute('data-value') || '0');
+        const currentValue = Math.floor(targetValue * elementProgress);
         
-        // Animate in next conversation
-        gsap.fromTo(containerRef.current?.children[nextIndex], 
-          { opacity: 0, x: 50 },
-          { 
-            opacity: 1, 
-            x: 0, 
-            duration: 0.5, 
-            ease: "power2.out",
-            onComplete: () => setIsAnimating(false)
-          }
-        );
+        if (targetValue >= 1000) {
+          numberElement.textContent = (currentValue / 1000).toFixed(currentValue >= 1000 ? 1 : 0) + 'k+';
+        } else if (targetValue >= 95) {
+          numberElement.textContent = currentValue + '%';
+        } else {
+          numberElement.textContent = currentValue + '';
+        }
+        
+        // Dynamic glow effect based on progress
+        if (elementProgress > 0.7) {
+          numberElement.style.filter = `drop-shadow(0 0 ${(elementProgress - 0.7) * 30}px ${
+            isDark ? '#E3FF70' : '#8C1D40'
+          })`;
+        } else {
+          numberElement.style.filter = 'none';
+        }
       }
     });
+  }, { 
+    start: 'top 80%', 
+    end: 'bottom 100%',
+    scrub: 2 
+  });
+
+  // Dynamic testimonial cards animation with real-time scroll response
+  useScrollTriggerStagger(gridRef, '.testimonial-card', (elements, progress) => {
+    elements.forEach((element, index) => {
+      const delay = index * 0.05;
+      const elementProgress = Math.max(0, Math.min(1, (progress - delay) / (1 - delay)));
+      
+      // Real-time card animations
+      gsap.set(element, {
+        opacity: elementProgress,
+        y: (1 - elementProgress) * 120,
+        scale: 0.7 + (elementProgress * 0.3),
+        rotation: (1 - elementProgress) * 10 * (index % 2 === 0 ? 1 : -1),
+        ease: 'none'
+      });
+
+      // Dynamic card background and border effects
+      const cardBg = element.style;
+      const borderOpacity = elementProgress * 0.5;
+      const shadowIntensity = elementProgress * 25;
+      
+      cardBg.borderColor = `rgba(${isDark ? '227, 255, 112' : '140, 29, 64'}, ${borderOpacity})`;
+      cardBg.boxShadow = `0 ${shadowIntensity}px ${shadowIntensity * 2}px rgba(0,0,0,${elementProgress * 0.15})`;
+      
+      // Dynamic avatar scaling
+      const avatar = element.querySelector('.testimonial-avatar');
+      if (avatar && elementProgress > 0.3) {
+        const avatarProgress = (elementProgress - 0.3) / 0.7;
+        gsap.set(avatar, {
+          scale: 0.8 + (avatarProgress * 0.4),
+          rotation: avatarProgress * 15,
+          ease: 'none'
+        });
+      }
+    });
+  }, { 
+    start: 'top 75%', 
+    end: 'bottom 100%',
+    scrub: 1.5,
+    invalidateOnRefresh: true
+  });
+
+  const getCategoryColor = (category: string) => {
+    const colors = {
+      internship: 'bg-blue-100 text-blue-800',
+      job: 'bg-green-100 text-green-800',
+      networking: 'bg-purple-100 text-purple-800',
+      mentorship: 'bg-orange-100 text-orange-800',
+      career_fair: 'bg-pink-100 text-pink-800'
+    };
+    return colors[category as keyof typeof colors] || 'bg-gray-100 text-gray-800';
   };
 
-  useEffect(() => {
-    // Initialize conversations
-    if (containerRef.current) {
-      gsap.set(containerRef.current.children, { opacity: 0, x: 50 });
-      gsap.set(containerRef.current.children[0], { opacity: 1, x: 0 });
-    }
-
-    // Auto-advance conversations
-    const interval = setInterval(() => {
-      if (!isAnimating) {
-        nextConversation();
-      }
-    }, 8000);
-
-    return () => clearInterval(interval);
-  }, [isAnimating]);
-
-  // Animate messages when conversation changes
-  useEffect(() => {
-    const messages = containerRef.current?.children[currentConversation]?.querySelectorAll('.message-bubble');
-    if (messages) {
-      gsap.fromTo(messages, 
-        { opacity: 0, y: 20, scale: 0.9 },
-        { 
-          opacity: 1, 
-          y: 0, 
-          scale: 1,
-          duration: 0.6,
-          stagger: 0.1,
-          ease: "back.out(1.7)"
-        }
-      );
-    }
-  }, [currentConversation]);
-
   return (
-    <section ref={testimonialsRef} className={`py-24 transition-colors duration-300 ${
+    <section ref={testimonialsRef} className={`py-24 transition-colors duration-300 overflow-hidden ${
       isDark ? 'bg-dark-surface' : 'bg-gradient-to-br from-gray-50 to-white'
     }`}>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Enhanced Section Header */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center space-x-2 mb-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
+        <div ref={headerRef} className="text-center mb-16">
+          <div className="header-badge inline-flex items-center space-x-2 mb-4">
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center">
-              <Typography variant="h6" className="text-white">💬</Typography>
+              <ChatBubbleOutline className="text-white h-6 w-6" />
             </div>
             <Typography variant="body1" className={`font-medium ${
               isDark ? 'text-lime' : 'text-asu-maroon'
             }`}>
-              REAL CONVERSATIONS
+              STUDENT SUCCESS STORIES
             </Typography>
           </div>
           <Typography 
             variant="h2" 
-            className={`text-4xl md:text-5xl font-bold mb-6 ${
+            className={`header-title text-4xl md:text-5xl font-bold mb-6 ${
               isDark ? 'text-dark-text' : 'text-gray-900'
             }`}
           >
-            Success Stories from Sun Devils
+            Real Stories from AUT Students
           </Typography>
           <Typography 
             variant="h6" 
-            className={`text-xl max-w-3xl mx-auto ${
+            className={`header-subtitle text-xl max-w-3xl mx-auto ${
               isDark ? 'text-dark-muted' : 'text-gray-600'
             }`}
           >
-            See how ASU students and employers connect through authentic conversations that lead to life-changing opportunities
+            Discover how AUT students are landing their dream jobs and building successful careers
           </Typography>
         </div>
 
         {/* Enhanced Stats */}
-        <div className="grid md:grid-cols-4 gap-6 mb-16">
+        <div ref={statsRef} className="grid md:grid-cols-4 gap-6 mb-16">
           {[
-            { number: "95%", label: "Success Rate", icon: "📈" },
-            { number: "48hr", label: "Avg Response Time", icon: "⚡" },
-            { number: "2,500+", label: "Active Connections", icon: "🤝" },
-            { number: "150+", label: "Partner Companies", icon: "🏢" }
+            { number: "2500", label: "Success Stories", icon: "📊" },
+            { number: "95", label: "Job Placement Rate", icon: "📈" },
+            { number: "500", label: "Partner Companies", icon: "🏢" },
+            { number: "48", label: "Avg Response Time (hrs)", icon: "⚡" }
           ].map((stat, index) => (
-            <Card key={index} className={`text-center p-6 ${
-              isDark ? 'bg-dark-bg/50' : 'bg-white/80'
-            } backdrop-blur-sm`}>
-              <div className="text-3xl mb-2">{stat.icon}</div>
-              <Typography variant="h3" className={`text-2xl font-bold ${
-                isDark ? 'text-dark-text' : 'text-gray-900'
-              }`}>
-                {stat.number}
+            <Card key={index} className="stat-card text-center p-6 bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+              <div className="w-12 h-12 bg-gradient-to-br from-asu-maroon to-asu-gold rounded-full flex items-center justify-center mx-auto mb-3">
+                <Star className="h-6 w-6 text-white" />
+              </div>
+              <Typography variant="h3" className="stat-number text-2xl font-bold text-gray-900" data-value={stat.number}>
+                0{stat.number.includes('500') ? '+' : stat.number.includes('95') ? '%' : ''}
               </Typography>
-              <Typography variant="body2" className={`${
-                isDark ? 'text-dark-muted' : 'text-gray-600'
-              }`}>
+              <Typography variant="body2" className="text-gray-600">
                 {stat.label}
               </Typography>
             </Card>
           ))}
         </div>
 
-        {/* Enhanced Conversation Container */}
-        <div className="relative max-w-5xl mx-auto">
-          {/* Enhanced Progress Indicators */}
-          <div className="flex justify-center mb-8 space-x-3">
-            {conversations.map((conversation, index) => (
-              <div
-                key={index}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-500 cursor-pointer ${
-                  index === currentConversation
-                    ? (isDark ? 'bg-lime/20 border-2 border-lime' : 'bg-asu-maroon/20 border-2 border-asu-maroon')
-                    : (isDark ? 'bg-dark-muted/20 border-2 border-transparent' : 'bg-gray-200 border-2 border-transparent')
-                }`}
-                onClick={() => !isAnimating && setCurrentConversation(index)}
-              >
-                <div className={`w-3 h-3 rounded-full ${
-                  index === currentConversation
-                    ? (isDark ? 'bg-lime' : 'bg-asu-maroon')
-                    : (isDark ? 'bg-dark-muted' : 'bg-gray-400')
-                }`} />
-                <Typography variant="body2" className={`text-xs font-medium ${
-                  index === currentConversation
-                    ? (isDark ? 'text-lime' : 'text-asu-maroon')
-                    : (isDark ? 'text-dark-muted' : 'text-gray-500')
-                }`}>
-                  {conversation.subtitle}
-                </Typography>
-              </div>
-            ))}
-          </div>
-
-          {/* Enhanced Conversations */}
-          <div ref={containerRef} className="relative min-h-[700px]">
-            {conversations.map((conversation, conversationIndex) => (
-              <div
-                key={conversation.id}
-                className={`absolute inset-0 ${
-                  conversationIndex === currentConversation ? 'z-10' : 'z-0'
-                }`}
-              >
-                {/* Enhanced Chat Header */}
-                <div className={`flex items-center justify-between p-6 rounded-t-2xl ${
-                  isDark ? 'bg-dark-bg border-b border-dark-muted/20' : 'bg-white border-b border-gray-200'
-                } shadow-lg`}>
-                  <div className="flex items-center space-x-4">
-                    <div className="relative">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-asu-maroon to-asu-gold flex items-center justify-center shadow-lg">
-                        <Typography variant="body1" className="text-white font-bold text-lg">
-                          🎓
-                        </Typography>
-                      </div>
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+        {/* Enhanced Pinterest-style Grid */}
+        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+          {testimonials.slice(0, visibleCards).map((testimonial) => (
+            <Card 
+              key={testimonial.id} 
+              className="testimonial-card bg-white shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer border border-gray-100 rounded-xl overflow-hidden"
+              style={{ 
+                minHeight: testimonial.height === 'short' ? '280px' : testimonial.height === 'medium' ? '340px' : '420px'
+              }}
+            >
+              <div className="p-6 h-full flex flex-col">
+                {/* Header */}
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="testimonial-avatar w-12 h-12 rounded-full bg-gradient-to-br from-asu-maroon to-asu-gold flex items-center justify-center text-xl shadow-lg">
+                      {testimonial.avatar}
                     </div>
-                    <div>
-                      <Typography variant="h6" className={`font-bold ${
-                        isDark ? 'text-dark-text' : 'text-gray-900'
-                      }`}>
-                        {conversation.title}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center space-x-2">
+                        <Typography variant="h6" className="font-bold text-gray-900 truncate">
+                          {testimonial.name}
+                        </Typography>
+                        {testimonial.verified && (
+                          <Verified className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                        )}
+                      </div>
+                      <Typography variant="body2" className="text-gray-600 font-medium truncate">
+                        {testimonial.role}
                       </Typography>
-                      <Typography variant="body2" className={`${
-                        isDark ? 'text-dark-muted' : 'text-gray-500'
-                      }`}>
-                        {conversation.participants.join(" • ")}
+                      <Typography variant="body2" className="text-gray-500 flex items-center truncate">
+                        <Business className="h-3 w-3 mr-1 flex-shrink-0" />
+                        <span className="truncate">{testimonial.company}</span>
+                      </Typography>
+                      <Typography variant="body2" className="text-gray-500 flex items-center truncate">
+                        <LocationOn className="h-3 w-3 mr-1 flex-shrink-0" />
+                        <span className="truncate">{testimonial.location}</span>
                       </Typography>
                     </div>
                   </div>
+                  <div className={`px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${getCategoryColor(testimonial.category)}`}>
+                    {testimonial.category.replace('_', ' ')}
+                  </div>
+                </div>
+
+                {/* Rating */}
+                <div className="flex items-center space-x-1 mb-3">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+
+                {/* Message */}
+                <div className="testimonial-content flex-1 mb-4">
+                  <Typography variant="body1" className="text-gray-700 leading-relaxed text-sm">
+                    "{testimonial.message}"
+                  </Typography>
+                </div>
+
+                {/* Footer */}
+                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                   <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
-                      <Typography variant="body2" className="text-green-600 font-medium">
-                        Active
-                      </Typography>
-                    </div>
-                    <button className={`p-2 rounded-full ${
-                      isDark ? 'hover:bg-dark-muted/20' : 'hover:bg-gray-100'
-                    }`}>
-                      <MoreVert className="w-5 h-5" />
+                    <button className="flex items-center space-x-1 text-gray-500 hover:text-red-500 transition-colors" title="Like this story">
+                      <ThumbUp className="h-4 w-4" />
+                      <span className="text-sm">{testimonial.likes}</span>
+                    </button>
+                    <button className="flex items-center space-x-1 text-gray-500 hover:text-blue-500 transition-colors" title="View comments">
+                      <ChatBubbleOutline className="h-4 w-4" />
+                      <span className="text-sm">{testimonial.comments}</span>
                     </button>
                   </div>
-                </div>
-
-                {/* Enhanced Messages */}
-                <div className={`p-6 space-y-6 rounded-b-2xl min-h-[550px] ${
-                  isDark ? 'bg-dark-bg/70' : 'bg-white/90'
-                } backdrop-blur-sm`}>
-                  {conversation.messages.map((message, messageIndex) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${message.isUser ? 'justify-end' : 'justify-start'} message-bubble`}
-                    >
-                      <div className={`flex max-w-md lg:max-w-lg ${
-                        message.isUser ? 'flex-row-reverse' : 'flex-row'
-                      } items-start space-x-3`}>
-                        {/* Enhanced Avatar */}
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold shadow-lg ${
-                          message.isUser 
-                            ? 'bg-gradient-to-br from-asu-maroon to-asu-gold text-white' 
-                            : 'bg-gradient-to-br from-blue-500 to-purple-600 text-white'
-                        }`}>
-                          {message.avatar}
-                        </div>
-
-                        {/* Enhanced Message Content */}
-                        <div className={`${message.isUser ? 'mr-3' : 'ml-3'} space-y-2`}>
-                          <div className={`px-5 py-4 rounded-2xl shadow-lg ${
-                            message.isUser
-                              ? (isDark ? 'bg-lime text-dark-bg' : 'bg-asu-maroon text-white')
-                              : (isDark ? 'bg-dark-bg border border-dark-muted/20 text-dark-text' : 'bg-white border border-gray-200 text-gray-900')
-                          } ${
-                            message.isUser ? 'rounded-br-lg' : 'rounded-bl-lg'
-                          }`}>
-                            <Typography variant="body1" className="leading-relaxed">
-                              {message.message}
-                            </Typography>
-                          </div>
-                          
-                          {/* Message Reactions */}
-                          {message.reactions && (
-                            <div className="flex space-x-1 px-2">
-                              {message.reactions.map((reaction, reactionIndex) => (
-                                <div
-                                  key={reactionIndex}
-                                  className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs ${
-                                    isDark ? 'bg-dark-muted/20' : 'bg-gray-100'
-                                  }`}
-                                >
-                                  <span>{reaction.emoji}</span>
-                                  <span className={`${
-                                    isDark ? 'text-dark-muted' : 'text-gray-600'
-                                  }`}>
-                                    {reaction.count}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                          
-                          {/* Enhanced Message Info */}
-                          <div className={`flex items-center mt-2 space-x-2 ${
-                            message.isUser ? 'justify-end' : 'justify-start'
-                          }`}>
-                            <Typography variant="body2" className={`text-xs font-medium ${
-                              isDark ? 'text-dark-muted' : 'text-gray-500'
-                            }`}>
-                              {message.sender}
-                            </Typography>
-                            <Typography variant="body2" className={`text-xs ${
-                              isDark ? 'text-dark-muted' : 'text-gray-400'
-                            }`}>
-                              {message.timestamp}
-                            </Typography>
-                            {message.isUser && (
-                              <div className="flex items-center space-x-1">
-                                <Check className="w-4 h-4 text-blue-500" />
-                                {message.status === 'read' && (
-                                  <Check className="w-4 h-4 text-blue-500 -ml-2" />
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-
-                  {/* Typing Indicator */}
-                  {showTypingIndicator && (
-                    <div className="flex justify-start message-bubble">
-                      <div className="flex items-start space-x-3">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xl">
-                          💭
-                        </div>
-                        <div className={`px-5 py-4 rounded-2xl rounded-bl-lg ${
-                          isDark ? 'bg-dark-bg border border-dark-muted/20' : 'bg-white border border-gray-200'
-                        }`}>
-                          <div className="flex space-x-1">
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                  <button className="text-gray-500 hover:text-gray-700 transition-colors" title="Share this story">
+                    <ShareOutlined className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
+            </Card>
+          ))}
+        </div>
 
-          {/* Enhanced Navigation */}
-          <div className="flex justify-center mt-8 space-x-4">
+        {/* Load More Button */}
+        {visibleCards < testimonials.length && (
+          <div className="text-center mt-12">
             <button
-              onClick={nextConversation}
-              disabled={isAnimating}
-              className={`px-8 py-4 rounded-full font-bold transition-all duration-300 shadow-lg ${
+              onClick={() => setVisibleCards(prev => Math.min(prev + 6, testimonials.length))}
+              className={`px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg ${
                 isDark 
-                  ? 'bg-lime text-dark-bg hover:bg-lime/90 hover:shadow-xl' 
-                  : 'bg-asu-maroon text-white hover:bg-asu-maroon/90 hover:shadow-xl'
-              } ${isAnimating ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
+                  ? 'bg-lime text-dark-bg hover:bg-lime/90' 
+                  : 'bg-asu-maroon text-white hover:bg-asu-maroon/90'
+              }`}
             >
-              {isAnimating ? 'Loading...' : 'Next Conversation →'}
+              Load More Stories
             </button>
           </div>
-        </div>
+        )}
 
         {/* Call to Action */}
         <div className="text-center mt-16">
-          <Card className={`p-8 max-w-2xl mx-auto ${
-            isDark ? 'bg-dark-bg/50' : 'bg-white/80'
-          } backdrop-blur-sm`}>
-            <Typography variant="h5" className={`font-bold mb-4 ${
-              isDark ? 'text-dark-text' : 'text-gray-900'
-            }`}>
-              Ready to Start Your Success Story?
+          <Card className="p-8 max-w-2xl mx-auto bg-white shadow-lg">
+            <Typography variant="h5" className="font-bold mb-4 text-gray-900">
+              Ready to Write Your Success Story?
             </Typography>
-            <Typography variant="body1" className={`mb-6 ${
-              isDark ? 'text-dark-muted' : 'text-gray-600'
-            }`}>
-              Join thousands of Sun Devils who have found their dream opportunities through meaningful connections
+            <Typography variant="body1" className="mb-6 text-gray-600">
+              Join thousands of AUT students who have transformed their careers through our platform
             </Typography>
-            <button className={`px-8 py-3 rounded-full font-bold transition-all duration-300 ${
+            <button className={`px-8 py-3 rounded-full font-bold transition-all duration-300 hover:scale-105 shadow-lg ${
               isDark 
                 ? 'bg-lime text-dark-bg hover:bg-lime/90' 
                 : 'bg-asu-maroon text-white hover:bg-asu-maroon/90'
-            } hover:scale-105 shadow-lg`}>
-              Get Started Today 🚀
+            }`}>
+              Start Your Journey Today
             </button>
           </Card>
         </div>

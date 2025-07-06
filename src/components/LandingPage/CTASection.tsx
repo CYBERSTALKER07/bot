@@ -4,6 +4,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { GraduationCap, Building2 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import { Typography } from '@mui/material';
 
 interface CTASectionProps {
   ctaRef: React.RefObject<HTMLDivElement>;
@@ -57,9 +58,13 @@ export default function CTASection({ ctaRef }: CTASectionProps) {
       </div>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         <div className="cta-content">
-          <h2 className={`text-5xl md:text-6xl font-bold mb-8 leading-tight transition-colors duration-300 ${
-            isDark ? 'text-dark-text' : 'text-gray-900'
-          }`}>
+          <Typography 
+            variant="h1" 
+            className={`text-5xl md:text-6xl font-bold mb-8 leading-tight transition-colors duration-300 ${
+              isDark ? 'text-dark-text' : 'text-gray-900'
+            }`}
+            align="center"
+          >
             Ready to Launch Your
             <span className={`block bg-clip-text text-transparent ${
               isDark 
@@ -68,12 +73,16 @@ export default function CTASection({ ctaRef }: CTASectionProps) {
             }`}>
               Dream Career?
             </span>
-          </h2>
-          <p className={`text-2xl mb-12 max-w-3xl mx-auto leading-relaxed transition-colors duration-300 ${
-            isDark ? 'text-dark-muted' : 'text-gray-600'
-          }`}>
-            Join thousands of ASU students who have already found their dream jobs with top companies worldwide.
-          </p>
+          </Typography>
+          <Typography 
+            variant="subtitle1" 
+            className={`text-2xl mb-12 max-w-3xl mx-auto leading-relaxed transition-colors duration-300 ${
+              isDark ? 'text-dark-muted' : 'text-gray-600'
+            }`}
+            align="center"
+          >
+            Join thousands of AUT American University of Technology in Tashkent students who have already found their dream jobs with top companies worldwide.
+          </Typography>
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
             <Link to="/register?role=student" className={`cta-button group px-10 py-5 rounded-full font-bold text-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-110 hover:-translate-y-1 flex items-center justify-center relative overflow-hidden ${
               isDark 
@@ -102,11 +111,15 @@ export default function CTASection({ ctaRef }: CTASectionProps) {
               }`}></div>
             </Link>
           </div>
-          <p className={`text-sm transition-colors duration-300 ${
-            isDark ? 'text-dark-muted' : 'text-gray-500'
-          }`}>
+          <Typography 
+            variant="body2" 
+            className={`text-sm transition-colors duration-300 ${
+              isDark ? 'text-dark-muted' : 'text-gray-500'
+            }`}
+            align="center"
+          >
             No credit card required • Setup in under 2 minutes
-          </p>
+          </Typography>
         </div>
       </div>
     </section>

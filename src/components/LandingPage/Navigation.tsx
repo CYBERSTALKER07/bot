@@ -27,7 +27,7 @@ export default function Navigation({ onScrollToSection }: NavigationProps) {
             <span className={`font-bold text-xl ${
               isDark ? 'text-dark-text' : 'text-gray-900'
             }`}>
-              ASU Handshake
+            AUT Handshake
             </span>
           </Link>
 

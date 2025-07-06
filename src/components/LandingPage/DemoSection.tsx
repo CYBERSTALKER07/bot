@@ -10,6 +10,7 @@ import {
   TrendingUp 
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import { Typography } from '@mui/material';
 
 interface DemoSectionProps {
   demoRef: React.RefObject<HTMLDivElement>;
@@ -57,17 +58,25 @@ export default function DemoSection({ demoRef }: DemoSectionProps) {
         }`}></div>
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className={`text-center mb-16 ${
-          isDark ? 'text-dark-text' : 'text-white'
-        }`}>
-          <h2 className="text-reveal text-5xl md:text-6xl font-bold mb-8">
-            See ASU Handshake in Action
-          </h2>
-          <p className={`text-reveal text-2xl mb-8 max-w-3xl mx-auto leading-relaxed ${
-            isDark ? 'text-dark-muted' : 'text-gray-200'
-          }`}>
-            Experience our intuitive platform designed specifically for ASU students and employers
-          </p>
+        <div className="text-center mb-16">
+          <Typography 
+            variant="h2" 
+            className={`text-reveal text-5xl md:text-6xl font-bold mb-8 transition-colors duration-300 ${
+              isDark ? 'text-dark-text' : 'text-white'
+            }`}
+            align="center"
+          >
+            See AUT Handshake in Action
+          </Typography>
+          <Typography 
+            variant="subtitle1" 
+            className={`text-reveal text-2xl mb-8 max-w-3xl mx-auto leading-relaxed transition-colors duration-300 ${
+              isDark ? 'text-dark-muted' : 'text-gray-200'
+            }`}
+            align="center"
+          >
+            Experience our intuitive platform designed specifically for AUT American University of Technology in Tashkent students and employers
+          </Typography>
         </div>
 
         {/* Demo Image/Screenshot */}
@@ -91,7 +100,7 @@ export default function DemoSection({ demoRef }: DemoSectionProps) {
               }`}>
                 <span className={`text-sm ${
                   isDark ? 'text-dark-muted/70' : 'text-white/70'
-                }`}>asu-handshake.com/dashboard</span>
+                }`}>aut-handshake.com/dashboard</span>
               </div>
             </div>
 
@@ -107,7 +116,7 @@ export default function DemoSection({ demoRef }: DemoSectionProps) {
                   }`} />
                   <span className={`font-bold text-xl ${
                     isDark ? 'text-dark-text' : 'text-gray-900'
-                  }`}>ASU Handshake</span>
+                  }`}>AUT Handshake</span>
                 </div>
                 <div className="flex items-center space-x-4">
                   <div className={`w-8 h-8 rounded-full ${

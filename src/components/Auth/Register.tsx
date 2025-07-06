@@ -81,7 +81,7 @@ export default function Register() {
               <School className={`h-8 w-8 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
             </div>
             <Typography variant="h3" color="textPrimary" className="font-bold mb-3">
-              Join ASU Handshake
+              Join AUT Handshake
             </Typography>
             <Typography variant="subtitle1" color="textSecondary">
               Create your account and start your career journey
@@ -258,7 +258,7 @@ export default function Register() {
                   isDark ? 'text-dark-muted' : 'text-white/90'
                 }`}
               >
-                Join thousands of ASU students and top employers building successful careers together
+                Join thousands of AUT American University of Technology in Tashkent students and top employers building successful careers together
               </Typography>
 
               {/* Benefits Cards */}
@@ -336,7 +336,7 @@ export default function Register() {
               <div className="flex items-center space-x-3 p-4">
                 <EmojiEvents className={`h-6 w-6 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
                 <Typography variant="body2" className="font-bold">
-                  #1 Career Platform at ASU
+                  #1 Career Platform at AUT
                 </Typography>
               </div>
             </Card>

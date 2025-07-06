@@ -1,6 +1,7 @@
 import React from 'react';
 import { GraduationCap, User, Search, Target, Award, CheckCircle, Briefcase } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import { Typography } from '@mui/material';
 
 export default function CareerPathSection() {
   const { isDark } = useTheme();
@@ -13,20 +14,28 @@ export default function CareerPathSection() {
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-20">
-          <h2 className={`text-5xl md:text-6xl font-bold mb-6 transition-colors duration-300 ${
-            isDark ? 'text-dark-text' : 'text-gray-900'
-          }`}>
+          <Typography 
+            variant="h2" 
+            className={`text-5xl md:text-6xl font-bold mb-6 transition-colors duration-300 ${
+              isDark ? 'text-dark-text' : 'text-gray-900'
+            }`}
+            align="center"
+          >
             Your Career <span className={`bg-clip-text text-transparent ${
               isDark 
                 ? 'bg-gradient-to-r from-lime to-dark-accent' 
                 : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
             }`}>Journey</span>
-          </h2>
-          <p className={`text-xl max-w-3xl mx-auto leading-relaxed transition-colors duration-300 ${
-            isDark ? 'text-dark-muted' : 'text-gray-600'
-          }`}>
-            Follow the path from ASU student to industry professional with our comprehensive career support system
-          </p>
+          </Typography>
+          <Typography 
+            variant="subtitle1" 
+            className={`text-xl max-w-3xl mx-auto leading-relaxed transition-colors duration-300 ${
+              isDark ? 'text-dark-muted' : 'text-gray-600'
+            }`}
+            align="center"
+          >
+            Follow the path from AUT American University of Technology in Tashkent student to industry professional with our comprehensive career support system
+          </Typography>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -139,7 +148,7 @@ export default function CareerPathSection() {
                         }`} />
                       </div>
                       <div className={isDark ? 'text-lime' : 'text-asu-maroon'}>
-                        <p className="font-bold text-lg">ASU Student</p>
+                        <p className="font-bold text-lg">AUT Student</p>
                         <p className="text-sm opacity-80">Your journey starts here</p>
                       </div>
                     </div>
@@ -247,7 +256,7 @@ export default function CareerPathSection() {
                 }`}>Land Your Dream Job</h3>
                 <p className={`text-lg transition-colors duration-300 ${
                   isDark ? 'text-dark-muted' : 'text-gray-600'
-                }`}>Join thousands of ASU students who have successfully launched their careers through our platform.</p>
+                }`}>Join thousands of AUT American University of Technology in Tashkent students who have successfully launched their careers through our platform.</p>
               </div>
             </div>
           </div>
