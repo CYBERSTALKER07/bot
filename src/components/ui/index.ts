@@ -9,6 +9,7 @@ export { default as Spinner, LoadingDots, LoadingPulse } from './Spinner';
 export { default as SearchBox } from './SearchBox';
 export { default as StatusBadge, getStatusColor, getStatusIcon, getStatusEmoji } from './StatusBadge';
 export { default as Avatar, AvatarGroup } from './Avatar';
+export { default as Carousel } from './Carousel';
 
 // Existing components (re-export for consistency)
 export { Card, StatsCard, JobCard } from './Card';

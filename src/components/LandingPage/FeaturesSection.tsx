@@ -139,7 +139,7 @@ export default function FeaturesSection({ featuresRef }: FeaturesSectionProps) {
               icon: <Search className="h-12 w-12 text-white" />,
               title: "AI-Powered Job Matching",
               description: "Advanced algorithms analyze your skills, interests, and career goals to match you with the perfect opportunities from our network of 500+ employers.",
-              gradient: isDark ? "from-lime to-dark-accent" : "from-aut-maroon to-aut-maroon-dark",
+              gradient: isDark ? "from-lime to-dark-accent" : "from-asu-maroon to-asu-maroon-dark",
               features: ["Personalized recommendations", "Skills assessment", "Career path guidance"],
               size: "large"
             },
@@ -147,15 +147,15 @@ export default function FeaturesSection({ featuresRef }: FeaturesSectionProps) {
               icon: <Users className="h-10 w-10 text-white" />,
               title: "Direct Employer Network", 
               description: "Skip the middleman and connect directly with hiring managers from Fortune 500 companies.",
-              gradient: isDark ? "from-lime to-dark-accent" : "from-aut-maroon to-aut-maroon-dark",
+              gradient: isDark ? "from-lime to-dark-accent" : "from-asu-maroon to-asu-maroon-dark",
               features: ["Real-time messaging", "Video interviews"],
               size: "medium"
             },
             {
-              icon: <Award className={`h-14 w-14 ${isDark ? 'text-lime' : 'text-aut-maroon'}`} />,
+              icon: <Award className={`h-14 w-14 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />,
               title: "Career Development Hub",
               description: "Access exclusive workshops, mentorship programs, resume reviews, and interview preparation resources designed for AUT students.",
-              gradient: isDark ? "from-dark-surface to-dark-bg" : "from-white to-gray-100", 
+              gradient: isDark ? "from-dark-surface to-dark-bg" : "from-asu-maroon/10 to-asu-gold/10", 
               features: ["1-on-1 mentoring", "Skill workshops", "Mock interviews", "Resume optimization"],
               size: "large"
             },
@@ -163,15 +163,15 @@ export default function FeaturesSection({ featuresRef }: FeaturesSectionProps) {
               icon: <MessageSquare className="h-10 w-10 text-white" />,
               title: "Integrated Communication",
               description: "Seamless messaging system with read receipts and file sharing.",
-              gradient: isDark ? "from-lime to-dark-accent" : "from-aut-maroon to-aut-maroon-dark",
+              gradient: isDark ? "from-lime to-dark-accent" : "from-asu-maroon to-asu-maroon-dark",
               features: ["Instant notifications", "File attachments"],
               size: "small"
             },
             {
-              icon: <Shield className={`h-12 w-12 ${isDark ? 'text-lime' : 'text-aut-maroon'}`} />,
+              icon: <Shield className={`h-12 w-12 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />,
               title: "Verified Opportunities Only",
               description: "Every job posting is manually reviewed and verified by our team to ensure legitimacy, competitive compensation, and growth potential.",
-              gradient: isDark ? "from-dark-surface to-dark-bg" : "from-white to-gray-100",
+              gradient: isDark ? "from-dark-surface to-dark-bg" : "from-asu-maroon/10 to-asu-gold/10",
               features: ["Background checks", "Salary transparency", "Company ratings"],
               size: "medium"
             },
@@ -179,7 +179,7 @@ export default function FeaturesSection({ featuresRef }: FeaturesSectionProps) {
               icon: <TrendingUp className="h-11 w-11 text-white" />,
               title: "Success Analytics Dashboard", 
               description: "Track your application progress, view response rates, and get actionable insights.",
-              gradient: isDark ? "from-lime to-dark-accent" : "from-aut-maroon to-aut-maroon-dark",
+              gradient: isDark ? "from-lime to-dark-accent" : "from-asu-maroon to-asu-maroon-dark",
               features: ["Application tracking", "Performance metrics"],
               size: "medium"
             }
@@ -187,11 +187,15 @@ export default function FeaturesSection({ featuresRef }: FeaturesSectionProps) {
             <div key={index} className={`feature-card group relative rounded-2xl p-6 hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-2 border break-inside-avoid mb-6 ${
               isDark 
                 ? 'bg-dark-surface border-lime/20 hover:border-lime/40' 
-                : 'bg-white border-gray-100 hover:border-aut-maroon/20'
+                : 'bg-white border-gray-200 hover:border-asu-maroon/30 shadow-lg'
             } ${feature.size === 'large' ? 'lg:p-8' : feature.size === 'medium' ? 'lg:p-7' : 'lg:p-6'}`}>
               <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-5 rounded-2xl transition-opacity duration-500`}></div>
               <div className="relative z-10">
-                <div className={`feature-icon mb-4 w-16 h-16 bg-gradient-to-br ${feature.gradient} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500 shadow-lg`}>
+                <div className={`feature-icon mb-4 w-16 h-16 bg-gradient-to-br ${feature.gradient} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500 shadow-lg ${
+                  !isDark && (feature.gradient.includes('from-asu-maroon/10') || feature.gradient.includes('to-asu-gold/10')) 
+                    ? 'border-2 border-asu-maroon/20' 
+                    : ''
+                }`}>
                   {feature.icon}
                 </div>
                 <h3 className={`feature-title text-xl font-bold mb-3 transition-colors duration-300 ${
@@ -219,7 +223,7 @@ export default function FeaturesSection({ featuresRef }: FeaturesSectionProps) {
         <div className={`rounded-3xl p-12 text-center transition-colors duration-300 ${
           isDark 
             ? 'bg-gradient-to-r from-lime/5 to-dark-accent/5' 
-            : 'bg-gradient-to-r from-aut-maroon/5 to-aut-gold/5'
+            : 'bg-gradient-to-r from-asu-maroon/5 to-asu-gold/5'
         }`}>
           <h3 className={`text-3xl font-bold mb-8 transition-colors duration-300 ${
             isDark ? 'text-dark-text' : 'text-gray-900'
@@ -235,9 +239,9 @@ export default function FeaturesSection({ featuresRef }: FeaturesSectionProps) {
                 <div className={`benefit-icon w-16 h-16 rounded-2xl shadow-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 border ${
                   isDark 
                     ? 'bg-dark-surface border-lime/20' 
-                    : 'bg-white border-aut-maroon/20'
+                    : 'bg-white border-asu-maroon/30 shadow-md'
                 }`}>
-                  <div className={isDark ? 'text-lime' : 'text-aut-maroon'}>{benefit.icon}</div>
+                  <div className={isDark ? 'text-lime' : 'text-asu-maroon'}>{benefit.icon}</div>
                 </div>
                 <h4 className={`font-semibold mb-2 transition-colors duration-300 ${
                   isDark ? 'text-dark-text' : 'text-gray-900'

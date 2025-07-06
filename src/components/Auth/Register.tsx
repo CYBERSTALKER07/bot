@@ -125,7 +125,6 @@ export default function Register() {
               placeholder="Enter your full name"
               variant="outlined"
               fullWidth
-              startIcon={<Person />}
             />
 
             <Input
@@ -137,7 +136,6 @@ export default function Register() {
               placeholder="Enter your email"
               variant="outlined"
               fullWidth
-              startIcon={<Email />}
             />
 
             <Input
@@ -148,7 +146,6 @@ export default function Register() {
               placeholder="Enter your phone number"
               variant="outlined"
               fullWidth
-              startIcon={<Phone />}
             />
 
             {formData.role === 'employer' && (
@@ -161,7 +158,6 @@ export default function Register() {
                 placeholder="Enter your company name"
                 variant="outlined"
                 fullWidth
-                startIcon={<Business />}
               />
             )}
 

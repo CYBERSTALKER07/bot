@@ -60,7 +60,7 @@ export default function HowItWorksSection({ howItWorksRef }: HowItWorksSectionPr
         const iconProgress = (elementProgress - 0.1) / 0.9;
         gsap.set(stepIcon, {
           scale: 0.3 + (iconProgress * 0.8),
-          rotation: iconProgress * 180,
+          rotation: iconProgress * 360,
           y: (1 - iconProgress) * 30,
           ease: 'none'
         });
@@ -152,7 +152,7 @@ export default function HowItWorksSection({ howItWorksRef }: HowItWorksSectionPr
               title: "Create Your Profile",
               description: "Build a comprehensive profile showcasing your skills, experience, and career aspirations. Upload your resume and let AI optimize it.",
               icon: <User className="h-20 w-20 text-white" />,
-              gradient: isDark ? "from-lime to-dark-accent" : "from-asu-maroon to-asu-maroon-dark",
+              gradient: isDark ? "from-dark to-lime" : "from-asu-maroon to-asu-maroon-dark",
               delay: 0
             },
             {
@@ -160,7 +160,7 @@ export default function HowItWorksSection({ howItWorksRef }: HowItWorksSectionPr
               title: "Discover Opportunities",
               description: "Browse through thousands of verified job postings and internships from top employers. Get personalized recommendations.",
               icon: <Search className="h-20 w-20 text-white" />,
-              gradient: isDark ? "from-lime to-dark-accent" : "from-asu-maroon to-asu-maroon-dark",
+              gradient: isDark ? "from-dark to-lime" : "from-asu-maroon to-asu-maroon-dark",
               delay: 0.2
             },
             {
@@ -168,7 +168,7 @@ export default function HowItWorksSection({ howItWorksRef }: HowItWorksSectionPr
               title: "Apply & Connect",
               description: "Apply with one click and connect directly with hiring managers. Track your progress and get real-time updates.",
               icon: <Target className="h-20 w-20 text-white" />,
-              gradient: isDark ? "from-lime to-dark-accent" : "from-asu-maroon to-asu-maroon-dark",
+              gradient: isDark ? "from-dark to-lime" : "from-asu-maroon to-asu-maroon-dark",
               delay: 0.4
             }
           ].map((step, index) => (

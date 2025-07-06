@@ -70,8 +70,8 @@ function AppContent() {
   const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
-    // Show splash screen on first load
-    const hasSeenSplash = sessionStorage.getItem('hasSeenSplash');
+    // Show splash screen only on first visit (use localStorage instead of sessionStorage)
+    const hasSeenSplash = localStorage.getItem('aut-handshake-splash-seen');
     if (hasSeenSplash) {
       setShowSplash(false);
     }
@@ -79,7 +79,8 @@ function AppContent() {
 
   const handleSplashComplete = () => {
     setShowSplash(false);
-    sessionStorage.setItem('hasSeenSplash', 'true');
+    // Store in localStorage so it persists across browser sessions
+    localStorage.setItem('aut-handshake-splash-seen', 'true');
   };
 
   if (showSplash) {
