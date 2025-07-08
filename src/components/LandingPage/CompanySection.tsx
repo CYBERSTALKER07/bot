@@ -98,7 +98,7 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 		},
 		{
 			start: 'top 85%',
-			end: 'top 50%',
+			end: 'top 80%',
 			scrub: 1.5
 		}
 	);
@@ -116,7 +116,7 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 		},
 		{
 			start: 'top 90%',
-			end: 'top 40%',
+			end: 'top 80%',
 			scrub: 2
 		}
 	);
@@ -208,7 +208,7 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 		},
 		{
 			start: 'top 75%',
-			end: 'bottom 50%',
+			end: 'bottom 70%',
 			scrub: 1.8
 		}
 	);
@@ -226,7 +226,7 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 		},
 		{
 			start: 'top 80%',
-			end: 'bottom 20%',
+			end: 'bottom 60%',
 			scrub: 3
 		}
 	);

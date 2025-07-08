@@ -31,7 +31,7 @@ export default function CTASection({ ctaRef }: CTASectionProps) {
           gsap.from('.cta-button', {
             duration: 1,
             scale: 0.8,
-            opacity: 0,
+            // opacity: 0,
             ease: 'elastic.out(1, 0.3)',
             stagger: 0.2,
             delay: 0.5
@@ -99,8 +99,8 @@ export default function CTASection({ ctaRef }: CTASectionProps) {
             </Link>
             <Link to="/register?role=employer" className={`cta-button group border-3 px-10 py-5 rounded-full font-bold text-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-110 hover:-translate-y-1 flex items-center justify-center relative overflow-hidden ${
               isDark 
-                ? 'border-lime text-lime hover:bg-lime hover:text-dark-surface' 
-                : 'border-asu-maroon text-asu-maroon hover:bg-asu-maroon hover:text-white'
+                ? 'border-lime bg-lime text-lime text-deepgreen hover:bg-lime hover:text-dark-surface' 
+                : 'border-asu-maroon bg-burgundy text-white text-asu-maroon hover:bg-asu-maroon hover:text-white'
             }`}>
               <span className="relative z-10">Post Jobs</span>
               <Building2 className="ml-3 h-6 w-6 group-hover:rotate-12 transition-transform duration-300 relative z-10" />
