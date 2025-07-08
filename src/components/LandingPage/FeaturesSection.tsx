@@ -187,7 +187,7 @@ export default function FeaturesSection({ featuresRef }: FeaturesSectionProps) {
             <div key={index} className={`feature-card group relative rounded-2xl p-6 hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-2 border break-inside-avoid mb-6 ${
               isDark 
                 ? 'bg-dark-surface border-lime/20 hover:border-lime/40' 
-                : 'bg-white border-gray-200 hover:border-asu-maroon/30 shadow-lg'
+                : 'bg-white border-gray-200 hover:border-asu-maroon/30 '
             } ${feature.size === 'large' ? 'lg:p-8' : feature.size === 'medium' ? 'lg:p-7' : 'lg:p-6'}`}>
               <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-5 rounded-2xl transition-opacity duration-500`}></div>
               <div className="relative z-10">
