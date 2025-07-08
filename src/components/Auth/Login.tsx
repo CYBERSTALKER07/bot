@@ -155,30 +155,30 @@ export default function Login() {
       <div className={`hidden lg:flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 ${
         isDark 
           ? 'bg-gradient-to-br from-dark-surface via-dark-bg to-gray-900' 
-          : 'bg-gradient-to-br from-aut-maroon via-aut-maroon-dark to-gray-900'
+          : 'bg-burgundy'
       }`}>
         <div className="mx-auto max-w-md text-center">
           <div className={`inline-flex items-center justify-center w-24 h-24 rounded-full mb-6 ${
             isDark ? 'bg-lime/20' : 'bg-aut-gold/20'
           }`}>
-            <EmojiEvents className={`h-12 w-12 ${isDark ? 'text-lime' : 'text-aut-gold'}`} />
+            {/* <EmojiEvents className={`h-12 w-12 ${isDark ? 'text-lime' : 'text-lime'}`} /> */}
           </div>
           <Typography 
             variant="h3" 
-            className={`font-bold mb-4 ${isDark ? 'text-dark-text' : 'text-white'}`}
+            className={`font-bold mb-4 ${isDark ? 'text-dark-text' : 'text-mintgreen'}`}
           >
-            Your Career Journey Starts Here! 🚀
+            Your Career Journey Starts Here! 
           </Typography>
           <Typography 
             variant="h6" 
-            className={`mb-8 ${isDark ? 'text-dark-muted' : 'text-gray-200'}`}
+            className={`mb-8 ${isDark ? 'text-dark-muted' : 'text-mintgreen'}`}
           >
             Connect with amazing companies, find your dream internship, and launch your career at Arizona State University's most comprehensive job platform! ✨
           </Typography>
           
           {/* Success Stats */}
           <div className="grid grid-cols-2 gap-4 mb-8">
-            <Card 
+            {/* <Card 
               className={`p-4 ${isDark ? 'bg-dark-surface' : 'bg-white/10'}`}
               variant="outlined"
             >
@@ -192,7 +192,7 @@ export default function Login() {
                 variant="body2" 
                 className={`${isDark ? 'text-dark-muted' : 'text-gray-300'}`}
               >
-                Happy Students 😊
+                Happy Students 
               </Typography>
             </Card>
             <Card 
@@ -209,9 +209,9 @@ export default function Login() {
                 variant="body2" 
                 className={`${isDark ? 'text-dark-muted' : 'text-gray-300'}`}
               >
-                Dream Jobs 💼
+                Dream Jobs 
               </Typography>
-            </Card>
+            </Card> */}
           </div>
           
           {/* Call to Action */}
@@ -220,19 +220,51 @@ export default function Login() {
               variant="h6" 
               className={`font-medium ${isDark ? 'text-dark-text' : 'text-white'}`}
             >
-              Ready to join the AUT career community? 🌟
+              Ready to join the AUT career community? 
             </Typography>
             <Button
+            
               component={Link}
               to="/register"
               variant="contained"
               color="primary"
               size="large"
-              className="shadow-lg hover:shadow-xl transition-shadow duration-200"
+              className={`shadow-lg hover:shadow-xl transition-shadow duration-200 
+              ${isDark 
+                ? 'bg-lime text-dark-surface hover:bg-lime/80' 
+                : 'bg-aut-maroon text-white hover:bg-aut-maroon/80'}
+            }`}
+              
               startIcon={<RocketLaunch />}
               endIcon={<ArrowForward />}
+              
             >
-              Create Your Account 🎯
+              <span className="font-bold">
+                Start Your Journey
+              </span>
+              <span className="ml-2 text-sm">
+                {role === 'student' ? 'as a Student' : 'as an Employer'}
+              </span>
+              <span className="ml-2">
+                {role === 'student' ? <School className="h-5 w-5" /> : <Business className="h-5 w-5" />}
+              </span>
+            </Button>
+            <Button
+              component={Link}
+              to="/register"
+              variant="outlined"
+              color="secondary"
+              size="large"
+              className={`mt-4 px-8 py-4 font-bold transition-colors duration-300 ${
+                isDark 
+                  ? 'bg-dark-surface hover:bg-lime/20 text-lime' 
+                  : 'bg-aut-maroon hover:bg-aut-maroon/80 text-white'
+              }`}
+              startIcon={<Group />}
+            >
+              
+              
+              Create Your Account 
             </Button>
           </div>
         </div>

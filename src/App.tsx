@@ -67,20 +67,22 @@ function DashboardRouter() {
 
 function AppContent() {
   const { user, loading } = useAuth();
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(() => {
+    // Only show splash if user hasn't seen it in this session AND it's the initial app load
+    const hasSeenSplash = sessionStorage.getItem('aut-handshake-splash-seen');
+    const isInitialLoad = !sessionStorage.getItem('aut-handshake-app-loaded');
+    return !hasSeenSplash && isInitialLoad;
+  });
 
   useEffect(() => {
-    // Show splash screen only on first visit (use localStorage instead of sessionStorage)
-    const hasSeenSplash = localStorage.getItem('aut-handshake-splash-seen');
-    if (hasSeenSplash) {
-      setShowSplash(false);
-    }
+    // Mark that the app has been loaded in this session
+    sessionStorage.setItem('aut-handshake-app-loaded', 'true');
   }, []);
 
   const handleSplashComplete = () => {
     setShowSplash(false);
-    // Store in localStorage so it persists across browser sessions
-    localStorage.setItem('aut-handshake-splash-seen', 'true');
+    // Store in sessionStorage so it only persists for the current session
+    sessionStorage.setItem('aut-handshake-splash-seen', 'true');
   };
 
   if (showSplash) {
