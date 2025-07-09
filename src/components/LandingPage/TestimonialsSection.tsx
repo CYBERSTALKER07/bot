@@ -42,7 +42,7 @@ export default function TestimonialsSection({ testimonialsRef }: TestimonialsSec
   const gridRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
-  const [visibleCards, setVisibleCards] = useState(12);
+  const [visibleCards, setVisibleCards] = useState(1);
 
   const testimonials: TestimonialCard[] = [
     {
@@ -327,8 +327,8 @@ export default function TestimonialsSection({ testimonialsRef }: TestimonialsSec
       ease: 'none'
     });
   }, { 
-    start: 'top 100%', 
-    end: 'bottom 90%',
+    start: 'top 10%', 
+    end: 'bottom 30%',
     scrub: 1.5 
   });
 
@@ -372,8 +372,8 @@ export default function TestimonialsSection({ testimonialsRef }: TestimonialsSec
       }
     });
   }, { 
-    start: 'top 80%', 
-    end: 'bottom 100%',
+    start: 'top 75%', 
+    end: 'bottom 85%',
     scrub: 2 
   });
 
@@ -451,6 +451,7 @@ export default function TestimonialsSection({ testimonialsRef }: TestimonialsSec
             className={`header-title text-4xl md:text-5xl font-bold mb-6 ${
               isDark ? 'text-dark-text' : 'text-gray-900'
             }`}
+            ml={30} align="center"
           >
             Real Stories from AUT Students
           </Typography>
@@ -459,6 +460,7 @@ export default function TestimonialsSection({ testimonialsRef }: TestimonialsSec
             className={`header-subtitle text-xl max-w-3xl mx-auto ${
               isDark ? 'text-dark-muted' : 'text-gray-600'
             }`}
+            align="center" ml={30}
           >
             Discover how AUT students are landing their dream jobs and building successful careers
           </Typography>

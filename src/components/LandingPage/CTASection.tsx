@@ -80,6 +80,7 @@ export default function CTASection({ ctaRef }: CTASectionProps) {
               isDark ? 'text-dark-muted' : 'text-gray-600'
             }`}
             align="center"
+            ml={10}
           >
             Join thousands of AUT American University of Technology in Tashkent students who have already found their dream jobs with top companies worldwide.
           </Typography>

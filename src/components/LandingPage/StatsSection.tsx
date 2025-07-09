@@ -161,6 +161,8 @@ export default function StatsSection({ statsRef }: StatsSectionProps) {
             className={`text-lg max-w-2xl mx-auto ${
               isDark ? 'text-dark-muted' : 'text-gray-600'
             }`}
+            align='center'
+            ml={30}
           >
             Join our growing community and achieve your career goals
           </Typography>
@@ -219,7 +221,7 @@ export default function StatsSection({ statsRef }: StatsSectionProps) {
               isDark ? 'text-dark-text' : 'text-gray-900'
             }`}
           >
-            Ready to join our success stories? 🚀
+            Ready to join our success stories? 
           </Typography>
         </div>
       </div>

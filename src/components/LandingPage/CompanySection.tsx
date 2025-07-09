@@ -98,7 +98,7 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 		},
 		{
 			start: 'top 85%',
-			end: 'top 80%',
+			end: 'top 10%',
 			scrub: 1.5
 		}
 	);
@@ -116,7 +116,7 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 		},
 		{
 			start: 'top 90%',
-			end: 'top 80%',
+			end: 'top 20%',
 			scrub: 2
 		}
 	);
@@ -168,7 +168,7 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 		},
 		{
 			start: 'top 70%',
-			end: 'bottom 60%',
+			end: 'bottom 90%',
 			scrub: 1.2
 		}
 	);
@@ -309,6 +309,7 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 							isDark ? 'text-dark-muted' : 'text-gray-600'
 						}`}
 						align="center"
+						ml={35}
 					>
 						Join thousands of students who've found their dream jobs with these incredible companies!
 					</Typography>

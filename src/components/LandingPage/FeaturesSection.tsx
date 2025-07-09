@@ -136,18 +136,18 @@ export default function FeaturesSection({ featuresRef }: FeaturesSectionProps) {
         <div className="columns-1 md:columns-2 lg:columns-3 gap-6 mb-16 space-y-6">
           {[
             {
-              icon: <Search className="h-12 w-12 text-white" />,
+              icon: <Search className="h-12 w-12 text-lime" />,
               title: "AI-Powered Job Matching",
               description: "Advanced algorithms analyze your skills, interests, and career goals to match you with the perfect opportunities from our network of 500+ employers.",
-              gradient: isDark ? "from-lime to-dark-accent" : "from-asu-maroon to-asu-maroon-dark",
+              gradient: isDark ? "from-dark-surface to-dark-bg" : "from-asu-maroon/10 to-asu-gold/10",
               features: ["Personalized recommendations", "Skills assessment", "Career path guidance"],
               size: "large"
             },
             {
-              icon: <Users className="h-10 w-10 text-white" />,
+              icon: <Users className="h-10 w-10 text-lime" />,
               title: "Direct Employer Network", 
               description: "Skip the middleman and connect directly with hiring managers from Fortune 500 companies.",
-              gradient: isDark ? "from-lime to-dark-accent" : "from-asu-maroon to-asu-maroon-dark",
+              gradient: isDark ? "from-dark-surface to-dark-bg" : "from-asu-maroon/10 to-asu-gold/10",
               features: ["Real-time messaging", "Video interviews"],
               size: "medium"
             },
@@ -160,10 +160,10 @@ export default function FeaturesSection({ featuresRef }: FeaturesSectionProps) {
               size: "large"
             },
             {
-              icon: <MessageSquare className="h-10 w-10 text-white" />,
+              icon: <MessageSquare className="h-10 w-10 text-lime" />,
               title: "Integrated Communication",
               description: "Seamless messaging system with read receipts and file sharing.",
-              gradient: isDark ? "from-lime to-dark-accent" : "from-asu-maroon to-asu-maroon-dark",
+              gradient: isDark ? "from-dark-surface to-dark-bg" : "from-asu-maroon/10 to-asu-gold/10",
               features: ["Instant notifications", "File attachments"],
               size: "small"
             },
@@ -176,10 +176,10 @@ export default function FeaturesSection({ featuresRef }: FeaturesSectionProps) {
               size: "medium"
             },
             {
-              icon: <TrendingUp className="h-11 w-11 text-white" />,
+              icon: <TrendingUp className="h-11 w-11 text-lime" />,
               title: "Success Analytics Dashboard", 
               description: "Track your application progress, view response rates, and get actionable insights.",
-              gradient: isDark ? "from-lime to-dark-accent" : "from-asu-maroon to-asu-maroon-dark",
+              gradient: isDark ? "from-dark-surface to-dark-bg" : "from-asu-maroon/10 to-asu-gold/10",
               features: ["Application tracking", "Performance metrics"],
               size: "medium"
             }
@@ -187,7 +187,7 @@ export default function FeaturesSection({ featuresRef }: FeaturesSectionProps) {
             <div key={index} className={`feature-card group relative rounded-2xl p-6 hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-2 border break-inside-avoid mb-6 ${
               isDark 
                 ? 'bg-dark-surface border-lime/20 hover:border-lime/40' 
-                : 'bg-white border-gray-200 hover:border-asu-maroon/30 '
+                : 'bg-lime border-gray-200 hover:border-asu-maroon/30 '
             } ${feature.size === 'large' ? 'lg:p-8' : feature.size === 'medium' ? 'lg:p-7' : 'lg:p-6'}`}>
               <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-5 rounded-2xl transition-opacity duration-500`}></div>
               <div className="relative z-10">

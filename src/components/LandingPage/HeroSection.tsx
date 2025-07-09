@@ -48,7 +48,7 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
             <Typography 
               variant="h5" 
               className={`text-xl md:text-2xl mb-8 leading-relaxed ${
-                isDark ? 'text-dark-muted' : 'text-gray-200'
+                isDark ? 'text-dark-muted' : 'text-white'
               }`}
             >
               Connect with amazing companies, find your dream internship, and launch your career at Auckland University of Technology's most comprehensive job platform!
@@ -64,7 +64,7 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
                 startIcon={<RocketLaunch />}
                 endIcon={<ArrowForward />}
               >
-                Find My Dream Job
+                Find Your Dream Job
               </Button>
               <Button
                 component={Link}
@@ -72,19 +72,14 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
                 variant="outlined"
                 color="primary"
                 size="large"
-                className="shadow-lg hover:shadow-xl transition-shadow duration-200"
+                className={`shadow-lg hover:shadow-xl transition-shadow duration-200 border-2 ${
+                  isDark 
+                    ? 'border-lime text-lime hover:bg-lime/10' 
+                    : 'border-white text-white hover:bg-white/10'
+                }`}
                 startIcon={<Business />}
-                sx={isDark ? { 
-                  borderColor: 'lime', 
-                  color: 'lime',
-                  '&:hover': { backgroundColor: 'rgba(50, 205, 50, 0.1)' }
-                } : {
-                  borderColor: 'white',
-                  color: 'white',
-                  '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' }
-                }}
               >
-                Post Amazing Jobs
+                Post Jobs
               </Button>
             </div>
           </div>

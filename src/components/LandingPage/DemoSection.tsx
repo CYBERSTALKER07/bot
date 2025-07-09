@@ -74,6 +74,7 @@ export default function DemoSection({ demoRef }: DemoSectionProps) {
               isDark ? 'text-dark-muted' : 'text-gray-200'
             }`}
             align="center"
+            ml="auto" mr="auto" 
           >
             Experience our intuitive platform designed specifically for AUT American University of Technology in Tashkent students and employers
           </Typography>

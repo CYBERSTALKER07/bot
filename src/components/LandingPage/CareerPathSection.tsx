@@ -181,6 +181,7 @@ export default function CareerPathSection() {
               isDark ? 'text-dark-muted' : 'text-gray-600'
             }`}
             align="center"
+            ml={30}
           >
             Follow the path from AUT American University of Technology in Tashkent student to industry professional with our comprehensive career support system
           </Typography>
