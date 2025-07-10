@@ -26,6 +26,7 @@ import Avatar from './ui/Avatar';
 import Badge from './ui/Badge';
 import Input from './ui/Input';
 import Select from './ui/Select';
+import { mockCompanies, mockIndustries, mockLocations, mockCompanySizes } from '../data/mockData';
 
 interface CompanyListing {
   id: string;
@@ -38,7 +39,6 @@ interface CompanyListing {
   description: string;
   rating: number;
   reviews_count: number;
-  open_positions: number;
   is_verified: boolean;
   is_hiring: boolean;
   is_following?: boolean;
@@ -46,6 +46,15 @@ interface CompanyListing {
   employee_count: number;
   founded_year: number;
   growth_rate?: number;
+  recent_jobs: Array<{
+    id: string;
+    title: string;
+    department: string;
+    location: string;
+    type: string;
+    posted_date: string;
+    application_count: number;
+  }>;
 }
 
 export default function CompaniesPage() {
@@ -70,125 +79,29 @@ export default function CompaniesPage() {
     try {
       setLoading(true);
       
-      // Mock data - in real app, this would come from your database
-      const mockCompanies: CompanyListing[] = [
-        {
-          id: '1',
-          name: 'Google',
-          logo_url: 'https://logo.clearbit.com/google.com',
-          cover_image_url: 'https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=600&h=300&fit=crop',
-          industry: 'Technology',
-          location: 'Mountain View, CA',
-          company_size: '10,000+ employees',
-          description: 'A global technology leader focused on organizing the world\'s information and making it universally accessible.',
-          rating: 4.5,
-          reviews_count: 12847,
-          open_positions: 234,
-          is_verified: true,
-          is_hiring: true,
-          featured_benefits: ['Healthcare', 'Stock Options', 'Free Meals'],
-          employee_count: 156500,
-          founded_year: 1998,
-          growth_rate: 15
-        },
-        {
-          id: '2',
-          name: 'Microsoft',
-          logo_url: 'https://logo.clearbit.com/microsoft.com',
-          cover_image_url: 'https://images.unsplash.com/photo-1560472355-536de3962603?w=600&h=300&fit=crop',
-          industry: 'Technology',
-          location: 'Redmond, WA',
-          company_size: '10,000+ employees',
-          description: 'Empowering every person and organization on the planet to achieve more through innovative technology solutions.',
-          rating: 4.4,
-          reviews_count: 9876,
-          open_positions: 189,
-          is_verified: true,
-          is_hiring: true,
-          featured_benefits: ['Healthcare', 'Retirement Plans', 'Learning Budget'],
-          employee_count: 221000,
-          founded_year: 1975,
-          growth_rate: 12
-        },
-        {
-          id: '3',
-          name: 'Apple',
-          logo_url: 'https://logo.clearbit.com/apple.com',
-          cover_image_url: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=300&fit=crop',
-          industry: 'Technology',
-          location: 'Cupertino, CA',
-          company_size: '10,000+ employees',
-          description: 'We\'re a diverse collective of thinkers and doers, continually reimagining what\'s possible to help us all do what we love.',
-          rating: 4.3,
-          reviews_count: 8234,
-          open_positions: 156,
-          is_verified: true,
-          is_hiring: true,
-          featured_benefits: ['Healthcare', 'Employee Discounts', 'Wellness Programs'],
-          employee_count: 164000,
-          founded_year: 1976,
-          growth_rate: 8
-        },
-        {
-          id: '4',
-          name: 'Tesla',
-          logo_url: 'https://logo.clearbit.com/tesla.com',
-          cover_image_url: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=600&h=300&fit=crop',
-          industry: 'Automotive',
-          location: 'Austin, TX',
-          company_size: '1,000-10,000 employees',
-          description: 'Accelerating the world\'s transition to sustainable energy through electric vehicles and clean energy solutions.',
-          rating: 4.1,
-          reviews_count: 5432,
-          open_positions: 287,
-          is_verified: true,
-          is_hiring: true,
-          featured_benefits: ['Stock Options', 'Healthcare', 'Innovation Time'],
-          employee_count: 127855,
-          founded_year: 2003,
-          growth_rate: 25
-        },
-        {
-          id: '5',
-          name: 'Netflix',
-          logo_url: 'https://logo.clearbit.com/netflix.com',
-          cover_image_url: 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=600&h=300&fit=crop',
-          industry: 'Entertainment',
-          location: 'Los Gatos, CA',
-          company_size: '1,000-10,000 employees',
-          description: 'We entertain the world with stories that connect people across cultures, languages, and borders.',
-          rating: 4.2,
-          reviews_count: 3456,
-          open_positions: 78,
-          is_verified: true,
-          is_hiring: true,
-          featured_benefits: ['Unlimited PTO', 'Parental Leave', 'Learning Budget'],
-          employee_count: 11300,
-          founded_year: 1997,
-          growth_rate: 18
-        },
-        {
-          id: '6',
-          name: 'Airbnb',
-          logo_url: 'https://logo.clearbit.com/airbnb.com',
-          cover_image_url: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=300&fit=crop',
-          industry: 'Travel',
-          location: 'San Francisco, CA',
-          company_size: '1,000-10,000 employees',
-          description: 'Creating a world where anyone can belong anywhere, connecting people to unique travel experiences.',
-          rating: 4.0,
-          reviews_count: 2789,
-          open_positions: 95,
-          is_verified: true,
-          is_hiring: true,
-          featured_benefits: ['Travel Credits', 'Healthcare', 'Flexible Work'],
-          employee_count: 6407,
-          founded_year: 2008,
-          growth_rate: 22
-        }
-      ];
+      // Convert mock data to match interface
+      const companiesData: CompanyListing[] = mockCompanies.map(company => ({
+        id: company.id,
+        name: company.name,
+        logo_url: company.logo_url,
+        cover_image_url: company.cover_image_url,
+        industry: company.industry,
+        location: company.location,
+        company_size: company.company_size,
+        description: company.description,
+        rating: company.rating,
+        reviews_count: company.reviews_count,
+        is_verified: company.is_verified,
+        is_hiring: company.is_hiring,
+        is_following: company.is_following,
+        featured_benefits: company.featured_benefits,
+        employee_count: company.employee_count,
+        founded_year: company.founded_year,
+        growth_rate: company.growth_rate,
+        recent_jobs: company.recent_jobs
+      }));
 
-      setCompanies(mockCompanies);
+      setCompanies(companiesData);
     } catch (error) {
       console.error('Error fetching companies:', error);
     } finally {
@@ -230,13 +143,17 @@ export default function CompaniesPage() {
         case 'rating':
           return b.rating - a.rating;
         case 'positions':
-          return b.open_positions - a.open_positions;
+          return b.recent_jobs.length - a.recent_jobs.length;
         case 'employees':
           return b.employee_count - a.employee_count;
         default:
           return a.name.localeCompare(b.name);
       }
     });
+
+  const getTotalOpenPositions = (company: CompanyListing) => {
+    return company.recent_jobs.reduce((sum, job) => sum + job.application_count, 0);
+  };
 
   const industries = [...new Set(companies.map(c => c.industry))];
   const locations = [...new Set(companies.map(c => c.location.split(',')[1]?.trim() || c.location))];
@@ -281,7 +198,7 @@ export default function CompaniesPage() {
             </Card>
             <Card className="p-4 text-center" elevation={1}>
               <div className={`text-2xl font-bold ${isDark ? 'text-lime' : 'text-asu-maroon'}`}>
-                {companies.reduce((sum, c) => sum + c.open_positions, 0)}
+                {companies.reduce((sum, c) => sum + c.recent_jobs.length, 0)}
               </div>
               <Typography variant="body2" color="textSecondary">Open Positions</Typography>
             </Card>
@@ -506,7 +423,7 @@ export default function CompaniesPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-1 text-sm">
                       <Work className="h-4 w-4 text-gray-400" />
-                      <span className="text-gray-600">{company.open_positions} open positions</span>
+                      <span className="text-gray-600">{getTotalOpenPositions(company)} open positions</span>
                     </div>
                     <Link to={`/companies/${company.id}`}>
                       <Button variant="contained" color="primary" size="small">
@@ -601,7 +518,7 @@ export default function CompaniesPage() {
                           </div>
                           <div className="flex items-center space-x-1 text-sm">
                             <Work className="h-4 w-4 text-gray-400" />
-                            <span className="text-gray-600">{company.open_positions} open positions</span>
+                            <span className="text-gray-600">{getTotalOpenPositions(company)} open positions</span>
                           </div>
                         </div>
                         <Link to={`/companies/${company.id}`}>
