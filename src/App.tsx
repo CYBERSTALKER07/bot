@@ -27,6 +27,8 @@ import ForStudentsPage from './components/ForStudentsPage';
 import ForEmployersPage from './components/ForEmployersPage';
 import CareerTipsPage from './components/CareerTipsPage';
 import WhosHiringPage from './components/WhosHiringPage';
+import DigitalLearningPassport from './components/DigitalLearningPassport';
+import SkillsAuditSystem from './components/SkillsAuditSystem';
 
 // ScrollToTop component to handle automatic scrolling on route changes
 function ScrollToTop() {
@@ -148,6 +150,10 @@ function AppContent() {
         
         {/* Profile Routes */}
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        
+        {/* Digital Learning Passport Routes */}
+        <Route path="/digital-learning-passport" element={<ProtectedRoute><DigitalLearningPassport /></ProtectedRoute>} />
+        <Route path="/skills-audit-system" element={<ProtectedRoute><SkillsAuditSystem /></ProtectedRoute>} />
       </Routes>
     </div>
   );

@@ -19,7 +19,9 @@ import {
   Group,  
   Settings,
   Assignment,
-  Dashboard
+  Dashboard,
+  Article,
+  Analytics
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -38,13 +40,17 @@ export default function Navigation() {
 
   // Navigation items based on user role
   const getNavigationItems = () => {
-    const baseItems = [
-      { icon: Dashboard, label: 'Dashboard', path: '/dashboard' },
-      { icon: Search, label: 'Find Jobs', path: '/jobs' },
-      { icon: Message, label: 'Messages', path: '/messages' },
-      { icon: Event, label: 'Events', path: '/events' },
-      { icon: MenuBook, label: 'Resources', path: '/resources' },
-    ];
+    if (user?.role === 'student') {
+      return [
+        { icon: Dashboard, label: 'Dashboard', path: '/dashboard' },
+        { icon: Article, label: 'Learning Passport', path: '/digital-learning-passport' },
+        { icon: Analytics, label: 'Skills Audit', path: '/skills-audit-system' },
+        { icon: Search, label: 'Find Jobs', path: '/jobs' },
+        { icon: Message, label: 'Messages', path: '/messages' },
+        { icon: Event, label: 'Events', path: '/events' },
+        { icon: MenuBook, label: 'Resources', path: '/resources' },
+      ];
+    }
 
     if (user?.role === 'employer') {
       return [
@@ -66,7 +72,14 @@ export default function Navigation() {
       ];
     }
 
-    return baseItems;
+    // Default items for non-authenticated users
+    return [
+      { icon: Dashboard, label: 'Dashboard', path: '/dashboard' },
+      { icon: Search, label: 'Find Jobs', path: '/jobs' },
+      { icon: Message, label: 'Messages', path: '/messages' },
+      { icon: Event, label: 'Events', path: '/events' },
+      { icon: MenuBook, label: 'Resources', path: '/resources' },
+    ];
   };
 
   const navigationItems = getNavigationItems();
