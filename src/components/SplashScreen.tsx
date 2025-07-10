@@ -27,11 +27,11 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
       span.style.display = 'inline-block';
       span.style.opacity = '0';
       if (index === 0) {
-        // First character starts from the right
-        span.style.transform = 'translateX(100px)';
+        // First character starts from the right - adjust for mobile
+        span.style.transform = window.innerWidth < 640 ? 'translateX(50px)' : 'translateX(100px)';
       } else {
-        // Rest of characters start from the left
-        span.style.transform = 'translateX(-30px)';
+        // Rest of characters start from the left - adjust for mobile
+        span.style.transform = window.innerWidth < 640 ? 'translateX(-15px)' : 'translateX(-30px)';
       }
       span.classList.add('char');
       span.dataset.index = index.toString();
@@ -53,11 +53,18 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
 
       const chars = textRef.current?.querySelectorAll('.char') || [];
       
+      // Responsive font sizes
+      const isMobile = window.innerWidth < 640;
+      const isTablet = window.innerWidth < 1024;
+      
+      const largeFontSize = isMobile ? '3rem' : isTablet ? '5rem' : '8rem';
+      const smallFontSize = isMobile ? '2.5rem' : isTablet ? '4rem' : '5.5rem';
+      
       // First character animation (from right)
       tl.to([chars[0], chars[1], chars[2]], {
         duration: 0.8,
         opacity: 1,
-        fontSize: '8rem',
+        fontSize: largeFontSize,
         fontWeight: 'bold',
         x: 0,
         ease: 'power2.out'
@@ -65,7 +72,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
       // Rest of characters animation (from left to right)
       .to(Array.from(chars).slice(3), {
         duration: 0.05,
-        fontSize: '5.5rem',
+        fontSize: smallFontSize,
         fontWeight: 'bold',
         opacity: 1,
         x: 0,
@@ -81,7 +88,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
       .to(chars, {
         duration: 0.03,
         opacity: 0,
-        x: 30,
+        x: isMobile ? 15 : 30,
         ease: 'power2.in',
         stagger: {
           amount: 0.6,
@@ -91,20 +98,9 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
       .to(containerRef.current, {
         duration: 0.8,
         opacity: 0,
-        scale: 1.1 ,
+        scale: 1.1,
         ease: 'power2.in'
       }, '-=0.3');
-
-      // Add subtle text glow effect during animation
-      // gsap.to(textRef.current, {
-      //   textShadow: isDark 
-      //     ? '0 0 30px rgba(227, 255, 112, 0.6)' 
-      //     : '0 0 30px rgba(140, 29, 64, 0.6)',
-      //   duration: 2,
-      //   repeat: -1,
-      //   yoyo: true,
-      //   ease: 'sine.inOut'
-      // });
 
     }, containerRef);
 
@@ -121,13 +117,13 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
       }`}
     >
       {/* Main Content - Only "AUT Handshake" Text */}
-      <div className="text-center relative z-10 w-full scale-150">
+      <div className="text-center relative z-10 w-full px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <Typography
             ref={textRef}
             variant="h1"
             align="center"
-            className={` bg-clip-text whitespace-nowrap ${
+            className={`bg-clip-text whitespace-nowrap text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl ${
               isDark 
                 ? 'bg-lime text-lime' 
                 : 'bg-burgundy text-burgundy'
