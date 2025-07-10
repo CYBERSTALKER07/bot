@@ -533,7 +533,7 @@ export default function TestimonialsSection({ testimonialsRef }: TestimonialsSec
             <div className="relative">
               <div className="relative">
                 <img 
-                  src="/public/testimonials.png" 
+                  src="/testimonials.png" 
                   alt="Student testimonials and success stories" 
                   className="w-full h-auto rounded-2xl shadow-2xl"
                 />
