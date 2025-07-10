@@ -48,6 +48,7 @@ export default function Navigation() {
         { icon: Article, label: 'Learning Passport', path: '/digital-learning-passport' },
         { icon: Analytics, label: 'Skills Audit', path: '/skills-audit-system' },
         { icon: Search, label: 'Find Jobs', path: '/jobs' },
+        { icon: Business, label: 'Companies', path: '/companies' },
         { icon: Message, label: 'Messages', path: '/messages' },
         { icon: Event, label: 'Events', path: '/events' },
         { icon: MenuBook, label: 'Resources', path: '/resources' },
@@ -60,6 +61,7 @@ export default function Navigation() {
         { icon: Dashboard, label: 'Dashboard', path: '/dashboard' },
         { icon: Work, label: 'Post Jobs', path: '/post-job' },
         { icon: Group, label: 'Applicants', path: '/applicants' },
+        { icon: Business, label: 'Companies', path: '/companies' },
         { icon: Message, label: 'Messages', path: '/messages' },
         { icon: Assignment, label: 'Resources', path: '/resources' },
       ];
@@ -71,6 +73,7 @@ export default function Navigation() {
         { icon: Dashboard, label: 'Admin Panel', path: '/dashboard' },
         { icon: Group, label: 'Users', path: '/users' },
         { icon: Work, label: 'Jobs', path: '/jobs' },
+        { icon: Business, label: 'Companies', path: '/companies' },
         { icon: Assignment, label: 'Reports', path: '/reports' },
         { icon: Settings, label: 'Settings', path: '/settings' },
       ];
@@ -81,6 +84,7 @@ export default function Navigation() {
       { icon: FeedIcon, label: 'Feed', path: '/feed' },
       { icon: Dashboard, label: 'Dashboard', path: '/dashboard' },
       { icon: Search, label: 'Find Jobs', path: '/jobs' },
+      { icon: Business, label: 'Companies', path: '/companies' },
       { icon: Message, label: 'Messages', path: '/messages' },
       { icon: Event, label: 'Events', path: '/events' },
       { icon: MenuBook, label: 'Resources', path: '/resources' },

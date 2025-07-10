@@ -31,6 +31,8 @@ import DigitalLearningPassport from './components/DigitalLearningPassport';
 import SkillsAuditSystem from './components/SkillsAuditSystem';
 import Feed from './components/Feed';
 import PostDetails from './components/PostDetails';
+import CompaniesPage from './components/CompaniesPage';
+import CompanyProfile from './components/CompanyProfile';
 
 // ScrollToTop component to handle automatic scrolling on route changes
 function ScrollToTop() {
@@ -160,6 +162,10 @@ function AppContent() {
         {/* Social Media Routes */}
         <Route path="/feed" element={<ProtectedRoute><Feed /></ProtectedRoute>} />
         <Route path="/post/:id" element={<ProtectedRoute><PostDetails /></ProtectedRoute>} />
+        
+        {/* Company Routes */}
+        <Route path="/companies" element={<ProtectedRoute><CompaniesPage /></ProtectedRoute>} />
+        <Route path="/companies/:companyId" element={<ProtectedRoute><CompanyProfile /></ProtectedRoute>} />
       </Routes>
     </div>
   );
