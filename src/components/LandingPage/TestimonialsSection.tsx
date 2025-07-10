@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { 
   Star,
   Verified,
@@ -348,7 +348,7 @@ export default function TestimonialsSection({ testimonialsRef }: TestimonialsSec
       });
 
       // Real-time number counter for stats
-      const numberElement = element.querySelector('.stat-number');
+      const numberElement = element.querySelector('.stat-number') as HTMLElement;
       if (numberElement && elementProgress > 0) {
         const targetValue = parseInt(numberElement.getAttribute('data-value') || '0');
         const currentValue = Math.floor(targetValue * elementProgress);
@@ -393,12 +393,12 @@ export default function TestimonialsSection({ testimonialsRef }: TestimonialsSec
       });
 
       // Dynamic card background and border effects
-      const cardBg = element.style;
+      const cardElement = element as HTMLElement;
       const borderOpacity = elementProgress * 0.5;
       const shadowIntensity = elementProgress * 25;
       
-      cardBg.borderColor = `rgba(${isDark ? '227, 255, 112' : '140, 29, 64'}, ${borderOpacity})`;
-      cardBg.boxShadow = `0 ${shadowIntensity}px ${shadowIntensity * 2}px rgba(0,0,0,${elementProgress * 0.15})`;
+      cardElement.style.borderColor = `rgba(${isDark ? '227, 255, 112' : '140, 29, 64'}, ${borderOpacity})`;
+      cardElement.style.boxShadow = `0 ${shadowIntensity}px ${shadowIntensity * 2}px rgba(0,0,0,${elementProgress * 0.15})`;
       
       // Dynamic avatar scaling
       const avatar = element.querySelector('.testimonial-avatar');
@@ -414,8 +414,7 @@ export default function TestimonialsSection({ testimonialsRef }: TestimonialsSec
   }, { 
     start: 'top 75%', 
     end: 'bottom 100%',
-    scrub: 1.5,
-    invalidateOnRefresh: true
+    scrub: 1.5
   });
 
   const getCategoryColor = (category: string) => {
@@ -431,175 +430,118 @@ export default function TestimonialsSection({ testimonialsRef }: TestimonialsSec
 
   return (
     <section ref={testimonialsRef} className={`py-24 transition-colors duration-300 overflow-hidden ${
-      isDark ? 'bg-dark-surface' : 'bg-gradient-to-br from-gray-50 to-white'
+      isDark 
+        ? 'bg-gradient-to-br from-black via-black to-purple-900' 
+        : 'bg-gradient-to-br from-black via-black to-purple-900'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div ref={headerRef} className="text-center mb-16">
-          <div className="header-badge inline-flex items-center space-x-2 mb-4">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center">
-              <ChatBubbleOutline className="text-white h-6 w-6" />
-            </div>
-            <Typography variant="body1" className={`font-medium ${
-              isDark ? 'text-lime' : 'text-asu-maroon'
-            }`}>
-              STUDENT SUCCESS STORIES
-            </Typography>
-          </div>
-          <Typography 
-            variant="h2" 
-            className={`header-title text-4xl md:text-5xl font-bold mb-6 ${
-              isDark ? 'text-dark-text' : 'text-gray-900'
-            }`}
-            ml={30} align="center"
-          >
-            Real Stories from AUT Students
-          </Typography>
-          <Typography 
-            variant="h6" 
-            className={`header-subtitle text-xl max-w-3xl mx-auto ${
-              isDark ? 'text-dark-muted' : 'text-gray-600'
-            }`}
-            align="center" ml={30}
-          >
-            Discover how AUT students are landing their dream jobs and building successful careers
-          </Typography>
-        </div>
-
+       
         {/* Enhanced Stats */}
-        <div ref={statsRef} className="grid md:grid-cols-4 gap-6 mb-16">
-          {[
-            { number: "2500", label: "Success Stories", icon: "📊" },
-            { number: "95", label: "Job Placement Rate", icon: "📈" },
-            { number: "500", label: "Partner Companies", icon: "🏢" },
-            { number: "48", label: "Avg Response Time (hrs)", icon: "⚡" }
-          ].map((stat, index) => (
-            <Card key={index} className="stat-card text-center p-6 bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-              <div className="w-12 h-12 bg-gradient-to-br from-asu-maroon to-asu-gold rounded-full flex items-center justify-center mx-auto mb-3">
-                <Star className="h-6 w-6 text-white" />
-              </div>
-              <Typography variant="h3" className="stat-number text-2xl font-bold text-gray-900" data-value={stat.number}>
-                0{stat.number.includes('500') ? '+' : stat.number.includes('95') ? '%' : ''}
-              </Typography>
-              <Typography variant="body2" className="text-gray-600">
-                {stat.label}
-              </Typography>
-            </Card>
-          ))}
-        </div>
+       
 
         {/* Enhanced Pinterest-style Grid */}
-        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-          {testimonials.slice(0, visibleCards).map((testimonial) => (
-            <Card 
-              key={testimonial.id} 
-              className="testimonial-card bg-white shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer border border-gray-100 rounded-xl overflow-hidden"
-              style={{ 
-                minHeight: testimonial.height === 'short' ? '280px' : testimonial.height === 'medium' ? '340px' : '420px'
-              }}
-            >
-              <div className="p-6 h-full flex flex-col">
-                {/* Header */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="testimonial-avatar w-12 h-12 rounded-full bg-gradient-to-br from-asu-maroon to-asu-gold flex items-center justify-center text-xl shadow-lg">
-                      {testimonial.avatar}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center space-x-2">
-                        <Typography variant="h6" className="font-bold text-gray-900 truncate">
-                          {testimonial.name}
-                        </Typography>
-                        {testimonial.verified && (
-                          <Verified className="h-4 w-4 text-blue-500 flex-shrink-0" />
-                        )}
-                      </div>
-                      <Typography variant="body2" className="text-gray-600 font-medium truncate">
-                        {testimonial.role}
-                      </Typography>
-                      <Typography variant="body2" className="text-gray-500 flex items-center truncate">
-                        <Business className="h-3 w-3 mr-1 flex-shrink-0" />
-                        <span className="truncate">{testimonial.company}</span>
-                      </Typography>
-                      <Typography variant="body2" className="text-gray-500 flex items-center truncate">
-                        <LocationOn className="h-3 w-3 mr-1 flex-shrink-0" />
-                        <span className="truncate">{testimonial.location}</span>
-                      </Typography>
-                    </div>
-                  </div>
-                  <div className={`px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${getCategoryColor(testimonial.category)}`}>
-                    {testimonial.category.replace('_', ' ')}
-                  </div>
-                </div>
+       
 
-                {/* Rating */}
-                <div className="flex items-center space-x-1 mb-3">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
-                  ))}
-                </div>
+        {/* Load More Button */}
+       
 
-                {/* Message */}
-                <div className="testimonial-content flex-1 mb-4">
-                  <Typography variant="body1" className="text-gray-700 leading-relaxed text-sm">
-                    "{testimonial.message}"
+        {/* Call to Action */}
+     
+        {/* Messaging Interface Section */}
+        <div className="mb-24">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left Side - Text Content */}
+            <div className="space-y-8">
+              <div className="space-y-6">
+                <div className="header-badge inline-flex items-center space-x-2">
+                 
+                  <Typography variant="body1" className={`font-medium ${
+                    isDark ? 'text-lime' : 'text-asu-maroon'
+                  }`}>
                   </Typography>
                 </div>
+                
+                <Typography 
+                  variant="h2" 
+                  className={`text-4xl md:text-5xl font-bold leading-tight ${
+                    isDark ? 'text-lime' : 'text-lime'
+                  }`}
+                >
+                  Connect Directly with Recruiters & Land Your Dream Job
+                </Typography>
 
-                {/* Footer */}
-                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                  <div className="flex items-center space-x-4">
-                    <button className="flex items-center space-x-1 text-gray-500 hover:text-red-500 transition-colors" title="Like this story">
-                      <ThumbUp className="h-4 w-4" />
-                      <span className="text-sm">{testimonial.likes}</span>
-                    </button>
-                    <button className="flex items-center space-x-1 text-gray-500 hover:text-blue-500 transition-colors" title="View comments">
-                      <ChatBubbleOutline className="h-4 w-4" />
-                      <span className="text-sm">{testimonial.comments}</span>
-                    </button>
+                <Typography 
+                  variant="h6" 
+                  className={`text-xl leading-relaxed ${
+                    isDark ? 'text-dark-muted' : 'text-lime'
+                  }`}
+                >
+                  See real conversations between students and employers. Join over 2,500 AUT students who have successfully connected with top companies through our platform.
+                </Typography>
+
+                {/* Key Features */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <span className="text-green-600 text-sm">✓</span>
+                    </div>
+                    <Typography variant="body1" className={`font-medium ${isDark ? 'text-lime' : 'text-lime'}`}>
+                      Direct messaging with recruiters
+                    </Typography>
                   </div>
-                  <button className="text-gray-500 hover:text-gray-700 transition-colors" title="Share this story">
-                    <ShareOutlined className="h-4 w-4" />
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <span className="text-green-600 text-sm">✓</span>
+                    </div>
+                    <Typography variant="body1" className={`font-medium ${isDark ? 'text-lime' : 'text-lime'}`}>
+                      Real-time event coordination
+                    </Typography>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <span className="text-green-600 text-sm">✓</span>
+                    </div>
+                    <Typography variant="body1" className={`font-medium ${isDark ? 'text-lime' : 'text-lime'}`}>
+                      Career fair scheduling
+                    </Typography>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <span className="text-green-600 text-sm">✓</span>
+                    </div>
+                    <Typography variant="body1" className={`font-medium ${isDark ? 'text-lime' : 'text-lime'}`}>
+                      Interview coordination
+                    </Typography>
+                  </div>
+                </div>
+
+                {/* CTA Button */}
+                <div className="pt-4">
+                  <button className={`px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg ${
+                    isDark 
+                      ? 'bg-lime text-dark-bg hover:bg-lime/90' 
+                      : 'bg-asu-maroon text-white hover:bg-asu-maroon/90'
+                  }`}>
+                    Start Connecting Today
                   </button>
                 </div>
               </div>
-            </Card>
-          ))}
-        </div>
+            </div>
 
-        {/* Load More Button */}
-        {visibleCards < testimonials.length && (
-          <div className="text-center mt-12">
-            <button
-              onClick={() => setVisibleCards(prev => Math.min(prev + 6, testimonials.length))}
-              className={`px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg ${
-                isDark 
-                  ? 'bg-lime text-dark-bg hover:bg-lime/90' 
-                  : 'bg-asu-maroon text-white hover:bg-asu-maroon/90'
-              }`}
-            >
-              Load More Stories
-            </button>
+            {/* Right Side - Testimonials Image */}
+            <div className="relative">
+              <div className="relative">
+                <img 
+                  src="/src/components/Dashboard/testimonials.png" 
+                  alt="Student testimonials and success stories" 
+                  className="w-full h-auto rounded-2xl shadow-2xl"
+                />
+                {/* Optional overlay for better integration */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent rounded-2xl"></div>
+              </div>
+            </div>
           </div>
-        )}
-
-        {/* Call to Action */}
-        <div className="text-center mt-16">
-          <Card className="p-8 max-w-2xl mx-auto bg-white shadow-lg">
-            <Typography variant="h5" className="font-bold mb-4 text-gray-900">
-              Ready to Write Your Success Story?
-            </Typography>
-            <Typography variant="body1" className="mb-6 text-gray-600">
-              Join thousands of AUT students who have transformed their careers through our platform
-            </Typography>
-            <button className={`px-8 py-3 rounded-full font-bold transition-all duration-300 hover:scale-105 shadow-lg ${
-              isDark 
-                ? 'bg-lime text-dark-bg hover:bg-lime/90' 
-                : 'bg-asu-maroon text-white hover:bg-asu-maroon/90'
-            }`}>
-              Start Your Journey Today
-            </button>
-          </Card>
         </div>
       </div>
     </section>

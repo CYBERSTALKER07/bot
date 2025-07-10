@@ -124,36 +124,181 @@ export default function LandingPage() {
       {/* CTA Section */}
       <CTASection ctaRef={ctaRef} />
 
-      {/* Material Design Footer */}
-      <footer className={`py-16 transition-colors duration-300 ${
-        isDark ? 'bg-dark-surface' : 'bg-white'
-      }`}>
+      {/* Handshake-style Footer */}
+      <footer className="bg-gray-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Card className="text-center" elevation={2}>
-            <div className="p-8 space-y-6">
-              <div className="flex justify-center">
-                <img 
-                  src="/aut-logo.png" 
-                  alt="AUT Logo" 
-                  className="h-12 w-auto opacity-80"
-                />
-              </div>
-              <Typography variant="h6" color="textPrimary" className="font-bold">
-                Auckland University of Technology Career Services
-              </Typography>
-              <Typography variant="body1" color="textSecondary">
-                Connecting AUT students with their dream careers since 2000
-              </Typography>
-              <div className="flex justify-center space-x-4 pt-4">
-                <Button variant="text" size="small" color="primary">Privacy Policy</Button>
-                <Button variant="text" size="small" color="primary">Terms of Service</Button>
-                <Button variant="text" size="small" color="primary">Contact Us</Button>
-              </div>
-              <Typography variant="caption" color="textSecondary">
-                © 2024 Auckland University of Technology. All rights reserved.
+          {/* Main Footer Content */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-12">
+            {/* Large Logo Section */}
+            <div className="lg:col-span-5">
+              <Typography 
+                variant="h1" 
+                className="text-6xl md:text-7xl font-bold text-lime italic transform -skew-x-12"
+                style={{ fontFamily: 'serif' }}
+              >
+                Handshake
               </Typography>
             </div>
-          </Card>
+
+            {/* Navigation Columns */}
+            <div className="lg:col-span-7 grid grid-cols-2 md:grid-cols-4 gap-8">
+              {/* Students Column */}
+              <div className="space-y-4">
+                <Typography variant="h6" className="font-bold text-white mb-4">
+                  Students
+                </Typography>
+                <div className="space-y-3">
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    How it works
+                  </Typography>
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    Who's hiring
+                  </Typography>
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    Career tips
+                  </Typography>
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    Companies
+                  </Typography>
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    Job roles
+                  </Typography>
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    Help center
+                  </Typography>
+                </div>
+              </div>
+
+              {/* Employers Column */}
+              <div className="space-y-4">
+                <Typography variant="h6" className="font-bold text-white mb-4">
+                  Employers
+                </Typography>
+                <div className="space-y-3">
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    Solutions
+                  </Typography>
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    Products
+                  </Typography>
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    Customers
+                  </Typography>
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    Resources
+                  </Typography>
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    Blog
+                  </Typography>
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    Request demo
+                  </Typography>
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    Help center
+                  </Typography>
+                </div>
+              </div>
+
+              {/* Career Centers Column */}
+              <div className="space-y-4">
+                <Typography variant="h6" className="font-bold text-white mb-4">
+                  Career centers
+                </Typography>
+                <div className="space-y-3">
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    Marketing toolkit
+                  </Typography>
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    Resources
+                  </Typography>
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    Events
+                  </Typography>
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    Security
+                  </Typography>
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    Request demo
+                  </Typography>
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    Help center
+                  </Typography>
+                </div>
+              </div>
+
+              {/* Company Column */}
+              <div className="space-y-4">
+                <Typography variant="h6" className="font-bold text-white mb-4">
+                  Company
+                </Typography>
+                <div className="space-y-3">
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    About
+                  </Typography>
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    Handshake AI
+                  </Typography>
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    Join us
+                  </Typography>
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    Press
+                  </Typography>
+                  <Typography variant="body2" className="text-lime hover:text-lime cursor-pointer transition-colors">
+                    Blog
+                  </Typography>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Download Section */}
+          <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-gray-700">
+            <div className="flex items-center space-x-6 mb-6 md:mb-0">
+              <Typography variant="h6" className="text-white font-semibold">
+                Download Handshake
+              </Typography>
+              <div className="flex items-center space-x-4">
+                {/* QR Code */}
+                <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center">
+                  <div className="grid grid-cols-8 gap-px">
+                    {[...Array(64)].map((_, i) => (
+                      <div 
+                        key={i} 
+                        className={`w-1 h-1 ${Math.random() > 0.5 ? 'bg-black' : 'bg-white'}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className="flex flex-col space-y-1">
+                  <Typography variant="caption" className="text-gray-400">
+                    Scan to download
+                  </Typography>
+                  <Typography variant="caption" className="text-gray-400">
+                    iOS & Android
+                  </Typography>
+                </div>
+              </div>
+            </div>
+
+            {/* Social Links & Copyright */}
+            <div className="text-center md:text-right">
+              <div className="flex justify-center md:justify-end space-x-6 mb-4">
+                <Typography variant="body2" className="text-gray-400 hover:text-lime cursor-pointer transition-colors">
+                  Privacy Policy
+                </Typography>
+                <Typography variant="body2" className="text-gray-400 hover:text-lime cursor-pointer transition-colors">
+                  Terms of Service
+                </Typography>
+                <Typography variant="body2" className="text-gray-400 hover:text-lime cursor-pointer transition-colors">
+                  Contact Us
+                </Typography>
+              </div>
+              <Typography variant="caption" className="text-gray-500">
+                © 2025 American University of Technology. All rights reserved.
+              </Typography>
+            </div>
+          </div>
         </div>
       </footer>
 

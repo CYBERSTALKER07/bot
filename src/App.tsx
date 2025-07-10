@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Navigation from './components/Navigation';
@@ -27,6 +27,22 @@ import ForStudentsPage from './components/ForStudentsPage';
 import ForEmployersPage from './components/ForEmployersPage';
 import CareerTipsPage from './components/CareerTipsPage';
 import WhosHiringPage from './components/WhosHiringPage';
+
+// ScrollToTop component to handle automatic scrolling on route changes
+function ScrollToTop() {
+  const location = useLocation();
+
+  useEffect(() => {
+    // Scroll to top whenever the pathname changes
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'smooth'
+    });
+  }, [location.pathname]);
+
+  return null;
+}
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -103,6 +119,7 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-dark-bg transition-colors duration-300">
       {user && <Navigation />}
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage />} />
         <Route path="/mobile-app" element={<MobileAppPage />} />

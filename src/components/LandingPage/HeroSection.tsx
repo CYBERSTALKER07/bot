@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   RocketLaunch,
@@ -12,6 +12,10 @@ import { useTheme } from '../../context/ThemeContext';
 import { Card } from '../ui/Card';
 import Button from '../ui/Button';
 import Typography from '../ui/Typography';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface HeroSectionProps {
   heroRef: React.RefObject<HTMLDivElement>;
@@ -19,6 +23,171 @@ interface HeroSectionProps {
 
 export default function HeroSection({ heroRef }: HeroSectionProps) {
   const { isDark } = useTheme();
+  const floatingImagesRef = useRef<HTMLDivElement>(null);
+  const heroContentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!floatingImagesRef.current || !heroRef.current) return;
+
+    const images = floatingImagesRef.current.querySelectorAll('.floating-image');
+    
+    // Set initial positions for floating images
+    gsap.set(images, {
+      opacity: 1,
+      scale: 0.8,
+      rotation: (i) => (i % 2 === 0 ? -15 : 15),
+    });
+
+    // Create scroll-triggered animation for each image
+    images.forEach((image, index) => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 1.5,
+          onUpdate: (self) => {
+            const progress = self.progress;
+            
+            // Calculate movement patterns - some go to center, some go up
+            let centerX, centerY;
+            
+            // Logos that animate upward (indices 5, 7, 9, 11, 13)
+            const upwardLogos = [5, 7, 9, 11, 13];
+            const isUpwardLogo = upwardLogos.includes(index);
+            
+            if (isUpwardLogo) {
+              // Animate upward and slightly inward
+              centerX = -20 * progress; // Slight inward movement
+              centerY = -150 * progress; // Strong upward movement
+            } else {
+              // Original center-bound animation with unique patterns
+              const baseX = -50 * progress;
+              const baseY = -30 * progress;
+              
+              centerX = baseX;
+              centerY = baseY;
+              
+              // Add unique movement patterns for center-bound logos
+              switch(index % 5) {
+                case 0: // Spiral inward
+                  centerX += Math.sin(progress * Math.PI * 2) * 20 * (1 - progress);
+                  centerY += Math.cos(progress * Math.PI * 2) * 15 * (1 - progress);
+                  break;
+                case 1: // Wave motion
+                  centerX += Math.sin(progress * Math.PI * 4) * 15 * (1 - progress);
+                  break;
+                case 2: // Bounce effect
+                  centerY += Math.abs(Math.sin(progress * Math.PI * 6)) * 10 * (1 - progress);
+                  break;
+                case 3: // Zigzag pattern
+                  centerX += (Math.sin(progress * Math.PI * 8) * 25) * (1 - progress);
+                  centerY += (Math.cos(progress * Math.PI * 6) * 20) * (1 - progress);
+                  break;
+                case 4: // Circular motion
+                  centerX += Math.cos(progress * Math.PI * 3) * 18 * (1 - progress);
+                  centerY += Math.sin(progress * Math.PI * 3) * 18 * (1 - progress);
+                  break;
+              }
+            }
+            
+            // Enhanced scale animation with different patterns for upward vs center logos
+            let scale;
+            if (isUpwardLogo) {
+              // Upward logos shrink as they move up
+              const baseScale = 0.8 - (0.4 * progress); // Shrink from 0.8 to 0.4
+              const pulseScale = 1 + Math.sin(progress * Math.PI * 6) * 0.15 * (1 - progress);
+              scale = Math.max(0.2, baseScale * pulseScale); // Minimum scale of 0.2
+            } else {
+              // Center logos grow as they move inward
+              const baseScale = 0.8 + (0.4 * progress);
+              const pulseScale = 1 + Math.sin(progress * Math.PI * 4) * 0.1 * (1 - progress);
+              scale = baseScale * pulseScale;
+            }
+            
+            // Dynamic rotation with different speeds
+            let rotation;
+            if (isUpwardLogo) {
+              // Upward logos spin faster
+              const baseRotation = (index % 2 === 0 ? -15 : 15) * (1 - progress);
+              const spinRotation = progress * 720 * (index % 2 === 0 ? 1 : -1); // 2 full rotations
+              rotation = baseRotation + spinRotation;
+            } else {
+              // Center logos spin slower
+              const baseRotation = (index % 2 === 0 ? -15 : 15) * (1 - progress);
+              const spinRotation = progress * 360 * (index % 2 === 0 ? 1 : -1) * 0.5;
+              rotation = baseRotation + spinRotation;
+            }
+            
+            // Enhanced opacity with different fade patterns
+            let opacity;
+            if (isUpwardLogo) {
+              // Upward logos fade out faster
+              if (progress < 0.5) {
+                opacity = 1 - (progress * 0.4); // Fade to 60% by halfway
+              } else {
+                opacity = 0.6 - ((progress - 0.5) / 0.5) * 0.6; // Fade to 0 in second half
+              }
+            } else {
+              // Center logos fade out slower
+              if (progress < 0.3) {
+                opacity = 1;
+              } else if (progress < 0.7) {
+                opacity = 1 - ((progress - 0.3) / 0.4) * 0.5;
+              } else {
+                opacity = 0.5 - ((progress - 0.7) / 0.3) * 0.5;
+              }
+            }
+            
+            // Apply transformations
+            gsap.set(image, {
+              x: `${centerX}%`,
+              y: `${centerY}%`,
+              scale: scale,
+              rotation: rotation,
+              opacity: opacity,
+              ease: 'power2.out'
+            });
+            
+            // Add dynamic glow effect with different colors for different directions
+            const imageElement = image as HTMLElement;
+            if (progress > 0.2 && progress < 0.8) {
+              const glowIntensity = Math.sin((progress - 0.2) * Math.PI / 0.6) * 20;
+              const glowColor = isUpwardLogo ? 
+                (isDark ? '70, 130, 180' : '255, 140, 0') : // Blue for upward, orange for center
+                (isDark ? '227, 255, 112' : '128, 0, 58'); // Lime/maroon for center
+              
+              imageElement.style.filter = `drop-shadow(0 0 ${glowIntensity}px rgba(${glowColor}, 0.6))`;
+            } else {
+              imageElement.style.filter = 'none';
+            }
+          }
+        }
+      });
+    });
+
+    // Animate hero content
+    const heroTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: heroRef.current,
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 1,
+      }
+    });
+
+    heroTl.to(heroContentRef.current, {
+      y: -100,
+      opacity: 0.3,
+      scale: 0.9,
+      ease: 'power2.out'
+    });
+
+    // Cleanup
+    return () => {
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    };
+  }, [isDark]);
 
   return (
     <section ref={heroRef} className={`relative min-h-screen flex items-center justify-center overflow-hidden transition-colors duration-300 ${
@@ -26,10 +195,8 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
         ? 'bg-gradient-to-br from-dark-bg via-dark-surface to-gray-900' 
         : 'bg-gradient-to-br from-asu-maroon via-asu-maroon-dark to-gray-900'
     }`}>
-      {/* Remove all Material Design background elements */}
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div ref={heroContentRef} className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className={`${isDark ? 'text-dark-text' : 'text-white'}`}>
             <Typography 
               variant="h1" 
@@ -51,7 +218,7 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
                 isDark ? 'text-dark-muted' : 'text-white'
               }`}
             >
-              Connect with amazing companies, find your dream internship, and launch your career at Auckland University of Technology's most comprehensive job platform!
+              Connect with amazing companies, find your dream internship, and launch your career at American University of Technology's most comprehensive job platform!
             </Typography>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
@@ -84,126 +251,72 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
             </div>
           </div>
           
-          {/* Material Design hero mockup */}
+          {/* Enhanced right side with floating animated images */}
           <div className="relative">
-            <Card 
-              className={`relative z-10 ${
-                isDark 
-                  ? 'bg-dark-surface/90 border-lime/20' 
-                  : 'bg-white/90 border-white/20'
-              }`}
-              variant="elevated"
-              elevation={4}
-            >
-              <div className={`relative w-full h-96 rounded-2xl overflow-hidden flex items-center justify-center ${
-                isDark 
-                  ? 'bg-gradient-to-br from-dark-surface to-dark-bg' 
-                  : 'bg-gradient-to-br from-white to-gray-50'
-              }`}>
-                <div className="text-center p-8">
-                  <div className="w-20 h-20 bg-gradient-to-br from-asu-maroon to-asu-gold rounded-full flex items-center justify-center mx-auto mb-6">
-                    <EmojiEvents className="h-10 w-10 text-white" />
-                  </div>
-                  <Card 
-                    className={`${isDark ? 'bg-dark-surface' : 'bg-white'}`}
-                    elevation={2}
-                  >
-                    <div className="p-6">
-                      <Typography 
-                        variant="h4" 
-                        className={`font-bold mb-2 ${
-                          isDark ? 'text-lime' : 'text-asu-maroon'
-                        }`}
-                      >
-                        Your Success Story
-                      </Typography>
-                      <Typography 
-                        variant="h6" 
-                        color="textSecondary"
-                        className="mb-4"
-                      >
-                        Starts Right Here!
-                      </Typography>
-                      <Typography 
-                        variant="body2" 
-                        color="textSecondary"
-                      >
-                        Join 15,000+ students
-                      </Typography>
-                    </div>
-                  </Card>
-                </div>
-              </div>
+            {/* Floating Images Container */}
+            <div ref={floatingImagesRef} className="absolute inset-0 pointer-events-none">
+              {/* Company Logo Cards - Maximum spacing distribution */}
+              <Card className="floating-image absolute top-2 left-1/2 transform -translate-x-1/2 translate-x-64 w-24 h-24 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl flex items-center justify-center" elevation={4}>
+                <img src="https://logo.clearbit.com/google.com" alt="Google" className="w-16 h-16 object-contain" />
+              </Card>
+              
+              <Card className="floating-image absolute top-72 left-1/2 transform -translate-x-1/2 translate-x-8 w-20 h-20 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl flex items-center justify-center" elevation={3}>
+                <img src="https://logo.clearbit.com/microsoft.com" alt="Microsoft" className="w-14 h-14 object-contain" />
+              </Card>
+              
+              <Card className="floating-image absolute top-16 left-1/2 transform -translate-x-1/2 translate-x-104 w-18 h-18 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl flex items-center justify-center" elevation={2}>
+                <img src="https://logo.clearbit.com/apple.com" alt="Apple" className="w-12 h-12 object-contain" />
+              </Card>
+              
+              <Card className="floating-image absolute top-96 left-1/2 transform -translate-x-1/2 translate-x-40 w-28 h-28 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl flex items-center justify-center" elevation={4}>
+                <img src="https://logo.clearbit.com/tesla.com" alt="Tesla" className="w-20 h-20 object-contain" />
+              </Card>
+              
+              <Card className="floating-image absolute top-8 left-1/2 transform -translate-x-1/2 translate-x-128 w-16 h-16 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl flex items-center justify-center" elevation={2}>
+                <img src="https://logo.clearbit.com/meta.com" alt="Meta" className="w-12 h-12 object-contain" />
+              </Card>
 
-              {/* Material Design badges */}
-              <div className={`absolute -top-4 -right-4 p-3 rounded-full shadow-lg ${
-                isDark ? 'bg-lime' : 'bg-asu-maroon'
-              }`}>
-                <EmojiEvents className={`h-6 w-6 ${
-                  isDark ? 'text-dark-surface' : 'text-white'
-                }`} />
-              </div>
-              <div className={`absolute -bottom-4 -left-4 p-3 rounded-full shadow-lg ${
-                isDark ? 'bg-dark-accent' : 'bg-asu-gold'
-              }`}>
-                <TrendingUp className={`h-6 w-6 ${
-                  isDark ? 'text-dark-surface' : 'text-white'
-                }`} />
-              </div>
-            </Card>
-
-            {/* Material Design success metrics */}
-            <Card 
-              className={`absolute -bottom-6 -left-6 ${
-                isDark ? 'bg-dark-surface' : 'bg-white'
-              }`}
-              variant="elevated"
-              elevation={3}
-            >
-              <div className="p-4 text-center">
-                <Typography 
-                  variant="h4" 
-                  className={`font-bold ${
-                    isDark ? 'text-lime' : 'text-asu-maroon'
-                  }`}
-                >
-                  95%
-                </Typography>
-                <Typography 
-                  variant="caption" 
-                  color="textSecondary"
-                  className="font-medium"
-                >
-                  Happy Students
-                </Typography>
-              </div>
-            </Card>
-            
-            <Card 
-              className={`absolute -top-6 -left-6 ${
-                isDark ? 'bg-dark-surface' : 'bg-white'
-              }`}
-              variant="elevated"
-              elevation={3}
-            >
-              <div className="p-4 text-center">
-                <Typography 
-                  variant="h4" 
-                  className={`font-bold ${
-                    isDark ? 'text-lime' : 'text-asu-maroon'
-                  }`}
-                >
-                  2.5k+
-                </Typography>
-                <Typography 
-                  variant="caption" 
-                  color="textSecondary"
-                  className="font-medium"
-                >
-                  Dream Jobs
-                </Typography>
-              </div>
-            </Card>
+              {/* Additional Company Logos - Maximum spacing */}
+              <Card className="floating-image absolute top-112 left-1/2 transform -translate-x-1/2 translate-x-80 w-22 h-22 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl flex items-center justify-center" elevation={3}>
+                <img src="https://logo.clearbit.com/netflix.com" alt="Netflix" className="w-16 h-16 object-contain" />
+              </Card>
+              
+              <Card className="floating-image absolute top-32 left-1/2 transform -translate-x-1/2 translate-x-24 w-20 h-20 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl flex items-center justify-center" elevation={4}>
+                <img src="https://logo.clearbit.com/amazon.com" alt="Amazon" className="w-14 h-14 object-contain" />
+              </Card>
+              
+              <Card className="floating-image absolute top-88 left-1/2 transform -translate-x-1/2 translate-x-144 w-18 h-18 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl flex items-center justify-center" elevation={2}>
+                <img src="https://logo.clearbit.com/adobe.com" alt="Adobe" className="w-12 h-12 object-contain" />
+              </Card>
+              
+              <Card className="floating-image absolute top-48 left-1/2 transform -translate-x-1/2 translate-x-4 w-19 h-19 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl flex items-center justify-center" elevation={3}>
+                <img src="https://logo.clearbit.com/spotify.com" alt="Spotify" className="w-13 h-13 object-contain" />
+              </Card>
+              
+              <Card className="floating-image absolute top-104 left-1/2 transform -translate-x-1/2 translate-x-112 w-21 h-21 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl flex items-center justify-center" elevation={3}>
+                <img src="https://logo.clearbit.com/airbnb.com" alt="Airbnb" className="w-15 h-15 object-contain" />
+              </Card>
+              
+              <Card className="floating-image absolute top-64 left-1/2 transform -translate-x-1/2 translate-x-48 w-17 h-17 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl flex items-center justify-center" elevation={2}>
+                <img src="https://logo.clearbit.com/slack.com" alt="Slack" className="w-12 h-12 object-contain" />
+              </Card>
+              
+              <Card className="floating-image absolute top-80 left-1/2 transform -translate-x-1/2 translate-x-136 w-23 h-23 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl flex items-center justify-center" elevation={4}>
+                <img src="https://logo.clearbit.com/uber.com" alt="Uber" className="w-17 h-17 object-contain" />
+              </Card>
+              
+              <Card className="floating-image absolute top-56 left-1/2 transform -translate-x-1/2 translate-x-72 w-18 h-18 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl flex items-center justify-center" elevation={2}>
+                <img src="https://logo.clearbit.com/linkedin.com" alt="LinkedIn" className="w-13 h-13 object-contain" />
+              </Card>
+              
+              <Card className="floating-image absolute top-120 left-1/2 transform -translate-x-1/2 translate-x-88 w-20 h-20 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl flex items-center justify-center" elevation={3}>
+                <img src="https://logo.clearbit.com/salesforce.com" alt="Salesforce" className="w-14 h-14 object-contain" />
+              </Card>
+              
+              <Card className="floating-image absolute top-40 left-1/2 transform -translate-x-1/2 translate-x-96 w-19 h-19 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl flex items-center justify-center" elevation={3}>
+                <img src="https://logo.clearbit.com/shopify.com" alt="Shopify" className="w-13 h-13 object-contain" />
+              </Card>
+            </div>
           </div>
         </div>
       </div>
