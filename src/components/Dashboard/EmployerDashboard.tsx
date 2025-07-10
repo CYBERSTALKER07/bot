@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Dashboard,
   Work,
   People,
   TrendingUp,
@@ -14,50 +13,120 @@ import {
   BarChart,
   Timeline
 } from '@mui/icons-material';
+import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { supabase } from '../../lib/supabase';
 import Typography from '../ui/Typography';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 import { Card } from '../ui/Card';
 
 export default function EmployerDashboard() {
+  const { user } = useAuth();
   const { isDark } = useTheme();
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [dashboardData, setDashboardData] = useState({
+    activeJobs: 0,
+    totalApplicants: 0,
+    interviewsScheduled: 0,
+    hiredCandidates: 0,
+    recentJobs: [],
+    recentApplicants: []
+  });
 
-  // Mock data
-  const stats = {
-    activeJobs: 12,
-    totalApplicants: 248,
-    interviewsScheduled: 16,
-    hiredCandidates: 8
+  useEffect(() => {
+    if (user?.id) {
+      fetchDashboardData();
+    }
+  }, [user?.id]);
+
+  const fetchDashboardData = async () => {
+    if (!user?.id) return;
+    
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Fetch jobs posted by this employer
+      const { data: jobs, error: jobsError } = await supabase
+        .from('jobs')
+        .select(`
+          *,
+          applications(
+            id,
+            status,
+            student_profiles(
+              full_name,
+              avatar_url
+            )
+          )
+        `)
+        .eq('employer_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (jobsError) throw jobsError;
+
+      // Calculate stats
+      const activeJobs = jobs?.filter(job => job.status === 'active').length || 0;
+      const allApplications = jobs?.flatMap(job => job.applications || []) || [];
+      const totalApplicants = allApplications.length;
+      const interviewsScheduled = allApplications.filter(app => app.status === 'interview').length;
+      const hiredCandidates = allApplications.filter(app => app.status === 'hired').length;
+
+      setDashboardData({
+        activeJobs,
+        totalApplicants,
+        interviewsScheduled,
+        hiredCandidates,
+        recentJobs: jobs?.slice(0, 5) || [],
+        recentApplicants: allApplications.slice(0, 10)
+      });
+    } catch (err) {
+      console.error('Error fetching dashboard data:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load dashboard data');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const recentJobs = [
-    {
-      id: '1',
-      title: 'Software Engineer',
-      department: 'Engineering',
-      applicants: 45,
-      status: 'Active',
-      posted: '2024-01-15'
-    },
-    {
-      id: '2',
-      title: 'Product Manager',
-      department: 'Product',
-      applicants: 32,
-      status: 'Active',
-      posted: '2024-01-12'
-    },
-    {
-      id: '3',
-      title: 'Data Scientist',
-      department: 'Analytics',
-      applicants: 28,
-      status: 'Closed',
-      posted: '2024-01-08'
-    }
-  ];
+  if (loading) {
+    return (
+      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <div className={`animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4 ${
+              isDark ? 'border-lime' : 'border-asu-maroon'
+            }`}></div>
+            <Typography variant="body1" color="textSecondary">
+              Loading dashboard...
+            </Typography>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Card className="p-8 text-center">
+            <Typography variant="h6" className="text-red-600 mb-2">
+              Error Loading Dashboard
+            </Typography>
+            <Typography variant="body1" color="textSecondary" className="mb-4">
+              {error}
+            </Typography>
+            <Button onClick={fetchDashboardData} variant="outlined">
+              Try Again
+            </Button>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
@@ -84,7 +153,7 @@ export default function EmployerDashboard() {
               </div>
               <div className="ml-4">
                 <Typography variant="h5" className="font-semibold">
-                  {stats.activeJobs}
+                  {dashboardData.activeJobs}
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
                   Active Jobs
@@ -102,7 +171,7 @@ export default function EmployerDashboard() {
               </div>
               <div className="ml-4">
                 <Typography variant="h5" className="font-semibold">
-                  {stats.totalApplicants}
+                  {dashboardData.totalApplicants}
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
                   Total Applicants
@@ -120,7 +189,7 @@ export default function EmployerDashboard() {
               </div>
               <div className="ml-4">
                 <Typography variant="h5" className="font-semibold">
-                  {stats.interviewsScheduled}
+                  {dashboardData.interviewsScheduled}
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
                   Interviews Scheduled
@@ -138,7 +207,7 @@ export default function EmployerDashboard() {
               </div>
               <div className="ml-4">
                 <Typography variant="h5" className="font-semibold">
-                  {stats.hiredCandidates}
+                  {dashboardData.hiredCandidates}
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
                   Hired This Month
@@ -223,7 +292,7 @@ export default function EmployerDashboard() {
             </div>
 
             <div className="space-y-4">
-              {recentJobs.map((job) => (
+              {dashboardData.recentJobs.map((job) => (
                 <Card key={job.id} className="p-4 hover:shadow-md transition-shadow" elevation={0}>
                   <div className="flex items-center justify-between">
                     <div className="flex-1">

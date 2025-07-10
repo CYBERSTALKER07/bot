@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Description, 
@@ -23,8 +23,10 @@ import {
   Article,
   School
 } from '@mui/icons-material';
-import { Resource } from '../types';
+import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { Resource } from '../types';
+import { supabase } from '../lib/supabase';
 import Typography from './ui/Typography';
 import Button from './ui/Button';
 import Input from './ui/Input';
@@ -32,93 +34,122 @@ import { Card, StatsCard } from './ui/Card';
 import Badge from './ui/Badge';
 
 export default function ResourceCenter() {
+  const { user } = useAuth();
   const { isDark } = useTheme();
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
   const [bookmarkedResources, setBookmarkedResources] = useState<Set<string>>(new Set());
+  const [resources, setResources] = useState<Resource[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock resources data
-  const resources: Resource[] = [
-    {
-      id: '1',
-      title: 'Ultimate Resume Template for Tech Students',
-      description: 'A comprehensive, ATS-friendly resume template specifically designed for computer science and engineering students. Includes sections for projects, technical skills, and internships with examples.',
-      type: 'template',
-      category: 'resume',
-      file_url: '/templates/tech-resume-template.pdf',
-      author_id: 'admin-1',
-      published: true,
-      tags: ['resume', 'template', 'technology', 'students', 'ATS'],
-      created_at: '2024-01-15T00:00:00Z',
-      updated_at: '2024-01-15T00:00:00Z'
-    },
-    {
-      id: '2',
-      title: 'How to Ace Your Technical Interview',
-      description: 'Complete 50-page guide covering data structures, algorithms, system design, and behavioral questions. Includes 100+ practice problems with detailed solutions.',
-      type: 'article',
-      category: 'interview',
-      content: 'Technical interviews can be challenging...',
-      author_id: 'admin-2',
-      published: true,
-      tags: ['interview', 'technical', 'algorithms', 'preparation', 'coding'],
-      created_at: '2024-01-20T00:00:00Z',
-      updated_at: '2024-01-20T00:00:00Z'
-    },
-    {
-      id: '3',
-      title: 'Networking for Introverts: A Student\'s Guide',
-      description: 'Practical strategies for building meaningful professional relationships. Features real student success stories and actionable networking scripts.',
-      type: 'video',
-      category: 'networking',
-      file_url: 'https://youtube.com/watch?v=example',
-      author_id: 'admin-3',
-      published: true,
-      tags: ['networking', 'career development', 'communication', 'introverts'],
-      created_at: '2024-02-01T00:00:00Z',
-      updated_at: '2024-02-01T00:00:00Z'
-    },
-    {
-      id: '4',
-      title: 'Cover Letter Templates by Industry',
-      description: 'Professional cover letter templates tailored for 15+ industries including tech, finance, healthcare, and consulting. Includes customization tips.',
-      type: 'template',
-      category: 'resume',
-      file_url: '/templates/cover-letter-templates.zip',
-      author_id: 'admin-1',
-      published: true,
-      tags: ['cover letter', 'template', 'industry specific', 'professional'],
-      created_at: '2024-02-05T00:00:00Z',
-      updated_at: '2024-02-05T00:00:00Z'
-    },
-    {
-      id: '5',
-      title: 'Career Planning Roadmap for College Students',
-      description: 'Step-by-step 4-year career planning guide from freshman to graduation. Includes timeline, action items, and milestone checkpoints.',
-      type: 'guide',
-      category: 'career_planning',
-      content: 'Career planning is essential...',
-      author_id: 'admin-2',
-      published: true,
-      tags: ['career planning', 'students', 'roadmap', 'timeline', 'goals'],
-      created_at: '2024-02-10T00:00:00Z',
-      updated_at: '2024-02-10T00:00:00Z'
-    },
-    {
-      id: '6',
-      title: 'Master Class: Salary Negotiation for New Grads',
-      description: 'Learn how to negotiate your first job offer confidently. Includes scripts, research methods, and real negotiation examples.',
-      type: 'video',
-      category: 'career_planning',
-      file_url: 'https://youtube.com/watch?v=salary-negotiation',
-      author_id: 'admin-3',
-      published: true,
-      tags: ['salary', 'negotiation', 'new grad', 'job offer', 'compensation'],
-      created_at: '2024-02-12T00:00:00Z',
-      updated_at: '2024-02-12T00:00:00Z'
+  useEffect(() => {
+    fetchResources();
+    if (user?.id) {
+      fetchBookmarkedResources();
     }
-  ];
+  }, [user?.id]);
+
+  const fetchResources = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const { data, error } = await supabase
+        .from('resources')
+        .select(`
+          *,
+          profiles!resources_author_id_fkey(
+            full_name,
+            avatar_url
+          )
+        `)
+        .eq('published', true)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      setResources(data || []);
+    } catch (err) {
+      console.error('Error fetching resources:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load resources');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchBookmarkedResources = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('bookmarked_resources')
+        .select('resource_id')
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      const bookmarkedIds = new Set(data?.map(bookmark => bookmark.resource_id) || []);
+      setBookmarkedResources(bookmarkedIds);
+    } catch (err) {
+      console.error('Error fetching bookmarked resources:', err);
+    }
+  };
+
+  const handleBookmark = async (resourceId: string) => {
+    if (!user?.id) return;
+
+    try {
+      if (bookmarkedResources.has(resourceId)) {
+        await supabase
+          .from('bookmarked_resources')
+          .delete()
+          .eq('resource_id', resourceId)
+          .eq('user_id', user.id);
+        
+        setBookmarkedResources(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(resourceId);
+          return newSet;
+        });
+      } else {
+        await supabase
+          .from('bookmarked_resources')
+          .insert([{
+            resource_id: resourceId,
+            user_id: user.id,
+            bookmarked_at: new Date().toISOString()
+          }]);
+        
+        setBookmarkedResources(prev => new Set([...prev, resourceId]));
+      }
+    } catch (err) {
+      console.error('Error toggling bookmark:', err);
+    }
+  };
+
+  const handleDownload = async (resource: Resource) => {
+    if (!resource.file_url || !user?.id) return;
+    
+    try {
+      // Track download
+      await supabase
+        .from('resource_downloads')
+        .insert([{
+          resource_id: resource.id,
+          user_id: user.id,
+          downloaded_at: new Date().toISOString()
+        }]);
+
+      // Open download link
+      window.open(resource.file_url, '_blank');
+    } catch (err) {
+      console.error('Error tracking download:', err);
+      // Still allow download even if tracking fails
+      window.open(resource.file_url, '_blank');
+    }
+  };
 
   const filteredResources = resources.filter(resource => {
     const matchesSearch = resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -126,21 +157,8 @@ export default function ResourceCenter() {
                          resource.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesCategory = categoryFilter === 'all' || resource.category === categoryFilter;
     const matchesType = typeFilter === 'all' || resource.type === typeFilter;
-    
-    return matchesSearch && matchesCategory && matchesType && resource.published;
+    return matchesSearch && matchesCategory && matchesType;
   });
-
-  const toggleBookmark = (resourceId: string) => {
-    setBookmarkedResources(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(resourceId)) {
-        newSet.delete(resourceId);
-      } else {
-        newSet.add(resourceId);
-      }
-      return newSet;
-    });
-  };
 
   const resourceStats = [
     { 
@@ -180,6 +198,43 @@ export default function ResourceCenter() {
       trendValue: 'Total downloads'
     },
   ];
+
+  if (loading) {
+    return (
+      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <div className={`animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4 ${
+              isDark ? 'border-lime' : 'border-asu-maroon'
+            }`}></div>
+            <Typography variant="body1" color="textSecondary">
+              Loading resources...
+            </Typography>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Card className="p-8 text-center">
+            <Typography variant="h6" className="text-red-600 mb-2">
+              Error Loading Resources
+            </Typography>
+            <Typography variant="body1" color="textSecondary" className="mb-4">
+              {error}
+            </Typography>
+            <Button onClick={fetchResources} variant="outlined">
+              Try Again
+            </Button>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
@@ -323,7 +378,7 @@ export default function ResourceCenter() {
                   <Button
                     variant="text"
                     size="small"
-                    onClick={() => toggleBookmark(resource.id)}
+                    onClick={() => handleBookmark(resource.id)}
                     className="min-w-0 p-2"
                   >
                     {bookmarkedResources.has(resource.id) ? 
@@ -399,6 +454,7 @@ export default function ResourceCenter() {
                     startIcon={resource.type === 'video' ? <PlayCircle /> : <FileDownload />}
                     component={Link}
                     to={`/resources/${resource.id}`}
+                    onClick={() => handleDownload(resource)}
                   >
                     {resource.type === 'video' ? 'Watch' : 'Download'}
                   </Button>

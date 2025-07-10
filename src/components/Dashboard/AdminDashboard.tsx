@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Users, 
   Briefcase, 
@@ -16,7 +16,10 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { supabase } from '../../lib/supabase';
 import { StatsCard, Card } from '../ui/Card';
+import Typography from '../ui/Typography';
+import Button from '../ui/Button';
 
 interface UserStats {
   totalUsers: number;
@@ -46,49 +49,117 @@ export default function AdminDashboard() {
   const { user } = useAuth();
   const { isDark } = useTheme();
   const [activeTab, setActiveTab] = useState('overview');
-  
-  // Mock data - in real implementation, fetch from Supabase
-  const userStats: UserStats = {
-    totalUsers: 15420,
-    students: 12850,
-    employers: 2570,
-    activeToday: 1240,
-    pendingApprovals: 23
-  };
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [userStats, setUserStats] = useState<UserStats>({
+    totalUsers: 0,
+    students: 0,
+    employers: 0,
+    activeToday: 0,
+    pendingApprovals: 0
+  });
+  const [jobStats, setJobStats] = useState<JobStats>({
+    totalJobs: 0,
+    activeJobs: 0,
+    pendingApproval: 0,
+    applications: 0
+  });
+  const [recentUsers, setRecentUsers] = useState<RecentUser[]>([]);
 
-  const jobStats: JobStats = {
-    totalJobs: 856,
-    activeJobs: 432,
-    pendingApproval: 18,
-    applications: 5420
-  };
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
-  const recentUsers: RecentUser[] = [
-    {
-      id: '1',
-      name: 'John Smith',
-      email: 'jsmith@asu.edu',
-      role: 'Student',
-      status: 'active',
-      joinDate: '2024-01-15'
-    },
-    {
-      id: '2',
-      name: 'Sarah Johnson',
-      email: 'sarah@intel.com',
-      role: 'Employer',
-      status: 'pending',
-      joinDate: '2024-01-14'
-    },
-    {
-      id: '3',
-      name: 'Mike Davis',
-      email: 'mdavis@asu.edu',
-      role: 'Student',
-      status: 'active',
-      joinDate: '2024-01-13'
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Fetch user statistics
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, role, created_at, status');
+
+      if (profilesError) throw profilesError;
+
+      const students = profiles?.filter(p => p.role === 'student').length || 0;
+      const employers = profiles?.filter(p => p.role === 'employer').length || 0;
+      const totalUsers = profiles?.length || 0;
+      const pendingApprovals = profiles?.filter(p => p.status === 'pending').length || 0;
+
+      // Calculate active today (users with activity in last 24 hours)
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      const { data: activeSessions, error: sessionsError } = await supabase
+        .from('user_sessions')
+        .select('user_id')
+        .gte('last_activity', yesterday.toISOString());
+
+      if (sessionsError) console.warn('Could not fetch session data:', sessionsError);
+
+      const activeToday = activeSessions?.length || 0;
+
+      setUserStats({
+        totalUsers,
+        students,
+        employers,
+        activeToday,
+        pendingApprovals
+      });
+
+      // Fetch job statistics
+      const { data: jobs, error: jobsError } = await supabase
+        .from('jobs')
+        .select('id, status, created_at');
+
+      if (jobsError) throw jobsError;
+
+      const totalJobs = jobs?.length || 0;
+      const activeJobs = jobs?.filter(j => j.status === 'active').length || 0;
+      const pendingJobApproval = jobs?.filter(j => j.status === 'pending').length || 0;
+
+      // Fetch application count
+      const { data: applications, error: applicationsError } = await supabase
+        .from('applications')
+        .select('id');
+
+      if (applicationsError) throw applicationsError;
+
+      setJobStats({
+        totalJobs,
+        activeJobs,
+        pendingApproval: pendingJobApproval,
+        applications: applications?.length || 0
+      });
+
+      // Fetch recent users
+      const { data: recentProfiles, error: recentError } = await supabase
+        .from('profiles')
+        .select('id, full_name, email, role, status, created_at')
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (recentError) throw recentError;
+
+      const formattedRecentUsers: RecentUser[] = recentProfiles?.map(profile => ({
+        id: profile.id,
+        name: profile.full_name || 'Unknown User',
+        email: profile.email || '',
+        role: profile.role || 'student',
+        status: profile.status || 'active',
+        joinDate: profile.created_at
+      })) || [];
+
+      setRecentUsers(formattedRecentUsers);
+
+    } catch (err) {
+      console.error('Error fetching dashboard data:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load dashboard data');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: TrendingUp },
@@ -303,6 +374,43 @@ export default function AdminDashboard() {
       </div>
     </Card>
   );
+
+  if (loading) {
+    return (
+      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <div className={`animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4 ${
+              isDark ? 'border-lime' : 'border-asu-maroon'
+            }`}></div>
+            <Typography variant="body1" color="textSecondary">
+              Loading admin dashboard...
+            </Typography>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Card className="p-8 text-center">
+            <Typography variant="h6" className="text-red-600 mb-2">
+              Error Loading Dashboard
+            </Typography>
+            <Typography variant="body1" color="textSecondary" className="mb-4">
+              {error}
+            </Typography>
+            <Button onClick={fetchDashboardData} variant="outlined">
+              Try Again
+            </Button>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

@@ -1,51 +1,38 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { 
-  BookOpen, 
-  Award, 
-  Target, 
-  TrendingUp,
-  Users,
+  BookOpen,
+  Award,
+  GraduationCap,
   Briefcase,
   Heart,
-  Star,
-  Calendar,
-  FileText,
-  CheckCircle,
+  Badge as BadgeIcon,
+  FolderOpen,
   Clock,
-  BarChart3,
   Medal,
-  Zap,
-  Globe,
-  Handshake,
-  Lightbulb,
   Plus,
-  Eye,
   Download,
   Share2,
+  Edit,
   Filter,
-  Search,
-  Trophy
+  BarChart3,
+  TrendingUp,
+  Trophy,
+  FileText,
+  CheckCircle
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { Card } from './ui/Card';
+import { DigitalPassport } from '../types';
+import { supabase } from '../lib/supabase';
 import Typography from './ui/Typography';
 import Button from './ui/Button';
-import { 
-  DigitalPassport, 
-  SkillsAudit, 
-  AcademicAchievement,
-  CoCurricularActivity,
-  InternshipExperience,
-  VolunteerWork,
-  MicroCredential,
-  CareerMilestone,
-  DigitalBadge,
-  PassportReflection,
-  StudentGoal,
-  PortfolioItem
-} from '../types';
+import { Card } from './ui/Card';
+import Badge from './ui/Badge';
+import Modal from './ui/Modal';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface PassportStats {
   totalAchievements: number;
@@ -63,302 +50,111 @@ export default function DigitalLearningPassport() {
   const [activeTab, setActiveTab] = useState('overview');
   const [passport, setPassport] = useState<DigitalPassport | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Mock data for demonstration
-  const mockPassport: DigitalPassport = {
-    id: '1',
-    student_id: user?.id || '',
-    created_at: '2024-01-15',
-    updated_at: '2024-12-10',
-    academic_achievements: [
-      {
-        id: '1',
-        type: 'course',
-        title: 'Advanced Data Structures & Algorithms',
-        description: 'Comprehensive course covering advanced algorithmic concepts and data structure implementations',
-        course_code: 'CSE 310',
-        grade: 'A',
-        gpa_impact: 4.0,
-        skills_demonstrated: ['Problem Solving', 'Algorithm Design', 'Python Programming', 'Optimization'],
-        date_completed: '2024-05-15',
-        instructor: 'Dr. Sarah Johnson',
-        verification_status: 'verified',
-        evidence_files: ['project_report.pdf', 'code_repository.zip']
-      },
-      {
-        id: '2',
-        type: 'project',
-        title: 'Machine Learning Portfolio Optimizer',
-        description: 'Capstone project developing an AI-driven investment portfolio optimization tool',
-        skills_demonstrated: ['Machine Learning', 'Python', 'Data Analysis', 'Financial Modeling'],
-        date_completed: '2024-11-20',
-        instructor: 'Prof. Michael Chen',
-        verification_status: 'verified',
-        evidence_files: ['demo_video.mp4', 'research_paper.pdf']
-      }
-    ],
-    co_curricular_activities: [
-      {
-        id: '1',
-        type: 'leadership',
-        title: 'Computer Science Student Association President',
-        organization: 'AUT CSSA',
-        role: 'President',
-        description: 'Led a team of 15 officers, organized tech talks, hackathons, and networking events',
-        skills_developed: ['Leadership', 'Event Management', 'Public Speaking', 'Team Coordination'],
-        start_date: '2024-01-01',
-        end_date: '2024-12-31',
-        hours_committed: 120,
-        achievements: ['Increased membership by 40%', 'Organized 3 major tech events', 'Secured $5K in sponsorships'],
-        reflection: 'This role taught me valuable leadership skills and how to manage diverse teams effectively.',
-        evidence_files: ['event_photos.zip', 'impact_report.pdf']
-      }
-    ],
-    internships: [
-      {
-        id: '1',
-        company: 'TechCorp Solutions',
-        position: 'Software Engineering Intern',
-        department: 'Backend Development',
-        description: 'Developed microservices for e-commerce platform, improved API performance by 35%',
-        skills_applied: ['Node.js', 'MongoDB', 'API Design', 'Agile Development'],
-        skills_learned: ['Docker', 'Kubernetes', 'CI/CD', 'System Architecture'],
-        start_date: '2024-06-01',
-        end_date: '2024-08-15',
-        hours_completed: 480,
-        supervisor_name: 'Jane Smith',
-        projects_completed: ['Payment Gateway Integration', 'Performance Optimization Module'],
-        reflection: 'Gained real-world experience in scalable backend development and DevOps practices.',
-        evidence_files: ['internship_certificate.pdf', 'project_demos.mp4']
-      }
-    ],
-    volunteer_work: [
-      {
-        id: '1',
-        organization: 'Code for Good',
-        role: 'Volunteer Developer',
-        cause_area: 'Education Technology',
-        description: 'Developed educational apps for underprivileged students',
-        skills_utilized: ['React', 'Firebase', 'UI/UX Design'],
-        impact_metrics: ['Reached 500+ students', 'Improved test scores by 20%'],
-        start_date: '2024-02-01',
-        hours_contributed: 80,
-        reflection: 'Meaningful experience using technology to create positive social impact.',
-        evidence_files: ['app_screenshots.png', 'impact_report.pdf']
-      }
-    ],
-    micro_credentials: [
-      {
-        id: '1',
-        title: 'AWS Cloud Practitioner',
-        issuer: 'Amazon Web Services',
-        type: 'certification',
-        platform: 'AWS Training',
-        skills_covered: ['Cloud Computing', 'AWS Services', 'Security', 'Cost Optimization'],
-        completion_date: '2024-09-15',
-        expiry_date: '2027-09-15',
-        credential_url: 'https://aws.amazon.com/verification/123456',
-        verification_code: 'AWS-CCP-2024-123456',
-        hours_invested: 40,
-        grade_achieved: 'Pass'
-      }
-    ],
-    career_milestones: [
-      {
-        id: '1',
-        type: 'resume_workshop',
-        title: 'Professional Resume Writing Workshop',
-        description: 'Comprehensive workshop on crafting ATS-friendly technical resumes',
-        facilitator: 'Career Services',
-        date_completed: '2024-03-10',
-        skills_practiced: ['Resume Writing', 'Professional Communication', 'Self-Marketing'],
-        feedback_received: 'Excellent improvement in technical skills presentation and quantifying achievements',
-        action_items: ['Update LinkedIn profile', 'Create portfolio website', 'Practice elevator pitch'],
-        follow_up_completed: true
-      }
-    ],
-    skills_audit: {
-      id: '1',
-      student_id: user?.id || '',
-      foundational_skills: {
-        category: 'Foundational Skills',
-        skills: [
-          {
-            name: 'Communication',
-            level: 'proficient',
-            score: 4.2,
-            evidence: ['Presentation awards', 'Peer feedback'],
-            last_updated: '2024-11-01',
-            validation_source: 'instructor'
-          },
-          {
-            name: 'Teamwork',
-            level: 'advanced',
-            score: 4.5,
-            evidence: ['Group project leadership', 'Team sports participation'],
-            last_updated: '2024-10-15',
-            validation_source: 'peer'
-          }
-        ],
-        category_score: 4.35,
-        self_assessment_score: 4.0,
-        instructor_score: 4.5,
-        peer_score: 4.6,
-        improvement_areas: ['Public speaking confidence'],
-        strengths: ['Active listening', 'Collaborative problem-solving']
-      },
-      digital_tech_skills: {
-        category: 'Digital & Technical Skills',
-        skills: [
-          {
-            name: 'Programming',
-            level: 'advanced',
-            score: 4.7,
-            evidence: ['GitHub repositories', 'Technical projects'],
-            last_updated: '2024-11-20',
-            validation_source: 'project'
-          }
-        ],
-        category_score: 4.7,
-        self_assessment_score: 4.5,
-        instructor_score: 4.8,
-        improvement_areas: ['System design patterns'],
-        strengths: ['Algorithm implementation', 'Code quality']
-      },
-      professionalism_ethics: {
-        category: 'Professionalism & Work Ethics',
-        skills: [],
-        category_score: 4.1,
-        self_assessment_score: 4.0,
-        improvement_areas: ['Time management'],
-        strengths: ['Reliability', 'Initiative']
-      },
-      entrepreneurship_innovation: {
-        category: 'Entrepreneurship & Innovation',
-        skills: [],
-        category_score: 3.8,
-        self_assessment_score: 3.5,
-        improvement_areas: ['Business acumen'],
-        strengths: ['Creative thinking', 'Problem identification']
-      },
-      global_intercultural: {
-        category: 'Global & Intercultural Competence',
-        skills: [],
-        category_score: 4.0,
-        self_assessment_score: 4.2,
-        improvement_areas: ['Cultural sensitivity'],
-        strengths: ['Language skills', 'Global perspective']
-      },
-      overall_score: 4.2,
-      last_assessment_date: '2024-11-01',
-      next_assessment_due: '2025-02-01',
-      assessments_history: []
-    },
-    reflections: [
-      {
-        id: '1',
-        semester: 'Fall',
-        year: 2024,
-        key_learnings: 'Advanced my technical skills significantly through internship and capstone project',
-        challenges_overcome: 'Learned to balance leadership responsibilities with academic workload',
-        skills_developed: 'Leadership, system architecture, and professional communication',
-        goals_achieved: ['Complete internship successfully', 'Lead student organization'],
-        goals_missed: ['Obtain second certification'],
-        areas_for_improvement: 'Time management and delegation skills',
-        career_insights: 'Discovered passion for backend architecture and team leadership',
-        next_semester_goals: ['Launch startup idea', 'Secure full-time offer'],
-        date_created: '2024-12-01'
-      }
-    ],
-    goals: [
-      {
-        id: '1',
-        title: 'Secure Full-Time Software Engineering Role',
-        description: 'Land a full-time position at a top tech company focusing on backend development',
-        category: 'career',
-        target_date: '2025-05-01',
-        status: 'in_progress',
-        progress_percentage: 65,
-        milestones: [
-          {
-            id: '1',
-            title: 'Complete technical interview prep',
-            description: 'Practice 200 LeetCode problems and system design',
-            due_date: '2025-01-15',
-            completed: true,
-            completion_date: '2025-01-10',
-            evidence: ['leetcode_progress.png']
-          }
-        ],
-        skills_to_develop: ['System Design', 'Advanced Algorithms'],
-        resources_needed: ['Interview prep books', 'Mock interview sessions'],
-        reflection_notes: 'Making good progress on technical skills'
-      }
-    ],
-    badges: [
-      {
-        id: '1',
-        name: 'Leadership Excellence',
-        description: 'Demonstrated exceptional leadership in student organizations',
-        criteria: ['Lead organization for 6+ months', 'Achieve measurable impact', 'Peer recognition'],
-        issuer: 'AUT Career Services',
-        issue_date: '2024-11-01',
-        badge_image_url: '/badges/leadership.png',
-        verification_url: 'https://aut.edu/verify/badge/123',
-        skills_represented: ['Leadership', 'Communication', 'Project Management'],
-        category: 'leadership',
-        rarity: 'uncommon'
-      },
-      {
-        id: '2',
-        name: 'Technical Excellence',
-        description: 'Outstanding performance in technical coursework and projects',
-        criteria: ['GPA 3.8+ in technical courses', 'Complete advanced project'],
-        issuer: 'AUT Computer Science Department',
-        issue_date: '2024-10-15',
-        badge_image_url: '/badges/technical.png',
-        verification_url: 'https://aut.edu/verify/badge/124',
-        skills_represented: ['Programming', 'Problem Solving', 'Innovation'],
-        category: 'academic',
-        rarity: 'rare'
-      }
-    ],
-    portfolio_items: [
-      {
-        id: '1',
-        type: 'project',
-        title: 'AI-Powered Study Assistant',
-        description: 'Mobile app that uses machine learning to create personalized study plans',
-        tags: ['React Native', 'Python', 'Machine Learning', 'Mobile Development'],
-        skills_demonstrated: ['Full-Stack Development', 'AI/ML', 'User Experience Design'],
-        file_urls: ['demo_video.mp4', 'source_code.zip'],
-        thumbnail_url: 'project_thumbnail.jpg',
-        visibility: 'public',
-        featured: true,
-        created_date: '2024-08-01',
-        last_updated: '2024-11-15'
-      }
-    ]
-  };
-
-  const passportStats: PassportStats = {
-    totalAchievements: mockPassport.academic_achievements.length + 
-                      mockPassport.co_curricular_activities.length + 
-                      mockPassport.internships.length + 
-                      mockPassport.volunteer_work.length,
-    skillsAssessed: 15,
-    hoursLogged: 680,
-    badgesEarned: mockPassport.badges.length,
-    portfolioItems: mockPassport.portfolio_items.length,
-    overallProgress: 78
-  };
-
   useEffect(() => {
-    setPassport(mockPassport);
-    setLoading(false);
-  }, []);
+    if (user?.id) {
+      fetchDigitalPassport();
+    }
+  }, [user?.id]);
+
+  const fetchDigitalPassport = async () => {
+    if (!user?.id) return;
+    
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const { data, error } = await supabase
+        .from('digital_passports')
+        .select(`
+          *,
+          academic_achievements(*),
+          co_curricular_activities(*),
+          internships(*),
+          volunteer_work(*),
+          micro_credentials(*),
+          career_milestones(*),
+          digital_badges(*),
+          portfolio_items(*),
+          passport_reflections(*)
+        `)
+        .eq('student_id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
+
+      if (data) {
+        setPassport(data);
+      } else {
+        // Create new passport for user
+        const { data: newPassport, error: createError } = await supabase
+          .from('digital_passports')
+          .insert([{
+            student_id: user.id,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }])
+          .select()
+          .single();
+
+        if (createError) throw createError;
+        setPassport(newPassport);
+      }
+    } catch (err) {
+      console.error('Error fetching digital passport:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load digital passport');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const calculatePassportStats = (passport: DigitalPassport | null): PassportStats => {
+    if (!passport) {
+      return {
+        totalAchievements: 0,
+        skillsAssessed: 0,
+        hoursLogged: 0,
+        badgesEarned: 0,
+        portfolioItems: 0,
+        overallProgress: 0
+      };
+    }
+
+    const academicCount = passport.academic_achievements?.length || 0;
+    const activitiesCount = passport.co_curricular_activities?.length || 0;
+    const internshipsCount = passport.internships?.length || 0;
+    const volunteerCount = passport.volunteer_work?.length || 0;
+    const totalAchievements = academicCount + activitiesCount + internshipsCount + volunteerCount;
+    
+    // Calculate completion percentage based on filled sections
+    const sections = [
+      academicCount > 0,
+      activitiesCount > 0,
+      internshipsCount > 0,
+      volunteerCount > 0,
+      (passport.portfolio_items?.length || 0) > 0,
+      (passport.digital_badges?.length || 0) > 0
+    ];
+    const completedSections = sections.filter(Boolean).length;
+    const overallProgress = Math.round((completedSections / sections.length) * 100);
+
+    return {
+      totalAchievements,
+      skillsAssessed: 15, // This would come from skills audit system
+      hoursLogged: passport.internships?.reduce((sum, internship) => 
+        sum + (internship.duration_weeks * 40), 0) || 0,
+      badgesEarned: passport.digital_badges?.length || 0,
+      portfolioItems: passport.portfolio_items?.length || 0,
+      overallProgress
+    };
+  };
+
+  const passportStats = calculatePassportStats(passport);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -420,12 +216,12 @@ export default function DigitalLearningPassport() {
   const tabs = [
     { id: 'overview', label: 'Overview', icon: BookOpen, emoji: '📊' },
     { id: 'skills', label: 'Skills Audit', icon: BarChart3, emoji: '📈' },
-    { id: 'academic', label: 'Academic', icon: Award, emoji: '🎓' },
+    { id: 'academic', label: 'Academic', icon: GraduationCap, emoji: '🎓' },
     { id: 'experience', label: 'Experience', icon: Briefcase, emoji: '💼' },
-    { id: 'portfolio', label: 'Portfolio', icon: FileText, emoji: '📁' },
+    { id: 'portfolio', label: 'Portfolio', icon: FolderOpen, emoji: '📁' },
     { id: 'badges', label: 'Badges', icon: Medal, emoji: '🏆' },
-    { id: 'goals', label: 'Goals', icon: Target, emoji: '🎯' },
-    { id: 'reflections', label: 'Reflections', icon: Heart, emoji: '💭' }
+    { id: 'goals', label: 'Goals', icon: TrendingUp, emoji: '🎯' },
+    { id: 'reflections', label: 'Reflections', icon: Award, emoji: '💭' }
   ];
 
   const renderOverview = () => (
@@ -575,6 +371,49 @@ export default function DigitalLearningPassport() {
           <Typography variant="body1" color="textSecondary">
             Loading your Digital Learning Passport...
           </Typography>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Card className="p-8 text-center">
+            <Typography variant="h6" className="text-red-600 mb-2">
+              Error Loading Digital Passport
+            </Typography>
+            <Typography variant="body1" color="textSecondary" className="mb-4">
+              {error}
+            </Typography>
+            <Button onClick={fetchDigitalPassport} variant="outlined">
+              Try Again
+            </Button>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (!passport) {
+    return (
+      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Card className="p-12 text-center">
+            <BookOpen className={`h-16 w-16 mx-auto mb-4 ${
+              isDark ? 'text-dark-muted' : 'text-gray-400'
+            }`} />
+            <Typography variant="h5" className="font-medium mb-2">
+              Create Your Digital Learning Passport
+            </Typography>
+            <Typography variant="body1" color="textSecondary" className="mb-6">
+              Document your academic journey, achievements, and professional growth in one comprehensive portfolio.
+            </Typography>
+            <Button variant="contained" color="primary" size="large" onClick={fetchDigitalPassport}>
+              Create Passport
+            </Button>
+          </Card>
         </div>
       </div>
     );

@@ -1,66 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Search, 
   Send, 
-  Person, 
-  Chat, 
-  Phone, 
-  VideoCall, 
-  MoreHoriz, 
-  AttachFile, 
+  Search, 
+  FilterList, 
+  MoreVert,
+  AttachFile,
   EmojiEmotions,
-  Star,
-  Archive,
-  Delete,
-  Check,
-  DoneAll,
-  FilterList,
-  Add,
-  Business,
-  School,
-  Work,
-  Message,
-  Forum,
-  VideoCallOutlined,
-  PhoneInTalk,
-  Notifications,
-  ArrowBack,
-  Menu
+  Phone,
+  VideoCall,
+  Info
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { Message, Conversation } from '../types';
+import { supabase } from '../lib/supabase';
 import Typography from './ui/Typography';
 import Button from './ui/Button';
-import Input from './ui/Input';
 import { Card } from './ui/Card';
-import Avatar from './ui/Avatar';
-
-interface Message {
-  id: string;
-  sender_id: string;
-  recipient_id: string;
-  sender_name: string;
-  sender_avatar?: string;
-  sender_role: 'student' | 'employer' | 'admin';
-  content: string;
-  timestamp: string;
-  read: boolean;
-  job_id?: string;
-  job_title?: string;
-}
-
-interface Conversation {
-  id: string;
-  participant_id: string;
-  participant_name: string;
-  participant_avatar?: string;
-  participant_role: 'student' | 'employer' | 'admin';
-  last_message: string;
-  last_message_time: string;
-  unread_count: number;
-  job_id?: string;
-  job_title?: string;
-}
+import Input from './ui/Input';
+import Badge from './ui/Badge';
 
 export default function Messages() {
   const { user } = useAuth();
@@ -72,141 +30,167 @@ export default function Messages() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState<'all' | 'student' | 'employer'>('all');
   const [showSidebar, setShowSidebar] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Mock conversations data
-    const mockConversations: Conversation[] = [
-      {
-        id: '1',
-        participant_id: '2',
-        participant_name: 'Sarah Johnson',
-        participant_avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150',
-        participant_role: 'student',
-        last_message: 'Thank you for considering my application! I\'d love to discuss the internship opportunity.',
-        last_message_time: '2024-01-15T10:30:00Z',
-        unread_count: 2,
-        job_id: '1',
-        job_title: 'Software Engineering Intern'
-      },
-      {
-        id: '2',
-        participant_id: '3',
-        participant_name: 'Tech Corp Recruiting',
-        participant_avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150',
-        participant_role: 'employer',
-        last_message: 'We\'d like to schedule a follow-up interview for next week.',
-        last_message_time: '2024-01-14T15:45:00Z',
-        unread_count: 1,
-        job_id: '2',
-        job_title: 'Full Stack Developer'
-      },
-      {
-        id: '3',
-        participant_id: '4',
-        participant_name: 'Alex Chen',
-        participant_avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
-        participant_role: 'student',
-        last_message: 'I have a question about the project requirements.',
-        last_message_time: '2024-01-13T09:20:00Z',
-        unread_count: 0,
-        job_id: '3',
-        job_title: 'Data Science Internship'
-      },
-      {
-        id: '4',
-        participant_id: '5',
-        participant_name: 'Innovation Labs',
-        participant_avatar: 'https://images.unsplash.com/photo-1549923746-c502d488b3ea?w=150',
-        participant_role: 'employer',
-        last_message: 'Great portfolio! Let\'s discuss the next steps.',
-        last_message_time: '2024-01-12T14:15:00Z',
-        unread_count: 0,
-        job_id: '4',
-        job_title: 'UX Designer'
+    if (user?.id) {
+      fetchConversations();
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (selectedConversation) {
+      fetchMessages(selectedConversation);
+    }
+  }, [selectedConversation]);
+
+  const fetchConversations = async () => {
+    if (!user?.id) return;
+    
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const { data, error } = await supabase
+        .from('conversations')
+        .select(`
+          *,
+          profiles!conversations_participant_id_fkey(
+            full_name,
+            avatar_url,
+            role
+          )
+        `)
+        .or(`participant_1.eq.${user.id},participant_2.eq.${user.id}`)
+        .order('last_message_at', { ascending: false });
+
+      if (error) throw error;
+
+      const formattedConversations: Conversation[] = data?.map(conv => ({
+        id: conv.id,
+        participant_id: conv.participant_1 === user.id ? conv.participant_2 : conv.participant_1,
+        participant_name: conv.profiles?.full_name || 'Unknown User',
+        participant_avatar: conv.profiles?.avatar_url || null,
+        participant_role: conv.profiles?.role || 'student',
+        last_message: conv.last_message,
+        last_message_time: conv.last_message_at,
+        unread_count: conv.unread_count || 0,
+        job_id: conv.job_id,
+        job_title: conv.job_title
+      })) || [];
+
+      setConversations(formattedConversations);
+      
+      // Select first conversation if none selected
+      if (formattedConversations.length > 0 && !selectedConversation) {
+        setSelectedConversation(formattedConversations[0].id);
       }
-    ];
+    } catch (err) {
+      console.error('Error fetching conversations:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load conversations');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const mockMessages: Message[] = [
-      {
-        id: '1',
-        sender_id: '2',
-        recipient_id: user?.id || '1',
-        sender_name: 'Sarah Johnson',
-        sender_role: 'student',
-        content: 'Hi! I just submitted my application for the Software Engineering Intern position. I\'m really excited about the opportunity to work with your team.',
-        timestamp: '2024-01-15T10:00:00Z',
-        read: true,
-        job_id: '1',
-        job_title: 'Software Engineering Intern'
-      },
-      {
-        id: '2',
-        sender_id: user?.id || '1',
-        recipient_id: '2',
-        sender_name: 'You',
-        sender_role: user?.role || 'employer',
-        content: 'Thank you for your interest! I\'ve reviewed your application and I\'m impressed with your projects. Could you tell me more about your experience with React?',
-        timestamp: '2024-01-15T10:15:00Z',
-        read: true,
-        job_id: '1',
-        job_title: 'Software Engineering Intern'
-      },
-      {
-        id: '3',
-        sender_id: '2',
-        recipient_id: user?.id || '1',
-        sender_name: 'Sarah Johnson',
-        sender_role: 'student',
-        content: 'Thank you for considering my application! I\'d love to discuss the internship opportunity.',
-        timestamp: '2024-01-15T10:30:00Z',
-        read: false,
-        job_id: '1',
-        job_title: 'Software Engineering Intern'
-      }
-    ];
+  const fetchMessages = async (conversationId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('conversation_id', conversationId)
+        .order('timestamp', { ascending: true });
 
-    setConversations(mockConversations);
-    setMessages(mockMessages);
-    setSelectedConversation(mockConversations[0]?.id || null);
-  }, [user]);
+      if (error) throw error;
 
-  const handleSendMessage = () => {
-    if (!newMessage.trim() || !selectedConversation) return;
+      setMessages(data || []);
+    } catch (err) {
+      console.error('Error fetching messages:', err);
+    }
+  };
 
-    const message: Message = {
-      id: Date.now().toString(),
-      sender_id: user?.id || '1',
-      recipient_id: selectedConversation,
-      sender_name: 'You',
-      sender_role: user?.role || 'employer',
-      content: newMessage,
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || !selectedConversation || !user?.id) return;
+
+    const messageData = {
+      conversation_id: selectedConversation,
+      sender_id: user.id,
+      content: newMessage.trim(),
       timestamp: new Date().toISOString(),
       read: false
     };
 
-    setMessages(prev => [...prev, message]);
-    setNewMessage('');
+    try {
+      const { data, error } = await supabase
+        .from('messages')
+        .insert([messageData])
+        .select()
+        .single();
 
-    // Update conversation last message
-    setConversations(prev => 
-      prev.map(conv => 
-        conv.id === selectedConversation 
-          ? { 
-              ...conv, 
-              last_message: newMessage,
-              last_message_time: new Date().toISOString()
-            }
-          : conv
-      )
-    );
+      if (error) throw error;
+
+      // Add message to local state
+      setMessages(prev => [...prev, data]);
+      setNewMessage('');
+
+      // Update conversation last message
+      await supabase
+        .from('conversations')
+        .update({
+          last_message: newMessage.trim(),
+          last_message_at: new Date().toISOString()
+        })
+        .eq('id', selectedConversation);
+
+    } catch (err) {
+      console.error('Error sending message:', err);
+    }
   };
 
   const filteredConversations = conversations.filter(conv => {
     const matchesSearch = conv.participant_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         conv.last_message.toLowerCase().includes(searchTerm.toLowerCase());
+                         (conv.job_title && conv.job_title.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesRole = filterRole === 'all' || conv.participant_role === filterRole;
     return matchesSearch && matchesRole;
   });
+
+  if (loading) {
+    return (
+      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <div className={`animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4 ${
+              isDark ? 'border-lime' : 'border-asu-maroon'
+            }`}></div>
+            <Typography variant="body1" color="textSecondary">
+              Loading conversations...
+            </Typography>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Card className="p-8 text-center">
+            <Typography variant="h6" className="text-red-600 mb-2">
+              Error Loading Messages
+            </Typography>
+            <Typography variant="body1" color="textSecondary" className="mb-4">
+              {error}
+            </Typography>
+            <Button onClick={fetchConversations} variant="outlined">
+              Try Again
+            </Button>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   const currentConversation = conversations.find(conv => conv.id === selectedConversation);
   const conversationMessages = messages.filter(msg => 

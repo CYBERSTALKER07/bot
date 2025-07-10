@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Close } from '@mui/icons-material';
+import { X } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 
 // Simple cn utility function to combine class names
@@ -91,7 +91,7 @@ export default function Modal({
                   : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
               }`}
             >
-              <Close className="h-6 w-6" />
+              <X className="h-6 w-6" />
             </button>
             {title && (
               <h1 className={`text-title-large font-medium ${
@@ -160,7 +160,7 @@ export default function Modal({
                       : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
                   }`}
                 >
-                  <Close className="h-5 w-5" />
+                  <X className="h-5 w-5" />
                 </button>
               )}
             </div>

@@ -1,134 +1,104 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Event,
+  CalendarToday,
   LocationOn,
-  AccessTime,
-  Person,
+  Schedule,
+  People,
   Search,
   FilterList,
-  CalendarToday,
-  BusinessCenter,
+  Event,
+  Business,
   School,
-  Group,
-  Bookmark,
-  Share
+  VideoCameraFront,
+  PersonAdd
 } from '@mui/icons-material';
+import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { Event as CareerEvent } from '../types';
+import { supabase } from '../lib/supabase';
 import Typography from './ui/Typography';
 import Button from './ui/Button';
-import Input from './ui/Input';
 import { Card } from './ui/Card';
-
-interface CareerEvent {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  time: string;
-  location: string;
-  type: 'workshop' | 'fair' | 'networking' | 'webinar' | 'info-session';
-  organizer: string;
-  attendees: number;
-  maxAttendees: number;
-  isRegistered: boolean;
-  isVirtual: boolean;
-  tags: string[];
-}
+import Badge from './ui/Badge';
+import SearchBox from './ui/SearchBox';
+import Select from './ui/Select';
 
 export default function Events() {
+  const { user } = useAuth();
   const { isDark } = useTheme();
   const [events, setEvents] = useState<CareerEvent[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Mock events data
-    const mockEvents: CareerEvent[] = [
-      {
-        id: '1',
-        title: 'Tech Career Fair 2024',
-        description: 'Connect with top tech companies hiring for internships and full-time positions. Meet recruiters from Google, Microsoft, Apple, and more.',
-        date: '2024-02-15',
-        time: '10:00 AM - 4:00 PM',
-        location: 'ASU Memorial Union',
-        type: 'fair',
-        organizer: 'ASU Career Services',
-        attendees: 245,
-        maxAttendees: 500,
-        isRegistered: false,
-        isVirtual: false,
-        tags: ['Technology', 'Internships', 'Full-time', 'Networking']
-      },
-      {
-        id: '2',
-        title: 'Resume Writing Workshop',
-        description: 'Learn how to craft a compelling resume that stands out to employers. Get personalized feedback from career counselors.',
-        date: '2024-02-12',
-        time: '2:00 PM - 4:00 PM',
-        location: 'Virtual Event',
-        type: 'workshop',
-        organizer: 'Career Development Center',
-        attendees: 78,
-        maxAttendees: 100,
-        isRegistered: true,
-        isVirtual: true,
-        tags: ['Resume', 'Career Development', 'Writing Skills']
-      },
-      {
-        id: '3',
-        title: 'LinkedIn Networking Strategies',
-        description: 'Master the art of professional networking on LinkedIn. Build meaningful connections and grow your professional network.',
-        date: '2024-02-18',
-        time: '6:00 PM - 7:30 PM',
-        location: 'Virtual Event',
-        type: 'webinar',
-        organizer: 'Alumni Network',
-        attendees: 156,
-        maxAttendees: 200,
-        isRegistered: false,
-        isVirtual: true,
-        tags: ['LinkedIn', 'Networking', 'Professional Development']
-      },
-      {
-        id: '4',
-        title: 'Finance Industry Info Session',
-        description: 'Discover career opportunities in finance. Learn about different roles, required skills, and application processes.',
-        date: '2024-02-20',
-        time: '5:00 PM - 6:30 PM',
-        location: 'Business Building Room 101',
-        type: 'info-session',
-        organizer: 'Finance Department',
-        attendees: 92,
-        maxAttendees: 150,
-        isRegistered: false,
-        isVirtual: false,
-        tags: ['Finance', 'Banking', 'Investment', 'Career Paths']
-      }
-    ];
-
-    setTimeout(() => {
-      setEvents(mockEvents);
-      setLoading(false);
-    }, 1000);
+    fetchEvents();
   }, []);
+
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .gte('date', new Date().toISOString().split('T')[0]) // Only future events
+        .order('date', { ascending: true });
+
+      if (error) throw error;
+
+      setEvents(data || []);
+    } catch (err) {
+      console.error('Error fetching events:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load events');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRegister = async (eventId: string) => {
+    if (!user?.id) return;
+
+    try {
+      const { error } = await supabase
+        .from('event_registrations')
+        .insert([{
+          event_id: eventId,
+          user_id: user.id,
+          registered_at: new Date().toISOString()
+        }]);
+
+      if (error) throw error;
+
+      // Update local state
+      setEvents(prev => prev.map(event => 
+        event.id === eventId 
+          ? { ...event, isRegistered: true, attendees: event.attendees + 1 }
+          : event
+      ));
+    } catch (err) {
+      console.error('Error registering for event:', err);
+    }
+  };
 
   const filteredEvents = events.filter(event => {
     const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         event.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+                         event.organizer.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = typeFilter === 'all' || event.type === typeFilter;
     return matchesSearch && matchesType;
   });
 
   const getEventTypeIcon = (type: string) => {
     switch (type) {
-      case 'fair': return <BusinessCenter className="h-5 w-5" />;
+      case 'fair': return <Business className="h-5 w-5" />;
       case 'workshop': return <School className="h-5 w-5" />;
-      case 'networking': return <Group className="h-5 w-5" />;
+      case 'networking': return <People className="h-5 w-5" />;
       case 'webinar': return <Event className="h-5 w-5" />;
-      case 'info-session': return <Person className="h-5 w-5" />;
+      case 'info-session': return <PersonAdd className="h-5 w-5" />;
       default: return <Event className="h-5 w-5" />;
     }
   };
@@ -148,11 +118,34 @@ export default function Events() {
     return (
       <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-center h-64">
-            <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${
+          <div className="text-center">
+            <div className={`animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4 ${
               isDark ? 'border-lime' : 'border-asu-maroon'
             }`}></div>
+            <Typography variant="body1" color="textSecondary">
+              Loading events...
+            </Typography>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Card className="p-8 text-center">
+            <Typography variant="h6" className="text-red-600 mb-2">
+              Error Loading Events
+            </Typography>
+            <Typography variant="body1" color="textSecondary" className="mb-4">
+              {error}
+            </Typography>
+            <Button onClick={fetchEvents} variant="outlined">
+              Try Again
+            </Button>
+          </Card>
         </div>
       </div>
     );
@@ -215,7 +208,7 @@ export default function Events() {
               <div className={`p-3 rounded-xl ${
                 isDark ? 'bg-green-500/10 text-green-400' : 'bg-green-50 text-green-600'
               }`}>
-                <Group className="h-6 w-6" />
+                <People className="h-6 w-6" />
               </div>
               <div className="ml-4">
                 <Typography variant="h5" className="font-semibold">
@@ -233,7 +226,7 @@ export default function Events() {
               <div className={`p-3 rounded-xl ${
                 isDark ? 'bg-purple-500/10 text-purple-400' : 'bg-purple-50 text-purple-600'
               }`}>
-                <BusinessCenter className="h-6 w-6" />
+                <Business className="h-6 w-6" />
               </div>
               <div className="ml-4">
                 <Typography variant="h5" className="font-semibold">
@@ -251,17 +244,16 @@ export default function Events() {
         <Card className="p-6 mb-8" elevation={1}>
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
-              <Input
+              <SearchBox
                 placeholder="Search events..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                startIcon={<Search />}
                 variant="outlined"
                 fullWidth
               />
             </div>
             <div className="flex gap-4">
-              <select
+              <Select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
                 className={`px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
@@ -276,7 +268,7 @@ export default function Events() {
                 <option value="networking">Networking</option>
                 <option value="webinar">Webinars</option>
                 <option value="info-session">Info Sessions</option>
-              </select>
+              </Select>
             </div>
           </div>
         </Card>
@@ -372,7 +364,7 @@ export default function Events() {
                       Registered
                     </Button>
                   ) : (
-                    <Button variant="contained" size="small" fullWidth>
+                    <Button variant="contained" size="small" fullWidth onClick={() => handleRegister(event.id)}>
                       Register
                     </Button>
                   )}

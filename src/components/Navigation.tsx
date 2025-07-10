@@ -21,7 +21,8 @@ import {
   Assignment,
   Dashboard,
   Article,
-  Analytics
+  Analytics,
+  Feed as FeedIcon
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -42,7 +43,8 @@ export default function Navigation() {
   const getNavigationItems = () => {
     if (user?.role === 'student') {
       return [
-        { icon: Dashboard, label: 'Dashboard', path: '/dashboard' },
+        { icon: FeedIcon, label: 'Feed', path: '/feed' },
+        { icon: Dashboard, label: 'Dashboard', path: '/job-search' },
         { icon: Article, label: 'Learning Passport', path: '/digital-learning-passport' },
         { icon: Analytics, label: 'Skills Audit', path: '/skills-audit-system' },
         { icon: Search, label: 'Find Jobs', path: '/jobs' },
@@ -54,6 +56,7 @@ export default function Navigation() {
 
     if (user?.role === 'employer') {
       return [
+        { icon: FeedIcon, label: 'Feed', path: '/feed' },
         { icon: Dashboard, label: 'Dashboard', path: '/dashboard' },
         { icon: Work, label: 'Post Jobs', path: '/post-job' },
         { icon: Group, label: 'Applicants', path: '/applicants' },
@@ -64,6 +67,7 @@ export default function Navigation() {
 
     if (user?.role === 'admin') {
       return [
+        { icon: FeedIcon, label: 'Feed', path: '/feed' },
         { icon: Dashboard, label: 'Admin Panel', path: '/dashboard' },
         { icon: Group, label: 'Users', path: '/users' },
         { icon: Work, label: 'Jobs', path: '/jobs' },
@@ -74,6 +78,7 @@ export default function Navigation() {
 
     // Default items for non-authenticated users
     return [
+      { icon: FeedIcon, label: 'Feed', path: '/feed' },
       { icon: Dashboard, label: 'Dashboard', path: '/dashboard' },
       { icon: Search, label: 'Find Jobs', path: '/jobs' },
       { icon: Message, label: 'Messages', path: '/messages' },
@@ -275,7 +280,7 @@ export default function Navigation() {
               <span className={`text-lg font-semibold ${
                 isDark ? 'text-dark-text' : 'text-gray-900'
               }`}>
-                ASU Jobs
+                AUT
               </span>
             </Link>
           ) : (

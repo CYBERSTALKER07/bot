@@ -29,6 +29,8 @@ import CareerTipsPage from './components/CareerTipsPage';
 import WhosHiringPage from './components/WhosHiringPage';
 import DigitalLearningPassport from './components/DigitalLearningPassport';
 import SkillsAuditSystem from './components/SkillsAuditSystem';
+import Feed from './components/Feed';
+import PostDetails from './components/PostDetails';
 
 // ScrollToTop component to handle automatic scrolling on route changes
 function ScrollToTop() {
@@ -79,8 +81,8 @@ function DashboardRouter() {
   
   if (!user) return <Navigate to="/login" />;
   
-  if (user.role === 'admin') return <AdminDashboard />;
-  return user.role === 'student' ? <StudentDashboard /> : <EmployerDashboard />;
+  // Always redirect to Feed as the main page
+  return <Navigate to="/feed" />;
 }
 
 function AppContent() {
@@ -154,6 +156,10 @@ function AppContent() {
         {/* Digital Learning Passport Routes */}
         <Route path="/digital-learning-passport" element={<ProtectedRoute><DigitalLearningPassport /></ProtectedRoute>} />
         <Route path="/skills-audit-system" element={<ProtectedRoute><SkillsAuditSystem /></ProtectedRoute>} />
+        
+        {/* Social Media Routes */}
+        <Route path="/feed" element={<ProtectedRoute><Feed /></ProtectedRoute>} />
+        <Route path="/post/:id" element={<ProtectedRoute><PostDetails /></ProtectedRoute>} />
       </Routes>
     </div>
   );

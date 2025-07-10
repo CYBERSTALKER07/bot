@@ -1,16 +1,16 @@
 import React, { forwardRef, useState } from 'react';
 import { 
-  Visibility, 
-  VisibilityOff, 
+  Eye, 
+  EyeOff, 
   Search, 
-  Email, 
-  Person, 
+  Mail, 
+  User, 
   Lock, 
   Phone, 
-  LocationOn,
-  Error,
+  MapPin,
+  AlertCircle,
   CheckCircle
-} from '@mui/icons-material';
+} from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -172,11 +172,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
           onClick={() => setShowPassword(!showPassword)}
           className="hover:opacity-70 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded"
         >
-          {showPassword ? <VisibilityOff className="w-5 h-5" /> : <Visibility className="w-5 h-5" />}
+          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
         </button>
       );
     }
-    if (hasError) return <Error className="w-5 h-5" />;
+    if (hasError) return <AlertCircle className="w-5 h-5" />;
     if (success) return <CheckCircle className="w-5 h-5" />;
     return endIcon;
   };
@@ -253,7 +253,7 @@ export default Input;
 // Material Design 3 Input Variants
 export const MaterialInput = {
   Email: (props: Omit<InputProps, 'type' | 'startIcon'>) => 
-    <Input type="email" startIcon={<Email />} {...props} />,
+    <Input type="email" startIcon={<Mail />} {...props} />,
   
   Password: (props: Omit<InputProps, 'type' | 'showPasswordToggle'>) => 
     <Input type="password" showPasswordToggle {...props} />,
@@ -265,8 +265,8 @@ export const MaterialInput = {
     <Input type="tel" startIcon={<Phone />} {...props} />,
   
   Location: (props: Omit<InputProps, 'startIcon'>) => 
-    <Input startIcon={<LocationOn />} {...props} />,
+    <Input startIcon={<MapPin />} {...props} />,
   
   Person: (props: Omit<InputProps, 'startIcon'>) => 
-    <Input startIcon={<Person />} {...props} />,
+    <Input startIcon={<User />} {...props} />,
 };

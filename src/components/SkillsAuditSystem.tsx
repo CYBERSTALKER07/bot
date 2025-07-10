@@ -1,40 +1,33 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { 
-  BarChart3, 
-  TrendingUp, 
-  Award, 
-  Users, 
-  Zap, 
-  Globe, 
+  Brain,
+  Computer,
   Briefcase,
   Target,
-  CheckCircle,
-  AlertCircle,
+  Globe,
+  TrendingUp,
+  BarChart3,
   Calendar,
-  Eye,
-  Edit,
-  Plus,
+  ClipboardList,
   Download,
   Share2,
-  Filter,
-  ArrowRight,
-  Star,
-  ChevronRight
+  Plus,
+  Edit,
+  CheckCircle,
+  AlertCircle,
+  Users
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { Card } from './ui/Card';
+import { SkillsAudit, SkillAssessment } from '../types';
+import { supabase } from '../lib/supabase';
 import Typography from './ui/Typography';
 import Button from './ui/Button';
-import { SkillsAudit, SkillAssessment, IndividualSkill } from '../types';
+import { Card } from './ui/Card';
 
-interface SkillRadarData {
-  category: string;
-  score: number;
-  maxScore: number;
-  color: string;
-}
+gsap.registerPlugin(ScrollTrigger);
 
 export default function SkillsAuditSystem() {
   const { user } = useAuth();
@@ -43,238 +36,66 @@ export default function SkillsAuditSystem() {
   const [activeCategory, setActiveCategory] = useState('overview');
   const [viewMode, setViewMode] = useState<'radar' | 'detailed'>('radar');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [skillsAudit, setSkillsAudit] = useState<SkillsAudit | null>(null);
 
-  // Mock skills audit data
-  const mockSkillsAudit: SkillsAudit = {
-    id: '1',
-    student_id: user?.id || '',
-    foundational_skills: {
-      category: 'Foundational Skills',
-      skills: [
-        {
-          name: 'Communication',
-          level: 'proficient',
-          score: 4.2,
-          evidence: ['Presentation at Tech Conference', 'Peer feedback from group projects', 'Leadership role communication'],
-          last_updated: '2024-11-01',
-          validation_source: 'instructor'
-        },
-        {
-          name: 'Teamwork',
-          level: 'advanced',
-          score: 4.5,
-          evidence: ['Team lead on capstone project', 'Successful internship collaboration', 'Student organization leadership'],
-          last_updated: '2024-10-15',
-          validation_source: 'peer'
-        },
-        {
-          name: 'Problem Solving',
-          level: 'advanced',
-          score: 4.6,
-          evidence: ['Algorithm competition wins', 'Complex project solutions', 'Creative debugging approaches'],
-          last_updated: '2024-11-20',
-          validation_source: 'project'
-        },
-        {
-          name: 'Adaptability',
-          level: 'proficient',
-          score: 4.0,
-          evidence: ['Quick learning of new technologies', 'Flexibility in changing project requirements'],
-          last_updated: '2024-10-01',
-          validation_source: 'employer'
-        }
-      ],
-      category_score: 4.33,
-      self_assessment_score: 4.0,
-      instructor_score: 4.5,
-      peer_score: 4.6,
-      employer_score: 4.2,
-      improvement_areas: ['Public speaking confidence', 'Conflict resolution'],
-      strengths: ['Active listening', 'Collaborative problem-solving', 'Critical thinking']
-    },
-    digital_tech_skills: {
-      category: 'Digital & Technical Skills',
-      skills: [
-        {
-          name: 'Programming',
-          level: 'advanced',
-          score: 4.7,
-          evidence: ['GitHub portfolio with 50+ repositories', 'Open source contributions', 'Technical interview success'],
-          last_updated: '2024-11-20',
-          validation_source: 'project'
-        },
-        {
-          name: 'Data Analysis',
-          level: 'proficient',
-          score: 4.3,
-          evidence: ['Machine learning projects', 'Data visualization dashboards', 'Statistical analysis coursework'],
-          last_updated: '2024-11-15',
-          validation_source: 'instructor'
-        },
-        {
-          name: 'AI Literacy',
-          level: 'developing',
-          score: 3.8,
-          evidence: ['AI/ML course completion', 'ChatGPT integration projects', 'Ethics in AI research'],
-          last_updated: '2024-11-10',
-          validation_source: 'self'
-        },
-        {
-          name: 'Digital Collaboration',
-          level: 'proficient',
-          score: 4.1,
-          evidence: ['Remote team management', 'Digital project coordination', 'Online presentation skills'],
-          last_updated: '2024-10-30',
-          validation_source: 'peer'
-        }
-      ],
-      category_score: 4.23,
-      self_assessment_score: 4.0,
-      instructor_score: 4.3,
-      peer_score: 4.4,
-      improvement_areas: ['Advanced system architecture', 'Cloud computing expertise'],
-      strengths: ['Algorithm implementation', 'Code quality', 'Technology adaptation']
-    },
-    professionalism_ethics: {
-      category: 'Professionalism & Work Ethics',
-      skills: [
-        {
-          name: 'Initiative',
-          level: 'advanced',
-          score: 4.5,
-          evidence: ['Self-started projects', 'Proactive problem identification', 'Leadership volunteer roles'],
-          last_updated: '2024-11-01',
-          validation_source: 'employer'
-        },
-        {
-          name: 'Time Management',
-          level: 'proficient',
-          score: 4.0,
-          evidence: ['Meeting all project deadlines', 'Balancing work and academics', 'Efficient task prioritization'],
-          last_updated: '2024-10-20',
-          validation_source: 'self'
-        },
-        {
-          name: 'Professional Ethics',
-          level: 'advanced',
-          score: 4.6,
-          evidence: ['Code of conduct adherence', 'Ethical decision-making in projects', 'Integrity in all dealings'],
-          last_updated: '2024-11-05',
-          validation_source: 'instructor'
-        }
-      ],
-      category_score: 4.37,
-      self_assessment_score: 4.2,
-      instructor_score: 4.5,
-      employer_score: 4.4,
-      improvement_areas: ['Stress management', 'Work-life balance'],
-      strengths: ['Reliability', 'Integrity', 'Self-motivation']
-    },
-    entrepreneurship_innovation: {
-      category: 'Entrepreneurship & Innovation',
-      skills: [
-        {
-          name: 'Creative Thinking',
-          level: 'proficient',
-          score: 4.2,
-          evidence: ['Innovative project solutions', 'Design thinking workshops', 'Creative problem approaches'],
-          last_updated: '2024-11-01',
-          validation_source: 'instructor'
-        },
-        {
-          name: 'Opportunity Recognition',
-          level: 'developing',
-          score: 3.6,
-          evidence: ['Market analysis projects', 'Startup idea development', 'Industry trend awareness'],
-          last_updated: '2024-10-15',
-          validation_source: 'self'
-        },
-        {
-          name: 'Business Acumen',
-          level: 'developing',
-          score: 3.4,
-          evidence: ['Business plan development', 'Financial modeling basics', 'Market research experience'],
-          last_updated: '2024-10-01',
-          validation_source: 'instructor'
-        }
-      ],
-      category_score: 3.73,
-      self_assessment_score: 3.5,
-      instructor_score: 3.8,
-      improvement_areas: ['Financial literacy', 'Market analysis', 'Business strategy'],
-      strengths: ['Innovation mindset', 'Creative solutions', 'Risk assessment']
-    },
-    global_intercultural: {
-      category: 'Global & Intercultural Competence',
-      skills: [
-        {
-          name: 'Cultural Awareness',
-          level: 'proficient',
-          score: 4.1,
-          evidence: ['International student collaboration', 'Cultural exchange participation', 'Diversity workshop completion'],
-          last_updated: '2024-11-01',
-          validation_source: 'peer'
-        },
-        {
-          name: 'Language Skills',
-          level: 'advanced',
-          score: 4.4,
-          evidence: ['Multilingual communication', 'Translation projects', 'International internship'],
-          last_updated: '2024-10-20',
-          validation_source: 'self'
-        },
-        {
-          name: 'Global Perspective',
-          level: 'proficient',
-          score: 4.0,
-          evidence: ['International case study analysis', 'Global trends research', 'Cross-cultural project management'],
-          last_updated: '2024-10-10',
-          validation_source: 'instructor'
-        }
-      ],
-      category_score: 4.17,
-      self_assessment_score: 4.2,
-      instructor_score: 4.0,
-      peer_score: 4.3,
-      improvement_areas: ['Regional expertise', 'International business protocols'],
-      strengths: ['Cultural sensitivity', 'Language abilities', 'Global mindset']
-    },
-    overall_score: 4.17,
-    last_assessment_date: '2024-11-01',
-    next_assessment_due: '2025-02-01',
-    assessments_history: [
-      {
-        id: '1',
-        assessment_date: '2024-08-01',
-        assessment_type: 'self',
-        scores: {
-          foundational_skills: 3.8,
-          digital_tech_skills: 3.9,
-          professionalism_ethics: 4.0,
-          entrepreneurship_innovation: 3.2,
-          global_intercultural: 3.9
-        },
-        feedback: 'Strong foundation with room for growth in entrepreneurship',
-        improvement_plan: ['Take business courses', 'Join startup incubator', 'Develop financial literacy']
+  const fetchSkillsAudit = useCallback(async () => {
+    if (!user?.id) return;
+    
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const { data, error } = await supabase
+        .from('skills_audits')
+        .select(`
+          *,
+          skill_assessments(*)
+        `)
+        .eq('student_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        throw error;
       }
-    ]
-  };
+
+      if (data) {
+        setSkillsAudit(data);
+      } else {
+        // No audit exists, create a placeholder or prompt to take assessment
+        setSkillsAudit(null);
+      }
+    } catch (err) {
+      console.error('Error fetching skills audit:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load skills audit');
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchSkillsAudit();
+    }
+  }, [user?.id, fetchSkillsAudit]);
 
   const skillCategories = [
     {
       id: 'foundational',
       name: 'Foundational Skills',
-      icon: Users,
+      icon: Brain,
       color: 'blue',
-      data: mockSkillsAudit.foundational_skills,
+      data: skillsAudit?.foundational_skills,
       description: 'Core interpersonal and cognitive abilities'
     },
     {
       id: 'digital',
       name: 'Digital & Tech Skills',
-      icon: Zap,
+      icon: Computer,
       color: 'purple',
-      data: mockSkillsAudit.digital_tech_skills,
+      data: skillsAudit?.digital_tech_skills,
       description: 'Technical competencies and digital literacy'
     },
     {
@@ -282,7 +103,7 @@ export default function SkillsAuditSystem() {
       name: 'Professionalism & Ethics',
       icon: Briefcase,
       color: 'green',
-      data: mockSkillsAudit.professionalism_ethics,
+      data: skillsAudit?.professionalism_ethics,
       description: 'Work ethics and professional conduct'
     },
     {
@@ -290,7 +111,7 @@ export default function SkillsAuditSystem() {
       name: 'Entrepreneurship & Innovation',
       icon: Target,
       color: 'orange',
-      data: mockSkillsAudit.entrepreneurship_innovation,
+      data: skillsAudit?.entrepreneurship_innovation,
       description: 'Innovation and business mindset'
     },
     {
@@ -298,10 +119,70 @@ export default function SkillsAuditSystem() {
       name: 'Global & Intercultural',
       icon: Globe,
       color: 'teal',
-      data: mockSkillsAudit.global_intercultural,
-      description: 'Cultural competence and global awareness'
+      data: skillsAudit?.global_intercultural,
+      description: 'Cultural awareness and global perspective'
     }
   ];
+
+  if (loading) {
+    return (
+      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <div className={`animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4 ${
+              isDark ? 'border-lime' : 'border-asu-maroon'
+            }`}></div>
+            <Typography variant="body1" color="textSecondary">
+              Loading your skills audit...
+            </Typography>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Card className="p-8 text-center">
+            <Typography variant="h6" className="text-red-600 mb-2">
+              Error Loading Skills Audit
+            </Typography>
+            <Typography variant="body1" color="textSecondary" className="mb-4">
+              {error}
+            </Typography>
+            <Button onClick={fetchSkillsAudit} variant="outlined">
+              Try Again
+            </Button>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (!skillsAudit) {
+    return (
+      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Card className="p-12 text-center">
+            <ClipboardList className={`h-16 w-16 mx-auto mb-4 ${
+              isDark ? 'text-dark-muted' : 'text-gray-400'
+            }`} />
+            <Typography variant="h5" className="font-medium mb-2">
+              No Skills Audit Available
+            </Typography>
+            <Typography variant="body1" color="textSecondary" className="mb-6">
+              Take a comprehensive skills assessment to track your professional development and identify areas for growth.
+            </Typography>
+            <Button variant="filled" color="primary" size="large">
+              Start Skills Assessment
+            </Button>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   useEffect(() => {
     setLoading(false);
@@ -376,7 +257,7 @@ export default function SkillsAuditSystem() {
   const renderOverview = () => (
     <div className="space-y-8">
       {/* Overall Score */}
-      <Card className="p-8" elevation={2}>
+      <Card className="p-8">
         <div className="flex items-center justify-between mb-6">
           <Typography variant="h5" className="font-bold">
             Overall Skills Profile
@@ -384,38 +265,48 @@ export default function SkillsAuditSystem() {
           <div className={`px-4 py-2 rounded-full text-lg font-bold ${
             isDark ? 'bg-lime/10 text-lime' : 'bg-asu-maroon/10 text-asu-maroon'
           }`}>
-            {mockSkillsAudit.overall_score.toFixed(1)}/5.0
+            {skillsAudit.overall_score.toFixed(1)}/5.0
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-          {skillCategories.map((category, index) => (
-            <div key={category.id} className="category-card text-center">
-              <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-${category.color}-100 dark:bg-${category.color}-900/30`}>
-                <category.icon className={`h-8 w-8 text-${category.color}-600 dark:text-${category.color}-400`} />
+          {skillCategories.map((category) => (
+            category.data && (
+              <div key={category.id} className="category-card text-center">
+                <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${
+                  isDark ? 'bg-gray-700' : 'bg-gray-100'
+                }`}>
+                  <category.icon className={`h-8 w-8 ${
+                    isDark ? 'text-lime' : 'text-asu-maroon'
+                  }`} />
+                </div>
+                <Typography variant="h6" className="font-semibold mb-2">
+                  {category.name}
+                </Typography>
+                <div className="text-2xl font-bold mb-2">
+                  {category.data.category_score.toFixed(1)}
+                </div>
+                <div className={`w-full rounded-full h-2 mb-2 ${
+                  isDark ? 'bg-gray-700' : 'bg-gray-200'
+                }`}>
+                  <div 
+                    className={`h-2 rounded-full ${
+                      isDark ? 'bg-lime' : 'bg-asu-maroon'
+                    }`}
+                    style={{ width: `${(category.data.category_score / 5) * 100}%` }}
+                  ></div>
+                </div>
+                <Typography variant="body2" color="textSecondary" className="text-sm">
+                  {category.description}
+                </Typography>
               </div>
-              <Typography variant="h6" className="font-semibold mb-2">
-                {category.name}
-              </Typography>
-              <div className="text-2xl font-bold mb-2">
-                {category.data.category_score.toFixed(1)}
-              </div>
-              <div className={`w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2`}>
-                <div 
-                  className={`h-2 rounded-full bg-${category.color}-500`}
-                  style={{ width: `${(category.data.category_score / 5) * 100}%` }}
-                ></div>
-              </div>
-              <Typography variant="body2" color="textSecondary" className="text-sm">
-                {category.description}
-              </Typography>
-            </div>
+            )
           ))}
         </div>
       </Card>
 
       {/* Next Assessment */}
-      <Card className="p-6 border-l-4 border-orange-500" elevation={1}>
+      <Card className="p-6 border-l-4 border-orange-500">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Calendar className="h-5 w-5 text-orange-500" />
@@ -428,14 +319,14 @@ export default function SkillsAuditSystem() {
               </Typography>
             </div>
           </div>
-          <Button variant="contained" color="primary">
+          <Button variant="filled" color="primary">
             Start Assessment
           </Button>
         </div>
       </Card>
 
       {/* Recent Progress */}
-      <Card className="p-8" elevation={2}>
+      <Card className="p-8">
         <Typography variant="h5" className="font-bold mb-6">
           Recent Skills Development
         </Typography>
@@ -676,7 +567,7 @@ export default function SkillsAuditSystem() {
               <Button variant="outlined" startIcon={<Share2 />}>
                 Share with Advisor
               </Button>
-              <Button variant="contained" startIcon={<Plus />}>
+              <Button variant="filled" startIcon={<Plus />}>
                 New Assessment
               </Button>
             </div>

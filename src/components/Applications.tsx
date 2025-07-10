@@ -1,123 +1,103 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Assignment,
-  Work,
-  Business,
-  LocationOn,
-  AccessTime,
-  TrendingUp,
+  MapPin,
+  Briefcase,
+  Clock,
+  DollarSign,
+  Filter,
   Search,
-  FilterList,
-  Bookmark,
-  Share,
-  Visibility,
-  Apply as ApplyIcon,
+  Building2,
+  FileText,
   CheckCircle,
-  Schedule
-} from '@mui/icons-material';
+  Clock as PendingIcon,
+  X,
+  MessageSquare,
+  Eye,
+  Share,
+  TrendingUp
+} from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { Application } from '../types';
+import { supabase } from '../lib/supabase';
 import Typography from './ui/Typography';
 import Button from './ui/Button';
-import Input from './ui/Input';
 import { Card } from './ui/Card';
-
-interface Application {
-  id: string;
-  job_id: string;
-  job_title: string;
-  company_name: string;
-  company_logo?: string;
-  location: string;
-  type: 'internship' | 'full-time' | 'part-time';
-  status: 'pending' | 'reviewed' | 'interview' | 'accepted' | 'rejected';
-  applied_date: string;
-  salary_range?: string;
-  description?: string;
-  requirements?: string[];
-  last_updated: string;
-}
+import Badge from './ui/Badge';
+import SearchBox from './ui/SearchBox';
+import Select from './ui/Select';
+import StatusBadge from './ui/StatusBadge';
 
 export default function Applications() {
+  const { user } = useAuth();
   const { isDark } = useTheme();
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
 
   useEffect(() => {
-    // Mock applications data
-    const mockApplications: Application[] = [
-      {
-        id: '1',
-        job_id: '1',
-        job_title: 'Software Engineering Intern',
-        company_name: 'Tech Corp',
-        location: 'San Francisco, CA',
-        type: 'internship',
-        status: 'interview',
-        applied_date: '2024-01-15T08:00:00Z',
-        salary_range: '$25-35/hour',
-        description: 'Join our dynamic development team and work on cutting-edge projects.',
-        requirements: ['React', 'Node.js', 'TypeScript', 'Git'],
-        last_updated: '2024-01-18T14:30:00Z'
-      },
-      {
-        id: '2',
-        job_id: '2',
-        job_title: 'Full Stack Developer',
-        company_name: 'Innovation Labs',
-        location: 'Remote',
-        type: 'full-time',
-        status: 'accepted',
-        applied_date: '2024-01-10T09:15:00Z',
-        salary_range: '$80,000-100,000',
-        description: 'Build scalable web applications with modern technologies.',
-        requirements: ['JavaScript', 'Python', 'AWS', 'Docker'],
-        last_updated: '2024-01-20T11:45:00Z'
-      },
-      {
-        id: '3',
-        job_id: '3',
-        job_title: 'UX Designer',
-        company_name: 'Creative Studio',
-        location: 'Los Angeles, CA',
-        type: 'part-time',
-        status: 'pending',
-        applied_date: '2024-01-12T16:20:00Z',
-        salary_range: '$30-40/hour',
-        description: 'Design intuitive user experiences for mobile and web applications.',
-        requirements: ['Figma', 'Adobe Creative Suite', 'User Research', 'Prototyping'],
-        last_updated: '2024-01-12T16:20:00Z'
-      },
-      {
-        id: '4',
-        job_id: '4',
-        job_title: 'Data Science Intern',
-        company_name: 'Analytics Plus',
-        location: 'Phoenix, AZ',
-        type: 'internship',
-        status: 'rejected',
-        applied_date: '2024-01-08T11:30:00Z',
-        salary_range: '$20-28/hour',
-        description: 'Analyze large datasets and build predictive models.',
-        requirements: ['Python', 'R', 'SQL', 'Machine Learning'],
-        last_updated: '2024-01-16T09:00:00Z'
-      }
-    ];
+    fetchApplications();
+  }, [user?.id]);
 
-    setTimeout(() => {
-      setApplications(mockApplications);
+  const fetchApplications = async () => {
+    if (!user?.id) return;
+    
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const { data, error } = await supabase
+        .from('applications')
+        .select(`
+          *,
+          jobs!inner(
+            title,
+            company,
+            location,
+            type,
+            salary_range,
+            description,
+            requirements
+          )
+        `)
+        .eq('student_id', user.id)
+        .order('applied_date', { ascending: false });
+
+      if (error) throw error;
+
+      const formattedApplications: Application[] = data?.map(app => ({
+        id: app.id,
+        job_id: app.job_id,
+        job_title: app.jobs.title,
+        company_name: app.jobs.company,
+        location: app.jobs.location,
+        type: app.jobs.type,
+        status: app.status,
+        applied_date: app.applied_date,
+        salary_range: app.jobs.salary_range,
+        description: app.jobs.description,
+        requirements: app.jobs.requirements,
+        last_updated: app.updated_at
+      })) || [];
+
+      setApplications(formattedApplications);
+    } catch (err) {
+      console.error('Error fetching applications:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load applications');
+    } finally {
       setLoading(false);
-    }, 1000);
-  }, []);
+    }
+  };
 
-  const filteredApplications = applications.filter(application => {
-    const matchesSearch = application.job_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         application.company_name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || application.status === statusFilter;
-    const matchesType = typeFilter === 'all' || application.type === typeFilter;
+  const filteredApplications = applications.filter(app => {
+    const matchesSearch = app.job_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         app.company_name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
+    const matchesType = typeFilter === 'all' || app.type === typeFilter;
     return matchesSearch && matchesStatus && matchesType;
   });
 
@@ -134,12 +114,12 @@ export default function Applications() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'pending': return <Schedule className="h-4 w-4" />;
-      case 'reviewed': return <Visibility className="h-4 w-4" />;
-      case 'interview': return <Assignment className="h-4 w-4" />;
+      case 'pending': return <Clock className="h-4 w-4" />;
+      case 'reviewed': return <Eye className="h-4 w-4" />;
+      case 'interview': return <FileText className="h-4 w-4" />;
       case 'accepted': return <CheckCircle className="h-4 w-4" />;
-      case 'rejected': return <Assignment className="h-4 w-4" />;
-      default: return <Schedule className="h-4 w-4" />;
+      case 'rejected': return <FileText className="h-4 w-4" />;
+      default: return <Clock className="h-4 w-4" />;
     }
   };
 
@@ -156,11 +136,34 @@ export default function Applications() {
     return (
       <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-center h-64">
-            <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${
+          <div className="text-center">
+            <div className={`animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4 ${
               isDark ? 'border-lime' : 'border-asu-maroon'
             }`}></div>
+            <Typography variant="body1" color="textSecondary">
+              Loading your applications...
+            </Typography>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Card className="p-8 text-center">
+            <Typography variant="h6" className="text-red-600 mb-2">
+              Error Loading Applications
+            </Typography>
+            <Typography variant="body1" color="textSecondary" className="mb-4">
+              {error}
+            </Typography>
+            <Button onClick={fetchApplications} variant="outlined">
+              Try Again
+            </Button>
+          </Card>
         </div>
       </div>
     );
@@ -207,17 +210,16 @@ export default function Applications() {
         <Card className="p-6 mb-8" elevation={1}>
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
-              <Input
+              <SearchBox
                 placeholder="Search applications..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                startIcon={<Search />}
                 variant="outlined"
                 fullWidth
               />
             </div>
             <div className="flex gap-4">
-              <select
+              <Select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className={`px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
@@ -232,8 +234,8 @@ export default function Applications() {
                 <option value="interview">Interview</option>
                 <option value="accepted">Accepted</option>
                 <option value="rejected">Rejected</option>
-              </select>
-              <select
+              </Select>
+              <Select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
                 className={`px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
@@ -246,7 +248,7 @@ export default function Applications() {
                 <option value="full-time">Full Time</option>
                 <option value="part-time">Part Time</option>
                 <option value="internship">Internship</option>
-              </select>
+              </Select>
             </div>
           </div>
         </Card>
@@ -254,7 +256,7 @@ export default function Applications() {
         {/* Applications List */}
         {filteredApplications.length === 0 ? (
           <Card className="p-12 text-center" elevation={1}>
-            <Assignment className={`h-16 w-16 mx-auto mb-4 ${
+            <FileText className={`h-16 w-16 mx-auto mb-4 ${
               isDark ? 'text-dark-muted' : 'text-gray-400'
             }`} />
             <Typography variant="h6" className="mb-2">
@@ -308,13 +310,13 @@ export default function Applications() {
                         </Typography>
                         <div className="flex items-center space-x-4 mt-1">
                           <div className="flex items-center space-x-1">
-                            <LocationOn className={`h-4 w-4 ${isDark ? 'text-dark-muted' : 'text-gray-400'}`} />
+                            <MapPin className={`h-4 w-4 ${isDark ? 'text-dark-muted' : 'text-gray-400'}`} />
                             <Typography variant="body2" color="textSecondary">
                               {application.location}
                             </Typography>
                           </div>
                           <div className="flex items-center space-x-1">
-                            <AccessTime className={`h-4 w-4 ${isDark ? 'text-dark-muted' : 'text-gray-400'}`} />
+                            <Clock className={`h-4 w-4 ${isDark ? 'text-dark-muted' : 'text-gray-400'}`} />
                             <Typography variant="body2" color="textSecondary">
                               Applied {new Date(application.applied_date).toLocaleDateString()}
                             </Typography>
@@ -378,7 +380,7 @@ export default function Applications() {
                 <div className="flex justify-between items-center pt-4 border-t">
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-2">
-                      <Business className={`h-4 w-4 ${isDark ? 'text-dark-muted' : 'text-gray-400'}`} />
+                      <Building2 className={`h-4 w-4 ${isDark ? 'text-dark-muted' : 'text-gray-400'}`} />
                       <Typography variant="body2" color="textSecondary" className="capitalize">
                         {application.type.replace('-', ' ')}
                       </Typography>

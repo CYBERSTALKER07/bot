@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { 
@@ -26,19 +26,30 @@ import {
   Plus
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { Event } from '../types';
+import { supabase } from '../lib/supabase';
+import Typography from './ui/Typography';
+import Button from './ui/Button';
+import { Card } from './ui/Card';
+import Badge from './ui/Badge';
+import Modal from './ui/Modal';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function EventDetails() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const { isDark } = useTheme();
+  const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   
   const [event, setEvent] = useState<Event | null>(null);
   const [isRegistered, setIsRegistered] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [registrationData, setRegistrationData] = useState({
     dietary_restrictions: '',
@@ -47,61 +58,88 @@ export default function EventDetails() {
   });
 
   useEffect(() => {
-    // Mock event data - replace with Supabase fetch
-    const mockEvent: Event = {
-      id: id || '1',
-      title: 'Tech Career Fair 2024',
-      description: 'Connect with top tech companies including Google, Microsoft, Apple, Amazon, and Meta. This premier career fair brings together the most innovative companies in technology with talented AUT American University of Technology in Tashkent students. Discover internship opportunities, full-time positions, and networking possibilities that could shape your future career.',
-      long_description: `Join us for the largest tech career fair of the year! This event features:
+    if (id) {
+      fetchEvent();
+      checkRegistrationStatus();
+    }
+  }, [id, user?.id]);
 
-• **Company Presentations**: Learn about company culture, values, and career paths
-• **One-on-One Interviews**: Schedule on-the-spot interviews with recruiters
-• **Networking Sessions**: Connect with industry professionals and fellow students
-• **Tech Talks**: Hear from industry leaders about emerging technologies
-• **Resume Reviews**: Get professional feedback on your resume
-• **Mock Interviews**: Practice your interview skills with experienced professionals
-
-**Featured Companies**:
-- Google (Software Engineering, Product Management)
-- Microsoft (Cloud Computing, AI/ML)
-- Apple (iOS Development, Hardware Engineering)
-- Amazon (AWS, Robotics)
-- Meta (VR/AR, Social Media)
-- Intel (Chip Design, Systems Engineering)
-- Adobe (Creative Software, UX Design)
-- Salesforce (CRM, Enterprise Solutions)
-
-**What to Bring**:
-- Multiple copies of your resume
-- Portfolio or project samples
-- Professional attire
-- Questions about the companies
-- Positive attitude and confidence!
-
-**Preparation Tips**:
-1. Research the companies attending
-2. Practice your elevator pitch
-3. Prepare thoughtful questions
-4. Dress professionally
-5. Bring business cards if you have them
-
-This is your chance to make lasting connections and potentially land your dream job or internship!`,
-      type: 'career_fair',
-      date: '2024-02-15',
-      time: '10:00 AM - 4:00 PM',
-      location: 'AUT Tashkent Campus - Main Building',
-      is_virtual: false,
-      virtual_link: null,
-      attendees_count: 450,
-      max_attendees: 500,
-      registration_deadline: '2024-02-10',
-      organizer_id: 'admin-1',
-      created_at: '2024-01-15T00:00:00Z',
-      updated_at: '2024-01-15T00:00:00Z'
-    };
+  const fetchEvent = async () => {
+    if (!id) return;
     
-    setEvent(mockEvent);
-  }, [id]);
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+
+      setEvent(data);
+    } catch (err) {
+      console.error('Error fetching event:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load event');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const checkRegistrationStatus = async () => {
+    if (!id || !user?.id) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('event_registrations')
+        .select('id')
+        .eq('event_id', id)
+        .eq('user_id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
+
+      setIsRegistered(!!data);
+    } catch (err) {
+      console.error('Error checking registration status:', err);
+    }
+  };
+
+  const handleRegister = async () => {
+    if (!event?.id || !user?.id) return;
+
+    try {
+      const { error } = await supabase
+        .from('event_registrations')
+        .insert([{
+          event_id: event.id,
+          user_id: user.id,
+          registered_at: new Date().toISOString(),
+          dietary_restrictions: registrationData.dietary_restrictions,
+          accessibility_needs: registrationData.accessibility_needs,
+          questions: registrationData.questions
+        }]);
+
+      if (error) throw error;
+
+      setIsRegistered(true);
+      setShowRegisterModal(false);
+      
+      // Update attendee count
+      await supabase
+        .from('events')
+        .update({ attendees: (event.attendees || 0) + 1 })
+        .eq('id', event.id);
+
+      setEvent(prev => prev ? { ...prev, attendees: (prev.attendees || 0) + 1 } : null);
+    } catch (err) {
+      console.error('Error registering for event:', err);
+    }
+  };
 
   useEffect(() => {
     if (!event) return;
@@ -148,20 +186,6 @@ This is your chance to make lasting connections and potentially land your dream 
     return () => ctx.revert();
   }, [event]);
 
-  const handleRegister = async () => {
-    // Mock registration - replace with Supabase
-    console.log('Registering for event:', event?.id, registrationData);
-    setIsRegistered(true);
-    setShowRegisterModal(false);
-    
-    // Reset form
-    setRegistrationData({
-      dietary_restrictions: '',
-      accessibility_needs: '',
-      questions: ''
-    });
-  };
-
   const getEventTypeColor = (type: string) => {
     switch (type) {
       case 'career_fair':
@@ -192,12 +216,38 @@ This is your chance to make lasting connections and potentially land your dream 
     }
   };
 
-  if (!event) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-asu-maroon mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading event details...</p>
+      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <div className={`animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4 ${
+              isDark ? 'border-lime' : 'border-asu-maroon'
+            }`}></div>
+            <Typography variant="body1" color="textSecondary">
+              Loading event details...
+            </Typography>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !event) {
+    return (
+      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Card className="p-8 text-center">
+            <Typography variant="h6" className="text-red-600 mb-2">
+              {error || 'Event Not Found'}
+            </Typography>
+            <Typography variant="body1" color="textSecondary" className="mb-4">
+              {error || 'The event you are looking for could not be found.'}
+            </Typography>
+            <Button onClick={() => navigate('/events')} variant="outlined">
+              Back to Events
+            </Button>
+          </Card>
         </div>
       </div>
     );
