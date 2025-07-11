@@ -36,7 +36,6 @@ import { Card } from './ui/Card';
 import Avatar from './ui/Avatar';
 import Input from './ui/Input';
 import Modal from './ui/Modal';
-import Badge from './ui/Badge';
 
 interface PostDetail {
   id: string;

@@ -51,7 +51,6 @@ import Typography from './ui/Typography';
 import Button from './ui/Button';
 import Input from './ui/Input';
 import { Card, StatsCard } from './ui/Card';
-import Badge from './ui/Badge';
 import Avatar from './ui/Avatar';
 
 interface Applicant {

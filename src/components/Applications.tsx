@@ -24,7 +24,6 @@ import { supabase } from '../lib/supabase';
 import Typography from './ui/Typography';
 import Button from './ui/Button';
 import { Card } from './ui/Card';
-import Badge from './ui/Badge';
 import SearchBox from './ui/SearchBox';
 import Select from './ui/Select';
 import StatusBadge from './ui/StatusBadge';

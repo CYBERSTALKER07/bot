@@ -32,7 +32,6 @@ import { supabase } from '../lib/supabase';
 import Typography from './ui/Typography';
 import Button from './ui/Button';
 import { Card } from './ui/Card';
-import Badge from './ui/Badge';
 import Modal from './ui/Modal';
 
 gsap.registerPlugin(ScrollTrigger);

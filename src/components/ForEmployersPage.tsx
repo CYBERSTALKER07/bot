@@ -43,7 +43,6 @@ import {
 import { Card, StatsCard } from './ui/Card';
 import Button from './ui/Button';
 import Typography from './ui/Typography';
-import Badge from './ui/Badge';
 import Input from './ui/Input';
 
 gsap.registerPlugin(ScrollTrigger);

@@ -36,7 +36,6 @@ import Typography from './ui/Typography';
 import Button from './ui/Button';
 import { Card } from './ui/Card';
 import Avatar from './ui/Avatar';
-import Badge from './ui/Badge';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -812,9 +811,11 @@ export default function CompanyProfile() {
                             {initiative.description}
                           </Typography>
                           {initiative.impact_metric && (
-                            <Badge variant="outlined" className="text-xs">
+                            <span className={`px-2 py-1 rounded text-xs font-medium border ${
+                              isDark ? 'text-blue-400 border-blue-400/30 bg-blue-400/10' : 'text-blue-600 border-blue-600/30 bg-blue-600/10'
+                            }`}>
                               {initiative.impact_metric}
-                            </Badge>
+                            </span>
                           )}
                         </div>
                       </div>
@@ -847,9 +848,11 @@ export default function CompanyProfile() {
                         <Typography variant="h6" className="font-semibold">
                           {job.title}
                         </Typography>
-                        <Badge variant="outlined">
+                        <span className={`px-3 py-1 rounded-full text-sm font-medium border ${
+                          isDark ? 'text-blue-400 border-blue-400/30 bg-blue-400/10' : 'text-blue-600 border-blue-600/30 bg-blue-600/10'
+                        }`}>
                           {job.type}
-                        </Badge>
+                        </span>
                       </div>
                       <div className="flex items-center space-x-4 text-sm text-gray-600">
                         <span>{job.department}</span>

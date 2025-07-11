@@ -20,7 +20,6 @@ import { supabase } from '../lib/supabase';
 import Typography from './ui/Typography';
 import Button from './ui/Button';
 import { Card } from './ui/Card';
-import Badge from './ui/Badge';
 import SearchBox from './ui/SearchBox';
 import Select from './ui/Select';
 
@@ -338,10 +337,10 @@ export default function Events() {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-1 mb-4">
-                  {event.tags.slice(0, 3).map((tag, index) => (
+                <div className="flex flex-wrap gap-1">
+                  {event.tags.slice(0, 3).map((tag, tagIndex) => (
                     <span
-                      key={index}
+                      key={tagIndex}
                       className={`px-2 py-1 rounded text-xs font-medium ${
                         isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'
                       }`}

@@ -37,7 +37,6 @@ import { Card } from './ui/Card';
 import Avatar from './ui/Avatar';
 import Input from './ui/Input';
 import Modal from './ui/Modal';
-import Badge from './ui/Badge';
 
 interface Post {
   id: string;
@@ -690,15 +689,14 @@ export default function Feed() {
                 {post.tags && post.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-4">
                     {post.tags.map((tag, index) => (
-                      <Badge 
+                      <span 
                         key={index}
-                        variant="outlined"
-                        className={`text-sm ${
-                          isDark ? 'text-lime border-lime/30' : 'text-asu-maroon border-asu-maroon/30'
+                        className={`px-3 py-1 rounded-full text-sm border ${
+                          isDark ? 'text-lime border-lime/30 bg-lime/10' : 'text-asu-maroon border-asu-maroon/30 bg-asu-maroon/10'
                         }`}
                       >
                         #{tag}
-                      </Badge>
+                      </span>
                     ))}
                   </div>
                 )}
