@@ -27,7 +27,7 @@ import {
   Schedule,
   HomeWork,
 //   Eco,
-//   Volunteer
+  VolunteerActivism
 } from '@mui/icons-material';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -801,7 +801,7 @@ export default function CompanyProfile() {
                             : 'bg-purple-100 text-purple-600'
                         }`}>
                           {initiative.category === 'environmental' ? <Eco className="h-5 w-5" /> :
-                           initiative.category === 'social' ? <Volunteer className="h-5 w-5" /> :
+                           initiative.category === 'social' ? <VolunteerActivism className="h-5 w-5" /> :
                            <Assessment className="h-5 w-5" />}
                         </div>
                         <div>
