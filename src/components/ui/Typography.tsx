@@ -1,141 +1,141 @@
 import React from 'react';
 import { useTheme } from '../../context/ThemeContext';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '../../lib/utils';
 
-interface TypographyProps {
-  variant?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'subtitle1' | 'subtitle2' | 'body1' | 'body2' | 'caption' | 'overline';
-  component?: React.ElementType;
-  color?: 'primary' | 'secondary' | 'textPrimary' | 'textSecondary' | 'error' | 'warning' | 'info' | 'success';
-  align?: 'left' | 'center' | 'right' | 'justify';
-  gutterBottom?: boolean;
-  noWrap?: boolean;
-  paragraph?: boolean;
+// Material Design 3 Typography Scale
+type TypographyVariant = 
+  | 'display-large' | 'display-medium' | 'display-small'
+  | 'headline-large' | 'headline-medium' | 'headline-small'
+  | 'title-large' | 'title-medium' | 'title-small'
+  | 'label-large' | 'label-medium' | 'label-small'
+  | 'body-large' | 'body-medium' | 'body-small';
+
+type SemanticColor = 
+  | 'primary' | 'secondary' | 'tertiary'
+  | 'surface' | 'on-surface' | 'on-surface-variant'
+  | 'error' | 'warning' | 'success' | 'info'
+  | 'inherit';
+
+// CVA for consistent styling with better performance
+const typographyVariants = cva(
+  'transition-colors duration-200 ease-material-standard',
+  {
+    variants: {
+      variant: {
+        'display-large': 'text-display-large font-light tracking-tight',
+        'display-medium': 'text-display-medium font-light tracking-tight',
+        'display-small': 'text-display-small font-light tracking-tight',
+        'headline-large': 'text-headline-large font-normal tracking-normal',
+        'headline-medium': 'text-headline-medium font-normal tracking-normal',
+        'headline-small': 'text-headline-small font-normal tracking-normal',
+        'title-large': 'text-title-large font-medium tracking-normal',
+        'title-medium': 'text-title-medium font-medium tracking-normal',
+        'title-small': 'text-title-small font-medium tracking-wide',
+        'label-large': 'text-label-large font-medium tracking-wide',
+        'label-medium': 'text-label-medium font-medium tracking-wider',
+        'label-small': 'text-label-small font-medium tracking-wider uppercase',
+        'body-large': 'text-body-large font-normal tracking-normal',
+        'body-medium': 'text-body-medium font-normal tracking-normal',
+        'body-small': 'text-body-small font-normal tracking-normal',
+      },
+      color: {
+        primary: 'text-primary-500 dark:text-primary-200',
+        secondary: 'text-secondary-500 dark:text-secondary-200',
+        tertiary: 'text-gray-700 dark:text-gray-300',
+        surface: 'text-gray-900 dark:text-dark-text',
+        'on-surface': 'text-gray-800 dark:text-gray-100',
+        'on-surface-variant': 'text-gray-600 dark:text-dark-muted',
+        error: 'text-error-500',
+        warning: 'text-warning-500',
+        success: 'text-success-500',
+        info: 'text-info-500',
+        inherit: 'text-inherit',
+      },
+      align: {
+        left: 'text-left',
+        center: 'text-center',
+        right: 'text-right',
+        justify: 'text-justify',
+      },
+      weight: {
+        light: 'font-light',
+        normal: 'font-normal',
+        medium: 'font-medium',
+        semibold: 'font-semibold',
+        bold: 'font-bold',
+      },
+    },
+    defaultVariants: {
+      variant: 'body-medium',
+      color: 'surface',
+      align: 'left',
+    },
+  }
+);
+
+interface TypographyProps extends VariantProps<typeof typographyVariants> {
+  as?: React.ElementType;
   className?: string;
   children: React.ReactNode;
+  truncate?: boolean;
+  gutterBottom?: boolean;
+  noWrap?: boolean;
+  // Accessibility props
+  role?: string;
+  'aria-level'?: number;
+  id?: string;
 }
 
-const Typography: React.FC<TypographyProps> = ({
-  variant = 'body1',
-  component,
-  color = 'textPrimary',
-  align = 'left',
-  gutterBottom = false,
-  noWrap = false,
-  paragraph = false,
-  className = '',
-  children,
-  ...props
-}) => {
-  const { isDark } = useTheme();
-
-  const getVariantClasses = () => {
-    const variants = {
-      h1: 'text-6xl font-light tracking-tight leading-tight',
-      h2: 'text-5xl font-light tracking-tight leading-tight',
-      h3: 'text-4xl font-normal tracking-normal leading-snug',
-      h4: 'text-3xl font-normal tracking-normal leading-snug',
-      h5: 'text-2xl font-normal tracking-normal leading-normal',
-      h6: 'text-xl font-medium tracking-normal leading-normal',
-      subtitle1: 'text-lg font-normal tracking-normal leading-relaxed',
-      subtitle2: 'text-base font-medium tracking-normal leading-relaxed',
-      body1: 'text-base font-normal tracking-normal leading-relaxed',
-      body2: 'text-sm font-normal tracking-normal leading-relaxed',
-      caption: 'text-xs font-normal tracking-wide leading-normal',
-      overline: 'text-xs font-medium tracking-wider leading-normal uppercase'
-    };
-    return variants[variant];
+// Semantic component mapping for better accessibility
+const getSemanticElement = (variant: TypographyVariant): React.ElementType => {
+  const elementMap: Record<TypographyVariant, React.ElementType> = {
+    'display-large': 'h1',
+    'display-medium': 'h1',
+    'display-small': 'h2',
+    'headline-large': 'h2',
+    'headline-medium': 'h3',
+    'headline-small': 'h4',
+    'title-large': 'h5',
+    'title-medium': 'h6',
+    'title-small': 'h6',
+    'label-large': 'span',
+    'label-medium': 'span',
+    'label-small': 'span',
+    'body-large': 'p',
+    'body-medium': 'p',
+    'body-small': 'p',
   };
-
-  const getColorClasses = () => {
-    const colors = {
-      primary: isDark ? 'text-lime' : 'text-asu-maroon',
-      secondary: isDark ? 'text-dark-accent' : 'text-asu-gold',
-      textPrimary: isDark ? 'text-dark-text' : 'text-gray-900',
-      textSecondary: isDark ? 'text-dark-muted' : 'text-gray-600',
-      error: 'text-red-500',
-      warning: 'text-amber-500',
-      info: 'text-blue-500',
-      success: 'text-green-500'
-    };
-    return colors[color];
-  };
-
-  const getAlignClasses = () => {
-    const aligns = {
-      left: 'text-left',
-      center: 'text-center',
-      right: 'text-right',
-      justify: 'text-justify'
-    };
-    return aligns[align];
-  };
-
-  const getDefaultComponent = () => {
-    const components = {
-      h1: 'h1',
-      h2: 'h2',
-      h3: 'h3',
-      h4: 'h4',
-      h5: 'h5',
-      h6: 'h6',
-      subtitle1: 'h6',
-      subtitle2: 'h6',
-      body1: 'p',
-      body2: 'p',
-      caption: 'span',
-      overline: 'span'
-    };
-    return components[variant];
-  };
-
-  const Component = component || getDefaultComponent();
-
-  const classes = `
-    ${getVariantClasses()}
-    ${getColorClasses()}
-    ${getAlignClasses()}
-    ${gutterBottom ? 'mb-4' : ''}
-    ${noWrap ? 'whitespace-nowrap overflow-hidden text-ellipsis' : ''}
-    ${paragraph ? 'mb-4' : ''}
-    ${className}
-  `.trim().replace(/\s+/g, ' ');
-
-  return (
-    <Component className={classes} {...props}>
-      {children}
-    </Component>
-  );
+  return elementMap[variant];
 };
 
-export default Typography;
-
-// Predefined typography variants for common use cases
-export const MaterialTypography = {
-  Heading1: (props: Omit<TypographyProps, 'variant'>) => 
-    <Typography variant="h1" {...props} />,
-  
-  Heading2: (props: Omit<TypographyProps, 'variant'>) => 
-    <Typography variant="h2" {...props} />,
-  
-  Heading3: (props: Omit<TypographyProps, 'variant'>) => 
-    <Typography variant="h3" {...props} />,
-  
-  Heading4: (props: Omit<TypographyProps, 'variant'>) => 
-    <Typography variant="h4" {...props} />,
-  
-  Heading5: (props: Omit<TypographyProps, 'variant'>) => 
-    <Typography variant="h5" {...props} />,
-  
-  Heading6: (props: Omit<TypographyProps, 'variant'>) => 
-    <Typography variant="h6" {...props} />,
-  
-  Subtitle1: (props: Omit<TypographyProps, 'variant'>) => 
-    <Typography variant="subtitle1" {...props} />,
-  
-  Subtitle2: (props: Omit<TypographyProps, 'variant'>) => 
-    <Typography variant="subtitle2" {...props} />,
-  
-  Body1: (props: Omit<TypographyProps, 'variant'>) => 
-    <Typography variant="body1" {...props} />,
+const Typography = React.forwardRef<HTMLElement, TypographyProps>(
+  ({ 
+    variant = 'body-medium',
+    color = 'surface',
+    align,
+    weight,
+    as,
+    className,
+    children,
+    truncate = false,
+    gutterBottom = false,
+    noWrap = false,
+    ...props
+  }, ref) => {
+    const Component = as || getSemanticElement(variant);
+    
+    return (
+      <Component
+        ref={ref}
+        className={cn(
+          typographyVariants({ variant, color, align, weight }),
+          {
+            'mb-4': gutterBottom,
+            'truncate': truncate,
+            'whitespace-nowrap overflow-hidden text-ellipsis': noWrap,
+          },
+          className
   
   Body2: (props: Omit<TypographyProps, 'variant'>) => 
     <Typography variant="body2" {...props} />,
