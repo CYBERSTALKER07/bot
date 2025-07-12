@@ -123,7 +123,9 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
             ref={textRef}
             variant="h1"
             align="center"
-            className={`bg-clip-text whitespace-nowrap text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl ${
+            // style={{ fontFamily: 'serif' }}
+
+            className={`bg-clip-text whitespace-nowrap text-3xl sm:text-5xl md:text-6xl lg:text-7xl -skew-x-12 xl:text-8xl ${
               isDark 
                 ? 'bg-lime text-lime' 
                 : 'bg-burgundy text-primary'
