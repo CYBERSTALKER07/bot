@@ -126,7 +126,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
             className={`bg-clip-text whitespace-nowrap text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl ${
               isDark 
                 ? 'bg-lime text-lime' 
-                : 'bg-burgundy text-burgundy'
+                : 'bg-burgundy text-primary'
             }`}
            
           >
