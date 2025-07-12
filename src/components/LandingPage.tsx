@@ -304,24 +304,7 @@ export default function LandingPage() {
 
       {/* Material Design FAB */}
       <div className="fixed bottom-6 right-6 flex flex-col space-y-3 z-50">
-        <Button
-          variant="fab"
-          color="primary"
-          size="large"
-          onClick={() => navigate('/register')}
-          className="shadow-lg hover:shadow-xl transition-shadow duration-200"
-        >
-          <RocketLaunch />
-        </Button>
-        <Button
-          variant="fab"
-          color="secondary"
-          size="medium"
-          onClick={() => scrollToSection('features')}
-          className="shadow-lg hover:shadow-xl transition-shadow duration-200"
-        >
-          <AutoAwesome />
-        </Button>
+      
       </div>
     </div>
   );
