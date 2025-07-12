@@ -69,7 +69,7 @@ export default function CTASection({ ctaRef }: CTASectionProps) {
             <span className={`block bg-clip-text text-transparent ${
               isDark 
                 ? 'bg-gradient-to-r from-lime to-dark-accent' 
-                : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
+                : 'bg-gradient-to-r from-asu-maroon to-asu-maroon'
             }`}>
               Dream Career?
             </span>
@@ -88,10 +88,10 @@ export default function CTASection({ ctaRef }: CTASectionProps) {
             <Link to="/register?role=student" className={`cta-button group px-10 py-5 rounded-full font-bold text-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-110 hover:-translate-y-1 flex items-center justify-center relative overflow-hidden ${
               isDark 
                 ? 'bg-gradient-to-r from-lime to-dark-accent text-dark-surface' 
-                : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white'
+                : 'bg-gradient-to-r from-asu-maroon to-asu-maroon text-white'
             }`}>
               <span className="relative z-10">Start as Student</span>
-              <GraduationCap className="ml-3 h-6 w-6 group-hover:rotate-12 transition-transform duration-300 relative z-10" />
+              {/* <GraduationCap className="ml-3 h-6 w-6 group-hover:rotate-12 transition-transform duration-300 relative z-10" /> */}
               <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
                 isDark 
                   ? 'bg-gradient-to-r from-dark-surface/20 to-transparent' 
@@ -100,11 +100,11 @@ export default function CTASection({ ctaRef }: CTASectionProps) {
             </Link>
             <Link to="/register?role=employer" className={`cta-button group border-3 px-10 py-5 rounded-full font-bold text-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-110 hover:-translate-y-1 flex items-center justify-center relative overflow-hidden ${
               isDark 
-                ? 'border-lime bg-lime text-lime text-deepgreen hover:bg-lime hover:text-dark-surface' 
-                : 'border-asu-maroon bg-burgundy text-white text-asu-maroon hover:bg-asu-maroon hover:text-white'
+                ? 'border-lime bg-lime text-black text-deepgreen hover:bg-lime hover:text-dark-surface' 
+                : 'bg-asu-maroon text-white hover:bg-asu-maroon hover:text-white'
             }`}>
               <span className="relative z-10">Post Jobs</span>
-              <Building2 className="ml-3 h-6 w-6 group-hover:rotate-12 transition-transform duration-300 relative z-10" />
+              {/* <Building2 className="ml-3 h-6 w-6 group-hover:rotate-12 transition-transform duration-300 relative z-10" /> */}
               <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
                 isDark 
                   ? 'bg-gradient-to-r from-lime/20 to-transparent' 

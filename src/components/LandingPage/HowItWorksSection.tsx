@@ -153,7 +153,7 @@ export default function HowItWorksSection({ howItWorksRef }: HowItWorksSectionPr
               title: "Create Your Profile",
               description: "Build a comprehensive profile showcasing your skills, experience, and career aspirations. Upload your resume and let AI optimize it.",
               icon: <User className="h-20 w-20 text-white" />,
-              gradient: isDark ? "from-dark to-lime" : "from-asu-maroon to-asu-maroon-dark",
+              gradient: isDark ? "from-dark to-lime" : "from-asu-maroon to-asu-maroon",
               delay: 0
             },
             {
@@ -161,7 +161,7 @@ export default function HowItWorksSection({ howItWorksRef }: HowItWorksSectionPr
               title: "Discover Opportunities",
               description: "Browse through thousands of verified job postings and internships from top employers. Get personalized recommendations.",
               icon: <Search className="h-20 w-20 text-white" />,
-              gradient: isDark ? "from-dark to-lime" : "from-asu-maroon to-asu-maroon-dark",
+              gradient: isDark ? "from-dark to-lime" : "from-asu-maroon to-asu-maroon",
               delay: 0.2
             },
             {
@@ -169,7 +169,7 @@ export default function HowItWorksSection({ howItWorksRef }: HowItWorksSectionPr
               title: "Apply & Connect",
               description: "Apply with one click and connect directly with hiring managers. Track your progress and get real-time updates.",
               icon: <Target className="h-20 w-20 text-white" />,
-              gradient: isDark ? "from-dark to-lime" : "from-asu-maroon to-asu-maroon-dark",
+              gradient: isDark ? "from-dark to-lime" : "from-asu-maroon to-asu-maroon",
               delay: 0.4
             }
           ].map((step, index) => (
