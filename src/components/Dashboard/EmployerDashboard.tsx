@@ -1,25 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Work,
-  People,
+  Briefcase,
+  Users,
   TrendingUp,
-  Visibility,
-  Add,
+  Eye,
+  Plus,
   Search,
-  FilterList,
-  Business,
-  Assignment,
-  BarChart,
+  Filter,
+  Building2,
+  FileText,
+  BarChart3,
   Timeline
-} from '@mui/icons-material';
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { supabase } from '../../lib/supabase';
-import Typography from '../ui/Typography';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
-import { Card } from '../ui/Card';
+import { Card, StatsCard } from '../ui/Card';
+import { cn } from '../../lib/cva';
 
 export default function EmployerDashboard() {
   const { user } = useAuth();
@@ -93,15 +93,13 @@ export default function EmployerDashboard() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
-            <div className={`animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4 ${
-              isDark ? 'border-lime' : 'border-asu-maroon'
-            }`}></div>
-            <Typography variant="body1" color="textSecondary">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary mx-auto mb-4"></div>
+            <p className="text-neutral-600 dark:text-neutral-400">
               Loading dashboard...
-            </Typography>
+            </p>
           </div>
         </div>
       </div>
@@ -110,16 +108,16 @@ export default function EmployerDashboard() {
 
   if (error) {
     return (
-      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Card className="p-8 text-center">
-            <Typography variant="h6" className="text-red-600 mb-2">
+          <Card variant="elevated" padding="lg" className="text-center">
+            <h2 className="text-xl font-semibold text-error mb-2">
               Error Loading Dashboard
-            </Typography>
-            <Typography variant="body1" color="textSecondary" className="mb-4">
+            </h2>
+            <p className="text-neutral-600 dark:text-neutral-400 mb-4">
               {error}
-            </Typography>
-            <Button onClick={fetchDashboardData} variant="outlined">
+            </p>
+            <Button onClick={fetchDashboardData} variant="outline">
               Try Again
             </Button>
           </Card>
@@ -129,105 +127,69 @@ export default function EmployerDashboard() {
   }
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         {/* Header */}
         <div className="mb-8">
-          <Typography variant="h4" className="font-medium mb-2">
+          <h1 className="text-3xl font-bold text-foreground mb-2">
             Employer Dashboard
-          </Typography>
-          <Typography variant="body1" color="textSecondary">
+          </h1>
+          <p className="text-neutral-600 dark:text-neutral-400">
             Manage your job postings and track candidate applications.
-          </Typography>
+          </p>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="p-6" elevation={1}>
-            <div className="flex items-center">
-              <div className={`p-3 rounded-xl ${
-                isDark ? 'bg-lime/10 text-lime' : 'bg-asu-maroon/10 text-asu-maroon'
-              }`}>
-                <Work className="h-6 w-6" />
-              </div>
-              <div className="ml-4">
-                <Typography variant="h5" className="font-semibold">
-                  {dashboardData.activeJobs}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Active Jobs
-                </Typography>
-              </div>
-            </div>
-          </Card>
+          <StatsCard
+            title="Active Jobs"
+            value={dashboardData.activeJobs.toString()}
+            icon={Briefcase}
+            color="primary"
+            animated
+            delay={0.1}
+          />
 
-          <Card className="p-6" elevation={1}>
-            <div className="flex items-center">
-              <div className={`p-3 rounded-xl ${
-                isDark ? 'bg-blue-500/10 text-blue-400' : 'bg-blue-50 text-blue-600'
-              }`}>
-                <People className="h-6 w-6" />
-              </div>
-              <div className="ml-4">
-                <Typography variant="h5" className="font-semibold">
-                  {dashboardData.totalApplicants}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Total Applicants
-                </Typography>
-              </div>
-            </div>
-          </Card>
+          <StatsCard
+            title="Total Applicants"
+            value={dashboardData.totalApplicants.toString()}
+            icon={Users}
+            color="info"
+            animated
+            delay={0.2}
+          />
 
-          <Card className="p-6" elevation={1}>
-            <div className="flex items-center">
-              <div className={`p-3 rounded-xl ${
-                isDark ? 'bg-orange-500/10 text-orange-400' : 'bg-orange-50 text-orange-600'
-              }`}>
-                <Timeline className="h-6 w-6" />
-              </div>
-              <div className="ml-4">
-                <Typography variant="h5" className="font-semibold">
-                  {dashboardData.interviewsScheduled}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Interviews Scheduled
-                </Typography>
-              </div>
-            </div>
-          </Card>
+          <StatsCard
+            title="Interviews Scheduled"
+            value={dashboardData.interviewsScheduled.toString()}
+            icon={Timeline}
+            color="warning"
+            animated
+            delay={0.3}
+          />
 
-          <Card className="p-6" elevation={1}>
-            <div className="flex items-center">
-              <div className={`p-3 rounded-xl ${
-                isDark ? 'bg-green-500/10 text-green-400' : 'bg-green-50 text-green-600'
-              }`}>
-                <TrendingUp className="h-6 w-6" />
-              </div>
-              <div className="ml-4">
-                <Typography variant="h5" className="font-semibold">
-                  {dashboardData.hiredCandidates}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Hired This Month
-                </Typography>
-              </div>
-            </div>
-          </Card>
+          <StatsCard
+            title="Hired This Month"
+            value={dashboardData.hiredCandidates.toString()}
+            icon={TrendingUp}
+            color="success"
+            animated
+            delay={0.4}
+          />
         </div>
 
         {/* Quick Actions */}
-        <Card className="p-6 mb-8" elevation={1}>
-          <Typography variant="h6" className="font-medium mb-4">
+        <Card variant="elevated" padding="lg" className="mb-8">
+          <h2 className="text-xl font-semibold text-foreground mb-6">
             Quick Actions
-          </Typography>
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Link to="/post-job">
               <Button 
-                variant="contained" 
+                variant="primary" 
                 fullWidth 
-                startIcon={<Add />}
+                leftIcon={<Plus className="h-4 w-4" />}
                 className="h-12"
               >
                 Post New Job
@@ -235,9 +197,9 @@ export default function EmployerDashboard() {
             </Link>
             <Link to="/applicants">
               <Button 
-                variant="outlined" 
+                variant="outline" 
                 fullWidth 
-                startIcon={<People />}
+                leftIcon={<Users className="h-4 w-4" />}
                 className="justify-start h-12"
               >
                 View Applicants
@@ -245,9 +207,9 @@ export default function EmployerDashboard() {
             </Link>
             <Link to="/messages">
               <Button 
-                variant="outlined" 
+                variant="outline" 
                 fullWidth 
-                startIcon={<Assignment />}
+                leftIcon={<FileText className="h-4 w-4" />}
                 className="justify-start h-12"
               >
                 Messages
@@ -255,9 +217,9 @@ export default function EmployerDashboard() {
             </Link>
             <Link to="/analytics">
               <Button 
-                variant="outlined" 
+                variant="outline" 
                 fullWidth 
-                startIcon={<BarChart />}
+                leftIcon={<BarChart3 className="h-4 w-4" />}
                 className="justify-start h-12"
               >
                 Analytics
@@ -267,14 +229,14 @@ export default function EmployerDashboard() {
         </Card>
 
         {/* Recent Jobs */}
-        <Card className="mb-8" elevation={1}>
+        <Card variant="elevated" className="mb-8">
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
-              <Typography variant="h6" className="font-medium">
+              <h2 className="text-xl font-semibold text-foreground">
                 Recent Job Postings
-              </Typography>
+              </h2>
               <Link to="/jobs">
-                <Button variant="text" color="primary">
+                <Button variant="ghost" className="text-brand-primary">
                   View All Jobs
                 </Button>
               </Link>
@@ -285,56 +247,53 @@ export default function EmployerDashboard() {
                 placeholder="Search jobs..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                startIcon={<Search />}
-                variant="outlined"
+                startIcon={<Search className="h-4 w-4" />}
+                variant="default"
                 fullWidth
               />
             </div>
 
             <div className="space-y-4">
               {dashboardData.recentJobs.map((job) => (
-                <Card key={job.id} className="p-4 hover:shadow-md transition-shadow" elevation={0}>
+                <Card key={job.id} variant="outlined" padding="md" className="hover:shadow-md transition-shadow">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-center space-x-4">
                         <div>
-                          <Typography variant="h6" className="font-medium">
+                          <h3 className="text-lg font-semibold text-foreground">
                             {job.title}
-                          </Typography>
-                          <Typography variant="body2" color="textSecondary">
+                          </h3>
+                          <p className="text-sm text-neutral-600 dark:text-neutral-400">
                             {job.department} • Posted {new Date(job.posted).toLocaleDateString()}
-                          </Typography>
+                          </p>
                         </div>
                       </div>
                     </div>
                     
                     <div className="flex items-center space-x-6">
                       <div className="text-center">
-                        <Typography variant="h6" className="font-semibold">
+                        <p className="text-xl font-semibold text-foreground">
                           {job.applicants}
-                        </Typography>
-                        <Typography variant="body2" color="textSecondary">
+                        </p>
+                        <p className="text-sm text-neutral-600 dark:text-neutral-400">
                           Applicants
-                        </Typography>
+                        </p>
                       </div>
                       
-                      <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      <div className={cn(
+                        "px-3 py-1 rounded-full text-sm font-medium",
                         job.status === 'Active' 
-                          ? isDark 
-                            ? 'bg-green-500/10 text-green-400' 
-                            : 'bg-green-50 text-green-600'
-                          : isDark
-                            ? 'bg-gray-500/10 text-gray-400'
-                            : 'bg-gray-50 text-gray-600'
-                      }`}>
+                          ? "bg-success/10 text-success border border-success/20"
+                          : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"
+                      )}>
                         {job.status}
                       </div>
                       
                       <div className="flex space-x-2">
-                        <Button variant="outlined" size="small">
-                          <Visibility className="h-4 w-4" />
+                        <Button variant="outline" size="sm">
+                          <Eye className="h-4 w-4" />
                         </Button>
-                        <Button variant="text" size="small">
+                        <Button variant="ghost" size="sm">
                           Edit
                         </Button>
                       </div>
@@ -346,109 +305,97 @@ export default function EmployerDashboard() {
           </div>
         </Card>
 
-        {/* Recent Activity */}
+        {/* Activity and Performance */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card className="p-6" elevation={1}>
-            <Typography variant="h6" className="font-medium mb-4">
+          <Card variant="elevated" padding="lg">
+            <h2 className="text-xl font-semibold text-foreground mb-6">
               Application Activity
-            </Typography>
-            <div className="space-y-4">
+            </h2>
+            <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <Typography variant="body1" className="font-medium">
+                  <p className="font-medium text-foreground">
                     New Applications Today
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
+                  </p>
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
                     Software Engineer position
-                  </Typography>
+                  </p>
                 </div>
-                <Typography variant="h6" className="font-semibold">
+                <p className="text-2xl font-semibold text-foreground">
                   8
-                </Typography>
+                </p>
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <Typography variant="body1" className="font-medium">
+                  <p className="font-medium text-foreground">
                     Interviews This Week
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
+                  </p>
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
                     Various positions
-                  </Typography>
+                  </p>
                 </div>
-                <Typography variant="h6" className="font-semibold">
+                <p className="text-2xl font-semibold text-foreground">
                   12
-                </Typography>
+                </p>
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <Typography variant="body1" className="font-medium">
+                  <p className="font-medium text-foreground">
                     Offers Extended
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
+                  </p>
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
                     This month
-                  </Typography>
+                  </p>
                 </div>
-                <Typography variant="h6" className="font-semibold">
+                <p className="text-2xl font-semibold text-foreground">
                   5
-                </Typography>
+                </p>
               </div>
             </div>
           </Card>
 
-          <Card className="p-6" elevation={1}>
-            <Typography variant="h6" className="font-medium mb-4">
+          <Card variant="elevated" padding="lg">
+            <h2 className="text-xl font-semibold text-foreground mb-6">
               Top Performing Jobs
-            </Typography>
-            <div className="space-y-4">
+            </h2>
+            <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <Typography variant="body1" className="font-medium">
+                  <p className="font-medium text-foreground">
                     Software Engineer
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
+                  </p>
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
                     45 applications
-                  </Typography>
+                  </p>
                 </div>
-                <div className={`w-16 h-2 rounded-full ${
-                  isDark ? 'bg-lime/20' : 'bg-asu-maroon/20'
-                }`}>
-                  <div className={`h-full w-4/5 rounded-full ${
-                    isDark ? 'bg-lime' : 'bg-asu-maroon'
-                  }`}></div>
+                <div className="w-16 h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full">
+                  <div className="h-full w-4/5 bg-brand-primary rounded-full"></div>
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <Typography variant="body1" className="font-medium">
+                  <p className="font-medium text-foreground">
                     Product Manager
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
+                  </p>
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
                     32 applications
-                  </Typography>
+                  </p>
                 </div>
-                <div className={`w-16 h-2 rounded-full ${
-                  isDark ? 'bg-blue-500/20' : 'bg-blue-100'
-                }`}>
-                  <div className={`h-full w-3/5 rounded-full ${
-                    isDark ? 'bg-blue-400' : 'bg-blue-600'
-                  }`}></div>
+                <div className="w-16 h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full">
+                  <div className="h-full w-3/5 bg-info rounded-full"></div>
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <Typography variant="body1" className="font-medium">
+                  <p className="font-medium text-foreground">
                     Data Scientist
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
+                  </p>
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
                     28 applications
-                  </Typography>
+                  </p>
                 </div>
-                <div className={`w-16 h-2 rounded-full ${
-                  isDark ? 'bg-green-500/20' : 'bg-green-100'
-                }`}>
-                  <div className={`h-full w-1/2 rounded-full ${
-                    isDark ? 'bg-green-400' : 'bg-green-600'
-                  }`}></div>
+                <div className="w-16 h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full">
+                  <div className="h-full w-1/2 bg-success rounded-full"></div>
                 </div>
               </div>
             </div>

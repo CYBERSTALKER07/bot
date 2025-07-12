@@ -1,74 +1,154 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Save, Loader2 } from 'lucide-react';
+import { Save, ArrowLeft, ArrowRight, User, Building2, Link, Briefcase } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
 import { supabase } from '../../lib/supabase';
+import Button from '../ui/Button';
+import Input from '../ui/Input';
+import { Card } from '../ui/Card';
+import Stepper from '../ui/Stepper';
+import { cn } from '../../lib/cva';
+
+interface ProfileData {
+  // Common fields
+  full_name: string;
+  bio: string;
+  phone: string;
+  location: string;
+  
+  // Student fields
+  major?: string;
+  graduation_year?: number;
+  skills?: string;
+  portfolio_url?: string;
+  linkedin_url?: string;
+  github_url?: string;
+  
+  // Employer fields
+  company_name?: string;
+  job_title?: string;
+  industry?: string;
+  company_size?: string;
+  company_description?: string;
+  website?: string;
+}
+
+const steps = [
+  {
+    id: 'basic',
+    title: 'Basic Info',
+    description: 'Tell us about yourself',
+  },
+  {
+    id: 'details',
+    title: 'Professional Details',
+    description: 'Academic or work information',
+  },
+  {
+    id: 'links',
+    title: 'Social Links',
+    description: 'Portfolio and social profiles',
+    optional: true,
+  },
+];
 
 export default function ProfileSetup() {
   const { user, updateProfile } = useAuth();
-  const { isDark } = useTheme();
   const navigate = useNavigate();
+  const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const [studentProfile, setStudentProfile] = useState({
+  const [profileData, setProfileData] = useState<ProfileData>({
     full_name: '',
     bio: '',
+    phone: '',
+    location: '',
     major: '',
     graduation_year: new Date().getFullYear() + 1,
-    gpa: '',
-    skills: [] as string[],
-    website: ''
-  });
-
-  const [employerProfile, setEmployerProfile] = useState({
-    full_name: '',
-    bio: '',
-    website: '',
+    skills: '',
+    portfolio_url: '',
+    linkedin_url: '',
+    github_url: '',
     company_name: '',
+    job_title: '',
     industry: '',
     company_size: '',
-    contact_title: ''
+    company_description: '',
+    website: '',
   });
 
-  const [skillInput, setSkillInput] = useState('');
+  const updateField = (field: keyof ProfileData, value: string | number) => {
+    setProfileData(prev => ({ ...prev, [field]: value }));
+  };
 
-  const addSkill = () => {
-    if (skillInput.trim() && !studentProfile.skills.includes(skillInput.trim())) {
-      setStudentProfile(prev => ({
-        ...prev,
-        skills: [...prev.skills, skillInput.trim()]
-      }));
-      setSkillInput('');
+  const isStepValid = (step: number): boolean => {
+    switch (step) {
+      case 1: // Basic Info
+        return !!(profileData.full_name && profileData.bio);
+      case 2: // Professional Details
+        if (user?.role === 'student') {
+          return !!(profileData.major && profileData.graduation_year);
+        }
+        return !!(profileData.company_name && profileData.job_title && profileData.industry && profileData.company_size);
+      case 3: // Social Links (optional)
+        return true;
+      default:
+        return false;
     }
   };
 
-  const removeSkill = (skill: string) => {
-    setStudentProfile(prev => ({
-      ...prev,
-      skills: prev.skills.filter(s => s !== skill)
-    }));
+  const nextStep = () => {
+    if (currentStep < steps.length && isStepValid(currentStep)) {
+      setCurrentStep(prev => prev + 1);
+    }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(prev => prev - 1);
+    }
+  };
+
+  const handleSubmit = async () => {
     setError('');
     setLoading(true);
 
     try {
-      const profile = user?.role === 'student' ? studentProfile : employerProfile;
-      
-      // First, try to update the profile
+      // Clean up data based on user role
+      const cleanData = user?.role === 'student' 
+        ? {
+            full_name: profileData.full_name,
+            bio: profileData.bio,
+            phone: profileData.phone,
+            location: profileData.location,
+            major: profileData.major,
+            graduation_year: profileData.graduation_year,
+            skills: profileData.skills,
+            portfolio_url: profileData.portfolio_url,
+            linkedin_url: profileData.linkedin_url,
+            github_url: profileData.github_url,
+          }
+        : {
+            full_name: profileData.full_name,
+            bio: profileData.bio,
+            phone: profileData.phone,
+            location: profileData.location,
+            company_name: profileData.company_name,
+            job_title: profileData.job_title,
+            industry: profileData.industry,
+            company_size: profileData.company_size,
+            company_description: profileData.company_description,
+            website: profileData.website,
+          };
+
       try {
-        await updateProfile(profile);
+        await updateProfile(cleanData);
         navigate('/dashboard');
       } catch (updateError: any) {
-        // If update fails because profile doesn't exist, create it
         if (updateError.code === 'PGRST116' || updateError.message?.includes('No rows found')) {
           console.log('Profile not found, creating new profile...');
           
-          // Create the profile directly
           const { error: createError } = await supabase.auth.getUser().then(async ({ data: { user: authUser } }) => {
             if (!authUser) throw new Error('No authenticated user');
             
@@ -78,14 +158,11 @@ export default function ProfileSetup() {
               .insert({
                 id: authUser.id,
                 username,
-                ...profile
+                ...cleanData
               });
           });
           
-          if (createError) {
-            throw createError;
-          }
-          
+          if (createError) throw createError;
           navigate('/dashboard');
         } else {
           throw updateError;
@@ -100,143 +177,94 @@ export default function ProfileSetup() {
   };
 
   const majors = [
-    'Computer Science',
-    'Business',
-    'Engineering',
-    'Marketing',
-    'Finance',
-    'Data Science',
-    'Psychology',
-    'Communications',
-    'Other'
+    'Computer Science', 'Business', 'Engineering', 'Marketing', 'Finance',
+    'Data Science', 'Psychology', 'Communications', 'Other'
   ];
 
   const industries = [
-    'Technology',
-    'Finance',
-    'Healthcare',
-    'Consulting',
-    'Manufacturing',
-    'Education',
-    'Government',
-    'Non-profit',
-    'Other'
-  ];
-
-  const companySizes = [
-    '1-10 employees',
-    '11-50 employees',
-    '51-200 employees',
-    '201-1000 employees',
-    '1000+ employees'
+    'Technology', 'Finance', 'Healthcare', 'Consulting', 'Manufacturing',
+    'Education', 'Government', 'Non-profit', 'Other'
   ];
 
   if (!user) return null;
 
-  return (
-    <div className={`min-h-screen transition-colors duration-300 ${
-      isDark ? 'bg-gradient-to-br from-dark-bg to-dark-surface' : 'bg-gradient-to-br from-gray-50 to-white'
-    }`}>
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className={`rounded-3xl shadow-lg border p-8 transition-colors duration-300 ${
-          isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-100'
-        }`}>
-          <div className="text-center mb-8">
-            <h1 className={`text-3xl font-bold mb-2 transition-colors ${
-              isDark ? 'text-dark-text' : 'text-gray-900'
-            }`}>Complete Your Profile</h1>
-            <p className={`transition-colors ${
-              isDark ? 'text-dark-muted' : 'text-gray-600'
-            }`}>
-              Tell us about yourself to help us match you with the right opportunities
-            </p>
-          </div>
-
-          {error && (
-            <div className={`mb-6 border px-4 py-3 rounded-md transition-colors ${
-              isDark 
-                ? 'bg-red-900/20 border-red-500/30 text-red-300' 
-                : 'bg-red-50 border-red-200 text-red-700'
-            }`}>
-              {error}
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <User className="h-12 w-12 text-brand-primary mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-foreground">Basic Information</h2>
+              <p className="text-neutral-600">Let's start with the basics</p>
             </div>
-          )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+            <Input
+              label="Full Name"
+              value={profileData.full_name}
+              onChange={(e) => updateField('full_name', e.target.value)}
+              required
+              startIcon={<User className="h-4 w-4" />}
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="Phone Number"
+                type="tel"
+                value={profileData.phone}
+                onChange={(e) => updateField('phone', e.target.value)}
+              />
+              <Input
+                label="Location"
+                value={profileData.location}
+                onChange={(e) => updateField('location', e.target.value)}
+                placeholder="City, State"
+              />
+            </div>
+
+            <Input
+              label="Bio"
+              multiline
+              rows={4}
+              value={profileData.bio}
+              onChange={(e) => updateField('bio', e.target.value)}
+              placeholder="Tell us about yourself, your interests, and goals..."
+              required
+            />
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              {user.role === 'student' ? (
+                <>
+                  <Briefcase className="h-12 w-12 text-brand-primary mx-auto mb-4" />
+                  <h2 className="text-xl font-semibold text-foreground">Academic Details</h2>
+                  <p className="text-neutral-600">Tell us about your studies</p>
+                </>
+              ) : (
+                <>
+                  <Building2 className="h-12 w-12 text-brand-primary mx-auto mb-4" />
+                  <h2 className="text-xl font-semibold text-foreground">Company Information</h2>
+                  <p className="text-neutral-600">Tell us about your company</p>
+                </>
+              )}
+            </div>
+
             {user.role === 'student' ? (
               <>
-                <div>
-                  <label className={`block text-sm font-medium mb-2 transition-colors ${
-                    isDark ? 'text-dark-text' : 'text-gray-700'
-                  }`}>
-                    Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={studentProfile.full_name}
-                    onChange={(e) => setStudentProfile(prev => ({ ...prev, full_name: e.target.value }))}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
-                      isDark 
-                        ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
-                        : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
-                    }`}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className={`block text-sm font-medium mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      value={studentProfile.phone}
-                      onChange={(e) => setStudentProfile(prev => ({ ...prev, phone: e.target.value }))}
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
-                        isDark 
-                          ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
-                          : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
-                      }`}
-                    />
-                  </div>
-                  <div>
-                    <label className={`block text-sm font-medium mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
-                      Location
-                    </label>
-                    <input
-                      type="text"
-                      value={studentProfile.location}
-                      onChange={(e) => setStudentProfile(prev => ({ ...prev, location: e.target.value }))}
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
-                        isDark 
-                          ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
-                          : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
-                      }`}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className={`block text-sm font-medium mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Major *
                     </label>
                     <select
                       required
-                      value={studentProfile.major}
-                      onChange={(e) => setStudentProfile(prev => ({ ...prev, major: e.target.value }))}
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
-                        isDark 
-                          ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text' 
-                          : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
-                      }`}
+                      value={profileData.major}
+                      onChange={(e) => updateField('major', e.target.value)}
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-brand-primary"
                     >
                       <option value="">Select your major</option>
                       {majors.map(major => (
@@ -245,20 +273,14 @@ export default function ProfileSetup() {
                     </select>
                   </div>
                   <div>
-                    <label className={`block text-sm font-medium mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Graduation Year *
                     </label>
                     <select
                       required
-                      value={studentProfile.graduation_year}
-                      onChange={(e) => setStudentProfile(prev => ({ ...prev, graduation_year: e.target.value }))}
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
-                        isDark 
-                          ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text' 
-                          : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
-                      }`}
+                      value={profileData.graduation_year}
+                      onChange={(e) => updateField('graduation_year', parseInt(e.target.value))}
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-brand-primary"
                     >
                       <option value="">Select graduation year</option>
                       {Array.from({ length: 6 }, (_, i) => new Date().getFullYear() + i).map(year => (
@@ -268,194 +290,42 @@ export default function ProfileSetup() {
                   </div>
                 </div>
 
-                <div>
-                  <label className={`block text-sm font-medium mb-2 transition-colors ${
-                    isDark ? 'text-dark-text' : 'text-gray-700'
-                  }`}>
-                    Bio
-                  </label>
-                  <textarea
-                    value={studentProfile.bio}
-                    onChange={(e) => setStudentProfile(prev => ({ ...prev, bio: e.target.value }))}
-                    rows={4}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
-                      isDark 
-                        ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
-                        : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
-                    }`}
-                    placeholder="Tell us about yourself, your interests, and career goals..."
-                  />
-                </div>
-
-                <div>
-                  <label className={`block text-sm font-medium mb-2 transition-colors ${
-                    isDark ? 'text-dark-text' : 'text-gray-700'
-                  }`}>
-                    Skills (comma-separated)
-                  </label>
-                  <input
-                    type="text"
-                    value={studentProfile.skills}
-                    onChange={(e) => setStudentProfile(prev => ({ ...prev, skills: e.target.value }))}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
-                      isDark 
-                        ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
-                        : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
-                    }`}
-                    placeholder="e.g., JavaScript, Python, React, Data Analysis"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
-                    <label className={`block text-sm font-medium mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
-                      Portfolio URL
-                    </label>
-                    <input
-                      type="url"
-                      value={studentProfile.portfolio_url}
-                      onChange={(e) => setStudentProfile(prev => ({ ...prev, portfolio_url: e.target.value }))}
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
-                        isDark 
-                          ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
-                          : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
-                      }`}
-                      placeholder="https://yourportfolio.com"
-                    />
-                  </div>
-                  <div>
-                    <label className={`block text-sm font-medium mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
-                      LinkedIn URL
-                    </label>
-                    <input
-                      type="url"
-                      value={studentProfile.linkedin_url}
-                      onChange={(e) => setStudentProfile(prev => ({ ...prev, linkedin_url: e.target.value }))}
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
-                        isDark 
-                          ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
-                          : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
-                      }`}
-                      placeholder="https://linkedin.com/in/yourname"
-                    />
-                  </div>
-                  <div>
-                    <label className={`block text-sm font-medium mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
-                      GitHub URL
-                    </label>
-                    <input
-                      type="url"
-                      value={studentProfile.github_url}
-                      onChange={(e) => setStudentProfile(prev => ({ ...prev, github_url: e.target.value }))}
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
-                        isDark 
-                          ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
-                          : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
-                      }`}
-                      placeholder="https://github.com/yourusername"
-                    />
-                  </div>
-                </div>
+                <Input
+                  label="Skills"
+                  value={profileData.skills}
+                  onChange={(e) => updateField('skills', e.target.value)}
+                  placeholder="e.g., JavaScript, Python, React, Data Analysis"
+                  helperText="Separate skills with commas"
+                />
               </>
             ) : (
               <>
-                <div>
-                  <label className={`block text-sm font-medium mb-2 transition-colors ${
-                    isDark ? 'text-dark-text' : 'text-gray-700'
-                  }`}>
-                    Company Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={employerProfile.company_name}
-                    onChange={(e) => setEmployerProfile(prev => ({ ...prev, company_name: e.target.value }))}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
-                      isDark 
-                        ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
-                        : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
-                    }`}
-                  />
-                </div>
-                <div>
-                  <label className={`block text-sm font-medium mb-2 transition-colors ${
-                    isDark ? 'text-dark-text' : 'text-gray-700'
-                  }`}>
-                    Your Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={employerProfile.full_name}
-                    onChange={(e) => setEmployerProfile(prev => ({ ...prev, full_name: e.target.value }))}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
-                      isDark 
-                        ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
-                        : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
-                    }`}
-                  />
-                </div>
+                <Input
+                  label="Company Name"
+                  value={profileData.company_name}
+                  onChange={(e) => updateField('company_name', e.target.value)}
+                  required
+                  startIcon={<Building2 className="h-4 w-4" />}
+                />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className={`block text-sm font-medium mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
-                      Job Title *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={employerProfile.job_title}
-                      onChange={(e) => setEmployerProfile(prev => ({ ...prev, job_title: e.target.value }))}
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
-                        isDark 
-                          ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
-                          : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
-                      }`}
-                    />
-                  </div>
-                  <div>
-                    <label className={`block text-sm font-medium mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      value={employerProfile.phone}
-                      onChange={(e) => setEmployerProfile(prev => ({ ...prev, phone: e.target.value }))}
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
-                        isDark 
-                          ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
-                          : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
-                      }`}
-                    />
-                  </div>
-                </div>
+                <Input
+                  label="Your Job Title"
+                  value={profileData.job_title}
+                  onChange={(e) => updateField('job_title', e.target.value)}
+                  required
+                  startIcon={<Briefcase className="h-4 w-4" />}
+                />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className={`block text-sm font-medium mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Industry *
                     </label>
                     <select
                       required
-                      value={employerProfile.industry}
-                      onChange={(e) => setEmployerProfile(prev => ({ ...prev, industry: e.target.value }))}
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
-                        isDark 
-                          ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text' 
-                          : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
-                      }`}
+                      value={profileData.industry}
+                      onChange={(e) => updateField('industry', e.target.value)}
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-brand-primary"
                     >
                       <option value="">Select industry</option>
                       {industries.map(industry => (
@@ -464,20 +334,14 @@ export default function ProfileSetup() {
                     </select>
                   </div>
                   <div>
-                    <label className={`block text-sm font-medium mb-2 transition-colors ${
-                      isDark ? 'text-dark-text' : 'text-gray-700'
-                    }`}>
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Company Size *
                     </label>
                     <select
                       required
-                      value={employerProfile.company_size}
-                      onChange={(e) => setEmployerProfile(prev => ({ ...prev, company_size: e.target.value }))}
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
-                        isDark 
-                          ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text' 
-                          : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
-                      }`}
+                      value={profileData.company_size}
+                      onChange={(e) => updateField('company_size', e.target.value)}
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-brand-primary"
                     >
                       <option value="">Select company size</option>
                       <option value="1-10">1-10 employees</option>
@@ -490,72 +354,136 @@ export default function ProfileSetup() {
                   </div>
                 </div>
 
-                <div>
-                  <label className={`block text-sm font-medium mb-2 transition-colors ${
-                    isDark ? 'text-dark-text' : 'text-gray-700'
-                  }`}>
-                    Company Description
-                  </label>
-                  <textarea
-                    value={employerProfile.company_description}
-                    onChange={(e) => setEmployerProfile(prev => ({ ...prev, company_description: e.target.value }))}
-                    rows={4}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
-                      isDark 
-                        ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
-                        : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
-                    }`}
-                    placeholder="Tell us about your company, culture, and what makes it special..."
-                  />
-                </div>
-
-                <div>
-                  <label className={`block text-sm font-medium mb-2 transition-colors ${
-                    isDark ? 'text-dark-text' : 'text-gray-700'
-                  }`}>
-                    Company Website
-                  </label>
-                  <input
-                    type="url"
-                    value={employerProfile.website}
-                    onChange={(e) => setEmployerProfile(prev => ({ ...prev, website: e.target.value }))}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
-                      isDark 
-                        ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
-                        : 'border-gray-300 focus:ring-asu-maroon bg-white text-gray-900'
-                    }`}
-                    placeholder="https://yourcompany.com"
-                  />
-                </div>
+                <Input
+                  label="Company Description"
+                  multiline
+                  rows={4}
+                  value={profileData.company_description}
+                  onChange={(e) => updateField('company_description', e.target.value)}
+                  placeholder="Tell us about your company, culture, and what makes it special..."
+                />
               </>
             )}
+          </div>
+        );
 
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                disabled={loading}
-                className={`px-8 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2 ${
-                  isDark 
-                    ? 'bg-lime text-dark-surface hover:bg-dark-accent focus:ring-lime' 
-                    : 'bg-asu-maroon text-white hover:bg-asu-maroon-dark focus:ring-asu-maroon'
-                }`}
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    <span>Saving...</span>
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-5 w-5" />
-                    <span>Complete Profile</span>
-                  </>
-                )}
-              </button>
+      case 3:
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <Link className="h-12 w-12 text-brand-primary mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-foreground">Social Links</h2>
+              <p className="text-neutral-600">Connect your professional profiles (optional)</p>
             </div>
-          </form 
-          >
-        </div>
+
+            {user.role === 'student' ? (
+              <>
+                <Input
+                  label="Portfolio URL"
+                  type="url"
+                  value={profileData.portfolio_url}
+                  onChange={(e) => updateField('portfolio_url', e.target.value)}
+                  placeholder="https://yourportfolio.com"
+                />
+
+                <Input
+                  label="LinkedIn Profile"
+                  type="url"
+                  value={profileData.linkedin_url}
+                  onChange={(e) => updateField('linkedin_url', e.target.value)}
+                  placeholder="https://linkedin.com/in/yourname"
+                />
+
+                <Input
+                  label="GitHub Profile"
+                  type="url"
+                  value={profileData.github_url}
+                  onChange={(e) => updateField('github_url', e.target.value)}
+                  placeholder="https://github.com/yourusername"
+                />
+              </>
+            ) : (
+              <Input
+                label="Company Website"
+                type="url"
+                value={profileData.website}
+                onChange={(e) => updateField('website', e.target.value)}
+                placeholder="https://yourcompany.com"
+              />
+            )}
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-neutral-50 py-8">
+      <div className="max-w-2xl mx-auto px-4">
+        <Card variant="elevated" padding="lg" className="mb-8">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-foreground mb-2">Complete Your Profile</h1>
+            <p className="text-neutral-600">
+              Help us match you with the right opportunities
+            </p>
+          </div>
+
+          {/* Progress Stepper */}
+          <div className="mb-8">
+            <Stepper
+              steps={steps}
+              currentStep={currentStep}
+              orientation="horizontal"
+            />
+          </div>
+
+          {error && (
+            <div className="mb-6 border border-error/20 bg-error/5 text-error px-4 py-3 rounded-md">
+              {error}
+            </div>
+          )}
+
+          {/* Step Content */}
+          <div className="mb-8">
+            {renderStepContent()}
+          </div>
+
+          {/* Navigation Buttons */}
+          <div className="flex justify-between items-center">
+            <Button
+              variant="outline"
+              onClick={prevStep}
+              disabled={currentStep === 1}
+              leftIcon={<ArrowLeft className="h-4 w-4" />}
+            >
+              Previous
+            </Button>
+
+            <div className="flex gap-3">
+              {currentStep < steps.length ? (
+                <Button
+                  variant="primary"
+                  onClick={nextStep}
+                  disabled={!isStepValid(currentStep)}
+                  rightIcon={<ArrowRight className="h-4 w-4" />}
+                >
+                  Next Step
+                </Button>
+              ) : (
+                <Button
+                  variant="primary"
+                  onClick={handleSubmit}
+                  loading={loading}
+                  leftIcon={<Save className="h-4 w-4" />}
+                >
+                  Complete Profile
+                </Button>
+              )}
+            </div>
+          </div>
+        </Card>
       </div>
     </div>
   );

@@ -18,8 +18,8 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { supabase } from '../../lib/supabase';
 import { StatsCard, Card } from '../ui/Card';
-import Typography from '../ui/Typography';
 import Button from '../ui/Button';
+import { cn } from '../../lib/cva';
 
 interface UserStats {
   totalUsers: number;
@@ -173,11 +173,11 @@ export default function AdminDashboard() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'active':
-        return <CheckCircle className={`h-4 w-4 ${isDark ? 'text-green-400' : 'text-green-600'}`} />;
+        return <CheckCircle className="h-4 w-4 text-success" />;
       case 'pending':
-        return <AlertTriangle className={`h-4 w-4 ${isDark ? 'text-yellow-400' : 'text-yellow-600'}`} />;
+        return <AlertTriangle className="h-4 w-4 text-warning" />;
       case 'suspended':
-        return <XCircle className={`h-4 w-4 ${isDark ? 'text-red-400' : 'text-red-600'}`} />;
+        return <XCircle className="h-4 w-4 text-error" />;
       default:
         return null;
     }
@@ -186,13 +186,13 @@ export default function AdminDashboard() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return isDark ? 'bg-green-500/20 text-green-300' : 'bg-green-100 text-green-800';
+        return 'bg-success/10 text-success border border-success/20';
       case 'pending':
-        return isDark ? 'bg-yellow-500/20 text-yellow-300' : 'bg-yellow-100 text-yellow-800';
+        return 'bg-warning/10 text-warning border border-warning/20';
       case 'suspended':
-        return isDark ? 'bg-red-500/20 text-red-300' : 'bg-red-100 text-red-800';
+        return 'bg-error/10 text-error border border-error/20';
       default:
-        return isDark ? 'bg-gray-500/20 text-gray-300' : 'bg-gray-100 text-gray-800';
+        return 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400';
     }
   };
 
@@ -205,16 +205,16 @@ export default function AdminDashboard() {
           value={userStats.totalUsers.toLocaleString()}
           icon={Users}
           subtitle="+12% from last month"
-          color="blue"
+          color="info"
           delay={0.2}
           rotation={1}
         />
         <StatsCard
           title="Active Jobs"
-          value={jobStats.activeJobs}
+          value={jobStats.activeJobs.toString()}
           icon={Briefcase}
           subtitle="+8% from last month"
-          color="green"
+          color="success"
           delay={0.4}
           rotation={-1}
         />
@@ -223,16 +223,16 @@ export default function AdminDashboard() {
           value={jobStats.applications.toLocaleString()}
           icon={FileText}
           subtitle="+24% from last month"
-          color="purple"
+          color="primary"
           delay={0.6}
           rotation={0.5}
         />
         <StatsCard
           title="Pending Approvals"
-          value={userStats.pendingApprovals}
+          value={userStats.pendingApprovals.toString()}
           icon={AlertTriangle}
           subtitle="Requires attention"
-          color="yellow"
+          color="warning"
           delay={0.8}
           rotation={-0.5}
         />
@@ -240,31 +240,25 @@ export default function AdminDashboard() {
 
       {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <Card className="transform rotate-0.5" delay={1}>
-          <div className={`p-6 border-b transition-colors duration-300 ${
-            isDark ? 'border-lime/20' : 'border-gray-200'
-          }`}>
-            <h3 className={`text-lg font-semibold transition-colors duration-300 ${
-              isDark ? 'text-dark-text' : 'text-gray-900'
-            }`}>Recent User Registrations</h3>
+        <Card variant="elevated" className="transform rotate-0.5" delay={1}>
+          <div className="p-6 border-b border-neutral-200 dark:border-neutral-700">
+            <h3 className="text-lg font-semibold text-foreground">Recent User Registrations</h3>
           </div>
           <div className="p-6">
             <div className="space-y-4">
               {recentUsers.map((user) => (
                 <div key={user.id} className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      isDark ? 'bg-dark-bg' : 'bg-gray-200'
-                    }`}>
-                      <Users className={`h-4 w-4 ${isDark ? 'text-dark-muted' : 'text-gray-600'}`} />
+                    <div className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
+                      <Users className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
                     </div>
                     <div>
-                      <p className={`font-medium ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>{user.name}</p>
-                      <p className={`text-sm ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>{user.email}</p>
+                      <p className="font-medium text-foreground">{user.name}</p>
+                      <p className="text-sm text-neutral-600 dark:text-neutral-400">{user.email}</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(user.status)}`}>
+                    <span className={cn("px-2 py-1 rounded-full text-xs font-medium", getStatusColor(user.status))}>
                       {user.status}
                     </span>
                     {getStatusIcon(user.status)}
@@ -275,47 +269,27 @@ export default function AdminDashboard() {
           </div>
         </Card>
 
-        <Card className="transform -rotate-0.5" delay={1.2}>
-          <div className={`p-6 border-b transition-colors duration-300 ${
-            isDark ? 'border-lime/20' : 'border-gray-200'
-          }`}>
-            <h3 className={`text-lg font-semibold transition-colors duration-300 ${
-              isDark ? 'text-dark-text' : 'text-gray-900'
-            }`}>Quick Actions</h3>
+        <Card variant="elevated" className="transform -rotate-0.5" delay={1.2}>
+          <div className="p-6 border-b border-neutral-200 dark:border-neutral-700">
+            <h3 className="text-lg font-semibold text-foreground">Quick Actions</h3>
           </div>
           <div className="p-6">
             <div className="grid grid-cols-2 gap-4">
-              <button className={`flex flex-col items-center p-4 border rounded-lg transition-all duration-300 ${
-                isDark 
-                  ? 'border-lime/20 hover:border-lime/40 hover:bg-dark-bg/50' 
-                  : 'border-gray-200 hover:bg-gray-50'
-              }`}>
-                <Users className={`h-6 w-6 mb-2 ${isDark ? 'text-blue-400' : 'text-blue-700'}`} />
-                <span className={`text-sm font-medium ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>Manage Users</span>
+              <button className="flex flex-col items-center p-4 border border-neutral-200 dark:border-neutral-700 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
+                <Users className="h-6 w-6 mb-2 text-info" />
+                <span className="text-sm font-medium text-foreground">Manage Users</span>
               </button>
-              <button className={`flex flex-col items-center p-4 border rounded-lg transition-all duration-300 ${
-                isDark 
-                  ? 'border-lime/20 hover:border-lime/40 hover:bg-dark-bg/50' 
-                  : 'border-gray-200 hover:bg-gray-50'
-              }`}>
-                <Briefcase className={`h-6 w-6 mb-2 ${isDark ? 'text-green-400' : 'text-green-700'}`} />
-                <span className={`text-sm font-medium ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>Review Jobs</span>
+              <button className="flex flex-col items-center p-4 border border-neutral-200 dark:border-neutral-700 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
+                <Briefcase className="h-6 w-6 mb-2 text-success" />
+                <span className="text-sm font-medium text-foreground">Review Jobs</span>
               </button>
-              <button className={`flex flex-col items-center p-4 border rounded-lg transition-all duration-300 ${
-                isDark 
-                  ? 'border-lime/20 hover:border-lime/40 hover:bg-dark-bg/50' 
-                  : 'border-gray-200 hover:bg-gray-50'
-              }`}>
-                <Calendar className={`h-6 w-6 mb-2 ${isDark ? 'text-purple-400' : 'text-purple-700'}`} />
-                <span className={`text-sm font-medium ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>Create Event</span>
+              <button className="flex flex-col items-center p-4 border border-neutral-200 dark:border-neutral-700 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
+                <Calendar className="h-6 w-6 mb-2 text-brand-primary" />
+                <span className="text-sm font-medium text-foreground">Create Event</span>
               </button>
-              <button className={`flex flex-col items-center p-4 border rounded-lg transition-all duration-300 ${
-                isDark 
-                  ? 'border-lime/20 hover:border-lime/40 hover:bg-dark-bg/50' 
-                  : 'border-gray-200 hover:bg-gray-50'
-              }`}>
-                <MessageSquare className={`h-6 w-6 mb-2 ${isDark ? 'text-yellow-400' : 'text-yellow-700'}`} />
-                <span className={`text-sm font-medium ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>Send Announcement</span>
+              <button className="flex flex-col items-center p-4 border border-neutral-200 dark:border-neutral-700 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
+                <MessageSquare className="h-6 w-6 mb-2 text-warning" />
+                <span className="text-sm font-medium text-foreground">Send Announcement</span>
               </button>
             </div>
           </div>
@@ -325,48 +299,34 @@ export default function AdminDashboard() {
   );
 
   const renderUserManagement = () => (
-    <Card className="transform rotate-0.3" delay={0.5}>
-      <div className={`p-6 border-b transition-colors duration-300 ${
-        isDark ? 'border-lime/20' : 'border-gray-200'
-      }`}>
-        <h3 className={`text-lg font-semibold transition-colors duration-300 ${
-          isDark ? 'text-dark-text' : 'text-gray-900'
-        }`}>User Management</h3>
+    <Card variant="elevated" className="transform rotate-0.3" delay={0.5}>
+      <div className="p-6 border-b border-neutral-200 dark:border-neutral-700">
+        <h3 className="text-lg font-semibold text-foreground">User Management</h3>
       </div>
       <div className="p-6">
         <div className="space-y-4">
           {recentUsers.map((user) => (
-            <div key={user.id} className={`flex items-center justify-between p-4 border rounded-lg transition-all duration-300 ${
-              isDark 
-                ? 'border-lime/20 hover:border-lime/40 hover:bg-dark-bg/50' 
-                : 'border-gray-200 hover:bg-gray-50'
-            }`}>
+            <div key={user.id} className="flex items-center justify-between p-4 border border-neutral-200 dark:border-neutral-700 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
               <div className="flex items-center space-x-4">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  isDark ? 'bg-dark-bg' : 'bg-gray-200'
-                }`}>
-                  <Users className={`h-5 w-5 ${isDark ? 'text-dark-muted' : 'text-gray-600'}`} />
+                <div className="w-10 h-10 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
+                  <Users className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
                 </div>
                 <div>
-                  <p className={`font-medium ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>{user.name}</p>
-                  <p className={`text-sm ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>{user.email}</p>
-                  <p className={`text-sm ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>Joined: {new Date(user.joinDate).toLocaleDateString()}</p>
+                  <p className="font-medium text-foreground">{user.name}</p>
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400">{user.email}</p>
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400">Joined: {new Date(user.joinDate).toLocaleDateString()}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(user.status)}`}>
+                <span className={cn("px-3 py-1 rounded-full text-sm font-medium", getStatusColor(user.status))}>
                   {user.status}
                 </span>
-                <button className={`p-2 transition-colors duration-300 ${
-                  isDark ? 'text-dark-muted hover:text-blue-400' : 'text-gray-500 hover:text-blue-700'
-                }`}>
+                <Button variant="ghost" size="sm" className="text-neutral-500 hover:text-info">
                   <Eye className="h-4 w-4" />
-                </button>
-                <button className={`p-2 transition-colors duration-300 ${
-                  isDark ? 'text-dark-muted hover:text-red-400' : 'text-gray-500 hover:text-red-700'
-                }`}>
+                </Button>
+                <Button variant="ghost" size="sm" className="text-neutral-500 hover:text-error">
                   <Ban className="h-4 w-4" />
-                </button>
+                </Button>
               </div>
             </div>
           ))}
@@ -377,15 +337,13 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
-            <div className={`animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4 ${
-              isDark ? 'border-lime' : 'border-asu-maroon'
-            }`}></div>
-            <Typography variant="body1" color="textSecondary">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary mx-auto mb-4"></div>
+            <p className="text-neutral-600 dark:text-neutral-400">
               Loading admin dashboard...
-            </Typography>
+            </p>
           </div>
         </div>
       </div>
@@ -394,16 +352,16 @@ export default function AdminDashboard() {
 
   if (error) {
     return (
-      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Card className="p-8 text-center">
-            <Typography variant="h6" className="text-red-600 mb-2">
+          <Card variant="elevated" padding="lg" className="text-center">
+            <h2 className="text-xl font-semibold text-error mb-2">
               Error Loading Dashboard
-            </Typography>
-            <Typography variant="body1" color="textSecondary" className="mb-4">
+            </h2>
+            <p className="text-neutral-600 dark:text-neutral-400 mb-4">
               {error}
-            </Typography>
-            <Button onClick={fetchDashboardData} variant="outlined">
+            </p>
+            <Button onClick={fetchDashboardData} variant="outline">
               Try Again
             </Button>
           </Card>
@@ -413,80 +371,65 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
-        <h1 className={`text-3xl font-bold mb-2 transition-colors duration-300 ${
-          isDark ? 'text-dark-text' : 'text-gray-900'
-        }`}>Admin Dashboard</h1>
-        <p className={`transition-colors duration-300 ${
-          isDark ? 'text-dark-muted' : 'text-gray-700'
-        }`}>Manage users, jobs, events, and platform settings</p>
-      </div>
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground mb-2">Admin Dashboard</h1>
+          <p className="text-neutral-600 dark:text-neutral-400">Manage users, jobs, events, and platform settings</p>
+        </div>
 
-      {/* Navigation Tabs */}
-      <div className={`border-b mb-8 transition-colors duration-300 ${
-        isDark ? 'border-lime/20' : 'border-gray-200'
-      }`}>
-        <nav className="flex space-x-8">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-300 ${
-                  activeTab === tab.id
-                    ? isDark 
-                      ? 'border-lime text-lime' 
-                      : 'border-asu-maroon text-asu-maroon'
-                    : isDark 
-                      ? 'border-transparent text-dark-muted hover:text-dark-text hover:border-lime/40' 
-                      : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'
-                }`}
-              >
-                <Icon className="h-5 w-5" />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
-        </nav>
-      </div>
+        {/* Navigation Tabs */}
+        <div className="border-b border-neutral-200 dark:border-neutral-700 mb-8">
+          <nav className="flex space-x-8">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={cn(
+                    "flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors",
+                    activeTab === tab.id
+                      ? "border-brand-primary text-brand-primary"
+                      : "border-transparent text-neutral-600 dark:text-neutral-400 hover:text-foreground hover:border-neutral-300 dark:hover:border-neutral-600"
+                  )}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+        </div>
 
-      {/* Tab Content */}
-      {activeTab === 'overview' && renderOverview()}
-      {activeTab === 'users' && renderUserManagement()}
-      {activeTab === 'jobs' && (
-        <div className="text-center py-12">
-          <Briefcase className={`h-12 w-12 mx-auto mb-4 ${
-            isDark ? 'text-dark-muted' : 'text-gray-400'
-          }`} />
-          <p className={`${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>Job moderation features coming soon</p>
-        </div>
-      )}
-      {activeTab === 'events' && (
-        <div className="text-center py-12">
-          <Calendar className={`h-12 w-12 mx-auto mb-4 ${
-            isDark ? 'text-dark-muted' : 'text-gray-400'
-          }`} />
-          <p className={`${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>Event management features coming soon</p>
-        </div>
-      )}
-      {activeTab === 'resources' && (
-        <div className="text-center py-12">
-          <FileText className={`h-12 w-12 mx-auto mb-4 ${
-            isDark ? 'text-dark-muted' : 'text-gray-400'
-          }`} />
-          <p className={`${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>Resource management features coming soon</p>
-        </div>
-      )}
-      {activeTab === 'settings' && (
-        <div className="text-center py-12">
-          <Settings className={`h-12 w-12 mx-auto mb-4 ${
-            isDark ? 'text-dark-muted' : 'text-gray-400'
-          }`} />
-          <p className={`${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>Platform settings coming soon</p>
-        </div>
-      )}
+        {/* Tab Content */}
+        {activeTab === 'overview' && renderOverview()}
+        {activeTab === 'users' && renderUserManagement()}
+        {activeTab === 'jobs' && (
+          <div className="text-center py-12">
+            <Briefcase className="h-12 w-12 mx-auto mb-4 text-neutral-400" />
+            <p className="text-neutral-600 dark:text-neutral-400">Job moderation features coming soon</p>
+          </div>
+        )}
+        {activeTab === 'events' && (
+          <div className="text-center py-12">
+            <Calendar className="h-12 w-12 mx-auto mb-4 text-neutral-400" />
+            <p className="text-neutral-600 dark:text-neutral-400">Event management features coming soon</p>
+          </div>
+        )}
+        {activeTab === 'resources' && (
+          <div className="text-center py-12">
+            <FileText className="h-12 w-12 mx-auto mb-4 text-neutral-400" />
+            <p className="text-neutral-600 dark:text-neutral-400">Resource management features coming soon</p>
+          </div>
+        )}
+        {activeTab === 'settings' && (
+          <div className="text-center py-12">
+            <Settings className="h-12 w-12 mx-auto mb-4 text-neutral-400" />
+            <p className="text-neutral-600 dark:text-neutral-400">Platform settings coming soon</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

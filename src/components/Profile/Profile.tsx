@@ -437,20 +437,6 @@ export default function Profile() {
             <button
               onClick={() => setIsEditing(!isEditing)}
               className="mt-4 md:mt-0 bg-white/20 backdrop-blur-sm border-2 border-white/30 text-white px-6 py-3 rounded-2xl hover:bg-white/30 transition-all duration-300 flex items-center space-x-2"
-              onMouseEnter={() => {
-                gsap.to(event?.currentTarget, {
-                  scale: 1.05,
-                  duration: 0.2,
-                  ease: 'power2.out'
-                });
-              }}
-              onMouseLeave={() => {
-                gsap.to(event?.currentTarget, {
-                  scale: 1,
-                  duration: 0.2,
-                  ease: 'power2.out'
-                });
-              }}
             >
               {isEditing ? <X className="h-4 w-4" /> : <Edit3 className="h-4 w-4" />}
               <span>{isEditing ? 'Cancel' : 'Edit Profile'}</span>
@@ -482,27 +468,9 @@ export default function Profile() {
                         ? 'bg-gradient-to-r from-lime to-dark-accent text-dark-surface shadow-lg' 
                         : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white shadow-lg'
                       : isDark 
-                        ? 'text-dark-muted hover:text-lime hover:bg-lime/5' 
-                        : 'text-gray-600 hover:text-asu-maroon hover:bg-asu-maroon/5'
+                        ? 'text-dark-muted' 
+                        : 'text-gray-600'
                   }`}
-                  onMouseEnter={() => {
-                    if (activeTab !== tab.id) {
-                      gsap.to(event?.currentTarget, {
-                        scale: 1.02,
-                        duration: 0.2,
-                        ease: 'power2.out'
-                      });
-                    }
-                  }}
-                  onMouseLeave={() => {
-                    if (activeTab !== tab.id) {
-                      gsap.to(event?.currentTarget, {
-                        scale: 1,
-                        duration: 0.2,
-                        ease: 'power2.out'
-                      });
-                    }
-                  }}
                 >
                   <Icon className="h-5 w-5" />
                   <span className="hidden md:inline">{tab.label}</span>

@@ -1,27 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Dashboard,
-  Work,
-  Business,
-  Assignment,
+  BarChart3,
+  Briefcase,
+  Building2,
+  FileText,
   Search,
-  LocationOn,
-  AccessTime,
+  MapPin,
+  Clock,
   TrendingUp,
-  Person,
+  User,
   Bookmark,
-  Notifications,
-  School,
-  Event,
-  MenuBook
-} from '@mui/icons-material';
+  Bell,
+  GraduationCap,
+  Calendar,
+  BookOpen
+} from 'lucide-react';
 import { useJobs } from '../../hooks/useJobs';
 import { useTheme } from '../../context/ThemeContext';
-import Typography from '../ui/Typography';
-import Input from '../ui/Input';
 import Button from '../ui/Button';
-import { Card } from '../ui/Card';
+import Input from '../ui/Input';
+import { Card, StatsCard } from '../ui/Card';
+import { cn } from '../../lib/cva';
 
 export default function StudentDashboard() {
   const { jobs, loading, error } = useJobs();
@@ -42,12 +42,10 @@ export default function StudentDashboard() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+      <div className="min-h-screen bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-center h-64">
-            <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${
-              isDark ? 'border-lime' : 'border-asu-maroon'
-            }`}></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
           </div>
         </div>
       </div>
@@ -55,126 +53,90 @@ export default function StudentDashboard() {
   }
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         {/* Header */}
         <div className="mb-8">
-          <Typography variant="h4" className="font-medium mb-2">
-            Dashboard
-          </Typography>
-          <Typography variant="body1" color="textSecondary">
+          <h1 className="text-3xl font-bold text-foreground mb-2">
+            Student Dashboard
+          </h1>
+          <p className="text-neutral-600 dark:text-neutral-400">
             Welcome back! Here's your career overview.
-          </Typography>
+          </p>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="p-6" elevation={1}>
-            <div className="flex items-center">
-              <div className={`p-3 rounded-xl ${
-                isDark ? 'bg-lime/10 text-lime' : 'bg-asu-maroon/10 text-asu-maroon'
-              }`}>
-                <Work className="h-6 w-6" />
-              </div>
-              <div className="ml-4">
-                <Typography variant="h5" className="font-semibold">
-                  {jobs.length}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Available Jobs
-                </Typography>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6" elevation={1}>
-            <div className="flex items-center">
-              <div className={`p-3 rounded-xl ${
-                isDark ? 'bg-blue-500/10 text-blue-400' : 'bg-blue-50 text-blue-600'
-              }`}>
-                <Business className="h-6 w-6" />
-              </div>
-              <div className="ml-4">
-                <Typography variant="h5" className="font-semibold">
-                  156
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Companies
-                </Typography>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6" elevation={1}>
-            <div className="flex items-center">
-              <div className={`p-3 rounded-xl ${
-                isDark ? 'bg-green-500/10 text-green-400' : 'bg-green-50 text-green-600'
-              }`}>
-                <Assignment className="h-6 w-6" />
-              </div>
-              <div className="ml-4">
-                <Typography variant="h5" className="font-semibold">
-                  7
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Applications
-                </Typography>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6" elevation={1}>
-            <div className="flex items-center">
-              <div className={`p-3 rounded-xl ${
-                isDark ? 'bg-purple-500/10 text-purple-400' : 'bg-purple-50 text-purple-600'
-              }`}>
-                <Bookmark className="h-6 w-6" />
-              </div>
-              <div className="ml-4">
-                <Typography variant="h5" className="font-semibold">
-                  12
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Saved Jobs
-                </Typography>
-              </div>
-            </div>
-          </Card>
+          <StatsCard
+            title="Available Jobs"
+            value={jobs.length.toString()}
+            icon={Briefcase}
+            color="primary"
+            animated
+            delay={0.1}
+          />
+          
+          <StatsCard
+            title="Companies"
+            value="156"
+            icon={Building2}
+            color="info"
+            animated
+            delay={0.2}
+          />
+          
+          <StatsCard
+            title="Applications"
+            value="7"
+            icon={FileText}
+            color="success"
+            animated
+            delay={0.3}
+          />
+          
+          <StatsCard
+            title="Saved Jobs"
+            value="12"
+            icon={Bookmark}
+            color="warning"
+            animated
+            delay={0.4}
+          />
         </div>
 
         {/* Quick Actions */}
-        <Card className="p-6 mb-8" elevation={1}>
-          <Typography variant="h6" className="font-medium mb-4">
+        <Card variant="elevated" padding="lg" className="mb-8">
+          <h2 className="text-xl font-semibold text-foreground mb-6">
             Quick Actions
-          </Typography>
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link to="/jobs">
               <Button 
-                variant="outlined" 
+                variant="outline" 
                 fullWidth 
-                startIcon={<Search />}
-                className="justify-start h-12"
+                leftIcon={<Search className="h-4 w-4" />}
+                className="justify-start h-12 text-left"
               >
                 Search Jobs
               </Button>
             </Link>
             <Link to="/events">
               <Button 
-                variant="outlined" 
+                variant="outline" 
                 fullWidth 
-                startIcon={<Event />}
-                className="justify-start h-12"
+                leftIcon={<Calendar className="h-4 w-4" />}
+                className="justify-start h-12 text-left"
               >
                 Career Events
               </Button>
             </Link>
             <Link to="/resources">
               <Button 
-                variant="outlined" 
+                variant="outline" 
                 fullWidth 
-                startIcon={<MenuBook />}
-                className="justify-start h-12"
+                leftIcon={<BookOpen className="h-4 w-4" />}
+                className="justify-start h-12 text-left"
               >
                 Resources
               </Button>
@@ -183,18 +145,18 @@ export default function StudentDashboard() {
         </Card>
 
         {/* Search and Filters */}
-        <Card className="p-6 mb-8" elevation={1}>
-          <Typography variant="h6" className="font-medium mb-4">
+        <Card variant="elevated" padding="lg" className="mb-8">
+          <h2 className="text-xl font-semibold text-foreground mb-6">
             Find Opportunities
-          </Typography>
+          </h2>
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <Input
                 placeholder="Search jobs or companies..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                startIcon={<Search />}
-                variant="outlined"
+                startIcon={<Search className="h-4 w-4" />}
+                variant="default"
                 fullWidth
               />
             </div>
@@ -203,18 +165,19 @@ export default function StudentDashboard() {
                 placeholder="Location"
                 value={locationFilter}
                 onChange={(e) => setLocationFilter(e.target.value)}
-                startIcon={<LocationOn />}
-                variant="outlined"
+                startIcon={<MapPin className="h-4 w-4" />}
+                variant="default"
                 className="w-48"
               />
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className={`px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
-                  isDark 
-                    ? 'border-gray-600 bg-dark-surface text-dark-text focus:ring-lime' 
-                    : 'border-gray-300 bg-white text-gray-900 focus:ring-asu-maroon'
-                }`}
+                className={cn(
+                  "px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors",
+                  "border-neutral-300 bg-background text-foreground",
+                  "focus:ring-brand-primary focus:border-brand-primary",
+                  "dark:border-neutral-600 dark:bg-neutral-800"
+                )}
               >
                 <option value="">All Types</option>
                 <option value="full-time">Full Time</option>
@@ -228,37 +191,35 @@ export default function StudentDashboard() {
         {/* Jobs Section */}
         <div className="mb-6">
           <div className="flex justify-between items-center mb-6">
-            <Typography variant="h5" className="font-medium">
+            <h2 className="text-2xl font-semibold text-foreground">
               Recommended for You
-            </Typography>
+            </h2>
             <Link to="/jobs">
-              <Button variant="text" color="primary">
+              <Button variant="ghost" className="text-brand-primary">
                 View All Jobs
               </Button>
             </Link>
           </div>
 
           {error && (
-            <Card className="p-6 mb-6 border-l-4 border-red-500" elevation={1}>
-              <Typography variant="body1" className="text-red-600">
+            <Card variant="outlined" padding="lg" className="mb-6 border-l-4 border-error">
+              <p className="text-error font-medium">
                 Error loading jobs: {error}
-              </Typography>
+              </p>
             </Card>
           )}
 
           {filteredJobs.length === 0 ? (
-            <Card className="p-12 text-center" elevation={1}>
-              <Work className={`h-16 w-16 mx-auto mb-4 ${
-                isDark ? 'text-dark-muted' : 'text-gray-400'
-              }`} />
-              <Typography variant="h6" className="mb-2">
+            <Card variant="elevated" padding="lg" className="text-center">
+              <Briefcase className="h-16 w-16 mx-auto mb-4 text-neutral-400" />
+              <h3 className="text-xl font-semibold text-foreground mb-2">
                 No jobs found
-              </Typography>
-              <Typography variant="body1" color="textSecondary" className="mb-4">
+              </h3>
+              <p className="text-neutral-600 dark:text-neutral-400 mb-6">
                 Try adjusting your search criteria or check back later
-              </Typography>
+              </p>
               <Button 
-                variant="outlined" 
+                variant="outline" 
                 onClick={() => {
                   setSearchTerm('');
                   setLocationFilter('');
@@ -271,53 +232,47 @@ export default function StudentDashboard() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredJobs.map((job) => (
-                <Card key={job.id} className="p-6 hover:shadow-lg transition-shadow" elevation={1}>
+                <Card key={job.id} variant="elevated" padding="lg" interactive className="group">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
-                      <Typography variant="h6" className="font-medium mb-1">
+                      <h3 className="text-lg font-semibold text-foreground mb-1 group-hover:text-brand-primary transition-colors">
                         {job.title}
-                      </Typography>
-                      <Typography variant="subtitle1" color="primary" className="font-medium">
+                      </h3>
+                      <p className="text-brand-primary font-medium">
                         {job.company}
-                      </Typography>
+                      </p>
                     </div>
-                    <Button variant="text" size="small" className="min-w-0 p-2">
+                    <Button variant="ghost" size="icon" className="text-neutral-400 hover:text-brand-primary">
                       <Bookmark className="h-5 w-5" />
                     </Button>
                   </div>
                   
                   <div className="space-y-2 mb-4">
-                    <div className={`flex items-center text-sm ${
-                      isDark ? 'text-dark-muted' : 'text-gray-600'
-                    }`}>
-                      <LocationOn className="h-4 w-4 mr-2" />
+                    <div className="flex items-center text-sm text-neutral-600 dark:text-neutral-400">
+                      <MapPin className="h-4 w-4 mr-2" />
                       {job.location}
                     </div>
-                    <div className={`flex items-center text-sm ${
-                      isDark ? 'text-dark-muted' : 'text-gray-600'
-                    }`}>
-                      <AccessTime className="h-4 w-4 mr-2" />
+                    <div className="flex items-center text-sm text-neutral-600 dark:text-neutral-400">
+                      <Clock className="h-4 w-4 mr-2" />
                       {job.type}
                     </div>
                     {job.salary_range && (
-                      <div className={`flex items-center text-sm ${
-                        isDark ? 'text-dark-muted' : 'text-gray-600'
-                      }`}>
+                      <div className="flex items-center text-sm text-neutral-600 dark:text-neutral-400">
                         <TrendingUp className="h-4 w-4 mr-2" />
                         {job.salary_range}
                       </div>
                     )}
                   </div>
 
-                  <Typography variant="body2" color="textSecondary" className="mb-4 line-clamp-3">
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4 line-clamp-3">
                     {job.description}
-                  </Typography>
+                  </p>
 
                   <div className="flex gap-2">
-                    <Button variant="contained" size="small" fullWidth>
+                    <Button variant="primary" size="sm" fullWidth>
                       Apply Now
                     </Button>
-                    <Button variant="outlined" size="small" fullWidth>
+                    <Button variant="outline" size="sm" fullWidth>
                       View Details
                     </Button>
                   </div>
