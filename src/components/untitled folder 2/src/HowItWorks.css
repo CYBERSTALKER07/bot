@@ -1,0 +1,165 @@
+.how-it-works {
+  background: linear-gradient(135deg, #FFFFFF 0%, #E3F2FD 100%);
+  padding: 100px 0;
+  position: relative;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.how-it-works h2 {
+  text-align: center;
+  font-size: 3rem;
+  font-weight: 600;
+  color: #1976D2;
+  margin-bottom: 64px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 32px;
+}
+
+.step {
+  background: #FFFFFF;
+  border-radius: 20px;
+  padding: 32px 24px;
+  box-shadow: 0 8px 32px rgba(25, 118, 210, 0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid #E0E0E0;
+  position: relative;
+  overflow: hidden;
+}
+
+.step:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 48px rgba(25, 118, 210, 0.25);
+  border-color: #1976D2;
+}
+
+.step-number {
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #1976D2 0%, #42A5F5 100%);
+  color: #FFFFFF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(25, 118, 210, 0.3);
+}
+
+.category-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 20px;
+}
+
+.category-internship {
+  background: rgba(25, 118, 210, 0.1);
+  color: #1976D2;
+}
+
+.category-job {
+  background: rgba(25, 118, 210, 0.1);
+  color: #1976D2;
+}
+
+.category-networking {
+  background: rgba(25, 118, 210, 0.1);
+  color: #1976D2;
+}
+
+.step h3 {
+  font-size: 1.5rem;
+  color: #212121;
+  margin-bottom: 16px;
+  font-weight: 600;
+  font-family: 'Roboto', sans-serif;
+}
+
+.step p {
+  color: #757575;
+  line-height: 1.6;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .how-it-works {
+    padding: 80px 0;
+  }
+
+  .container {
+    padding: 0 16px;
+  }
+
+  .how-it-works h2 {
+    font-size: 2.25rem;
+    margin-bottom: 48px;
+  }
+
+  .steps-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .step {
+    padding: 28px 20px;
+  }
+
+  .step-number {
+    width: 60px;
+    height: 60px;
+    font-size: 1.25rem;
+    top: -15px;
+    right: -15px;
+  }
+
+  .step h3 {
+    font-size: 1.25rem;
+  }
+
+  .step p {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .how-it-works h2 {
+    font-size: 1.875rem;
+  }
+
+  .step {
+    padding: 24px 16px;
+  }
+
+  .step h3 {
+    font-size: 1.125rem;
+  }
+
+  .step p {
+    font-size: 0.9rem;
+  }
+
+  .category-badge {
+    padding: 4px 12px;
+    font-size: 0.75rem;
+  }
+}
