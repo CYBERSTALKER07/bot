@@ -191,7 +191,7 @@ export default function Navigation() {
           <div className="flex justify-between items-center h-14 px-4">
             <Link to="/dashboard" className="flex items-center space-x-2">
               <GraduationCap className="h-6 w-6 text-brand-primary" />
-              <span className="font-semibold text-foreground">ASU</span>
+              <span className="font-semibold text-foreground">AUt</span>
             </Link>
 
             <div className="flex items-center space-x-3">
