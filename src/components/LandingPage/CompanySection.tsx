@@ -8,63 +8,55 @@ import { Briefcase } from 'lucide-react';
 const hiringAnnouncements = [
 	{
 		name: 'Google',
-		logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg',
 		color: '#4285F4',
 		announcement: '🔥 Hiring 500+ Software Engineers',
 		positions: 'AI/ML, Frontend, Backend',
-		// icon: <Rocket className="h-5 w-5" />
+		icon: <Briefcase className="h-5 w-5" />
 	},
 	{
 		name: 'Microsoft',
-		logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/microsoft/microsoft-original.svg',
 		color: '#00A4EF',
 		announcement: '⚡ 300+ Open Positions',
 		positions: 'Cloud, Security, DevOps',
-		// icon: <Zap className="h-5 w-5" />
+		icon: <Briefcase className="h-5 w-5" />
 	},
 	{
 		name: 'Apple',
-		logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/apple/apple-original.svg',
 		color: '#000000',
 		announcement: '🚀 iOS Team Expansion',
 		positions: 'Mobile, UI/UX, Hardware',
-		// icon: <TrendingUp className="h-5 w-5" />
+		icon: <Briefcase className="h-5 w-5" />
 	},
 	{
 		name: 'Amazon',
-		logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original-wordmark.svg',
 		color: '#FF9900',
 		announcement: '💼 AWS Division Growing',
 		positions: 'SysAdmin, Solutions Architect',
-		// icon: <Building2 className="h-5 w-5" />
+		icon: <Briefcase className="h-5 w-5" />
 	},
 	{
 		name: 'Meta',
-		logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg',
 		color: '#1877F2',
 		announcement: '🌟 Metaverse Opportunities',
 		positions: 'VR/AR, Backend, Research',
-		// icon: <Globe className="h-5 w-5" />
+		icon: <Briefcase className="h-5 w-5" />
 	},
 	{
 		name: 'Tesla',
-		logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1zbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDEuNUw4LjkgNC43NkM5LjYgNC4zNSAxMC40IDQuMDUgMTEuMzMgMy45MmMuNjctLjEzIDEuMzMtLjEzIDIgMGMuOTMuMTMgMS43My40MyAyLjQzLjg0bC0zLjEtMy4yNloiIGZpbGw9IiNDQzAwMDAiLz4KPHBhdGggZD0iTTEyIDIyLjVMMTUuMSAxOS4yNEMxNC40NSAxOS42NiAxMy42NSAxOS45NiAxMi42NyAyMC4wOGMtLjY3LjEzLTEuMzMuMTMtMiAwYy0uOTMtLjEzLTEuNzMtLjQzLTIuNDMtLjg0bDMuMSAzLjI2WiIgZmlsbD0iI0NDMDAwMCIvPgo8cGF0aCBkPSJNMTIgMjIuNUwxNS4xIDE5LjI0QzE0LjQ1IDE5LjY2IDEzLjY1IDE5Ljk2IDEyLjY3IDIwLjA4Yy0uNjcuMTMtMS4zMy4xMy0yIDBjLS45My0uMTMtMS43My0uNDMtMi40My04NGwzLjEgMy4yNloiIGZpbGw9IiNDQzAwMDAiLz4KPC9zdmc+',
 		color: '#CC0000',
 		announcement: '🔋 Energy Revolution',
 		positions: 'Embedded, Automotive, Energy',
-		// icon: <Award className="h-5 w-5" />
+		icon: <Briefcase className="h-5 w-5" />
 	},
 	{
 		name: 'Netflix',
-		logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1zbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTUuMzk4IDBoLS43OTZBMSAxIDAgMCAwIDQgMXYyMmExIDEgMCAwIDAgLjYwMi45MmwxMS4yIDIuOGMuMzA4LjA3Ny42MTgtLjEyNi42MjItLjQ0NEwyMCAzLjIzNmMwLS4zLS4yNDgtLjU0LS41NDgtLjQ5OGwtOC4wNSAxLjEwNkE1LjM5OCA1LjM5OCAwIDAgMCA1LjM5OCAwWiIgZmlsbD0iI0UyMDYxNCIvPgo8L3N2Zz4K',
 		color: '#E20614',
 		announcement: '🎬 Content & Tech Roles',
 		positions: 'Streaming, Data Science, ML',
-		// icon: <Users className="h-5 w-5" />
+		icon: <Briefcase className="h-5 w-5" />
 	},
 	{
 		name: 'Spotify',
-		logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spotify/spotify-original.svg',
 		color: '#1DB954',
 		announcement: '🎵 Music Tech Innovation',
 		positions: 'Audio Engineering, Backend',
@@ -73,67 +65,29 @@ const hiringAnnouncements = [
 ];
 
 interface CompanySectionProps {
-	companiesRef: React.RefObject<HTMLDivElement>;
+	companiesRef: React.RefObject<HTMLElement>;
 }
 
 export default function CompanySection({ companiesRef }: CompanySectionProps) {
 	const { isDark } = useTheme();
-	const headerRef = useRef<HTMLDivElement>(null);
 	const firstRowRef = useRef<HTMLDivElement>(null);
 	const secondRowRef = useRef<HTMLDivElement>(null);
-	const decorativeRef = useRef<HTMLDivElement>(null);
+	const headerRef = useRef<HTMLDivElement>(null);
 	const gradientRef = useRef<HTMLDivElement>(null);
 
-	// Header animation with dynamic scroll response
+	// Company logo scroll effect with enhanced reveal animation
 	useScrollTrigger(
-		headerRef,
-		(element, progress) => {
-			gsap.set(element, {
-				opacity: progress,
-				y: (1 - progress) * 60,
-				scale: 0.9 + progress * 0.1,
-				rotation: (1 - progress) * 3,
-				ease: 'none'
-			});
-		},
-		{
-			start: 'top 85%',
-			end: 'top 10%',
-			scrub: 1.5
-		}
-	);
-
-	// Decorative element parallax animation
-	useScrollTrigger(
-		decorativeRef,
-		(element, progress) => {
-			gsap.set(element, {
-				scaleX: 0.5 + progress * 0.5,
-				opacity: progress * 0.8,
-				skewX: (1 - progress) * 20,
-				ease: 'none'
-			});
-		},
-		{
-			start: 'top 90%',
-			end: 'top 20%',
-			scrub: 2
-		}
-	);
-
-	// First row cards with staggered scroll animations
-	useScrollTriggerStagger(
 		firstRowRef,
-		'.hiring-card',
-		(elements, progress) => {
-			elements.forEach((element, index) => {
-				const delay = index * 0.15;
+		(element, progress) => {
+			const logos = element.querySelectorAll('.hiring-card');
+			logos.forEach((logo, index) => {
+				const delay = index * 0.05;
 				const elementProgress = Math.max(0, Math.min(1, (progress - delay) / (1 - delay)));
 
-				gsap.set(element, {
+				gsap.set(logo, {
 					opacity: elementProgress,
-					scale: 0.6 + elementProgress * 0.4,
-					y: (1 - elementProgress) * 80,
+					scale: 0.7 + elementProgress * 0.3,
+					x: (1 - elementProgress) * (index % 2 === 0 ? 100 : -100),
 					rotation: (1 - elementProgress) * (index % 2 === 0 ? -15 : 15),
 					ease: 'none'
 				});
@@ -141,48 +95,47 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 				// Advanced glow effect on high progress
 				if (elementProgress > 0.7) {
 					const glowIntensity = (elementProgress - 0.7) / 0.3;
-					(element as HTMLElement).style.boxShadow = `0 0 ${glowIntensity * 40}px rgba(59, 130, 246, ${glowIntensity * 0.4})`;
+					(logo as HTMLElement).style.boxShadow = `0 0 ${glowIntensity * 40}px rgba(59, 130, 246, ${glowIntensity * 0.4})`;
 				}
 
-				// Logo rotation effect
-				const logo = element.querySelector('img') as HTMLElement;
-				if (logo) {
-					gsap.set(logo, {
-						rotation: elementProgress * 360,
-						scale: 1 + elementProgress * 0.2,
+				// Company name rotation effect
+				const nameEl = logo.querySelector('h3') as HTMLElement;
+				if (nameEl) {
+					gsap.set(nameEl, {
+						rotation: elementProgress * 10 - 5,
+						scale: 1 + elementProgress * 0.1,
 						ease: 'none'
 					});
 				}
 
 				// Badge bounce effect
-				const badge = element.querySelector('.hiring-badge') as HTMLElement;
-				if (badge && elementProgress > 0.5) {
-					const badgeProgress = (elementProgress - 0.5) / 0.5;
+				const badge = logo.querySelector('.hiring-badge') as HTMLElement;
+				if (badge) {
 					gsap.set(badge, {
-						scale: 1 + Math.sin(badgeProgress * Math.PI * 3) * 0.1,
-						rotation: Math.sin(badgeProgress * Math.PI * 2) * 5,
+						y: Math.sin(elementProgress * Math.PI * 4) * 5,
+						scale: 1 + Math.sin(elementProgress * Math.PI * 8) * 0.1,
 						ease: 'none'
 					});
 				}
 			});
 		},
 		{
-			start: 'top 70%',
-			end: 'bottom 90%',
-			scrub: 1.2
+			start: 'top 75%',
+			end: 'bottom 70%',
+			scrub: 1.5
 		}
 	);
 
-	// Second row cards with different animation pattern
-	useScrollTriggerStagger(
+	// Staggered text reveal effect for company names
+	useScrollTrigger(
 		secondRowRef,
-		'.hiring-card',
-		(elements, progress) => {
-			elements.forEach((element, index) => {
-				const delay = index * 0.12;
+		(element, progress) => {
+			const cards = element.querySelectorAll('.hiring-card');
+			cards.forEach((card, index) => {
+				const delay = index * 0.08;
 				const elementProgress = Math.max(0, Math.min(1, (progress - delay) / (1 - delay)));
 
-				gsap.set(element, {
+				gsap.set(card, {
 					opacity: elementProgress,
 					scale: 0.7 + elementProgress * 0.3,
 					x: (1 - elementProgress) * (index % 2 === 0 ? 100 : -100),
@@ -191,7 +144,7 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 				});
 
 				// Text reveal effect - using blue color consistently
-				const title = element.querySelector('h3') as HTMLElement;
+				const title = card.querySelector('h3') as HTMLElement;
 				if (title) {
 					gsap.set(title, {
 						backgroundPosition: `${elementProgress * 100}% 0%`,
@@ -245,7 +198,6 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 					duration: 25,
 					ease: 'none',
 					repeat: -1,
-					repeatDelay: 0
 				});
 			}
 		}
@@ -256,17 +208,14 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 		if (secondRowRef.current) {
 			const container = secondRowRef.current.querySelector('.carousel-container') as HTMLElement;
 			if (container) {
-				gsap.fromTo(
-					container,
-					{ x: '-50%' },
-					{
-						x: '0%',
-						duration: 25,
-						ease: 'none',
-						repeat: -1,
-						repeatDelay: 0
-					}
-				);
+				gsap.fromTo(container, {
+					x: '-50%'
+				}, {
+					x: '0%',
+					duration: 30,
+					ease: 'none',
+					repeat: -1,
+				});
 			}
 		}
 	}, []);
@@ -274,18 +223,14 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 	return (
 		<section
 			ref={companiesRef}
-			className={`py-20 overflow-hidden relative transition-colors duration-300`}
+			className={`relative py-32 overflow-hidden transition-colors duration-500 ${
+				isDark ? 'bg-dark-surface' : 'bg-white'
+			}`}
 		>
-			{/* Animated Background */}
+			{/* Animated Background Gradient */}
 			<div
 				ref={gradientRef}
-				className="absolute inset-0 -z-10"
-			/>
-
-			{/* Decorative elements with scroll animations */}
-			<div
-				ref={decorativeRef}
-				className={`absolute top-0 left-0 w-full h-2 transform -skew-x-12 ${
+				className={`absolute left-0 top-0 w-full h-2 transform -skew-x-12 ${
 					isDark
 						? 'bg-gradient-to-r from-transparent via-lime/30 to-transparent'
 						: 'bg-gradient-to-r from-transparent via-asu-maroon/30 to-transparent'
@@ -328,11 +273,10 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 							<div className="flex items-start space-x-4">
 								<div className="flex-shrink-0">
 									<div className="relative">
-										<img
-											src={company.logo}
-											alt={company.name}
-											className="w-16 h-16 object-contain filter drop-shadow-md group-hover:scale-110 transition-transform duration-300"
-										/>
+										<div className={`w-16 h-16 rounded-xl flex items-center justify-center text-white text-2xl font-bold shadow-lg group-hover:scale-110 transition-transform duration-300`}
+											style={{ backgroundColor: company.color }}>
+											{company.name.charAt(0)}
+										</div>
 										<div className="absolute -top-2 -right-2 text-blue-500 group-hover:scale-125 transition-transform duration-300">
 											{company.icon}
 										</div>
@@ -373,11 +317,10 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 							<div className="flex items-start space-x-4">
 								<div className="flex-shrink-0">
 									<div className="relative">
-										<img
-											src={company.logo}
-											alt={company.name}
-											className="w-16 h-16 object-contain filter drop-shadow-md group-hover:scale-110 transition-transform duration-300"
-										/>
+										<div className={`w-16 h-16 rounded-xl flex items-center justify-center text-white text-2xl font-bold shadow-lg group-hover:scale-110 transition-transform duration-300`}
+											style={{ backgroundColor: company.color }}>
+											{company.name.charAt(0)}
+										</div>
 										<div className="absolute -top-2 -right-2 text-blue-500 group-hover:scale-125 transition-transform duration-300">
 											{company.icon}
 										</div>

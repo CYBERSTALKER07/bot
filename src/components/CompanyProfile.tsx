@@ -31,7 +31,6 @@ import {
 } from '@mui/icons-material';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
-import { supabase } from '../lib/supabase';
 import Typography from './ui/Typography';
 import Button from './ui/Button';
 import { Card } from './ui/Card';
@@ -39,12 +38,83 @@ import Avatar from './ui/Avatar';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-gsap.registerPlugin(ScrollTrigger);
+interface CompanyBenefit {
+  id: string;
+  category: string;
+  title: string;
+  description: string;
+  icon: string;
+}
+
+interface CompanyValue {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+}
+
+interface CompanyOffice {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  country: string;
+  is_headquarters: boolean;
+  employee_count: number;
+  image_url?: string;
+}
+
+interface CompanyStats {
+  total_employees: number;
+  avg_tenure: string;
+  employee_satisfaction: number;
+  glassdoor_rating: number;
+  total_jobs_posted: number;
+  successful_hires: number;
+}
+
+interface Job {
+  id: string;
+  title: string;
+  department: string;
+  location: string;
+  type: string;
+  posted_date: string;
+  application_count: number;
+}
+
+interface EmployeeTestimonial {
+  id: string;
+  employee_name: string;
+  employee_title: string;
+  employee_avatar?: string;
+  content: string;
+  rating: number;
+  tenure: string;
+  department: string;
+}
+
+interface DiversityData {
+  gender_ratio: {
+    male: number;
+    female: number;
+    other: number;
+  };
+  ethnic_diversity: number;
+  leadership_diversity: number;
+}
+
+interface SustainabilityInitiative {
+  id: string;
+  title: string;
+  description: string;
+  category: 'environmental' | 'social' | 'governance';
+  impact_metric?: string;
+}
 
 interface Company {
   id: string;
   name: string;
-  logo_url?: string;
   cover_image_url?: string;
   description: string;
   mission_statement?: string;
@@ -72,76 +142,7 @@ interface Company {
   sustainability_initiatives?: SustainabilityInitiative[];
 }
 
-interface CompanyBenefit {
-  id: string;
-  category: 'health' | 'financial' | 'time-off' | 'learning' | 'perks' | 'family';
-  title: string;
-  description: string;
-  icon: string;
-}
-
-interface CompanyValue {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-}
-
-interface CompanyOffice {
-  id: string;
-  name: string;
-  address: string;
-  city: string;
-  country: string;
-  is_headquarters: boolean;
-  employee_count?: number;
-  image_url?: string;
-}
-
-interface CompanyStats {
-  total_employees: number;
-  avg_tenure: string;
-  employee_satisfaction: number;
-  glassdoor_rating?: number;
-  total_jobs_posted: number;
-  successful_hires: number;
-}
-
-interface Job {
-  id: string;
-  title: string;
-  department: string;
-  location: string;
-  type: 'full-time' | 'part-time' | 'contract' | 'internship';
-  posted_date: string;
-  application_count: number;
-}
-
-interface EmployeeTestimonial {
-  id: string;
-  employee_name: string;
-  employee_title: string;
-  employee_avatar?: string;
-  content: string;
-  rating: number;
-  tenure: string;
-  department: string;
-}
-
-interface DiversityData {
-  gender_diversity: { male: number; female: number; other: number };
-  age_diversity: { under_25: number; age_25_34: number; age_35_44: number; over_45: number };
-  ethnicity_diversity: Record<string, number>;
-  leadership_diversity: number;
-}
-
-interface SustainabilityInitiative {
-  id: string;
-  title: string;
-  description: string;
-  category: 'environmental' | 'social' | 'governance';
-  impact_metric?: string;
-}
+gsap.registerPlugin(ScrollTrigger);
 
 export default function CompanyProfile() {
   const { companyId } = useParams<{ companyId: string }>();
@@ -245,7 +246,6 @@ export default function CompanyProfile() {
       const mockCompany: Company = {
         id: companyId!,
         name: 'Google',
-        logo_url: 'https://logo.clearbit.com/google.com',
         cover_image_url: 'https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=1200&h=400&fit=crop',
         description: 'Google LLC is an American multinational technology company that specializes in Internet-related services and products, which include online advertising technologies, a search engine, cloud computing, software, and hardware.',
         mission_statement: 'To organize the world\'s information and make it universally accessible and useful.',
@@ -527,13 +527,11 @@ export default function CompanyProfile() {
             <div className="flex items-end justify-between">
               <div className="flex items-end space-x-6">
                 <div className="relative">
-                  <Avatar
-                    src={company.logo_url}
-                    alt={company.name}
-                    size="xl"
-                    className="ring-4 ring-white shadow-2xl bg-white"
-                    fallback={company.name[0]}
-                  />
+                  <div className={`w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-bold shadow-2xl ${
+                    isDark ? 'bg-lime text-dark-surface' : 'bg-asu-maroon text-white'
+                  }`}>
+                    {company.name.charAt(0)}
+                  </div>
                   {company.is_verified && (
                     <div className={`absolute -bottom-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center ${
                       isDark ? 'bg-lime' : 'bg-asu-maroon'

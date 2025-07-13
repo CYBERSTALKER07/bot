@@ -109,79 +109,83 @@ export default function WhosHiringPage() {
   const categories = [
     {
       name: 'Technology',
-      count: 1250,
+      count: 1200,
       companies: [
-        { name: 'Amazon', logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original.svg' },
-        { name: 'Tesla', logo: 'https://images.unsplash.com/photo-1560472354-a40ab98e3025?w=100&h=100&fit=crop' },
-        { name: 'Meta', logo: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=100&h=100&fit=crop' },
-        { name: 'Elastic', logo: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=100&h=100&fit=crop' }
+        { name: 'Google' },
+        { name: 'Microsoft' },
+        { name: 'Apple' },
+        { name: 'Amazon' }
+      ]
+    },
+    {
+      name: 'Consulting',
+      count: 950,
+      companies: [
+        { name: 'McKinsey & Company' },
+        { name: 'Boston Consulting Group' },
+        { name: 'Bain & Company' },
+        { name: 'Deloitte' }
+      ]
+    },
+    {
+      name: 'Engineering',
+      count: 800,
+      companies: [
+        { name: 'Tesla' },
+        { name: 'SpaceX' },
+        { name: 'Boeing' },
+        { name: 'Lockheed Martin' }
+      ]
+    },
+    {
+      name: 'Data Science',
+      count: 750,
+      companies: [
+        { name: 'Netflix' },
+        { name: 'Spotify' },
+        { name: 'Airbnb' },
+        { name: 'Elastic' }
       ]
     },
     {
       name: 'Media',
       count: 450,
       companies: [
-        { name: 'New York Times', logo: 'https://images.unsplash.com/photo-1586776739023-69a6e17e8056?w=100&h=100&fit=crop' },
-        { name: 'Bloomberg', logo: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=100&h=100&fit=crop' },
-        { name: 'Verizon', logo: 'https://images.unsplash.com/photo-1599305445411-b615a88b7a5d?w=100&h=100&fit=crop' },
-        { name: 'Hearst', logo: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=100&h=100&fit=crop' }
+        { name: 'New York Times' },
+        { name: 'Bloomberg' },
+        { name: 'Verizon' },
+        { name: 'Hearst' }
       ]
     },
     {
       name: 'Finance',
       count: 850,
       companies: [
-        { name: 'Ernst & Young', logo: 'https://images.unsplash.com/photo-1560472354-a40ab98e3025?w=100&h=100&fit=crop' },
-        { name: 'Bank of America', logo: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=100&h=100&fit=crop' },
-        { name: 'Deutsche Bank', logo: 'https://images.unsplash.com/photo-1586880244406-556ebe35f282?w=100&h=100&fit=crop' },
-        { name: 'UBS', logo: 'https://images.unsplash.com/photo-1611339555312-e607c8352fd7?w=100&h=100&fit=crop' }
+        { name: 'Ernst & Young' },
+        { name: 'Bank of America' },
+        { name: 'Deutsche Bank' },
+        { name: 'UBS' }
       ]
     },
     {
       name: 'Healthcare',
       count: 650,
       companies: [
-        { name: 'Johnson & Johnson', logo: 'https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=100&h=100&fit=crop' },
-        { name: 'Pfizer', logo: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=100&h=100&fit=crop' },
-        { name: 'Boston Scientific', logo: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=100&h=100&fit=crop' },
-        { name: 'Genentech', logo: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=100&h=100&fit=crop' }
-      ]
-    },
-    {
-      name: 'Education',
-      count: 380,
-      companies: [
-        { name: 'Duolingo', logo: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=100&h=100&fit=crop' },
-        { name: 'Urban Teachers', logo: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=100&h=100&fit=crop' },
-        { name: 'City Year', logo: 'https://images.unsplash.com/photo-1523580846011-d3982bcd500e?w=100&h=100&fit=crop' },
-        { name: 'KIPP', logo: 'https://images.unsplash.com/photo-1497486751825-1233686d5d80?w=100&h=100&fit=crop' }
-      ]
-    },
-    {
-      name: 'Government',
-      count: 280,
-      companies: [
-        { name: 'House of Representatives', logo: 'https://images.unsplash.com/photo-1508796079212-a4b83cbf734d?w=100&h=100&fit=crop' },
-        { name: 'CDC', logo: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=100&h=100&fit=crop' },
-        { name: 'US Dept of State', logo: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=100&h=100&fit=crop' },
-        { name: 'FDA', logo: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=100&h=100&fit=crop' }
+        { name: 'Johnson & Johnson' },
+        { name: 'Pfizer' },
+        { name: 'Boston Scientific' },
+        { name: 'FDA' }
       ]
     }
   ];
 
   const topEmployers = [
-    { name: 'Under Armour', logo: 'https://images.unsplash.com/photo-1556906781-9a412961c28c?w=100&h=100&fit=crop', jobs: 45, locations: ['Baltimore', 'New York', 'Austin'] },
-    { name: 'Google', logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg', jobs: 120, locations: ['San Francisco', 'New York', 'Austin'] },
-    { name: 'Microsoft', logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/microsoft/microsoft-original.svg', jobs: 85, locations: ['Seattle', 'New York', 'Austin'] },
-    { name: 'Apple', logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/apple/apple-original.svg', jobs: 95, locations: ['Cupertino', 'Austin', 'New York'] },
-    { name: 'Amazon', logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original.svg', jobs: 200, locations: ['Seattle', 'New York', 'Austin'] },
-    { name: 'Meta', logo: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=100&h=100&fit=crop', jobs: 75, locations: ['Menlo Park', 'New York', 'Austin'] },
-    { name: 'Tesla', logo: 'https://images.unsplash.com/photo-1560472354-a40ab98e3025?w=100&h=100&fit=crop', jobs: 60, locations: ['Palo Alto', 'Austin', 'Berlin'] },
-    { name: 'Netflix', logo: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=100&h=100&fit=crop', jobs: 40, locations: ['Los Gatos', 'Los Angeles', 'New York'] },
-    { name: 'Spotify', logo: 'https://images.unsplash.com/photo-1611339555312-e607c8352fd7?w=100&h=100&fit=crop', jobs: 35, locations: ['New York', 'Boston', 'Stockholm'] },
-    { name: 'Airbnb', logo: 'https://images.unsplash.com/photo-1586880244406-556ebe35f282?w=100&h=100&fit=crop', jobs: 50, locations: ['San Francisco', 'New York', 'Austin'] },
-    { name: 'Uber', logo: 'https://images.unsplash.com/photo-1599305445411-b615a88b7a5d?w=100&h=100&fit=crop', jobs: 65, locations: ['San Francisco', 'New York', 'Chicago'] },
-    { name: 'Stripe', logo: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=100&h=100&fit=crop', jobs: 55, locations: ['San Francisco', 'New York', 'Dublin'] }
+    { name: 'Under Armour', jobs: 45, locations: ['Baltimore', 'New York', 'Austin'] },
+    { name: 'Google', jobs: 120, locations: ['San Francisco', 'New York', 'Austin'] },
+    { name: 'Microsoft', jobs: 85, locations: ['Seattle', 'New York', 'Austin'] },
+    { name: 'Apple', jobs: 92, locations: ['Cupertino', 'Austin', 'New York'] },
+    { name: 'Amazon', jobs: 156, locations: ['Seattle', 'Austin', 'New York'] },
+    { name: 'Meta', jobs: 78, locations: ['Menlo Park', 'Austin', 'New York'] }
   ];
 
   const cities = [
@@ -316,11 +320,11 @@ export default function WhosHiringPage() {
                     {category.companies.map((company, idx) => (
                       <div key={idx} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
                         <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
-                          <img 
+                          {/* <img 
                             src={company.logo} 
                             alt={company.name}
                             className="w-6 h-6 object-contain"
-                          />
+                          /> */}
                         </div>
                         <span className="text-sm font-medium text-gray-700 truncate">{company.name}</span>
                       </div>
@@ -360,11 +364,11 @@ export default function WhosHiringPage() {
                 <div className="p-6">
                   <div className="flex items-center space-x-4 mb-4">
                     <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center group-hover:bg-gray-100 transition-colors">
-                      <img 
+                      {/* <img 
                         src={employer.logo} 
                         alt={employer.name}
                         className="w-10 h-10 object-contain"
-                      />
+                      /> */}
                     </div>
                     <div className="flex-1">
                       <h3 className="text-xl font-bold text-gray-900">{employer.name}</h3>

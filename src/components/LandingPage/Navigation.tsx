@@ -21,13 +21,10 @@ export default function Navigation({ onScrollToSection }: NavigationProps) {
         <div className="flex justify-between items-center h-16">
           {/* Left side - Logo */}
           <Link to="/" className="flex items-center space-x-3">
-            <School className={`h-8 w-8 ${
-              isDark ? 'text-lime' : 'text-asu-maroon'
-            }`} />
-            <span className={`font-bold text-xl ${
-              isDark ? 'text-dark-text' : 'text-gray-900'
+            <span className={`font-bold text-xl -skew-x-12 ${
+              isDark ? 'text-lime' : 'text-primary'
             }`}>
-            AUT Handshake
+            AUTHandshake
             </span>
           </Link>
 

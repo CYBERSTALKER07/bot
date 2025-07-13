@@ -31,8 +31,6 @@ import { mockCompanies, mockIndustries, mockLocations, mockCompanySizes } from '
 interface CompanyListing {
   id: string;
   name: string;
-  logo_url?: string;
-  cover_image_url?: string;
   industry: string;
   location: string;
   company_size: string;
@@ -66,9 +64,8 @@ export default function CompaniesPage() {
   const [selectedIndustry, setSelectedIndustry] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
-  const [sortBy, setSortBy] = useState<'name' | 'rating' | 'positions' | 'employees'>('name');
+  const [sortBy, setSortBy] = useState('name');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [showFilters, setShowFilters] = useState(false);
   const [followingCompanies, setFollowingCompanies] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -78,30 +75,9 @@ export default function CompaniesPage() {
   const fetchCompanies = async () => {
     try {
       setLoading(true);
-      
-      // Convert mock data to match interface
-      const companiesData: CompanyListing[] = mockCompanies.map(company => ({
-        id: company.id,
-        name: company.name,
-        logo_url: company.logo_url,
-        cover_image_url: company.cover_image_url,
-        industry: company.industry,
-        location: company.location,
-        company_size: company.company_size,
-        description: company.description,
-        rating: company.rating,
-        reviews_count: company.reviews_count,
-        is_verified: company.is_verified,
-        is_hiring: company.is_hiring,
-        is_following: company.is_following,
-        featured_benefits: company.featured_benefits,
-        employee_count: company.employee_count,
-        founded_year: company.founded_year,
-        growth_rate: company.growth_rate,
-        recent_jobs: company.recent_jobs
-      }));
-
-      setCompanies(companiesData);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setCompanies(mockCompanies);
     } catch (error) {
       console.error('Error fetching companies:', error);
     } finally {
@@ -109,23 +85,16 @@ export default function CompaniesPage() {
     }
   };
 
-  const handleFollowCompany = async (companyId: string) => {
-    if (!user) return;
-    
-    const newFollowingState = new Set(followingCompanies);
-    if (newFollowingState.has(companyId)) {
-      newFollowingState.delete(companyId);
-    } else {
-      newFollowingState.add(companyId);
-    }
-    setFollowingCompanies(newFollowingState);
-
-    // In a real app, this would update the database
-    try {
-      // await supabase.from('company_followers').upsert([...])
-    } catch (error) {
-      console.error('Error following company:', error);
-    }
+  const handleFollowCompany = (companyId: string) => {
+    setFollowingCompanies(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(companyId)) {
+        newSet.delete(companyId);
+      } else {
+        newSet.add(companyId);
+      }
+      return newSet;
+    });
   };
 
   const filteredAndSortedCompanies = companies
@@ -140,24 +109,22 @@ export default function CompaniesPage() {
     })
     .sort((a, b) => {
       switch (sortBy) {
+        case 'name':
+          return a.name.localeCompare(b.name);
         case 'rating':
           return b.rating - a.rating;
         case 'positions':
           return b.recent_jobs.length - a.recent_jobs.length;
-        case 'employees':
+        case 'size':
           return b.employee_count - a.employee_count;
         default:
-          return a.name.localeCompare(b.name);
+          return 0;
       }
     });
 
   const getTotalOpenPositions = (company: CompanyListing) => {
-    return company.recent_jobs.reduce((sum, job) => sum + job.application_count, 0);
+    return company.recent_jobs.length;
   };
-
-  const industries = [...new Set(companies.map(c => c.industry))];
-  const locations = [...new Set(companies.map(c => c.location.split(',')[1]?.trim() || c.location))];
-  const sizes = [...new Set(companies.map(c => c.company_size))];
 
   if (loading) {
     return (
@@ -204,9 +171,9 @@ export default function CompaniesPage() {
             </Card>
             <Card className="p-4 text-center" elevation={1}>
               <div className={`text-2xl font-bold ${isDark ? 'text-lime' : 'text-asu-maroon'}`}>
-                {industries.length}
+                {Math.round(companies.reduce((sum, c) => sum + c.rating, 0) / companies.length * 10) / 10}
               </div>
-              <Typography variant="body2" color="textSecondary">Industries</Typography>
+              <Typography variant="body2" color="textSecondary">Avg Rating</Typography>
             </Card>
             <Card className="p-4 text-center" elevation={1}>
               <div className={`text-2xl font-bold ${isDark ? 'text-lime' : 'text-asu-maroon'}`}>
@@ -215,107 +182,90 @@ export default function CompaniesPage() {
               <Typography variant="body2" color="textSecondary">Actively Hiring</Typography>
             </Card>
           </div>
-        </div>
 
-        {/* Search and Filters */}
-        <Card className="p-6 mb-8" elevation={1}>
-          <div className="space-y-4">
-            {/* Search Bar */}
-            <div className="flex items-center space-x-4">
-              <div className="flex-1">
+          {/* Search and Filters */}
+          <Card className="p-6 mb-6" elevation={1}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+              <div className="lg:col-span-2">
                 <Input
-                  placeholder="Search companies by name or description..."
+                  placeholder="Search companies..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   startIcon={<Search />}
-                  variant="outlined"
                   fullWidth
                 />
               </div>
-              <Button
-                variant="outlined"
-                onClick={() => setShowFilters(!showFilters)}
-                startIcon={<FilterList />}
-              >
-                Filters
-              </Button>
+              <Select
+                value={selectedIndustry}
+                onChange={(e) => setSelectedIndustry(e.target.value)}
+                options={[
+                  { value: '', label: 'All Industries' },
+                  ...mockIndustries.map(industry => ({ value: industry, label: industry }))
+                ]}
+                placeholder="Industry"
+              />
+              <Select
+                value={selectedLocation}
+                onChange={(e) => setSelectedLocation(e.target.value)}
+                options={[
+                  { value: '', label: 'All Locations' },
+                  ...mockLocations.map(location => ({ value: location, label: location }))
+                ]}
+                placeholder="Location"
+              />
+              <Select
+                value={selectedSize}
+                onChange={(e) => setSelectedSize(e.target.value)}
+                options={[
+                  { value: '', label: 'All Sizes' },
+                  ...mockCompanySizes.map(size => ({ value: size, label: size }))
+                ]}
+                placeholder="Company Size"
+              />
+            </div>
+          </Card>
+
+          {/* View Controls */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <Button
                   variant={viewMode === 'grid' ? 'contained' : 'outlined'}
                   size="small"
                   onClick={() => setViewMode('grid')}
-                  className="min-w-0 p-2"
+                  startIcon={<ViewModule />}
                 >
-                  <ViewModule />
+                  Grid
                 </Button>
                 <Button
                   variant={viewMode === 'list' ? 'contained' : 'outlined'}
                   size="small"
                   onClick={() => setViewMode('list')}
-                  className="min-w-0 p-2"
+                  startIcon={<ViewList />}
                 >
-                  <ViewList />
+                  List
                 </Button>
               </div>
+              <Select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                options={[
+                  { value: 'name', label: 'Name' },
+                  { value: 'rating', label: 'Rating' },
+                  { value: 'positions', label: 'Open Positions' },
+                  { value: 'size', label: 'Company Size' }
+                ]}
+                size="small"
+                startIcon={<Sort />}
+              />
             </div>
-
-            {/* Filters */}
-            {showFilters && (
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
-                <Select
-                  label="Industry"
-                  value={selectedIndustry}
-                  onChange={(e) => setSelectedIndustry(e.target.value)}
-                  options={[
-                    { value: '', label: 'All Industries' },
-                    ...industries.map(industry => ({ value: industry, label: industry }))
-                  ]}
-                />
-                <Select
-                  label="Location"
-                  value={selectedLocation}
-                  onChange={(e) => setSelectedLocation(e.target.value)}
-                  options={[
-                    { value: '', label: 'All Locations' },
-                    ...locations.map(location => ({ value: location, label: location }))
-                  ]}
-                />
-                <Select
-                  label="Company Size"
-                  value={selectedSize}
-                  onChange={(e) => setSelectedSize(e.target.value)}
-                  options={[
-                    { value: '', label: 'All Sizes' },
-                    ...sizes.map(size => ({ value: size, label: size }))
-                  ]}
-                />
-                <Select
-                  label="Sort By"
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
-                  options={[
-                    { value: 'name', label: 'Company Name' },
-                    { value: 'rating', label: 'Rating' },
-                    { value: 'positions', label: 'Open Positions' },
-                    { value: 'employees', label: 'Company Size' }
-                  ]}
-                />
-              </div>
-            )}
-          </div>
-        </Card>
-
-        {/* Results Count */}
-        <div className="flex items-center justify-between mb-6">
-          <Typography variant="body1" color="textSecondary">
-            {filteredAndSortedCompanies.length} companies found
-          </Typography>
-          <div className="flex items-center space-x-2">
-            <Sort className="h-4 w-4 text-gray-400" />
-            <Typography variant="body2" color="textSecondary">
-              Sorted by {sortBy === 'name' ? 'Name' : sortBy === 'rating' ? 'Rating' : 
-                        sortBy === 'positions' ? 'Open Positions' : 'Company Size'}
-            </Typography>
+            <div className="flex items-center space-x-2 text-sm">
+              <Sort className="h-4 w-4 text-gray-400" />
+              <Typography variant="body2" color="textSecondary">
+                Sorted by {sortBy === 'name' ? 'Name' : sortBy === 'rating' ? 'Rating' : 
+                          sortBy === 'positions' ? 'Open Positions' : 'Company Size'}
+              </Typography>
+            </div>
           </div>
         </div>
 
@@ -327,7 +277,7 @@ export default function CompaniesPage() {
                 {/* Cover Image */}
                 <div className="relative h-32 overflow-hidden">
                   <img
-                    src={company.cover_image_url}
+                    src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=150&fit=crop"
                     alt={`${company.name} office`}
                     className="w-full h-full object-cover"
                   />
@@ -346,13 +296,11 @@ export default function CompaniesPage() {
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center space-x-3">
                       <div className="relative">
-                        <Avatar
-                          src={company.logo_url}
-                          alt={company.name}
-                          size="md"
-                          className="bg-white shadow-lg"
-                          fallback={company.name[0]}
-                        />
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold shadow-lg ${
+                          isDark ? 'bg-lime text-dark-surface' : 'bg-asu-maroon text-white'
+                        }`}>
+                          {company.name.charAt(0)}
+                        </div>
                         {company.is_verified && (
                           <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center ${
                             isDark ? 'bg-lime' : 'bg-asu-maroon'
@@ -442,13 +390,11 @@ export default function CompaniesPage() {
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-4 flex-1">
                     <div className="relative">
-                      <Avatar
-                        src={company.logo_url}
-                        alt={company.name}
-                        size="lg"
-                        className="bg-white shadow-lg"
-                        fallback={company.name[0]}
-                      />
+                      <div className={`w-16 h-16 rounded-xl flex items-center justify-center text-xl font-bold shadow-lg ${
+                        isDark ? 'bg-lime text-dark-surface' : 'bg-asu-maroon text-white'
+                      }`}>
+                        {company.name.charAt(0)}
+                      </div>
                       {company.is_verified && (
                         <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center ${
                           isDark ? 'bg-lime' : 'bg-asu-maroon'

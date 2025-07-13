@@ -46,8 +46,7 @@ import {
   MapPin,
   GraduationCap,
   Trophy,
-  Handshake,
-  Sparkles
+  Handshake
 } from 'lucide-react';
 
 // Material Design UI Components
@@ -469,11 +468,10 @@ export default function ForEmployersPage() {
               <div className={`inline-flex items-center px-4 py-2 rounded-full mb-6 ${
                 isDark ? 'bg-lime/10 border border-lime/20' : 'bg-asu-maroon/10 border border-asu-maroon/20'
               }`}>
-                <Sparkles className={`h-4 w-4 mr-2 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
                 <Typography variant="caption" className={`font-medium ${
                   isDark ? 'text-lime' : 'text-asu-maroon'
                 }`}>
-                  #1 University Talent Platform in Uzbekistan
+                  Top University Talent Platform in Uzbekistan
                 </Typography>
               </div>
 
@@ -817,21 +815,9 @@ export default function ForEmployersPage() {
             {pricingPlans.map((plan, index) => (
               <Card 
                 key={index} 
-                className={`relative p-8 ${plan.popular ? 'ring-2 ring-opacity-50 scale-105' : ''} ${
-                  plan.popular 
-                    ? isDark ? 'ring-lime' : 'ring-asu-maroon'
-                    : ''
-                }`}
+                className={`relative p-8 ${plan.popular ? 'scale-105' : ''}`}
                 elevation={plan.popular ? 4 : 2}
               >
-                {plan.popular && (
-                  <div className={`absolute -top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-full text-sm font-bold text-white ${
-                    isDark ? 'bg-lime' : 'bg-asu-maroon'
-                  }`}>
-                    Most Popular
-                  </div>
-                )}
-                
                 <div className="text-center mb-8">
                   <Typography variant="h5" className={`font-bold mb-2 ${
                     isDark ? 'text-dark-text' : 'text-gray-900'
@@ -907,32 +893,25 @@ export default function ForEmployersPage() {
                 elevation={2}
               >
                 <div className="p-8">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center">
-                      <div className="w-16 h-16 rounded-2xl overflow-hidden mr-4 shadow-md">
-                        <img 
-                          src={study.logo} 
-                          alt={study.company}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div>
-                        <Typography variant="h6" className={`font-bold ${
-                          isDark ? 'text-dark-text' : 'text-gray-900'
-                        }`}>
-                          {study.company}
-                        </Typography>
-                        <Typography variant="caption" className={`${
-                          isDark ? 'text-dark-muted' : 'text-gray-600'
-                        }`}>
-                          {study.industry}
-                        </Typography>
-                      </div>
+                  <div className="flex items-center mb-6">
+                    <div className="w-16 h-16 rounded-2xl overflow-hidden mr-4 shadow-md">
+                      <img 
+                        src={study.logo} 
+                        alt={study.company}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                    <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      isDark ? 'bg-lime/10 text-lime' : 'bg-asu-maroon/10 text-asu-maroon'
-                    }`}>
-                      {study.results}
+                    <div>
+                      <Typography variant="h6" className={`font-bold ${
+                        isDark ? 'text-dark-text' : 'text-gray-900'
+                      }`}>
+                        {study.company}
+                      </Typography>
+                      <Typography variant="caption" className={`${
+                        isDark ? 'text-dark-muted' : 'text-gray-600'
+                      }`}>
+                        {study.industry}
+                      </Typography>
                     </div>
                   </div>
                   
@@ -942,10 +921,16 @@ export default function ForEmployersPage() {
                     {study.title}
                   </Typography>
                   
-                  <Typography variant="body1" className={`leading-relaxed mb-6 ${
+                  <Typography variant="body1" className={`leading-relaxed mb-4 ${
                     isDark ? 'text-dark-muted' : 'text-gray-600'
                   }`}>
                     {study.description}
+                  </Typography>
+
+                  <Typography variant="body2" className={`font-medium mb-6 ${
+                    isDark ? 'text-lime' : 'text-asu-maroon'
+                  }`}>
+                    Result: {study.results}
                   </Typography>
                   
                   <div className="flex items-center">
