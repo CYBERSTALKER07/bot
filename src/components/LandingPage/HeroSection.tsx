@@ -227,7 +227,11 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
                 variant="contained"
                 color="primary"
                 size="large"
-                className="shadow-lg hover:shadow-xl transition-shadow duration-200"
+                className={`shadow-lg rounded-3xl hover:shadow-xl transition-shadow duration-200
+                ${isDark 
+                  ? 'bg-lime text-dark-bg hover:bg-lime/90' 
+                  : 'bg-asu-gold hover:bg-yellow-400'
+                }`}
                 startIcon={<RocketLaunch />}
                 endIcon={<ArrowForward />}
               >
@@ -239,7 +243,7 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
                 variant="outlined"
                 color="primary"
                 size="large"
-                className={`shadow-lg hover:shadow-xl transition-shadow duration-200 border-2 ${
+                className={`shadow-lg rounded-3xl hover:shadow-xl transition-shadow duration-200 border-2 ${
                   isDark 
                     ? 'border-lime text-lime hover:bg-lime/10' 
                     : 'border-white text-white hover:bg-white/10'
