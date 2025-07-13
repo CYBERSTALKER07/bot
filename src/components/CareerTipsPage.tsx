@@ -665,9 +665,9 @@ export default function CareerTipsPage() {
                       className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
                     >
                       <option value="all">Any Read Time</option>
-                      <option value="quick">Quick Read (< 5 min)</option>
-                      <option value="medium">Medium Read (5-15 min)</option>
-                      <option value="long">Long Read (> 15 min)</option>
+                      {/* <option value="quick">Quick Read (&lt; 5 min)</option> */}
+                      {/* <option value="medium">Medium Read (5-15 min)</option> */}
+                      <option value="long">Long Read </option>
                     </select>
                     <button className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                       Clear Filters
