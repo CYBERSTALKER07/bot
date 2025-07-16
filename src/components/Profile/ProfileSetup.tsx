@@ -14,7 +14,7 @@ interface ProfileData {
   full_name: string;
   bio: string;
   phone: string;
-  location: string;
+  location: string; 
   
   // Student fields
   major?: string;

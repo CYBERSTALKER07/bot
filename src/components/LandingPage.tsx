@@ -14,10 +14,14 @@ import {
 import Navigation from './LandingPage/Navigation';
 import HeroSection from './LandingPage/HeroSection';
 import CompanySection from './LandingPage/CompanySection';
+import CompanyLogosFlowSection from './LandingPage/CompanyLogosFlowSection';
 import StatsSection from './LandingPage/StatsSection';
 import FeaturesSection from './LandingPage/FeaturesSection';
 import HowItWorksSection from './LandingPage/HowItWorksSection';
 import CareerPathSection from './LandingPage/CareerPathSection';
+import IndustrySpotlightSection from './LandingPage/IndustrySpotlightSection';
+import AlumniNetworkSection from './LandingPage/AlumniNetworkSection';
+import ResourceHubSection from './LandingPage/ResourceHubSection';
 import TestimonialsSection from './LandingPage/TestimonialsSection';
 import DemoSection from './LandingPage/DemoSection';
 import CTASection from './LandingPage/CTASection';
@@ -34,9 +38,13 @@ export default function LandingPage() {
   // Create refs for all sections with correct names
   const heroRef = useRef<HTMLDivElement>(null);
   const companiesRef = useRef<HTMLDivElement>(null);
+  const companyLogosRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
   const howItWorksRef = useRef<HTMLDivElement>(null);
+  const industryRef = useRef<HTMLDivElement>(null);
+  const alumniRef = useRef<HTMLDivElement>(null);
+  const resourcesRef = useRef<HTMLDivElement>(null);
   const testimonialsRef = useRef<HTMLDivElement>(null);
   const demoRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
@@ -45,9 +53,13 @@ export default function LandingPage() {
     const refs = {
       hero: heroRef,
       companies: companiesRef,
+      companyLogos: companyLogosRef,
       stats: statsRef,
       features: featuresRef,
       howItWorks: howItWorksRef,
+      industry: industryRef,
+      alumni: alumniRef,
+      resources: resourcesRef,
       testimonials: testimonialsRef,
       demo: demoRef,
       cta: ctaRef
@@ -88,6 +100,9 @@ export default function LandingPage() {
       {/* Company Section */}
       <CompanySection companiesRef={companiesRef} />
 
+      {/* Company Logos Flow Section */}
+      <CompanyLogosFlowSection companyLogosRef={companyLogosRef} />
+
       {/* Stats Section */}
       <StatsSection statsRef={statsRef} />
 
@@ -99,6 +114,15 @@ export default function LandingPage() {
 
       {/* Career Path Section */}
       <CareerPathSection />
+
+      {/* Industry Spotlight Section */}
+      {/* <IndustrySpotlightSection industryRef={industryRef} /> */}
+
+      {/* Alumni Network Section */}
+      {/* <AlumniNetworkSection alumniRef={alumniRef} /> */}
+
+      {/* Resource Hub Section */}
+      {/* <ResourceHubSection resourcesRef={resourcesRef} /> */}
 
       {/* Testimonials Section */}
       <TestimonialsSection testimonialsRef={testimonialsRef} />

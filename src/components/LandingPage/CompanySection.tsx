@@ -3,7 +3,16 @@ import { useTheme } from '../../context/ThemeContext';
 import { Typography } from '@mui/material';
 import { useScrollTrigger, useScrollTriggerStagger } from '../../hooks/useScrollTrigger';
 import { gsap } from 'gsap';
-import { Briefcase } from 'lucide-react';
+import { 
+	Briefcase, 
+	Rocket, 
+	Zap, 
+	TrendingUp, 
+	Building2, 
+	Globe, 
+	Award, 
+	Users 
+} from 'lucide-react';
 
 const hiringAnnouncements = [
 	{
@@ -12,7 +21,7 @@ const hiringAnnouncements = [
 		color: '#4285F4',
 		announcement: '🔥 Hiring 500+ Software Engineers',
 		positions: 'AI/ML, Frontend, Backend',
-		// icon: <Rocket className="h-5 w-5" />
+		icon: <Rocket className="h-5 w-5" />
 	},
 	{
 		name: 'Microsoft',
@@ -20,7 +29,7 @@ const hiringAnnouncements = [
 		color: '#00A4EF',
 		announcement: '⚡ 300+ Open Positions',
 		positions: 'Cloud, Security, DevOps',
-		// icon: <Zap className="h-5 w-5" />
+		icon: <Zap className="h-5 w-5" />
 	},
 	{
 		name: 'Apple',
@@ -28,7 +37,7 @@ const hiringAnnouncements = [
 		color: '#000000',
 		announcement: '🚀 iOS Team Expansion',
 		positions: 'Mobile, UI/UX, Hardware',
-		// icon: <TrendingUp className="h-5 w-5" />
+		icon: <TrendingUp className="h-5 w-5" />
 	},
 	{
 		name: 'Amazon',
@@ -36,7 +45,7 @@ const hiringAnnouncements = [
 		color: '#FF9900',
 		announcement: '💼 AWS Division Growing',
 		positions: 'SysAdmin, Solutions Architect',
-		// icon: <Building2 className="h-5 w-5" />
+		icon: <Building2 className="h-5 w-5" />
 	},
 	{
 		name: 'Meta',
@@ -44,7 +53,7 @@ const hiringAnnouncements = [
 		color: '#1877F2',
 		announcement: '🌟 Metaverse Opportunities',
 		positions: 'VR/AR, Backend, Research',
-		// icon: <Globe className="h-5 w-5" />
+		icon: <Globe className="h-5 w-5" />
 	},
 	{
 		name: 'Tesla',
@@ -52,7 +61,7 @@ const hiringAnnouncements = [
 		color: '#CC0000',
 		announcement: '🔋 Energy Revolution',
 		positions: 'Embedded, Automotive, Energy',
-		// icon: <Award className="h-5 w-5" />
+		icon: <Award className="h-5 w-5" />
 	},
 	{
 		name: 'Netflix',
@@ -60,7 +69,7 @@ const hiringAnnouncements = [
 		color: '#E20614',
 		announcement: '🎬 Content & Tech Roles',
 		positions: 'Streaming, Data Science, ML',
-		// icon: <Users className="h-5 w-5" />
+		icon: <Users className="h-5 w-5" />
 	},
 	{
 		name: 'Spotify',
