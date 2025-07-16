@@ -92,16 +92,9 @@ function DashboardRouter() {
 function AppContent() {
   const { user, loading } = useAuth();
   const [showSplash, setShowSplash] = useState(() => {
-    // Only show splash if user hasn't seen it in this session AND it's the initial app load
-    const hasSeenSplash = sessionStorage.getItem('aut-handshake-splash-seen');
-    const isInitialLoad = !sessionStorage.getItem('aut-handshake-app-loaded');
-    return !hasSeenSplash && isInitialLoad;
+    // Only show splash if user hasn't seen it in this session
+    return !sessionStorage.getItem('aut-handshake-splash-seen');
   });
-
-  useEffect(() => {
-    // Mark that the app has been loaded in this session
-    sessionStorage.setItem('aut-handshake-app-loaded', 'true');
-  }, []);
 
   const handleSplashComplete = () => {
     setShowSplash(false);
@@ -151,6 +144,7 @@ function AppContent() {
         <Route path="/resource/:id" element={<ProtectedRoute><ResourceDetails /></ProtectedRoute>} />
         
         {/* Employer Routes */}
+        <Route path="/employer-dashboard" element={<ProtectedRoute><EmployerDashboard /></ProtectedRoute>} />
         <Route path="/post-job" element={<ProtectedRoute><PostJob /></ProtectedRoute>} />
         <Route path="/applicants" element={<ProtectedRoute><Applicants /></ProtectedRoute>} />
         

@@ -47,7 +47,15 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
       // Create main timeline
       const tl = gsap.timeline({
         onComplete: () => {
-          setTimeout(onComplete, 500);
+          // Fade out the entire splash screen smoothly
+          gsap.to(containerRef.current, {
+            duration: 0.5,
+            opacity: 0,
+            ease: 'power2.inOut',
+            onComplete: () => {
+              setTimeout(onComplete, 100);
+            }
+          });
         }
       });
 
@@ -94,13 +102,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
           amount: 0.6,
           from: 'start'
         }
-      })
-      .to(containerRef.current, {
-        duration: 0.8,
-        opacity: 0,
-        scale: 1.1,
-        ease: 'power2.in'
-      }, '-=0.3');
+      });
 
     }, containerRef);
 
@@ -112,8 +114,8 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
       ref={containerRef}
       className={`fixed inset-0 z-50 flex items-center justify-center transition-colors duration-300 overflow-hidden ${
         isDark 
-          ? 'bg-gradient-to-br from-dark-bg via-dark-surface to-dark-bg' 
-          : 'bg-gradient-to-br from-gray-50 via-white to-gray-100'
+          ? 'bg-dark-bg' 
+          : 'bg-gray-50'
       }`}
     >
       {/* Main Content - Only "AUT Handshake" Text */}
@@ -123,14 +125,11 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
             ref={textRef}
             variant="h1"
             align="center"
-            // style={{ fontFamily: 'serif' }}
-
             className={`bg-clip-text whitespace-nowrap text-3xl sm:text-5xl md:text-6xl lg:text-7xl -skew-x-12 xl:text-8xl ${
               isDark 
                 ? 'bg-lime text-lime' 
                 : 'bg-burgundy text-primary'
             }`}
-           
           >
             AUT Handshake
           </Typography>

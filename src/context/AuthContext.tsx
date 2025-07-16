@@ -19,40 +19,65 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string, role: 'student' | 'employer') => {
     setLoading(true);
-    // Simulate login delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // Set static user based on role
-    if (role === 'student') {
-      setUser({
-        id: 'demo-student-1',
-        email: email,
-        role: 'student',
-        profile: {
+    try {
+      // Simulate login delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Validate credentials based on role
+      const validCredentials = {
+        student: {
+          email: 'student@aut.edu',
+          password: 'student123'
+        },
+        employer: {
+          email: 'employer@intel.com',
+          password: 'employer123'
+        }
+      };
+      
+      const expectedCreds = validCredentials[role];
+      
+      // Check if credentials match
+      if (email !== expectedCreds.email || password !== expectedCreds.password) {
+        throw new Error(`Invalid credentials. Try: ${expectedCreds.email} with password: ${expectedCreds.password}`);
+      }
+      
+      // Set user based on role
+      if (role === 'student') {
+        setUser({
           id: 'demo-student-1',
-          username: email.split('@')[0],
-          full_name: 'Demo Student',
-          bio: 'Computer Science student at AUT',
-          avatar_url: null,
-          website: null
-        }
-      });
-    } else {
-      setUser({
-        id: 'demo-employer-1',
-        email: email,
-        role: 'employer',
-        profile: {
+          email: email,
+          role: 'student',
+          profile: {
+            id: 'demo-student-1',
+            username: email.split('@')[0],
+            full_name: 'Demo Student',
+            bio: 'Computer Science student at AUT',
+            avatar_url: null,
+            website: null
+          }
+        });
+      } else {
+        setUser({
           id: 'demo-employer-1',
-          username: email.split('@')[0],
-          full_name: 'Demo Employer',
-          bio: 'HR Manager at Tech Company',
-          avatar_url: null,
-          website: null
-        }
-      });
+          email: email,
+          role: 'employer',
+          profile: {
+            id: 'demo-employer-1',
+            username: email.split('@')[0],
+            full_name: 'Demo Employer',
+            bio: 'HR Manager at Intel',
+            avatar_url: null,
+            website: null
+          }
+        });
+      }
+    } catch (error) {
+      throw error; // Re-throw the error so it can be caught in the login component
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const logout = async () => {

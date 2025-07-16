@@ -53,15 +53,15 @@ export default function StudentDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
+    <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
+          <h1 className={`text-3xl font-bold mb-2 ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
             Student Dashboard
           </h1>
-          <p className="text-neutral-600 dark:text-neutral-400">
+          <p className={`${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>
             Welcome back! Here's your career overview.
           </p>
         </div>
@@ -107,7 +107,7 @@ export default function StudentDashboard() {
 
         {/* Quick Actions */}
         <Card variant="elevated" padding="lg" className="mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-6">
+          <h2 className={`text-xl font-semibold mb-6 ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
             Quick Actions
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -146,7 +146,7 @@ export default function StudentDashboard() {
 
         {/* Search and Filters */}
         <Card variant="elevated" padding="lg" className="mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-6">
+          <h2 className={`text-xl font-semibold mb-6 ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
             Find Opportunities
           </h2>
           <div className="flex flex-col md:flex-row gap-4">
@@ -174,9 +174,9 @@ export default function StudentDashboard() {
                 onChange={(e) => setTypeFilter(e.target.value)}
                 className={cn(
                   "px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors",
-                  "border-neutral-300 bg-background text-foreground",
-                  "focus:ring-brand-primary focus:border-brand-primary",
-                  "dark:border-neutral-600 dark:bg-neutral-800"
+                  isDark 
+                    ? "border-gray-600 bg-dark-surface text-dark-text focus:ring-lime focus:border-lime" 
+                    : "border-gray-300 bg-white text-gray-900 focus:ring-asu-maroon focus:border-asu-maroon"
                 )}
               >
                 <option value="">All Types</option>
@@ -191,19 +191,19 @@ export default function StudentDashboard() {
         {/* Jobs Section */}
         <div className="mb-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold text-foreground">
+            <h2 className={`text-2xl font-semibold ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
               Recommended for You
             </h2>
             <Link to="/jobs">
-              <Button variant="ghost" className="text-brand-primary">
+              <Button variant="ghost" className={isDark ? 'text-lime' : 'text-asu-maroon'}>
                 View All Jobs
               </Button>
             </Link>
           </div>
 
           {error && (
-            <Card variant="outlined" padding="lg" className="mb-6 border-l-4 border-error">
-              <p className="text-error font-medium">
+            <Card variant="outlined" padding="lg" className="mb-6 border-l-4 border-red-500">
+              <p className="text-red-600 font-medium">
                 Error loading jobs: {error}
               </p>
             </Card>
@@ -211,11 +211,11 @@ export default function StudentDashboard() {
 
           {filteredJobs.length === 0 ? (
             <Card variant="elevated" padding="lg" className="text-center">
-              <Briefcase className="h-16 w-16 mx-auto mb-4 text-neutral-400" />
-              <h3 className="text-xl font-semibold text-foreground mb-2">
+              <Briefcase className={`h-16 w-16 mx-auto mb-4 ${isDark ? 'text-dark-muted' : 'text-gray-400'}`} />
+              <h3 className={`text-xl font-semibold mb-2 ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
                 No jobs found
               </h3>
-              <p className="text-neutral-600 dark:text-neutral-400 mb-6">
+              <p className={`mb-6 ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>
                 Try adjusting your search criteria or check back later
               </p>
               <Button 
@@ -235,36 +235,36 @@ export default function StudentDashboard() {
                 <Card key={job.id} variant="elevated" padding="lg" interactive className="group">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-foreground mb-1 group-hover:text-brand-primary transition-colors">
+                      <h3 className={`text-lg font-semibold mb-1 group-hover:${isDark ? 'text-lime' : 'text-asu-maroon'} transition-colors ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
                         {job.title}
                       </h3>
-                      <p className="text-brand-primary font-medium">
+                      <p className={`font-medium ${isDark ? 'text-lime' : 'text-asu-maroon'}`}>
                         {job.company}
                       </p>
                     </div>
-                    <Button variant="ghost" size="icon" className="text-neutral-400 hover:text-brand-primary">
+                    <Button variant="ghost" size="icon" className={`${isDark ? 'text-dark-muted hover:text-lime' : 'text-gray-400 hover:text-asu-maroon'}`}>
                       <Bookmark className="h-5 w-5" />
                     </Button>
                   </div>
                   
                   <div className="space-y-2 mb-4">
-                    <div className="flex items-center text-sm text-neutral-600 dark:text-neutral-400">
+                    <div className={`flex items-center text-sm ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>
                       <MapPin className="h-4 w-4 mr-2" />
                       {job.location}
                     </div>
-                    <div className="flex items-center text-sm text-neutral-600 dark:text-neutral-400">
+                    <div className={`flex items-center text-sm ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>
                       <Clock className="h-4 w-4 mr-2" />
                       {job.type}
                     </div>
                     {job.salary_range && (
-                      <div className="flex items-center text-sm text-neutral-600 dark:text-neutral-400">
+                      <div className={`flex items-center text-sm ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>
                         <TrendingUp className="h-4 w-4 mr-2" />
                         {job.salary_range}
                       </div>
                     )}
                   </div>
 
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4 line-clamp-3">
+                  <p className={`text-sm mb-4 line-clamp-3 ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>
                     {job.description}
                   </p>
 

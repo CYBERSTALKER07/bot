@@ -103,7 +103,7 @@ export default function Navigation() {
     if (user?.role === 'employer') {
       return [
         { icon: Rss, label: 'Feed', path: '/feed', group: 'main' },
-        { icon: BarChart3, label: 'Dashboard', path: '/dashboard', group: 'main' },
+        { icon: BarChart3, label: 'Dashboard', path: '/employer-dashboard', group: 'main' },
         { icon: Briefcase, label: 'Post Jobs', path: '/post-job', group: 'jobs' },
         { icon: Users, label: 'Applicants', path: '/applicants', group: 'jobs' },
         { icon: Building2, label: 'Companies', path: '/companies', group: 'jobs' },

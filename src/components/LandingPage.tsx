@@ -21,7 +21,6 @@ import CareerPathSection from './LandingPage/CareerPathSection';
 import TestimonialsSection from './LandingPage/TestimonialsSection';
 import DemoSection from './LandingPage/DemoSection';
 import CTASection from './LandingPage/CTASection';
-import SplashScreen from './SplashScreen';
 
 // Material Design components
 import { Card } from './ui/Card';
@@ -31,7 +30,6 @@ import Typography from './ui/Typography';
 export default function LandingPage() {
   const { isDark } = useTheme();
   const navigate = useNavigate();
-  const [showSplash, setShowSplash] = useState(true);
   
   // Create refs for all sections with correct names
   const heroRef = useRef<HTMLDivElement>(null);
@@ -63,19 +61,6 @@ export default function LandingPage() {
       });
     }
   };
-
-  // Simplified splash screen logic
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSplash(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (showSplash) {
-    return <SplashScreen />;
-  }
 
   return (
     <div className={`min-h-screen relative transition-colors duration-300 ${

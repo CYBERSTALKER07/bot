@@ -9,7 +9,11 @@ import {
   AutoAwesome,
   CheckCircle,
   TrendingUp,
-  EmojiEvents
+  EmojiEvents,
+  Security,
+  Verified,
+  Groups,
+  WorkOutline
 } from '@mui/icons-material';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -68,46 +72,48 @@ export default function Register() {
 
   return (
     <div className={`min-h-screen flex transition-colors duration-300 ${
-      isDark ? 'bg-dark-bg' : 'bg-gray-50'
+      isDark ? 'bg-dark-bg' : 'bg-neutral-50'
     }`}>
-      {/* Left Side - Form */}
-      <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
-        <div className="mx-auto w-full max-w-sm lg:w-96">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${
-              isDark ? 'bg-lime/20' : 'bg-asu-maroon/10'
+      {/* Left Side - Registration Form */}
+      <div className="flex-1 flex flex-col justify-center py-8 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
+        <div className="mx-auto w-full max-w-md lg:w-96">
+          {/* Header Section */}
+          <div className="text-center mb-12">
+            <div className={`inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-6 ${
+              isDark ? 'bg-lime/15' : 'bg-asu-maroon/10'
             }`}>
-              <School className={`h-8 w-8 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
+              <School className={`h-10 w-10 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
             </div>
-            <Typography variant="h3" color="textPrimary" className="font-bold mb-3">
-              Join AUT Handshake
+            <Typography variant="h3" color="textPrimary" className="font-bold mb-4 tracking-tight">
+              Create Your Account
             </Typography>
-            <Typography variant="subtitle1" color="textSecondary">
-              Create your account and start your career journey
+            <Typography variant="body1" color="textSecondary" className="max-w-sm mx-auto leading-relaxed">
+              Join the AUT community and connect with thousands of students and employers
             </Typography>
           </div>
 
-          {/* Role Selection Card */}
-          <Card className="p-2 mb-8" variant="outlined">
-            <div className="flex">
+          {/* Role Selection - Material Design Segmented Button */}
+          <Card className="p-1 mb-8 shadow-elevation-1" variant="outlined">
+            <div className="flex rounded-xl overflow-hidden">
               <Button
-                variant={formData.role === 'student' ? 'contained' : 'text'}
+                variant={formData.role === 'student' ? 'filled' : 'text'}
                 color="primary"
                 startIcon={Person}
                 fullWidth
                 onClick={() => setFormData(prev => ({ ...prev, role: 'student' }))}
-                className="flex-1 mr-1"
+                className={`flex-1 rounded-r-none ${formData.role === 'student' ? 'shadow-none' : ''}`}
+                size="large"
               >
                 Student
               </Button>
               <Button
-                variant={formData.role === 'employer' ? 'contained' : 'text'}
+                variant={formData.role === 'employer' ? 'filled' : 'text'}
                 color="primary"
                 startIcon={Business}
                 fullWidth
                 onClick={() => setFormData(prev => ({ ...prev, role: 'employer' }))}
-                className="flex-1 ml-1"
+                className={`flex-1 rounded-l-none ${formData.role === 'employer' ? 'shadow-none' : ''}`}
+                size="large"
               >
                 Employer
               </Button>
@@ -123,8 +129,10 @@ export default function Register() {
               value={formData.name}
               onChange={handleChange('name')}
               placeholder="Enter your full name"
-              variant="outlined"
+              variant="filled"
               fullWidth
+              startIcon={<Person />}
+              size="large"
             />
 
             <Input
@@ -134,8 +142,10 @@ export default function Register() {
               value={formData.email}
               onChange={handleChange('email')}
               placeholder="Enter your email"
-              variant="outlined"
+              variant="filled"
               fullWidth
+              startIcon={<Email />}
+              size="large"
             />
 
             <Input
@@ -144,8 +154,11 @@ export default function Register() {
               value={formData.phone}
               onChange={handleChange('phone')}
               placeholder="Enter your phone number"
-              variant="outlined"
+              variant="filled"
               fullWidth
+              startIcon={<Phone />}
+              size="large"
+              helperText="Optional - for account verification"
             />
 
             {formData.role === 'employer' && (
@@ -156,8 +169,10 @@ export default function Register() {
                 value={formData.companyName}
                 onChange={handleChange('companyName')}
                 placeholder="Enter your company name"
-                variant="outlined"
+                variant="filled"
                 fullWidth
+                startIcon={<WorkOutline />}
+                size="large"
               />
             )}
 
@@ -167,11 +182,12 @@ export default function Register() {
               required
               value={formData.password}
               onChange={handleChange('password')}
-              placeholder="Create a password"
-              variant="outlined"
+              placeholder="Create a strong password"
+              variant="filled"
               fullWidth
               showPasswordToggle
-              helperText="Password must be at least 6 characters"
+              size="large"
+              helperText="Must be at least 6 characters long"
             />
 
             <Input
@@ -181,18 +197,19 @@ export default function Register() {
               value={formData.confirmPassword}
               onChange={handleChange('confirmPassword')}
               placeholder="Confirm your password"
-              variant="outlined"
+              variant="filled"
               fullWidth
               showPasswordToggle
+              size="large"
             />
 
             {error && (
-              <Card className={`p-4 border-l-4 ${
+              <Card className={`p-4 rounded-xl border-l-4 ${
                 isDark 
-                  ? 'bg-red-900/20 border-red-500 text-red-300' 
-                  : 'bg-red-50 border-red-400 text-red-800'
-              }`}>
-                <Typography variant="body2" color="error">
+                  ? 'bg-error-600/10 border-error-400 text-error-300' 
+                  : 'bg-error-50 border-error-400 text-error-700'
+              }`} variant="outlined">
+                <Typography variant="body2" className="font-medium">
                   {error}
                 </Typography>
               </Card>
@@ -200,92 +217,141 @@ export default function Register() {
 
             <Button
               type="submit"
-              variant="contained"
+              variant="filled"
               color="primary"
               size="large"
               fullWidth
               loading={loading}
-              className="py-4"
+              className="py-4 mt-8 font-semibold tracking-wide"
             >
               Create Account
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
-            <Typography variant="body2" color="textSecondary">
-              Already have an account?{' '}
-              <Link 
-                to="/login" 
-                className={`font-medium transition-colors duration-300 ${
-                  isDark ? 'text-lime hover:text-dark-accent' : 'text-asu-maroon hover:text-asu-maroon/80'
-                }`}
-              >
-                Sign in
-              </Link>
+          {/* Sign In Link */}
+          <div className="mt-8 text-center">
+            <Typography variant="body2" color="textSecondary" className="mb-2">
+              Already have an account?
             </Typography>
+            <Button
+              variant="text"
+              color="primary"
+              component={Link}
+              to="/login"
+              className="font-semibold"
+            >
+              Sign In Instead
+            </Button>
+          </div>
+
+          {/* Trust Indicators */}
+          <div className="mt-8 pt-6 border-t border-opacity-20">
+            <div className="flex items-center justify-center space-x-6 text-xs">
+              <div className={`flex items-center space-x-1 ${
+                isDark ? 'text-dark-muted' : 'text-gray-500'
+              }`}>
+                <Security className="h-4 w-4" />
+                <span>Secure</span>
+              </div>
+              <div className={`flex items-center space-x-1 ${
+                isDark ? 'text-dark-muted' : 'text-gray-500'
+              }`}>
+                <Verified className="h-4 w-4" />
+                <span>Verified</span>
+              </div>
+              <div className={`flex items-center space-x-1 ${
+                isDark ? 'text-dark-muted' : 'text-gray-500'
+              }`}>
+                <Groups className="h-4 w-4" />
+                <span>Trusted</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Right Side - Hero */}
+      {/* Right Side - Enhanced Hero Section */}
       <div className="hidden lg:block relative w-0 flex-1">
         <div className={`absolute inset-0 transition-colors duration-300 ${
           isDark 
             ? 'bg-gradient-to-br from-dark-surface via-dark-bg to-dark-surface' 
             : 'bg-gradient-to-br from-asu-maroon via-asu-maroon-dark to-asu-maroon'
         }`}>
-          <div className={`absolute inset-0 ${
-            isDark ? 'bg-lime/5' : 'bg-black/20'
-          } flex flex-col justify-center items-center p-12`}>
-            <div className="text-center max-w-md">
+          {/* Background Pattern */}
+          <div className={`absolute inset-0 opacity-10 ${
+            isDark ? 'bg-lime/5' : 'bg-white/10'
+          }`}>
+            <div className="absolute top-0 left-0 w-full h-full">
+              {[...Array(20)].map((_, i) => (
+                <div
+                  key={i}
+                  className={`absolute rounded-full ${
+                    isDark ? 'bg-lime/20' : 'bg-white/20'
+                  }`}
+                  style={{
+                    width: Math.random() * 4 + 2 + 'px',
+                    height: Math.random() * 4 + 2 + 'px',
+                    top: Math.random() * 100 + '%',
+                    left: Math.random() * 100 + '%',
+                    animationDelay: Math.random() * 3 + 's',
+                    animation: 'float 6s ease-in-out infinite'
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="relative z-10 flex flex-col justify-center items-center h-full p-12">
+            <div className="text-center max-w-lg">
               <Typography 
-                variant="h3" 
-                className={`font-bold mb-6 leading-tight ${
+                variant="h2" 
+                className={`font-bold mb-8 leading-tight ${
                   isDark ? 'text-dark-text' : 'text-white'
                 }`}
               >
-                Start Your <span className={`${
+                Welcome to Your <span className={`${
                   isDark ? 'text-lime' : 'text-asu-gold'
-                }`}>Career Journey</span>
+                }`}>Future</span>
               </Typography>
               <Typography 
-                variant="subtitle1" 
-                className={`mb-8 leading-relaxed ${
+                variant="body1" 
+                className={`mb-12 leading-relaxed ${
                   isDark ? 'text-dark-muted' : 'text-white/90'
                 }`}
               >
-                Join thousands of AUT American University of Technology in Tashkent students and top employers building successful careers together
+                Connect with leading employers, discover opportunities, and build meaningful 
+                relationships that will shape your career at AUT American University of Technology.
               </Typography>
 
-              {/* Benefits Cards */}
-              <div className="space-y-4">
+              {/* Feature Highlights */}
+              <div className="space-y-6">
                 <Card className={`backdrop-blur-xl border ${
                   isDark 
-                    ? 'bg-dark-surface/15 border-lime/30' 
-                    : 'bg-white/15 border-white/30'
-                }`}>
+                    ? 'bg-dark-surface/20 border-lime/20' 
+                    : 'bg-white/20 border-white/20'
+                }`} variant="outlined">
                   <div className="flex items-center space-x-4 p-6">
-                    <div className={`w-14 h-14 rounded-full flex items-center justify-center ${
-                      isDark ? 'bg-lime' : 'bg-asu-gold'
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
+                      isDark ? 'bg-lime/20' : 'bg-asu-gold/20'
                     }`}>
-                      <CheckCircle className={`h-8 w-8 ${
-                        isDark ? 'text-dark-surface' : 'text-asu-maroon'
+                      <CheckCircle className={`h-6 w-6 ${
+                        isDark ? 'text-lime' : 'text-asu-gold'
                       }`} />
                     </div>
-                    <div className="text-left">
+                    <div className="text-left flex-1">
                       <Typography 
-                        variant="h6" 
-                        className={`font-bold ${
+                        variant="subtitle1" 
+                        className={`font-semibold mb-1 ${
                           isDark ? 'text-dark-text' : 'text-white'
                         }`}
                       >
-                        Free to Join
+                        Free & Secure
                       </Typography>
                       <Typography 
-                        variant="caption" 
-                        className={isDark ? 'text-dark-muted' : 'text-white/70'}
+                        variant="body2" 
+                        className={isDark ? 'text-dark-muted' : 'text-white/80'}
                       >
-                        No hidden fees or charges
+                        No costs, complete privacy protection
                       </Typography>
                     </div>
                   </div>
@@ -293,31 +359,63 @@ export default function Register() {
 
                 <Card className={`backdrop-blur-xl border ${
                   isDark 
-                    ? 'bg-dark-surface/15 border-lime/30' 
-                    : 'bg-white/15 border-white/30'
-                }`}>
+                    ? 'bg-dark-surface/20 border-lime/20' 
+                    : 'bg-white/20 border-white/20'
+                }`} variant="outlined">
                   <div className="flex items-center space-x-4 p-6">
-                    <div className={`w-14 h-14 rounded-full flex items-center justify-center ${
-                      isDark ? 'bg-lime' : 'bg-asu-gold'
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
+                      isDark ? 'bg-lime/20' : 'bg-asu-gold/20'
                     }`}>
-                      <TrendingUp className={`h-8 w-8 ${
-                        isDark ? 'text-dark-surface' : 'text-asu-maroon'
+                      <TrendingUp className={`h-6 w-6 ${
+                        isDark ? 'text-lime' : 'text-asu-gold'
                       }`} />
                     </div>
-                    <div className="text-left">
+                    <div className="text-left flex-1">
                       <Typography 
-                        variant="h6" 
-                        className={`font-bold ${
+                        variant="subtitle1" 
+                        className={`font-semibold mb-1 ${
                           isDark ? 'text-dark-text' : 'text-white'
                         }`}
                       >
                         Career Growth
                       </Typography>
                       <Typography 
-                        variant="caption" 
-                        className={isDark ? 'text-dark-muted' : 'text-white/70'}
+                        variant="body2" 
+                        className={isDark ? 'text-dark-muted' : 'text-white/80'}
                       >
-                        Track your progress
+                        Track progress and achievements
+                      </Typography>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className={`backdrop-blur-xl border ${
+                  isDark 
+                    ? 'bg-dark-surface/20 border-lime/20' 
+                    : 'bg-white/20 border-white/20'
+                }`} variant="outlined">
+                  <div className="flex items-center space-x-4 p-6">
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
+                      isDark ? 'bg-lime/20' : 'bg-asu-gold/20'
+                    }`}>
+                      <Groups className={`h-6 w-6 ${
+                        isDark ? 'text-lime' : 'text-asu-gold'
+                      }`} />
+                    </div>
+                    <div className="text-left flex-1">
+                      <Typography 
+                        variant="subtitle1" 
+                        className={`font-semibold mb-1 ${
+                          isDark ? 'text-dark-text' : 'text-white'
+                        }`}
+                      >
+                        Network Building
+                      </Typography>
+                      <Typography 
+                        variant="body2" 
+                        className={isDark ? 'text-dark-muted' : 'text-white/80'}
+                      >
+                        Connect with professionals
                       </Typography>
                     </div>
                   </div>
@@ -325,24 +423,29 @@ export default function Register() {
               </div>
             </div>
 
-            {/* Achievement Badge */}
-            <Card className={`absolute bottom-8 left-8 shadow-xl ${
-              isDark ? 'bg-dark-surface/98' : 'bg-white/95'
-            }`}>
+            {/* Floating Success Badge */}
+            <Card className={`absolute bottom-8 left-8 shadow-2xl ${
+              isDark ? 'bg-dark-surface/95' : 'bg-white/95'
+            }`} variant="elevated">
               <div className="flex items-center space-x-3 p-4">
-                <EmojiEvents className={`h-6 w-6 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
-                <Typography variant="body2" className="font-bold">
-                  #1 Career Platform at AUT
-                </Typography>
+                <EmojiEvents className={`h-5 w-5 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
+                <div>
+                  <Typography variant="caption" className="font-semibold">
+                    #1 Student Platform
+                  </Typography>
+                  <Typography variant="caption" color="textSecondary" className="block">
+                    at AUT University
+                  </Typography>
+                </div>
               </div>
             </Card>
 
-            {/* Floating badge */}
+            {/* Decorative Elements */}
             <div className={`absolute top-8 right-8 rounded-full p-3 shadow-lg ${
-              isDark ? 'bg-lime/90' : 'bg-asu-gold/90'
+              isDark ? 'bg-lime/15' : 'bg-asu-gold/15'
             }`}>
-              <AutoAwesome className={`h-6 w-6 ${
-                isDark ? 'text-dark-surface' : 'text-asu-maroon'
+              <AutoAwesome className={`h-5 w-5 ${
+                isDark ? 'text-lime' : 'text-asu-gold'
               }`} />
             </div>
           </div>

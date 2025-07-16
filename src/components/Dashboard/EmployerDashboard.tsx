@@ -11,7 +11,7 @@ import {
   Building2,
   FileText,
   BarChart3,
-  Timeline
+  // Timeline
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -93,11 +93,11 @@ export default function EmployerDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
+      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary mx-auto mb-4"></div>
-            <p className="text-neutral-600 dark:text-neutral-400">
+            <div className={`animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4 ${isDark ? 'border-lime' : 'border-asu-maroon'}`}></div>
+            <p className={`${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>
               Loading dashboard...
             </p>
           </div>
@@ -108,13 +108,13 @@ export default function EmployerDashboard() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
+      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Card variant="elevated" padding="lg" className="text-center">
-            <h2 className="text-xl font-semibold text-error mb-2">
+            <h2 className="text-xl font-semibold text-red-600 mb-2">
               Error Loading Dashboard
             </h2>
-            <p className="text-neutral-600 dark:text-neutral-400 mb-4">
+            <p className={`mb-4 ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>
               {error}
             </p>
             <Button onClick={fetchDashboardData} variant="outline">
@@ -127,15 +127,15 @@ export default function EmployerDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
+    <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
+          <h1 className={`text-3xl font-bold mb-2 ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
             Employer Dashboard
           </h1>
-          <p className="text-neutral-600 dark:text-neutral-400">
+          <p className={`${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>
             Manage your job postings and track candidate applications.
           </p>
         </div>
@@ -181,7 +181,7 @@ export default function EmployerDashboard() {
 
         {/* Quick Actions */}
         <Card variant="elevated" padding="lg" className="mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-6">
+          <h2 className={`text-xl font-semibold mb-6 ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
             Quick Actions
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -232,11 +232,11 @@ export default function EmployerDashboard() {
         <Card variant="elevated" className="mb-8">
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-foreground">
+              <h2 className={`text-xl font-semibold ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
                 Recent Job Postings
               </h2>
               <Link to="/jobs">
-                <Button variant="ghost" className="text-brand-primary">
+                <Button variant="ghost" className={isDark ? 'text-lime' : 'text-asu-maroon'}>
                   View All Jobs
                 </Button>
               </Link>
@@ -260,10 +260,10 @@ export default function EmployerDashboard() {
                     <div className="flex-1">
                       <div className="flex items-center space-x-4">
                         <div>
-                          <h3 className="text-lg font-semibold text-foreground">
+                          <h3 className={`text-lg font-semibold ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
                             {job.title}
                           </h3>
-                          <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                          <p className={`text-sm ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>
                             {job.department} • Posted {new Date(job.posted).toLocaleDateString()}
                           </p>
                         </div>
@@ -272,10 +272,10 @@ export default function EmployerDashboard() {
                     
                     <div className="flex items-center space-x-6">
                       <div className="text-center">
-                        <p className="text-xl font-semibold text-foreground">
+                        <p className={`text-xl font-semibold ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
                           {job.applicants}
                         </p>
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                        <p className={`text-sm ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>
                           Applicants
                         </p>
                       </div>
@@ -283,8 +283,8 @@ export default function EmployerDashboard() {
                       <div className={cn(
                         "px-3 py-1 rounded-full text-sm font-medium",
                         job.status === 'Active' 
-                          ? "bg-success/10 text-success border border-success/20"
-                          : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"
+                          ? "bg-green-100 text-green-800 border border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800"
+                          : `${isDark ? 'bg-dark-surface text-dark-muted' : 'bg-gray-100 text-gray-600'}`
                       )}>
                         {job.status}
                       </div>
@@ -308,46 +308,46 @@ export default function EmployerDashboard() {
         {/* Activity and Performance */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <Card variant="elevated" padding="lg">
-            <h2 className="text-xl font-semibold text-foreground mb-6">
+            <h2 className={`text-xl font-semibold mb-6 ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
               Application Activity
             </h2>
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-foreground">
+                  <p className={`font-medium ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
                     New Applications Today
                   </p>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                  <p className={`text-sm ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>
                     Software Engineer position
                   </p>
                 </div>
-                <p className="text-2xl font-semibold text-foreground">
+                <p className={`text-2xl font-semibold ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
                   8
                 </p>
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-foreground">
+                  <p className={`font-medium ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
                     Interviews This Week
                   </p>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                  <p className={`text-sm ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>
                     Various positions
                   </p>
                 </div>
-                <p className="text-2xl font-semibold text-foreground">
+                <p className={`text-2xl font-semibold ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
                   12
                 </p>
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-foreground">
+                  <p className={`font-medium ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
                     Offers Extended
                   </p>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                  <p className={`text-sm ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>
                     This month
                   </p>
                 </div>
-                <p className="text-2xl font-semibold text-foreground">
+                <p className={`text-2xl font-semibold ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
                   5
                 </p>
               </div>
@@ -355,47 +355,47 @@ export default function EmployerDashboard() {
           </Card>
 
           <Card variant="elevated" padding="lg">
-            <h2 className="text-xl font-semibold text-foreground mb-6">
+            <h2 className={`text-xl font-semibold mb-6 ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
               Top Performing Jobs
             </h2>
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-foreground">
+                  <p className={`font-medium ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
                     Software Engineer
                   </p>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                  <p className={`text-sm ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>
                     45 applications
                   </p>
                 </div>
-                <div className="w-16 h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full">
-                  <div className="h-full w-4/5 bg-brand-primary rounded-full"></div>
+                <div className={`w-16 h-2 rounded-full ${isDark ? 'bg-dark-border' : 'bg-gray-200'}`}>
+                  <div className={`h-full w-4/5 rounded-full ${isDark ? 'bg-lime' : 'bg-asu-maroon'}`}></div>
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-foreground">
+                  <p className={`font-medium ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
                     Product Manager
                   </p>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                  <p className={`text-sm ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>
                     32 applications
                   </p>
                 </div>
-                <div className="w-16 h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full">
-                  <div className="h-full w-3/5 bg-info rounded-full"></div>
+                <div className={`w-16 h-2 rounded-full ${isDark ? 'bg-dark-border' : 'bg-gray-200'}`}>
+                  <div className="h-full w-3/5 bg-blue-500 rounded-full"></div>
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-foreground">
+                  <p className={`font-medium ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
                     Data Scientist
                   </p>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                  <p className={`text-sm ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>
                     28 applications
                   </p>
                 </div>
-                <div className="w-16 h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full">
-                  <div className="h-full w-1/2 bg-success rounded-full"></div>
+                <div className={`w-16 h-2 rounded-full ${isDark ? 'bg-dark-border' : 'bg-gray-200'}`}>
+                  <div className="h-full w-1/2 bg-green-500 rounded-full"></div>
                 </div>
               </div>
             </div>
