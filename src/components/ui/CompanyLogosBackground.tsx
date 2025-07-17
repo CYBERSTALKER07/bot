@@ -18,6 +18,7 @@ export default function CompanyLogosBackground({
 }: CompanyLogosBackgroundProps) {
   const { isDark } = useTheme();
   const containerRef = useRef<HTMLDivElement>(null);
+  const trendsRef = useRef<HTMLDivElement>(null);
 
   // Company data with real logos and authentic brand colors
   const companies = [
@@ -388,34 +389,51 @@ export default function CompanyLogosBackground({
           initialY: logo.y,
           initialX: logo.x,
           initialRotation: logo.rotation,
-          speed: (index % 5 + 1) * 0.2, // More varied parallax speeds
-          floatRange: Math.random() * 40 + 20,
+          speed: (index % 5 + 1) * 0.3, // Varied upward movement speeds
+          floatRange: Math.random() * 20 + 10,
           rotationRange: Math.random() * 60 - 30,
-          scaleRange: Math.random() * 0.4 + 0.8, // 0.8 to 1.2
-          horizontalDrift: Math.random() * 100 - 50 // -50 to 50px drift
+          scaleRange: Math.random() * 0.3 + 0.8, // 0.8 to 1.1
+          horizontalDrift: Math.random() * 50 - 25 // -25 to 25px drift
         };
       }).filter(Boolean);
 
-      // Continuous floating animation for each logo
+      // Continuous upward floating animation for each logo
       logoData.forEach((data, index) => {
         if (!data) return;
 
-        // Main floating animation
+        // Main upward floating animation - logos move up continuously
         gsap.to(data.element, {
-          y: `+=${data.floatRange}`,
+          y: `-=${data.floatRange}`,
           x: `+=${data.horizontalDrift}`,
           rotation: `+=${data.rotationRange}`,
-          duration: Math.random() * 12 + 18, // 18-30 seconds for slower, more natural movement
+          duration: Math.random() * 8 + 12, // 12-20 seconds for natural movement
           repeat: -1,
           yoyo: true,
           ease: 'sine.inOut',
           delay: logos[index].animationDelay
         });
-
+// Trends section with slide animation
+gsap.fromTo('.trend-item', {
+  opacity: 0,
+  x: -50,
+  scale: 0.9
+}, {
+  opacity: 1,
+  x: 0,
+  scale: 1,
+  duration: 0.8,
+  ease: 'power2.out',
+  stagger: 0.1,
+  scrollTrigger: {
+    trigger: trendsRef.current,
+    start: 'top 80%',   
+    toggleActions: 'play none none reverse'
+  } 
+});
         // Independent scale pulsing
         gsap.to(data.element, {
           scale: data.scaleRange,
-          duration: Math.random() * 10 + 12, // 12-22 seconds
+          duration: Math.random() * 6 + 8, // 8-14 seconds
           repeat: -1,
           yoyo: true,
           ease: 'sine.inOut',
@@ -424,8 +442,8 @@ export default function CompanyLogosBackground({
 
         // Subtle opacity breathing
         gsap.to(data.element, {
-          opacity: `+=${Math.random() * 0.3 + 0.1}`, // Vary opacity by 0.1-0.4
-          duration: Math.random() * 8 + 10,
+          opacity: `+=${Math.random() * 0.2 + 0.1}`, // Vary opacity by 0.1-0.3
+          duration: Math.random() * 6 + 8,
           repeat: -1,
           yoyo: true,
           ease: 'sine.inOut',
@@ -433,17 +451,17 @@ export default function CompanyLogosBackground({
         });
       });
 
-      // Enhanced dynamic scroll-based animations
+      // Enhanced scroll-based upward movement animations
       let previousProgress = 0;
       let scrollVelocity = 0;
       let velocityHistory = [];
-      const maxVelocityHistory = 5;
+      const maxVelocityHistory = 8; // More history for smoother response
       
       ScrollTrigger.create({
         trigger: containerRef.current,
         start: 'top bottom',
         end: 'bottom top',
-        scrub: 0.5, // Slightly less scrub for more responsive feel
+        scrub: 3, // Much slower response to scroll (increased from 0.3)
         onUpdate: (self) => {
           const progress = self.progress;
           const currentVelocity = Math.abs(progress - previousProgress);
@@ -463,52 +481,102 @@ export default function CompanyLogosBackground({
           logoData.forEach((data, index) => {
             if (!data) return;
             
-            // Dynamic parallax based on scroll progress and velocity
-            const baseParallax = progress * data.speed * 200;
-            const velocityBoost = avgVelocity * direction * 100;
-            const finalY = baseParallax + velocityBoost;
+            // Much slower upward movement based on scroll
+            const baseUpwardMovement = progress * data.speed * 60; // Reduced from 300
+            const velocityBoost = avgVelocity * direction * 20; // Reduced from 150
+            const finalY = -(baseUpwardMovement + velocityBoost);
             
-            // Dynamic rotation based on scroll direction and velocity
-            const scrollRotation = progress * 45 + (direction * avgVelocity * 180);
+            // Much slower dynamic rotation
+            const upwardRotation = progress * 10 + (direction * avgVelocity * 15);
             
-            // Dynamic scale based on velocity (logos get smaller when scrolling fast)
-            const velocityScale = Math.max(0.7, 1 - (avgVelocity * 2));
+            // More subtle scale changes
+            const heightScale = Math.max(0.85, 1 - (progress * 0.1));
+            const velocityScale = Math.max(0.95, 1 - (avgVelocity * 0.2));
+            const finalScale = heightScale * velocityScale;
             
-            // Dynamic horizontal drift based on scroll
-            const horizontalOffset = Math.sin(progress * Math.PI * 2 + index) * 30;
+            // Smaller horizontal drift
+            const horizontalOffset = Math.sin(progress * Math.PI * 1.5 + index) * 10;
+            
+            // More gradual fade out
+            const fadeOpacity = Math.max(0.3, opacity * (1 - progress * 0.4));
             
             gsap.to(data.element, {
               y: finalY,
               x: horizontalOffset,
-              rotation: scrollRotation,
-              scale: velocityScale,
-              duration: 0.6,
-              ease: 'power2.out',
+              rotation: upwardRotation,
+              scale: finalScale,
+              opacity: fadeOpacity,
+              duration: 1.5, // Slower response time
+              ease: 'power1.out',
               overwrite: 'auto'
             });
             
-            // Dynamic blur effect based on velocity
-            const blurAmount = Math.min(avgVelocity * 10, 3);
-            gsap.to(data.element, {
-              filter: `blur(${blurAmount}px)`,
-              duration: 0.3,
-              ease: 'power2.out'
-            });
+            // Much more gradual disappearing effect
+            if (progress > 0.9) {
+              const disappearProgress = (progress - 0.9) / 0.1;
+              gsap.to(data.element, {
+                opacity: opacity * (1 - disappearProgress * 0.5),
+                scale: finalScale * (1 - disappearProgress * 0.2),
+                filter: `blur(${disappearProgress * 1}px)`,
+                duration: 1.0,
+                ease: 'power1.out'
+              });
+            }
           });
           
           previousProgress = progress;
         },
         
         onEnter: () => {
-          // Staggered entrance animation
+          // Logos appear from bottom with staggered entrance
           logoData.forEach((data, index) => {
             if (!data) return;
             gsap.fromTo(data.element, 
               { 
                 opacity: 0, 
                 scale: 0.3,
-                rotation: -180,
-                y: 100 
+                rotation: -90,
+                y: 200 // Start from bottom
+              },
+              { 
+                opacity: opacity, 
+                scale: 1, 
+                rotation: data.initialRotation,
+                y: 0,
+                duration: 1.5, 
+                delay: index * 0.06,
+                ease: 'back.out(1.4)'
+              }
+            );
+          });
+        },
+        
+        onLeave: () => {
+          // Logos disappear upward when leaving viewport
+          logoData.forEach((data, index) => {
+            if (!data) return;
+            gsap.to(data.element, {
+              opacity: 0,
+              scale: 0.3,
+              rotation: `+=${90}`,
+              y: -300, // Exit upward
+              duration: 1.0,
+              delay: index * 0.02,
+              ease: 'power2.in'
+            });
+          });
+        },
+        
+        onEnterBack: () => {
+          // Re-entrance from top when scrolling back
+          logoData.forEach((data, index) => {
+            if (!data) return;
+            gsap.fromTo(data.element,
+              { 
+                opacity: 0, 
+                scale: 0.4,
+                rotation: 180,
+                y: -200 // Come from top
               },
               { 
                 opacity: opacity, 
@@ -516,84 +584,45 @@ export default function CompanyLogosBackground({
                 rotation: data.initialRotation,
                 y: 0,
                 duration: 1.2, 
-                delay: index * 0.08,
-                ease: 'back.out(1.7)'
-              }
-            );
-          });
-        },
-        
-        onLeave: () => {
-          // Dynamic exit animation
-          logoData.forEach((data, index) => {
-            if (!data) return;
-            gsap.to(data.element, {
-              opacity: 0,
-              scale: 0.6,
-              rotation: `+=${180}`,
-              y: -100,
-              duration: 0.8,
-              delay: index * 0.03,
-              ease: 'power2.in'
-            });
-          });
-        },
-        
-        onEnterBack: () => {
-          // Re-entrance from bottom with different animation
-          logoData.forEach((data, index) => {
-            if (!data) return;
-            gsap.fromTo(data.element,
-              { 
-                opacity: 0, 
-                scale: 0.5,
-                rotation: 360,
-                y: -100 
-              },
-              { 
-                opacity: opacity, 
-                scale: 1, 
-                rotation: data.initialRotation,
-                y: 0,
-                duration: 1.0, 
-                delay: index * 0.06,
-                ease: 'elastic.out(1, 0.75)'
+                delay: index * 0.04,
+                ease: 'elastic.out(1, 0.6)'
               }
             );
           });
         },
         
         onLeaveBack: () => {
-          // Exit upward when scrolling back up
+          // Exit downward when scrolling back up past the trigger
           logoData.forEach((data, index) => {
             if (!data) return;
             gsap.to(data.element, {
               opacity: 0,
-              scale: 0.3,
-              rotation: `-=${180}`,
-              y: 150,
-              duration: 0.7,
-              delay: index * 0.02,
+              scale: 0.2,
+              rotation: `-=${120}`,
+              y: 300, // Exit downward
+              duration: 0.8,
+              delay: index * 0.015,
               ease: 'power2.in'
             });
           });
         }
       });
 
-      // Additional scroll velocity-based effects
+      // Additional continuous upward movement effect
       ScrollTrigger.create({
         trigger: containerRef.current,
         start: 'top bottom',
         end: 'bottom top',
         onUpdate: () => {
-          // Create ripple effect based on scroll velocity
-          if (scrollVelocity > 0.02) {
+          // Create ripple effect based on scroll velocity for upward movement
+          if (scrollVelocity > 0.015) {
             logoData.forEach((data, index) => {
-              if (!data || Math.random() > 0.3) return; // Only affect 30% of logos randomly
+              if (!data || Math.random() > 0.25) return; // Only affect 25% of logos randomly
               
               gsap.to(data.element, {
-                scale: `+=${scrollVelocity * 2}`,
-                duration: 0.3,
+                y: `-=${scrollVelocity * 100}`, // Additional upward boost
+                scale: `+=${scrollVelocity * 1.5}`,
+                duration: 0.4,
                 yoyo: true,
                 repeat: 1,
                 ease: 'power2.out'
@@ -602,6 +631,38 @@ export default function CompanyLogosBackground({
           }
         }
       });
+
+      // Continuous logo regeneration effect for seamless upward flow
+      const logoRegenerationInterval = setInterval(() => {
+        logoData.forEach((data, index) => {
+          if (!data || Math.random() > 0.05) return; // 5% chance per cycle
+          
+          // Reset logos that have moved too far up
+          const currentY = gsap.getProperty(data.element, "y") as number;
+          if (currentY < -400) {
+            gsap.set(data.element, {
+              y: window.innerHeight + 100,
+              opacity: 0,
+              scale: 0.3
+            });
+            
+            // Animate back in from bottom
+            gsap.to(data.element, {
+              y: data.initialY,
+              opacity: opacity,
+              scale: 1,
+              duration: 1.5,
+              delay: Math.random() * 2,
+              ease: 'power2.out'
+            });
+          }
+        });
+      }, 2000); // Check every 2 seconds
+
+      // Cleanup interval on component unmount
+      return () => {
+        clearInterval(logoRegenerationInterval);
+      };
 
     }, containerRef);
 
