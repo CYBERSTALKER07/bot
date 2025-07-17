@@ -209,9 +209,9 @@ export default function CareerTipsPage() {
         stagger: 0.1,
         scrollTrigger: {
           trigger: trendsRef.current,
-          start: 'top 80%',
+          start: 'top 80%',   
           toggleActions: 'play none none reverse'
-        }
+        } 
       });
 
       // Floating animation for decorative elements
@@ -905,7 +905,7 @@ export default function CareerTipsPage() {
                               src={article.image} 
                               alt={article.title}
                               className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
-                            />
+                            />  
                             <div className="absolute top-4 left-4">
                               <Badge className={`${categories.find(cat => cat.name === article.category)?.color || 'bg-gray-100 text-gray-800'} text-xs`}>
                                 {article.category.toUpperCase()}

@@ -24,7 +24,7 @@ export default function HowItWorksSection({ howItWorksRef }: HowItWorksSectionPr
     });
   }, { 
     start: 'top 90%', 
-    end: 'top 40%',
+    end: 'top 10%',
     scrub: 2 
   });
 
@@ -104,7 +104,7 @@ export default function HowItWorksSection({ howItWorksRef }: HowItWorksSectionPr
       }
     });
   }, { 
-    start: 'top 70%', 
+    start: 'top 100%', 
     end: 'bottom 70%',
     scrub: 1.8
   });
