@@ -191,7 +191,7 @@ export default function Navigation() {
           <div className="flex justify-between items-center h-14 px-4">
             <Link to="/dashboard" className="flex items-center space-x-2">
               <GraduationCap className="h-6 w-6 text-brand-primary" />
-              <span className="font-semibold text-foreground">AUt</span>
+              <span className="font-semibold text-foreground">AUT</span>
             </Link>
 
             <div className="flex items-center space-x-3">
@@ -394,7 +394,7 @@ export default function Navigation() {
               <span className={cn(
                 'text-lg font-semibold',
                 isDark ? 'text-white' : 'text-gray-900'
-              )}>ASU</span>
+              )}>AUT</span>
             </Link>
           ) : (
             <Link to="/dashboard" className="flex justify-center w-full">
