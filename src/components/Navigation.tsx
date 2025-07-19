@@ -118,24 +118,30 @@ export default function Navigation() {
       <>
         {/* Mobile Top Bar */}
         <header className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-xl border-b ${
-          isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
+          isDark ? 'bg-black  border-gray-800' : 'bg-white/80 border-gray-200'
         }`}>
           <div className="flex items-center justify-between px-4 py-3">
-            <div className="flex items-center space-x-3">
+            {/* <div className="flex items-center space-x-3">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                 isDark ? 'bg-white' : 'bg-black'
               }`}>
                 <XIcon className={`h-4 w-4 ${isDark ? 'text-black' : 'text-white'}`} />
               </div>
-            </div>
+            </div> */}
             
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2"
+              className={cn(
+                "p-2 rounded-full transition-colors duration-200",
+                isDark ? 'hover:bg-black text-white' : 'hover:bg-gray-100'
+              )}
             >
-              {isMobileMenuOpen ? <XIcon className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {isMobileMenuOpen ? <XIcon className={cn(
+                isDark ? 'text-white' : 'text-gray-900',
+                "h-5 w-5 transition-transform duration-200"
+              )} /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
 
@@ -153,10 +159,10 @@ export default function Navigation() {
                       key={index}
                       to={item.path}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className={`flex items-center space-x-3 px-4 py-3 rounded-full transition-colors ${
+                      className={`flex items-center backdrop-blur-xl space-x-3 px-4 py-3 rounded-full transition-colors ${
                         isActive
                           ? isDark ? 'bg-gray-900' : 'bg-gray-100'
-                          : isDark ? 'hover:bg-gray-900' : 'hover:bg-gray-100'
+                          : isDark ? 'hover:bg-gray-900 text-white' : 'hover:bg-gray-100'
                       }`}
                     >
                       <Icon className="h-6 w-6" />

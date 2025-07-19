@@ -58,11 +58,19 @@ export default function Feed() {
   const [newPostContent, setNewPostContent] = useState('');
   const [isPosting, setIsPosting] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   
   const timelineRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    window.addEventListener('resize', handleResize);
     fetchPosts();
+    
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const fetchPosts = async () => {
@@ -368,7 +376,10 @@ export default function Feed() {
   if (loading) {
     return (
       <PageLayout className={isDark ? 'bg-black text-white' : 'bg-white text-black'}>
-        <div className="flex justify-center items-center min-h-screen">
+        <div className={cn(
+          'flex justify-center items-center min-h-screen',
+          isMobile ? 'pt-16 pb-20' : ''
+        )}>
           <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${
             isDark ? 'border-white' : 'border-black'
           }`}></div>
@@ -379,55 +390,94 @@ export default function Feed() {
 
   return (
     <div className={cn(
-      'min-h-screen w-full flex',
-      isDark ? 'bg-black text-white' : 'bg-white text-black'
+      'min-h-screen w-full',
+      isDark ? 'bg-black text-white' : 'bg-white text-black',
+      isMobile ? 'pb-20' : 'flex'
     )}>
       {/* Main Content */}
-      <main className="flex-1 ml-80 max-w-2xl mx-auto">
-        {/* X-Style Header */}
-        <div className={`sticky top-0 z-10 backdrop-blur-xl border-b ${
-          isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
-        }`}>
-          <div className="flex items-center justify-between px-4 py-3">
+      <main className={cn(
+        'flex-1',
+        isMobile 
+          ? 'pt-16 px-0' 
+          : 'lg:ml-80 max-w-2xl mx-auto'
+      )}>
+        {/* Mobile/Desktop Header */}
+        <div className={cn(
+          'sticky top-0 z-10 backdrop-blur-xl border-b',
+          isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200',
+          isMobile ? 'top-16' : 'top-0'
+        )}>
+          <div className={cn(
+            'flex items-center justify-between py-3',
+            isMobile ? 'px-4' : 'px-4'
+          )}>
             <div>
-              {/* <h1 className="text-xl font-bold">Home</h1> */}
+              <h1 className={cn(
+                'font-bold',
+                isMobile ? 'text-lg' : 'text-xl'
+              )}>
+                {isMobile ? '' : ''}
+              </h1>
             </div>
-            {/* <Button variant="ghost" size="sm" className="p-2">
-              <Sparkles className="h-5 w-5" />
-            </Button> */}
+           
           </div>
         </div>
 
         {/* Create Post Section */}
-        <div className={`border-b p-4 ${isDark ? 'border-gray-800' : 'border-gray-200'}`}>
+        <div className={cn(
+          'border-b p-4',
+          isDark ? 'border-gray-800' : 'border-gray-200'
+        )}>
           <div className="flex space-x-3">
-            <div className={`w-10 h-10 rounded-full ${isDark ? 'bg-gray-800' : 'bg-gray-200'} flex items-center justify-center`}>
-              <User className="h-5 w-5" />
+            <div className={cn(
+              'rounded-full flex items-center justify-center flex-shrink-0',
+              isDark ? 'bg-gray-800' : 'bg-gray-200',
+              isMobile ? 'w-8 h-8' : 'w-10 h-10'
+            )}>
+              <User className={cn(isMobile ? 'h-4 w-4' : 'h-5 w-5')} />
             </div>
             <div className="flex-1">
               <textarea
-                placeholder="Share your career journey..."
-                className={`w-full bg-transparent rounded-[100px]  text-xl placeholder-gray-500 placeholder:pl-[10px] placeholder:pt-[10px] resize-none border-2 outline-none ${
-                  isDark ? 'text-white' : 'text-black'
-                }`}
-                rows={3}
+                placeholder={isMobile ? "What's happening?" : "Share your career journey..."}
+                className={cn(
+                  'w-full bg-transparent placeholder-gray-500 resize-none border-0 outline-none',
+                  isDark ? 'text-white' : 'text-black',
+                  isMobile 
+                    ? 'text-base placeholder:text-sm' 
+                    : 'text-xl rounded-[100px] placeholder:pl-[10px] placeholder:pt-[10px] border-2'
+                )}
+                rows={isMobile ? 2 : 3}
+                value={newPostContent}
+                onChange={(e) => setNewPostContent(e.target.value)}
               />
-              <div className="flex items-center justify-between mt-3 pt-3">
-                <div className="flex items-center space-x-4">
+              <div className={cn(
+                'flex items-center justify-between mt-3 pt-3',
+                isMobile ? 'flex-col space-y-3' : 'flex-row'
+              )}>
+                <div className={cn(
+                  'flex items-center space-x-4',
+                  isMobile ? 'w-full justify-start' : ''
+                )}>
                   <Button variant="ghost" size="sm" className="p-2">
-                    <ImageIcon className="h-5 w-5" />
+                    <ImageIcon className={cn(isMobile ? 'h-4 w-4' : 'h-5 w-5')} />
                   </Button>
                   <Button variant="ghost" size="sm" className="p-2">
-                    <FileText className="h-5 w-5" />
+                    <FileText className={cn(isMobile ? 'h-4 w-4' : 'h-5 w-5')} />
                   </Button>
                   <Button variant="ghost" size="sm" className="p-2">
-                    <Calendar className="h-5 w-5" />
+                    <Calendar className={cn(isMobile ? 'h-4 w-4' : 'h-5 w-5')} />
                   </Button>
                 </div>
-                <Button className={`px-6 py-2 rounded-full font-semibold ${
-                  isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800'
-                }`}>
-                  Post
+                <Button 
+                  onClick={handlePost}
+                  disabled={isPosting || !newPostContent.trim()}
+                  className={cn(
+                    'rounded-full font-semibold',
+                    isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800',
+                    isMobile ? 'w-full px-4 py-2' : 'px-6 py-2'
+                  )}
+                >
+                  {isPosting ? 'Posting...' : 'Post'}
                 </Button>
               </div>
             </div>
@@ -435,49 +485,78 @@ export default function Feed() {
         </div>
 
         {/* Posts Feed */}
-        <div className="border-gray-800 border-[0.5px] divide-gray-800">
+        <div className={cn(
+          'divide-y',
+          isDark ? 'divide-gray-800' : 'divide-gray-200'
+        )}>
           {posts.map((post) => (
             <div 
               key={post.id} 
-              className={`p-4 hover:bg-gray-50/5 transition-colors cursor-pointer border-[0.5px] ${
-                isDark ? 'divide-gray-800 hover:bg-gray-950/50' : 'border-gray-200 hover:bg-gray-50/50'
-              }`}
-              onClick={() => setSelectedPost(post)}
+              className={cn(
+                'transition-colors cursor-pointer',
+                isDark ? 'hover:bg-gray-950/50' : 'hover:bg-gray-50/50',
+                isMobile ? 'p-3' : 'p-4'
+              )}
+              onClick={() => navigate(`/post/${post.id}`)}
             >
-              <div className="flex space-x-3">
+              <div className={cn('flex space-x-3', isMobile ? 'space-x-2' : 'space-x-3')}>
                 <Link to={`/profile/${post.author.username}`} onClick={(e) => e.stopPropagation()}>
                   <img
                     src={post.author.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author.name)}&background=random`}
                     alt={post.author.name}
-                    className="w-12 h-12 rounded-full object-cover"
+                    className={cn(
+                      'rounded-full object-cover',
+                      isMobile ? 'w-10 h-10' : 'w-12 h-12'
+                    )}
                   />
                 </Link>
                 
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-2 mb-1">
-                    <Link 
-                      to={`/profile/${post.author.username}`}
-                      onClick={(e) => e.stopPropagation()}
-                      className="font-bold hover:underline"
-                    >
-                      {post.author.name}
-                    </Link>
-                    {post.author.verified && (
-                      <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                        <span className="text-white text-xs">✓</span>
-                      </div>
-                    )}
-                    <span className={`text-gray-500`}>@{post.author.username}</span>
-                    <span className="text-gray-500">·</span>
-                    <span className="text-gray-500">{formatTime(post.created_at)}</span>
+                  {/* Author Info */}
+                  <div className={cn(
+                    'flex items-center mb-1',
+                    isMobile ? 'flex-col items-start space-y-1' : 'space-x-2'
+                  )}>
+                    <div className="flex items-center space-x-2">
+                      <Link 
+                        to={`/profile/${post.author.username}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className={cn(
+                          'font-bold hover:underline',
+                          isMobile ? 'text-sm' : 'text-base'
+                        )}
+                      >
+                        {post.author.name}
+                      </Link>
+                      {post.author.verified && (
+                        <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs">✓</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className={cn(
+                      'flex items-center space-x-1 text-gray-500',
+                      isMobile ? 'text-xs' : 'text-sm'
+                    )}>
+                      <span>@{post.author.username}</span>
+                      <span>·</span>
+                      <span>{formatTime(post.created_at)}</span>
+                    </div>
                   </div>
                   
-                  <p className="text-base leading-normal mb-3 whitespace-pre-wrap">
+                  {/* Post Content */}
+                  <p className={cn(
+                    'leading-normal mb-3 whitespace-pre-wrap',
+                    isMobile ? 'text-sm' : 'text-base'
+                  )}>
                     {post.content}
                   </p>
                   
                   {/* Post Actions */}
-                  <div className="flex items-center justify-between max-w-md">
+                  <div className={cn(
+                    'flex items-center justify-between',
+                    isMobile ? 'max-w-full' : 'max-w-md'
+                  )}>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -485,10 +564,13 @@ export default function Feed() {
                         e.stopPropagation();
                         navigate(`/post/${post.id}`);
                       }}
-                      className="flex items-center space-x-2 p-2 text-gray-500 hover:text-blue-500 hover:bg-blue-500/10 rounded-full group"
+                      className={cn(
+                        'flex items-center space-x-2 p-2 text-gray-500 hover:text-blue-500 hover:bg-blue-500/10 rounded-full group',
+                        isMobile ? 'p-1' : 'p-2'
+                      )}
                     >
-                      <MessageCircle className="h-5 w-5" />
-                      <span className="text-sm">{post.replies_count}</span>
+                      <MessageCircle className={cn(isMobile ? 'h-4 w-4' : 'h-5 w-5')} />
+                      <span className={cn(isMobile ? 'text-xs' : 'text-sm')}>{post.replies_count}</span>
                     </Button>
                     
                     <Button
@@ -498,14 +580,16 @@ export default function Feed() {
                         e.stopPropagation();
                         handleRetweet(post.id);
                       }}
-                      className={`flex items-center space-x-2 p-2 rounded-full group ${
+                      className={cn(
+                        'flex items-center space-x-2 rounded-full group',
                         post.has_retweeted
                           ? 'text-green-500'
-                          : 'text-gray-500 hover:text-green-500 hover:bg-green-500/10'
-                      }`}
+                          : 'text-gray-500 hover:text-green-500 hover:bg-green-500/10',
+                        isMobile ? 'p-1' : 'p-2'
+                      )}
                     >
-                      <Repeat2 className="h-5 w-5" />
-                      <span className="text-sm">{post.retweets_count}</span>
+                      <Repeat2 className={cn(isMobile ? 'h-4 w-4' : 'h-5 w-5')} />
+                      <span className={cn(isMobile ? 'text-xs' : 'text-sm')}>{post.retweets_count}</span>
                     </Button>
                     
                     <Button
@@ -515,42 +599,52 @@ export default function Feed() {
                         e.stopPropagation();
                         handleLike(post.id);
                       }}
-                      className={`flex items-center space-x-2 p-2 rounded-full group ${
+                      className={cn(
+                        'flex items-center space-x-2 rounded-full group',
                         post.has_liked
                           ? 'text-red-500'
-                          : 'text-gray-500 hover:text-red-500 hover:bg-red-500/10'
-                      }`}
+                          : 'text-gray-500 hover:text-red-500 hover:bg-red-500/10',
+                        isMobile ? 'p-1' : 'p-2'
+                      )}
                     >
-                      <Heart className={`h-5 w-5 ${post.has_liked ? 'fill-current' : ''}`} />
-                      <span className="text-sm">{post.likes_count}</span>
+                      <Heart className={cn(
+                        post.has_liked ? 'fill-current' : '',
+                        isMobile ? 'h-4 w-4' : 'h-5 w-5'
+                      )} />
+                      <span className={cn(isMobile ? 'text-xs' : 'text-sm')}>{post.likes_count}</span>
                     </Button>
                     
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={(e) => e.stopPropagation()}
-                      className="flex items-center space-x-2 p-2 text-gray-500 hover:text-blue-500 hover:bg-blue-500/10 rounded-full group"
+                      className={cn(
+                        'flex items-center space-x-2 text-gray-500 hover:text-blue-500 hover:bg-blue-500/10 rounded-full group',
+                        isMobile ? 'p-1' : 'p-2'
+                      )}
                     >
-                      <Share className="h-5 w-5" />
+                      <Share className={cn(isMobile ? 'h-4 w-4' : 'h-5 w-5')} />
                     </Button>
                   </div>
                 </div>
                 
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => e.stopPropagation()}
-                  className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-500/10 rounded-full"
-                >
-                  <MoreHorizontal className="h-5 w-5" />
-                </Button>
+                {!isMobile && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => e.stopPropagation()}
+                    className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-500/10 rounded-full"
+                  >
+                    <MoreHorizontal className="h-5 w-5" />
+                  </Button>
+                )}
               </div>
             </div>
           ))}
         </div>
 
         {/* Loading More */}
-        <div className="p-8 text-center">
+        <div className={cn('text-center', isMobile ? 'p-4' : 'p-8')}>
           <Button
             variant="ghost"
             className="text-blue-500 hover:bg-blue-500/10"
@@ -560,169 +654,171 @@ export default function Feed() {
         </div>
       </main>
 
-      {/* Right Sidebar */}
-      <aside className={cn(
-        'hidden xl:block w-80 border-l sticky top-0 h-screen mr-20 overflow-y-auto',
-        isDark ? 'border-gray-800' : 'border-gray-200'
-      )}>
-        <div className="p-4 space-y-6">
-          {/* Job Recommendations */}
-          <div className={cn(
-            'rounded-xl p-4 border',
-            isDark ? 'bg-black border-gray-800' : 'bg-gray-50 border-gray-200'
-          )}>
-            <h3 className="font-bold text-lg mb-4 flex items-center">
-              <Bookmark className="h-5 w-5 mr-2" />
-              Jobs For You
-            </h3>
-            <div className="space-y-4">
-              {[
-                {
-                  title: 'Frontend Developer',
-                  company: 'Google',
-                  location: 'Remote',
-                  salary: '$120k - $180k',
-                  logo: 'https://images.unsplash.com/photo-1573804633927-bfcbcd909acd?w=40&h=40&fit=crop&crop=center'
-                },
-                {
-                  title: 'Product Manager',
-                  company: 'Meta',
-                  location: 'San Francisco',
-                  salary: '$150k - $200k',
-                  logo: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=40&h=40&fit=crop&crop=center'
-                },
-                {
-                  title: 'Data Scientist',
-                  company: 'Netflix',
-                  location: 'Los Angeles',
-                  salary: '$140k - $190k',
-                  logo: 'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=40&h=40&fit=crop&crop=center'
-                }
-              ].map((job, index) => (
-                <div key={index} className={cn(
-                  'p-3 rounded-lg hover:bg-gray-800/30 cursor-pointer transition-colors',
-                  isDark ? 'hover:bg-gray-800/30' : 'hover:bg-gray-100'
-                )}>
-                  <div className="flex items-center space-x-3 mb-2">
-                    <img src={job.logo} alt={job.company} className="w-10 h-10 rounded-lg" />
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-sm">{job.title}</h4>
-                      <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-600')}>
-                        {job.company} • {job.location}
-                      </p>
-                    </div>
-                  </div>
-                  <p className="text-sm font-medium text-green-500">{job.salary}</p>
-                </div>
-              ))}
-            </div>
-            <Button variant="ghost" className="w-full mt-4 text-blue-500">
-              View All Jobs
-            </Button>
-          </div>
-
-          {/* Who to Follow */}
-          <div className={cn(
-            'rounded-xl p-4 border',
-            isDark ? 'bg-black border-gray-800' : 'bg-gray-50 border-gray-200'
-          )}>
-            <h3 className="font-bold text-lg mb-4 flex items-center">
-              <Users className="h-5 w-5 mr-2" />
-              Who to Follow
-            </h3>
-            <div className="space-y-4">
-              {[
-                {
-                  name: 'Emily Chen',
-                  username: 'emilychen_dev',
-                  title: 'Senior Engineer at Apple',
-                  avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b278?w=40&h=40&fit=crop&crop=face',
-                  verified: true
-                },
-                {
-                  name: 'Marcus Johnson',
-                  username: 'marcusj_pm',
-                  title: 'Product Lead at Stripe',
-                  avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face',
-                  verified: false
-                },
-                {
-                  name: 'Tesla Careers',
-                  username: 'teslacareers',
-                  title: 'Official Tesla Recruiting',
-                  avatar: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=40&h=40&fit=crop&crop=center',
-                  verified: true
-                }
-              ].map((user, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <img src={user.avatar} alt={user.name} className="w-10 h-10 rounded-full" />
-                    <div>
-                      <div className="flex items-center space-x-1">
-                        <h4 className="font-semibold text-sm">{user.name}</h4>
-                        {user.verified && (
-                          <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                            <span className="text-white text-xs">✓</span>
-                          </div>
-                        )}
+      {/* Right Sidebar - Desktop Only */}
+      {!isMobile && (
+        <aside className={cn(
+          'hidden xl:block w-80 border-l sticky top-0 h-screen mr-20 overflow-y-auto',
+          isDark ? 'border-gray-800' : 'border-gray-200'
+        )}>
+          <div className="p-4 space-y-6">
+            {/* Job Recommendations */}
+            <div className={cn(
+              'rounded-xl p-4 border',
+              isDark ? 'bg-black border-gray-800' : 'bg-gray-50 border-gray-200'
+            )}>
+              <h3 className="font-bold text-lg mb-4 flex items-center">
+                <Bookmark className="h-5 w-5 mr-2" />
+                Jobs For You
+              </h3>
+              <div className="space-y-4">
+                {[
+                  {
+                    title: 'Frontend Developer',
+                    company: 'Google',
+                    location: 'Remote',
+                    salary: '$120k - $180k',
+                    logo: 'https://images.unsplash.com/photo-1573804633927-bfcbcd909acd?w=40&h=40&fit=crop&crop=center'
+                  },
+                  {
+                    title: 'Product Manager',
+                    company: 'Meta',
+                    location: 'San Francisco',
+                    salary: '$150k - $200k',
+                    logo: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=40&h=40&fit=crop&crop=center'
+                  },
+                  {
+                    title: 'Data Scientist',
+                    company: 'Netflix',
+                    location: 'Los Angeles',
+                    salary: '$140k - $190k',
+                    logo: 'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=40&h=40&fit=crop&crop=center'
+                  }
+                ].map((job, index) => (
+                  <div key={index} className={cn(
+                    'p-3 rounded-lg hover:bg-gray-800/30 cursor-pointer transition-colors',
+                    isDark ? 'hover:bg-gray-800/30' : 'hover:bg-gray-100'
+                  )}>
+                    <div className="flex items-center space-x-3 mb-2">
+                      <img src={job.logo} alt={job.company} className="w-10 h-10 rounded-lg" />
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-sm">{job.title}</h4>
+                        <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                          {job.company} • {job.location}
+                        </p>
                       </div>
-                      <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-600')}>
-                        @{user.username}
-                      </p>
-                      <p className={cn('text-xs', isDark ? 'text-gray-500' : 'text-gray-500')}>
-                        {user.title}
-                      </p>
                     </div>
+                    <p className="text-sm font-medium text-green-500">{job.salary}</p>
                   </div>
-                  <Button size="sm" className="rounded-full">
-                    Follow
-                  </Button>
-                </div>
-              ))}
+                ))}
+              </div>
+              <Button variant="ghost" className="w-full mt-4 text-blue-500">
+                View All Jobs
+              </Button>
             </div>
-            <Button variant="ghost" className="w-full mt-4 text-blue-500">
-              Show More
-            </Button>
-          </div>
 
-          {/* Recent Activity */}
-          <div className={cn(
-            'rounded-xl p-4 border',
-            isDark ? 'bg-black border-gray-800' : 'bg-gray-50 border-gray-200'
-          )}>
-            <h3 className="font-bold text-lg mb-4">Recent Activity</h3>
-            <div className="space-y-3">
-              {[
-                { action: 'New job posted', detail: 'Senior Developer at Spotify', time: '2h ago' },
-                { action: 'Event reminder', detail: 'Tech Networking Meetup', time: '4h ago' },
-                { action: 'Profile view', detail: '12 people viewed your profile', time: '6h ago' },
-                { action: 'Application update', detail: 'Your Netflix application is under review', time: '1d ago' }
-              ].map((activity, index) => (
-                <div key={index} className="text-sm">
-                  <p className="font-medium">{activity.action}</p>
-                  <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-600')}>
-                    {activity.detail}
-                  </p>
-                  <p className={cn('text-xs', isDark ? 'text-gray-500' : 'text-gray-500')}>
-                    {activity.time}
-                  </p>
-                </div>
-              ))}
+            {/* Who to Follow */}
+            <div className={cn(
+              'rounded-xl p-4 border',
+              isDark ? 'bg-black border-gray-800' : 'bg-gray-50 border-gray-200'
+            )}>
+              <h3 className="font-bold text-lg mb-4 flex items-center">
+                <Users className="h-5 w-5 mr-2" />
+                Who to Follow
+              </h3>
+              <div className="space-y-4">
+                {[
+                  {
+                    name: 'Emily Chen',
+                    username: 'emilychen_dev',
+                    title: 'Senior Engineer at Apple',
+                    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b278?w=40&h=40&fit=crop&crop=face',
+                    verified: true
+                  },
+                  {
+                    name: 'Marcus Johnson',
+                    username: 'marcusj_pm',
+                    title: 'Product Lead at Stripe',
+                    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face',
+                    verified: false
+                  },
+                  {
+                    name: 'Tesla Careers',
+                    username: 'teslacareers',
+                    title: 'Official Tesla Recruiting',
+                    avatar: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=40&h=40&fit=crop&crop=center',
+                    verified: true
+                  }
+                ].map((user, index) => (
+                  <div key={index} className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <img src={user.avatar} alt={user.name} className="w-10 h-10 rounded-full" />
+                      <div>
+                        <div className="flex items-center space-x-1">
+                          <h4 className="font-semibold text-sm">{user.name}</h4>
+                          {user.verified && (
+                            <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                              <span className="text-white text-xs">✓</span>
+                            </div>
+                          )}
+                        </div>
+                        <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                          @{user.username}
+                        </p>
+                        <p className={cn('text-xs', isDark ? 'text-gray-500' : 'text-gray-500')}>
+                          {user.title}
+                        </p>
+                      </div>
+                    </div>
+                    <Button size="sm" className="rounded-full">
+                      Follow
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              <Button variant="ghost" className="w-full mt-4 text-blue-500">
+                Show More
+              </Button>
             </div>
-          </div>
 
-          {/* Footer Links */}
-          <div className={cn('text-xs space-y-2', isDark ? 'text-gray-500' : 'text-gray-500')}>
-            <div className="flex flex-wrap gap-2">
-              <a href="/about" className="hover:underline">About</a>
-              <a href="/privacy" className="hover:underline">Privacy</a>
-              <a href="/terms" className="hover:underline">Terms</a>
-              <a href="/help" className="hover:underline">Help</a>
+            {/* Recent Activity */}
+            <div className={cn(
+              'rounded-xl p-4 border',
+              isDark ? 'bg-black border-gray-800' : 'bg-gray-50 border-gray-200'
+            )}>
+              <h3 className="font-bold text-lg mb-4">Recent Activity</h3>
+              <div className="space-y-3">
+                {[
+                  { action: 'New job posted', detail: 'Senior Developer at Spotify', time: '2h ago' },
+                  { action: 'Event reminder', detail: 'Tech Networking Meetup', time: '4h ago' },
+                  { action: 'Profile view', detail: '12 people viewed your profile', time: '6h ago' },
+                  { action: 'Application update', detail: 'Your Netflix application is under review', time: '1d ago' }
+                ].map((activity, index) => (
+                  <div key={index} className="text-sm">
+                    <p className="font-medium">{activity.action}</p>
+                    <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                      {activity.detail}
+                    </p>
+                    <p className={cn('text-xs', isDark ? 'text-gray-500' : 'text-gray-500')}>
+                      {activity.time}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
-            <p>© 2025 TalentLink. All rights reserved.</p>
+
+            {/* Footer Links */}
+            <div className={cn('text-xs space-y-2', isDark ? 'text-gray-500' : 'text-gray-500')}>
+              <div className="flex flex-wrap gap-2">
+                <a href="/about" className="hover:underline">About</a>
+                <a href="/privacy" className="hover:underline">Privacy</a>
+                <a href="/terms" className="hover:underline">Terms</a>
+                <a href="/help" className="hover:underline">Help</a>
+              </div>
+              <p>© 2025 TalentLink. All rights reserved.</p>
+            </div>
           </div>
-        </div>
-      </aside>
+        </aside>
+      )}
     </div>
   );
 }
