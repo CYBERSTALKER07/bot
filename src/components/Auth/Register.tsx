@@ -1,32 +1,22 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  Person, 
-  Business, 
-  Email,
-  Phone,
-  School,
-  AutoAwesome,
-  CheckCircle,
-  TrendingUp,
-  EmojiEvents,
-  Security,
-  Verified,
-  Groups,
-  WorkOutline
-} from '@mui/icons-material';
+  User, 
+  Building2, 
+  Mail,
+  Eye,
+  EyeOff,
+  AlertCircle,
+  X as XIcon
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import Typography from '../ui/Typography';
-import Input from '../ui/Input';
 import Button from '../ui/Button';
-import { Card } from '../ui/Card';
 
 export default function Register() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: '',
     password: '',
     confirmPassword: '',
     role: 'student' as 'student' | 'employer',
@@ -34,6 +24,8 @@ export default function Register() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const { register } = useAuth();
   const { isDark } = useTheme();
@@ -71,382 +63,300 @@ export default function Register() {
   };
 
   return (
-    <div className={`min-h-screen flex transition-colors duration-300 ${
-      isDark ? 'bg-dark-bg' : 'bg-neutral-50'
-    }`}>
-      {/* Left Side - Registration Form */}
-      <div className="flex-1 flex flex-col justify-center py-8 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
-        <div className="mx-auto w-full max-w-md lg:w-96">
-          {/* Header Section */}
-          <div className="text-center mb-12">
-            <div className={`inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-6 ${
-              isDark ? 'bg-lime/15' : 'bg-asu-maroon/10'
-            }`}>
-              <School className={`h-10 w-10 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
+    <div className={`min-h-screen ${isDark ? 'bg-black text-white' : 'bg-white text-black'}`}>
+      <div className="min-h-screen flex">
+        {/* Left Side - Form */}
+        <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24 max-w-md mx-auto lg:max-w-none">
+          <div className="mx-auto w-full max-w-sm lg:w-96">
+            {/* X Logo */}
+            <div className="text-center mb-8">
+              <div className={`w-12 h-12 rounded-full mx-auto mb-6 flex items-center justify-center ${
+                isDark ? 'bg-white' : 'bg-black'
+              }`}>
+                <XIcon className={`h-6 w-6 ${isDark ? 'text-black' : 'text-white'}`} />
+              </div>
+              <h1 className="text-3xl font-bold mb-2">Create your account</h1>
             </div>
-            <Typography variant="h3" color="textPrimary" className="font-bold mb-4 tracking-tight">
-              Create Your Account
-            </Typography>
-            <Typography variant="body1" color="textSecondary" className="max-w-sm mx-auto leading-relaxed">
-              Join the AUT community and connect with thousands of students and employers
-            </Typography>
-          </div>
 
-          {/* Role Selection - Material Design Segmented Button */}
-          <Card className="p-1 mb-8 shadow-elevation-1" variant="outlined">
-            <div className="flex rounded-xl overflow-hidden">
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Role Selection */}
+              <div className="space-y-3">
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, role: 'student' }))}
+                  className={`w-full p-4 rounded-full border-2 transition-all duration-200 flex items-center justify-center space-x-3 ${
+                    formData.role === 'student'
+                      ? isDark
+                        ? 'border-white bg-white text-black'
+                        : 'border-black bg-black text-white'
+                      : isDark
+                        ? 'border-gray-600 text-gray-300 hover:border-gray-500'
+                        : 'border-gray-300 text-gray-700 hover:border-gray-400'
+                  }`}
+                >
+                  <User className="h-5 w-5" />
+                  <span className="font-medium">Sign up as Student</span>
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, role: 'employer' }))}
+                  className={`w-full p-4 rounded-full border-2 transition-all duration-200 flex items-center justify-center space-x-3 ${
+                    formData.role === 'employer'
+                      ? isDark
+                        ? 'border-white bg-white text-black'
+                        : 'border-black bg-black text-white'
+                      : isDark
+                        ? 'border-gray-600 text-gray-300 hover:border-gray-500'
+                        : 'border-gray-300 text-gray-700 hover:border-gray-400'
+                  }`}
+                >
+                  <Building2 className="h-5 w-5" />
+                  <span className="font-medium">Sign up as Employer</span>
+                </button>
+              </div>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className={`px-2 ${isDark ? 'bg-black text-gray-400' : 'bg-white text-gray-500'}`}>
+                    Enter your details
+                  </span>
+                </div>
+              </div>
+
+              {/* Name Input */}
+              <div className="space-y-1">
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={handleChange('name')}
+                  placeholder="Full name"
+                  required
+                  className={`w-full px-4 py-4 text-lg rounded-md border-2 bg-transparent transition-colors ${
+                    isDark
+                      ? 'border-gray-600 focus:border-blue-500 text-white placeholder-gray-400'
+                      : 'border-gray-300 focus:border-blue-500 text-black placeholder-gray-500'
+                  } focus:outline-none`}
+                />
+              </div>
+
+              {/* Email Input */}
+              <div className="space-y-1">
+                <div className="relative">
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange('email')}
+                    placeholder="Email"
+                    required
+                    className={`w-full px-4 py-4 text-lg rounded-md border-2 bg-transparent transition-colors ${
+                      isDark
+                        ? 'border-gray-600 focus:border-blue-500 text-white placeholder-gray-400'
+                        : 'border-gray-300 focus:border-blue-500 text-black placeholder-gray-500'
+                    } focus:outline-none`}
+                  />
+                  <Mail className={`absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 ${
+                    isDark ? 'text-gray-400' : 'text-gray-500'
+                  }`} />
+                </div>
+              </div>
+
+              {/* Company Name (for employers) */}
+              {formData.role === 'employer' && (
+                <div className="space-y-1">
+                  <input
+                    type="text"
+                    value={formData.companyName}
+                    onChange={handleChange('companyName')}
+                    placeholder="Company name"
+                    required
+                    className={`w-full px-4 py-4 text-lg rounded-md border-2 bg-transparent transition-colors ${
+                      isDark
+                        ? 'border-gray-600 focus:border-blue-500 text-white placeholder-gray-400'
+                        : 'border-gray-300 focus:border-blue-500 text-black placeholder-gray-500'
+                    } focus:outline-none`}
+                  />
+                </div>
+              )}
+
+              {/* Password Input */}
+              <div className="space-y-1">
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={formData.password}
+                    onChange={handleChange('password')}
+                    placeholder="Password"
+                    required
+                    className={`w-full px-4 py-4 text-lg rounded-md border-2 bg-transparent transition-colors pr-12 ${
+                      isDark
+                        ? 'border-gray-600 focus:border-blue-500 text-white placeholder-gray-400'
+                        : 'border-gray-300 focus:border-blue-500 text-black placeholder-gray-500'
+                    } focus:outline-none`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className={`absolute right-4 top-1/2 transform -translate-y-1/2 ${
+                      isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                  Must be at least 6 characters
+                </p>
+              </div>
+
+              {/* Confirm Password Input */}
+              <div className="space-y-1">
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={formData.confirmPassword}
+                    onChange={handleChange('confirmPassword')}
+                    placeholder="Confirm password"
+                    required
+                    className={`w-full px-4 py-4 text-lg rounded-md border-2 bg-transparent transition-colors pr-12 ${
+                      isDark
+                        ? 'border-gray-600 focus:border-blue-500 text-white placeholder-gray-400'
+                        : 'border-gray-300 focus:border-blue-500 text-black placeholder-gray-500'
+                    } focus:outline-none`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className={`absolute right-4 top-1/2 transform -translate-y-1/2 ${
+                      isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Error Message */}
+              {error && (
+                <div className={`p-4 rounded-lg border ${
+                  isDark 
+                    ? 'bg-red-900/20 border-red-800 text-red-300' 
+                    : 'bg-red-50 border-red-200 text-red-700'
+                }`}>
+                  <div className="flex items-center space-x-2">
+                    <AlertCircle className="h-5 w-5" />
+                    <span>{error}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Submit Button */}
               <Button
-                variant={formData.role === 'student' ? 'filled' : 'text'}
-                color="primary"
-                startIcon={Person}
-                fullWidth
-                onClick={() => setFormData(prev => ({ ...prev, role: 'student' }))}
-                className={`flex-1 rounded-r-none ${formData.role === 'student' ? 'shadow-none' : ''}`}
-                size="large"
+                type="submit"
+                disabled={loading}
+                className={`w-full py-4 text-lg font-bold rounded-full transition-colors ${
+                  isDark
+                    ? 'bg-white text-black hover:bg-gray-200 disabled:bg-gray-800 disabled:text-gray-500'
+                    : 'bg-black text-white hover:bg-gray-800 disabled:bg-gray-300 disabled:text-gray-500'
+                }`}
               >
-                Student
+                {loading ? 'Creating account...' : 'Create account'}
               </Button>
-              <Button
-                variant={formData.role === 'employer' ? 'filled' : 'text'}
-                color="primary"
-                startIcon={Business}
-                fullWidth
-                onClick={() => setFormData(prev => ({ ...prev, role: 'employer' }))}
-                className={`flex-1 rounded-l-none ${formData.role === 'employer' ? 'shadow-none' : ''}`}
-                size="large"
-              >
-                Employer
-              </Button>
-            </div>
-          </Card>
+            </form>
 
-          {/* Registration Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <Input
-              label="Full Name"
-              type="text"
-              required
-              value={formData.name}
-              onChange={handleChange('name')}
-              placeholder="Enter your full name"
-              variant="filled"
-              fullWidth
-              startIcon={<Person />}
-              size="large"
-            />
+            {/* Terms */}
+            <p className={`mt-6 text-sm text-center ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+              By signing up, you agree to the{' '}
+              <Link to="/terms" className={`hover:underline ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
+                Terms of Service
+              </Link>{' '}
+              and{' '}
+              <Link to="/privacy" className={`hover:underline ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
+                Privacy Policy
+              </Link>
+              .
+            </p>
 
-            <Input
-              label="Email Address"
-              type="email"
-              required
-              value={formData.email}
-              onChange={handleChange('email')}
-              placeholder="Enter your email"
-              variant="filled"
-              fullWidth
-              startIcon={<Email />}
-              size="large"
-            />
-
-            <Input
-              label="Phone Number"
-              type="tel"
-              value={formData.phone}
-              onChange={handleChange('phone')}
-              placeholder="Enter your phone number"
-              variant="filled"
-              fullWidth
-              startIcon={<Phone />}
-              size="large"
-              helperText="Optional - for account verification"
-            />
-
-            {formData.role === 'employer' && (
-              <Input
-                label="Company Name"
-                type="text"
-                required
-                value={formData.companyName}
-                onChange={handleChange('companyName')}
-                placeholder="Enter your company name"
-                variant="filled"
-                fullWidth
-                startIcon={<WorkOutline />}
-                size="large"
-              />
-            )}
-
-            <Input
-              label="Password"
-              type="password"
-              required
-              value={formData.password}
-              onChange={handleChange('password')}
-              placeholder="Create a strong password"
-              variant="filled"
-              fullWidth
-              showPasswordToggle
-              size="large"
-              helperText="Must be at least 6 characters long"
-            />
-
-            <Input
-              label="Confirm Password"
-              type="password"
-              required
-              value={formData.confirmPassword}
-              onChange={handleChange('confirmPassword')}
-              placeholder="Confirm your password"
-              variant="filled"
-              fullWidth
-              showPasswordToggle
-              size="large"
-            />
-
-            {error && (
-              <Card className={`p-4 rounded-xl border-l-4 ${
-                isDark 
-                  ? 'bg-error-600/10 border-error-400 text-error-300' 
-                  : 'bg-error-50 border-error-400 text-error-700'
-              }`} variant="outlined">
-                <Typography variant="body2" className="font-medium">
-                  {error}
-                </Typography>
-              </Card>
-            )}
-
-            <Button
-              type="submit"
-              variant="filled"
-              color="primary"
-              size="large"
-              fullWidth
-              loading={loading}
-              className="py-4 mt-8 font-semibold tracking-wide"
-            >
-              Create Account
-            </Button>
-          </form>
-
-          {/* Sign In Link */}
-          <div className="mt-8 text-center">
-            <Typography variant="body2" color="textSecondary" className="mb-2">
-              Already have an account?
-            </Typography>
-            <Button
-              variant="text"
-              color="primary"
-              component={Link}
-              to="/login"
-              className="font-semibold"
-            >
-              Sign In Instead
-            </Button>
-          </div>
-
-          {/* Trust Indicators */}
-          <div className="mt-8 pt-6 border-t border-opacity-20">
-            <div className="flex items-center justify-center space-x-6 text-xs">
-              <div className={`flex items-center space-x-1 ${
-                isDark ? 'text-dark-muted' : 'text-gray-500'
-              }`}>
-                <Security className="h-4 w-4" />
-                <span>Secure</span>
-              </div>
-              <div className={`flex items-center space-x-1 ${
-                isDark ? 'text-dark-muted' : 'text-gray-500'
-              }`}>
-                <Verified className="h-4 w-4" />
-                <span>Verified</span>
-              </div>
-              <div className={`flex items-center space-x-1 ${
-                isDark ? 'text-dark-muted' : 'text-gray-500'
-              }`}>
-                <Groups className="h-4 w-4" />
-                <span>Trusted</span>
-              </div>
+            {/* Sign In Link */}
+            <div className="mt-8 text-center">
+              <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                Already have an account?{' '}
+                <Link 
+                  to="/login"
+                  className={`font-medium hover:underline ${
+                    isDark ? 'text-blue-400' : 'text-blue-600'
+                  }`}
+                >
+                  Sign in
+                </Link>
+              </span>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Right Side - Enhanced Hero Section */}
-      <div className="hidden lg:block relative w-0 flex-1">
-        <div className={`absolute inset-0 transition-colors duration-300 ${
-          isDark 
-            ? 'bg-gradient-to-br from-dark-surface via-dark-bg to-dark-surface' 
-            : 'bg-gradient-to-br from-asu-maroon via-asu-maroon-dark to-asu-maroon'
-        }`}>
-          {/* Background Pattern */}
-          <div className={`absolute inset-0 opacity-10 ${
-            isDark ? 'bg-lime/5' : 'bg-white/10'
+        {/* Right Side - Hero */}
+        <div className="hidden lg:block relative flex-1">
+          <div className={`absolute inset-0 ${
+            isDark 
+              ? 'bg-gradient-to-br from-gray-900 via-black to-gray-900' 
+              : 'bg-gradient-to-br from-gray-100 via-white to-gray-100'
           }`}>
-            <div className="absolute top-0 left-0 w-full h-full">
-              {[...Array(20)].map((_, i) => (
-                <div
-                  key={i}
-                  className={`absolute rounded-full ${
-                    isDark ? 'bg-lime/20' : 'bg-white/20'
-                  }`}
-                  style={{
-                    width: Math.random() * 4 + 2 + 'px',
-                    height: Math.random() * 4 + 2 + 'px',
-                    top: Math.random() * 100 + '%',
-                    left: Math.random() * 100 + '%',
-                    animationDelay: Math.random() * 3 + 's',
-                    animation: 'float 6s ease-in-out infinite'
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div className="relative z-10 flex flex-col justify-center items-center h-full p-12">
-            <div className="text-center max-w-lg">
-              <Typography 
-                variant="h2" 
-                className={`font-bold mb-8 leading-tight ${
-                  isDark ? 'text-dark-text' : 'text-white'
-                }`}
-              >
-                Welcome to Your <span className={`${
-                  isDark ? 'text-lime' : 'text-asu-gold'
-                }`}>Future</span>
-              </Typography>
-              <Typography 
-                variant="body1" 
-                className={`mb-12 leading-relaxed ${
-                  isDark ? 'text-dark-muted' : 'text-white/90'
-                }`}
-              >
-                Connect with leading employers, discover opportunities, and build meaningful 
-                relationships that will shape your career at AUT American University of Technology.
-              </Typography>
-
-              {/* Feature Highlights */}
-              <div className="space-y-6">
-                <Card className={`backdrop-blur-xl border ${
-                  isDark 
-                    ? 'bg-dark-surface/20 border-lime/20' 
-                    : 'bg-white/20 border-white/20'
-                }`} variant="outlined">
-                  <div className="flex items-center space-x-4 p-6">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
-                      isDark ? 'bg-lime/20' : 'bg-asu-gold/20'
-                    }`}>
-                      <CheckCircle className={`h-6 w-6 ${
-                        isDark ? 'text-lime' : 'text-asu-gold'
-                      }`} />
-                    </div>
-                    <div className="text-left flex-1">
-                      <Typography 
-                        variant="subtitle1" 
-                        className={`font-semibold mb-1 ${
-                          isDark ? 'text-dark-text' : 'text-white'
-                        }`}
-                      >
-                        Free & Secure
-                      </Typography>
-                      <Typography 
-                        variant="body2" 
-                        className={isDark ? 'text-dark-muted' : 'text-white/80'}
-                      >
-                        No costs, complete privacy protection
-                      </Typography>
-                    </div>
-                  </div>
-                </Card>
-
-                <Card className={`backdrop-blur-xl border ${
-                  isDark 
-                    ? 'bg-dark-surface/20 border-lime/20' 
-                    : 'bg-white/20 border-white/20'
-                }`} variant="outlined">
-                  <div className="flex items-center space-x-4 p-6">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
-                      isDark ? 'bg-lime/20' : 'bg-asu-gold/20'
-                    }`}>
-                      <TrendingUp className={`h-6 w-6 ${
-                        isDark ? 'text-lime' : 'text-asu-gold'
-                      }`} />
-                    </div>
-                    <div className="text-left flex-1">
-                      <Typography 
-                        variant="subtitle1" 
-                        className={`font-semibold mb-1 ${
-                          isDark ? 'text-dark-text' : 'text-white'
-                        }`}
-                      >
-                        Career Growth
-                      </Typography>
-                      <Typography 
-                        variant="body2" 
-                        className={isDark ? 'text-dark-muted' : 'text-white/80'}
-                      >
-                        Track progress and achievements
-                      </Typography>
-                    </div>
-                  </div>
-                </Card>
-
-                <Card className={`backdrop-blur-xl border ${
-                  isDark 
-                    ? 'bg-dark-surface/20 border-lime/20' 
-                    : 'bg-white/20 border-white/20'
-                }`} variant="outlined">
-                  <div className="flex items-center space-x-4 p-6">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
-                      isDark ? 'bg-lime/20' : 'bg-asu-gold/20'
-                    }`}>
-                      <Groups className={`h-6 w-6 ${
-                        isDark ? 'text-lime' : 'text-asu-gold'
-                      }`} />
-                    </div>
-                    <div className="text-left flex-1">
-                      <Typography 
-                        variant="subtitle1" 
-                        className={`font-semibold mb-1 ${
-                          isDark ? 'text-dark-text' : 'text-white'
-                        }`}
-                      >
-                        Network Building
-                      </Typography>
-                      <Typography 
-                        variant="body2" 
-                        className={isDark ? 'text-dark-muted' : 'text-white/80'}
-                      >
-                        Connect with professionals
-                      </Typography>
-                    </div>
-                  </div>
-                </Card>
+            <div className="flex flex-col justify-center items-center h-full p-12 text-center">
+              <div className={`w-24 h-24 rounded-full mb-8 flex items-center justify-center ${
+                isDark ? 'bg-white' : 'bg-black'
+              }`}>
+                <XIcon className={`h-12 w-12 ${isDark ? 'text-black' : 'text-white'}`} />
               </div>
-            </div>
+              
+              <h2 className={`text-4xl font-bold mb-4 ${
+                isDark ? 'text-white' : 'text-black'
+              }`}>
+                Join today.
+              </h2>
+              
+              <p className={`text-xl mb-8 max-w-md ${
+                isDark ? 'text-gray-300' : 'text-gray-700'
+              }`}>
+                Connect with students, employers, and opportunities that matter to your career.
+              </p>
 
-            {/* Floating Success Badge */}
-            <Card className={`absolute bottom-8 left-8 shadow-2xl ${
-              isDark ? 'bg-dark-surface/95' : 'bg-white/95'
-            }`} variant="elevated">
-              <div className="flex items-center space-x-3 p-4">
-                <EmojiEvents className={`h-5 w-5 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
-                <div>
-                  <Typography variant="caption" className="font-semibold">
-                    #1 Student Platform
-                  </Typography>
-                  <Typography variant="caption" color="textSecondary" className="block">
-                    at AUT University
-                  </Typography>
+              {/* Benefits */}
+              <div className="space-y-4 text-left max-w-sm">
+                <div className="flex items-center space-x-3">
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                    isDark ? 'bg-white text-black' : 'bg-black text-white'
+                  }`}>
+                    <span className="text-sm">✓</span>
+                  </div>
+                  <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>
+                    Free for students
+                  </span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                    isDark ? 'bg-white text-black' : 'bg-black text-white'
+                  }`}>
+                    <span className="text-sm">✓</span>
+                  </div>
+                  <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>
+                    Direct access to employers
+                  </span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                    isDark ? 'bg-white text-black' : 'bg-black text-white'
+                  }`}>
+                    <span className="text-sm">✓</span>
+                  </div>
+                  <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>
+                    Exclusive job opportunities
+                  </span>
                 </div>
               </div>
-            </Card>
-
-            {/* Decorative Elements */}
-            <div className={`absolute top-8 right-8 rounded-full p-3 shadow-lg ${
-              isDark ? 'bg-lime/15' : 'bg-asu-gold/15'
-            }`}>
-              <AutoAwesome className={`h-5 w-5 ${
-                isDark ? 'text-lime' : 'text-asu-gold'
-              }`} />
             </div>
           </div>
         </div>

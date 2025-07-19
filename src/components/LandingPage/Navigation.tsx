@@ -111,6 +111,7 @@ export default function Navigation({ onScrollToSection }: NavigationProps) {
 
       {/* Mobile menu - simplified */}
       <div className="md:hidden">
+        
         {/* You can add a mobile hamburger menu here if needed */}
       </div>
     </nav>

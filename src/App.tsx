@@ -2,11 +2,11 @@ import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
-import Navigation from './components/Navigation';
 import { Loader2 } from 'lucide-react';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToastProvider } from './components/ui/Toast';
 import PerformanceMonitor from './components/ui/PerformanceMonitor';
+import Navigation from './components/Navigation';
 
 // Lazy load components for better performance
 const LandingPage = lazy(() => import('./components/LandingPage'));
@@ -14,6 +14,7 @@ const Login = lazy(() => import('./components/Auth/Login'));
 const Register = lazy(() => import('./components/Auth/Register'));
 const ProfileSetup = lazy(() => import('./components/Profile/ProfileSetup'));
 const Profile = lazy(() => import('./components/Profile/Profile'));
+const Settings = lazy(() => import('./components/Settings'));
 const StudentDashboard = lazy(() => import('./components/Dashboard/StudentDashboard'));
 const EmployerDashboard = lazy(() => import('./components/Dashboard/EmployerDashboard'));
 const AdminDashboard = lazy(() => import('./components/Dashboard/AdminDashboard'));
@@ -84,7 +85,7 @@ function DashboardRouter() {
   
   if (!user) return <Navigate to="/login" replace />;
   
-  switch (user.user_metadata?.role || 'student') {
+  switch (user.role) {
     case 'admin':
       return (
         <Suspense fallback={<LoadingFallback message="Loading dashboard..." />}>
@@ -148,7 +149,9 @@ function AppContent() {
     <div className="App">
       <Router>
         <ScrollToTop />
-        <Navigation />
+        {/* X-Style Navigation - only show when user is authenticated */}
+        {user && <Navigation />}
+        
         <main className="min-h-screen">
           <Routes>
             {/* Public routes with lazy loading */}
@@ -204,7 +207,18 @@ function AppContent() {
             } />
 
             {/* Protected routes with lazy loading */}
-            <Route path="/dashboard" element={<DashboardRouter />} />
+            <Route path="/feed" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading feed..." />}>
+                  <Feed />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <DashboardRouter />
+              </ProtectedRoute>
+            } />
             <Route path="/profile-setup" element={
               <ProtectedRoute>
                 <Suspense fallback={<LoadingFallback message="Loading profile setup..." />}>
@@ -286,10 +300,10 @@ function AppContent() {
                 </Suspense>
               </ProtectedRoute>
             } />
-            <Route path="/feed" element={
+            <Route path="/settings" element={
               <ProtectedRoute>
-                <Suspense fallback={<LoadingFallback message="Loading feed..." />}>
-                  <Feed />
+                <Suspense fallback={<LoadingFallback message="Loading settings..." />}>
+                  <Settings />
                 </Suspense>
               </ProtectedRoute>
             } />
@@ -300,14 +314,16 @@ function AppContent() {
                 </Suspense>
               </ProtectedRoute>
             } />
+
+            {/* Catch all route - redirect to appropriate home */}
+            <Route path="*" element={
+              user ? <Navigate to="/feed" replace /> : <Navigate to="/" replace />
+            } />
           </Routes>
         </main>
         
         {/* Performance Monitor - only shows in development */}
-        <PerformanceMonitor 
-          showInDev={true} 
-          onPerformanceIssue={handlePerformanceIssue}
-        />
+      
       </Router>
     </div>
   );

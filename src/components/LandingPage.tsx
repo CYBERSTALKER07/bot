@@ -90,7 +90,7 @@ export default function LandingPage() {
           isDark ? 'bg-lime/20' : 'bg-aut-maroon/20'
         }`} />
       </div>
-
+          
       {/* Navigation */}
       <Navigation onScrollToSection={scrollToSection} />
 

@@ -1,96 +1,54 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
-  GraduationCap,
+  Home,
   Search,
+  Bell,
+  Mail,
+  Bookmark,
+  User,
+  Settings,
+  MoreHorizontal,
   Building2,
-  MessageSquare,
+  Briefcase,
   Calendar,
   BookOpen,
-  User,
-  LogOut,
-  Bell,
-  Menu,
-  X,
-  ChevronLeft,
-  ChevronRight,
-  Home,
-  Briefcase,
-  Users,  
-  Settings,
+  Users,
   FileText,
   BarChart3,
-  Rss,
-  ChevronDown,
-  Smartphone
+  MessageSquare,
+  LogOut,
+  Menu,
+  X as XIcon,
+  Plus,
+  Feather
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import ThemeToggle from './ui/ThemeToggle';
-import  Button from './ui/Button';
+import Button from './ui/Button';
 import { cn } from '../lib/cva';
-import { useExclusiveAccordion } from '../hooks/useExclusiveState';
 
 interface NavigationItem {
   icon: React.ComponentType<any>;
   label: string;
   path: string;
   badge?: number;
-  group?: string;
+  isActive?: boolean;
 }
 
-// Public routes that shouldn't show the sidebar
-const PUBLIC_ROUTES = [
-  '/',
-  '/login', 
-  '/register',
-  '/mobile-app',
-  '/for-students', 
-  '/for-employers',
-  '/career-tips',
-  '/whos-hiring'
-];
-
-// Semi-public routes that can be accessed without login but might show minimal nav
-const SEMI_PUBLIC_ROUTES = [
-  '/companies',
-  '/company',
-  '/events',
-  '/event',
-  '/resources',
-  '/resource',
-  '/job'
-];
-
+// X-Style Navigation
 export default function Navigation() {
   const { user, logout } = useAuth();
   const { isDark } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Always call all hooks first, before any conditional logic
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isHidden, setIsHidden] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(3);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  
-  // Use exclusive accordion for navigation groups
-  const { toggle: toggleGroup, isOpen: isGroupOpen } = useExclusiveAccordion();
-  
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
+  const sidebarTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const hoverZoneRef = useRef<HTMLDivElement>(null);
-  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Clear timeout when component unmounts
-  useEffect(() => {
-    return () => {
-      if (hideTimeoutRef.current) {
-        clearTimeout(hideTimeoutRef.current);
-      }
-    };
-  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -104,118 +62,95 @@ export default function Navigation() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // NOW check if we should render the navigation (after all hooks are called)
-  const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname) || 
-    SEMI_PUBLIC_ROUTES.some(route => location.pathname.startsWith(route));
-  
-  // Don't render navigation on public routes when user is not authenticated
-  if (isPublicRoute && !user) {
-    return null;
-  }
-  
-  // Don't render navigation if user is not authenticated
-  if (!user) {
-    return null;
-  }
+  // Handle mouse movement for sidebar trigger
+  useEffect(() => {
+    if (isMobile) return;
 
-  // Handle mouse enter to show sidebar
-  const handleMouseEnter = () => {
-    if (hideTimeoutRef.current) {
-      clearTimeout(hideTimeoutRef.current);
-      hideTimeoutRef.current = null;
+    const handleMouseMove = (e: MouseEvent) => {
+      // Show sidebar when cursor is within 50px of left edge
+      if (e.clientX <= 50) {
+        if (sidebarTimeoutRef.current) {
+          clearTimeout(sidebarTimeoutRef.current);
+        }
+        setIsSidebarVisible(true);
+      } else if (e.clientX > 300 && isSidebarVisible) {
+        // Hide sidebar when cursor moves away from sidebar area
+        if (sidebarTimeoutRef.current) {
+          clearTimeout(sidebarTimeoutRef.current);
+        }
+        sidebarTimeoutRef.current = setTimeout(() => {
+          setIsSidebarVisible(false);
+        }, 300); // 300ms delay before hiding
+      }
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      if (sidebarTimeoutRef.current) {
+        clearTimeout(sidebarTimeoutRef.current);
+      }
+    };
+  }, [isMobile, isSidebarVisible]);
+
+  // Handle sidebar mouse enter/leave
+  const handleSidebarMouseEnter = () => {
+    if (sidebarTimeoutRef.current) {
+      clearTimeout(sidebarTimeoutRef.current);
     }
-    setIsHovered(true);
-    if (isHidden) {
-      setIsHidden(false);
-    }
+    setIsSidebarVisible(true);
   };
 
-  // Handle mouse leave to hide sidebar after delay
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    // Collapse to icon view instead of hiding completely
-    hideTimeoutRef.current = setTimeout(() => {
-      setIsCollapsed(true);
-    }, 500); // 500ms delay
+  const handleSidebarMouseLeave = () => {
+    if (sidebarTimeoutRef.current) {
+      clearTimeout(sidebarTimeoutRef.current);
+    }
+    sidebarTimeoutRef.current = setTimeout(() => {
+      setIsSidebarVisible(false);
+    }, 500); // 500ms delay when leaving sidebar
   };
 
-  // Enhanced navigation items with grouping
+  // X-style navigation items
   const getNavigationItems = (): NavigationItem[] => {
+    const baseItems = [
+      { icon: Home, label: 'Home', path: '/feed' },
+      { icon: Search, label: 'Explore', path: '/jobs' },
+      { icon: Bell, label: 'Notifications', path: '/notifications', badge: 3 },
+      { icon: Mail, label: 'Messages', path: '/messages', badge: 2 },
+      { icon: Bookmark, label: 'Bookmarks', path: '/bookmarks' },
+    ];
+
     if (user?.role === 'student') {
       return [
-        { icon: Rss, label: 'Feed', path: '/feed', group: 'main' },
-        { icon: BarChart3, label: 'Dashboard', path: '/dashboard', group: 'main' },
-        { icon: Search, label: 'Find Jobs', path: '/jobs', group: 'jobs' },
-        { icon: Building2, label: 'Companies', path: '/companies', group: 'jobs' },
-        { icon: FileText, label: 'Applications', path: '/applications', group: 'jobs' },
-        { icon: FileText, label: 'Learning Passport', path: '/digital-passport', group: 'learning' },
-        { icon: BarChart3, label: 'Skills Audit', path: '/skills-audit', group: 'learning' },
-        { icon: MessageSquare, label: 'Messages', path: '/messages', badge: unreadCount, group: 'communication' },
-        { icon: Calendar, label: 'Events', path: '/events', group: 'communication' },
-        { icon: BookOpen, label: 'Resources', path: '/resources', group: 'learning' },
-        { icon: Settings, label: 'Profile Setup', path: '/profile-setup', group: 'profile' },
-        // Add new mobile-accessible pages
-        { icon: BookOpen, label: 'Career Tips', path: '/career-tips', group: 'learning' },
-        { icon: Users, label: 'Who\'s Hiring', path: '/whos-hiring', group: 'jobs' },
-        { icon: GraduationCap, label: 'For Students', path: '/for-students', group: 'tools' },
-        { icon: Smartphone, label: 'Mobile App', path: '/mobile-app', group: 'tools' },
+        ...baseItems,
+        { icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
+        { icon: Building2, label: 'Companies', path: '/companies' },
+        { icon: FileText, label: 'Applications', path: '/applications' },
+        { icon: Calendar, label: 'Events', path: '/events' },
+        { icon: User, label: 'Profile', path: '/profile' }
       ];
-    }
-
-    if (user?.role === 'employer') {
+    } else if (user?.role === 'employer') {
       return [
-        { icon: Rss, label: 'Feed', path: '/feed', group: 'main' },
-        { icon: BarChart3, label: 'Dashboard', path: '/dashboard', group: 'main' },
-        { icon: Briefcase, label: 'Post Jobs', path: '/post-job', group: 'jobs' },
-        { icon: Users, label: 'Applicants', path: '/applicants', group: 'jobs' },
-        { icon: Building2, label: 'Companies', path: '/companies', group: 'jobs' },
-        { icon: MessageSquare, label: 'Messages', path: '/messages', badge: unreadCount, group: 'communication' },
-        { icon: FileText, label: 'Resources', path: '/resources', group: 'learning' },
-        { icon: Settings, label: 'Profile Setup', path: '/profile-setup', group: 'profile' },
-        // Add new mobile-accessible pages
-        { icon: Building2, label: 'For Employers', path: '/for-employers', group: 'tools' },
-        { icon: BookOpen, label: 'Career Tips', path: '/career-tips', group: 'learning' },
-        { icon: Smartphone, label: 'Mobile App', path: '/mobile-app', group: 'tools' },
+        ...baseItems,
+        { icon: BarChart3, label: 'Dashboard', path: '/employer-dashboard' },
+        { icon: Briefcase, label: 'Post Jobs', path: '/post-job' },
+        { icon: Users, label: 'Applicants', path: '/applicants' },
+        { icon: User, label: 'Profile', path: '/profile' }
       ];
-    }
-
-    if (user?.role === 'admin') {
+    } else {
       return [
-        { icon: Rss, label: 'Feed', path: '/feed', group: 'main' },
-        { icon: BarChart3, label: 'Admin Panel', path: '/dashboard', group: 'main' },
-        { icon: Users, label: 'Users', path: '/users', group: 'management' },
-        { icon: Briefcase, label: 'Jobs', path: '/jobs', group: 'management' },
-        { icon: Building2, label: 'Companies', path: '/companies', group: 'management' },
-        { icon: FileText, label: 'Reports', path: '/reports', group: 'analytics' },
-        { icon: Settings, label: 'Settings', path: '/settings', group: 'system' },
-        { icon: User, label: 'Profile Setup', path: '/profile-setup', group: 'profile' },
-        // Add new mobile-accessible pages
-        { icon: BookOpen, label: 'Career Tips', path: '/career-tips', group: 'tools' },
-        { icon: Users, label: 'Who\'s Hiring', path: '/whos-hiring', group: 'tools' },
-        { icon: Smartphone, label: 'Mobile App', path: '/mobile-app', group: 'tools' },
-        { icon: GraduationCap, label: 'For Students', path: '/for-students', group: 'tools' },
-        { icon: Building2, label: 'For Employers', path: '/for-employers', group: 'tools' },
+        ...baseItems,
+        { icon: BarChart3, label: 'Admin', path: '/admin' },
+        { icon: Users, label: 'Users', path: '/users' },
+        { icon: Settings, label: 'Settings', path: '/settings' },
+        { icon: User, label: 'Profile', path: '/profile' }
       ];
     }
-
-    return [
-      { icon: Rss, label: 'Feed', path: '/feed', group: 'main' },
-      { icon: BarChart3, label: 'Dashboard', path: '/dashboard', group: 'main' },
-      { icon: Search, label: 'Find Jobs', path: '/jobs', group: 'jobs' },
-      { icon: Building2, label: 'Companies', path: '/companies', group: 'jobs' },
-      { icon: MessageSquare, label: 'Messages', path: '/messages', group: 'communication' },
-      { icon: Calendar, label: 'Events', path: '/events', group: 'communication' },
-      { icon: BookOpen, label: 'Resources', path: '/resources', group: 'learning' },
-      { icon: Settings, label: 'Profile Setup', path: '/profile-setup', group: 'profile' },
-      // Add new mobile-accessible pages
-      { icon: BookOpen, label: 'Career Tips', path: '/career-tips', group: 'learning' },
-      { icon: Users, label: 'Who\'s Hiring', path: '/whos-hiring', group: 'jobs' },
-      { icon: Smartphone, label: 'Mobile App', path: '/mobile-app', group: 'tools' },
-    ];
   };
 
   const navigationItems = getNavigationItems();
-  const mobileNavItems = navigationItems.filter(item => item.group === 'main' || ['jobs', 'messages'].includes(item.path.split('/')[1]));
+  const isCurrentPath = (path: string) => location.pathname === path;
 
   const handleLogout = async () => {
     try {
@@ -226,421 +161,276 @@ export default function Navigation() {
     }
   };
 
-  const isCurrentPath = (path: string) => location.pathname === path;
-
-  // Group navigation items
-  const groupedItems = navigationItems.reduce((acc, item) => {
-    const group = item.group || 'main';
-    if (!acc[group]) acc[group] = [];
-    acc[group].push(item);
-    return acc;
-  }, {} as Record<string, NavigationItem[]>);
+  if (!user) return null;
 
   // Mobile Navigation
   if (isMobile) {
     return (
       <>
-        {/* Top App Bar */}
-        <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-neutral-200 safe-top">
-          <div className="flex justify-between items-center h-14 px-4">
-            <Link to="/dashboard" className="flex items-center space-x-2">
-              <GraduationCap className="h-6 w-6 text-brand-primary" />
-              <span className="font-semibold text-foreground">AUT</span>
-            </Link>
-
+        {/* Mobile Top Bar */}
+        <header className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-xl border-b ${
+          isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
+        }`}>
+          <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center space-x-3">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative"
-                aria-label={`Notifications ${unreadCount ? `(${unreadCount} unread)` : ''}`}
-              >
-                <Bell className="h-5 w-5" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 h-4 w-4 bg-error text-white text-xs rounded-full flex items-center justify-center">
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </span>
-                )}
-              </Button>
-
-              <div className="w-8 h-8 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center text-sm font-medium">
-                {user?.name?.charAt(0) || <User className="h-4 w-4" />}
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                isDark ? 'bg-white' : 'bg-black'
+              }`}>
+                <XIcon className={`h-4 w-4 ${isDark ? 'text-black' : 'text-white'}`} />
               </div>
-
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                aria-expanded={isMobileMenuOpen}
-                aria-label="Toggle menu"
-              >
-                {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </Button>
             </div>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2"
+            >
+              {isMobileMenuOpen ? <XIcon className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
           </div>
 
           {/* Mobile Menu Dropdown */}
           {isMobileMenuOpen && (
-            <div className="border-t border-neutral-200 bg-background">
-              <nav className="py-2" role="navigation" aria-label="Mobile navigation">
-                {navigationItems.map((item, index) => {
+            <div className={`absolute top-full left-0 right-0 ${
+              isDark ? 'bg-black/95' : 'bg-white/95'
+            } backdrop-blur-xl border-b ${isDark ? 'border-gray-800' : 'border-gray-200'} shadow-lg`}>
+              <div className="p-4 space-y-1">
+                {navigationItems.slice(5).map((item, index) => {
                   const Icon = item.icon;
-                  const active = isCurrentPath(item.path);
-                  
+                  const isActive = isCurrentPath(item.path);
                   return (
                     <Link
-                      key={`mobile-${index}`}
+                      key={index}
                       to={item.path}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className={cn(
-                        'flex items-center justify-between px-4 py-3 transition-colors',
-                        active
-                          ? 'bg-brand-primary/5 text-brand-primary border-r-2 border-brand-primary'
-                          : 'text-neutral-700 hover:bg-neutral-50'
-                      )}
-                      aria-current={active ? 'page' : undefined}
+                      className={`flex items-center space-x-3 px-4 py-3 rounded-full transition-colors ${
+                        isActive
+                          ? isDark ? 'bg-gray-900' : 'bg-gray-100'
+                          : isDark ? 'hover:bg-gray-900' : 'hover:bg-gray-100'
+                      }`}
                     >
-                      <div className="flex items-center space-x-3">
-                        <Icon className="h-5 w-5" />
-                        <span className="font-medium">{item.label}</span>
-                      </div>
+                      <Icon className="h-6 w-6" />
+                      <span className="text-xl font-normal">{item.label}</span>
                       {item.badge && item.badge > 0 && (
-                        <span className="bg-error text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center">
-                          {item.badge > 99 ? '99+' : item.badge}
+                        <span className="ml-auto bg-blue-500 text-white text-sm px-2 py-1 rounded-full min-w-[20px] text-center">
+                          {item.badge}
                         </span>
                       )}
                     </Link>
                   );
                 })}
-                
-                <div className="border-t border-neutral-200 mx-4 my-2" />
-                
-                <Link
-                  to="/profile"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={cn(
-                    'flex items-center justify-between px-4 py-3 transition-colors',
-                    isCurrentPath('/profile')
-                      ? 'bg-brand-primary/5 text-brand-primary border-r-2 border-brand-primary'
-                      : 'text-neutral-700 hover:bg-neutral-50'
-                  )}
-                  aria-current={isCurrentPath('/profile') ? 'page' : undefined}
-                >
-                  <div className="flex items-center space-x-3">
-                    <User className="h-5 w-5" />
-                    <span className="font-medium">My Profile</span>
-                  </div>
-                </Link>
-                
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    handleLogout();
-                  }}
-                  className="w-full justify-start px-4 py-3 text-error hover:bg-error/10"
-                >
-                  <LogOut className="h-5 w-5 mr-3" />
-                  Logout
-                </Button>
-              </nav>
+                <div className={`border-t pt-4 mt-4 ${isDark ? 'border-gray-800' : 'border-gray-200'}`}>
+                  <Button
+                    variant="ghost"
+                    onClick={handleLogout}
+                    className="w-full justify-start px-4 py-3 text-red-500 hover:bg-red-500/10 rounded-full"
+                  >
+                    <LogOut className="h-6 w-6 mr-3" />
+                    <span className="text-xl font-normal">Log out</span>
+                  </Button>
+                </div>
+              </div>
             </div>
           )}
         </header>
 
-        {/* Bottom Navigation */}
-        <nav 
-          className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-t border-neutral-200 safe-bottom"
-          role="navigation" 
-          aria-label="Bottom navigation"
-        >
-          <div className="grid grid-cols-4 h-16">
-            {mobileNavItems.slice(0, 4).map((item, index) => {
+        {/* Mobile Bottom Navigation */}
+        <nav className={`fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl border-t ${
+          isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
+        }`}>
+          <div className="grid grid-cols-5 h-14">
+            {navigationItems.slice(0, 5).map((item, index) => {
               const Icon = item.icon;
-              const active = isCurrentPath(item.path);
+              const isActive = isCurrentPath(item.path);
               
               return (
                 <Link
-                  key={`bottom-${index}`}
+                  key={index}
                   to={item.path}
-                  className={cn(
-                    'flex flex-col items-center justify-center py-2 transition-colors relative',
-                    active ? 'text-brand-primary' : 'text-neutral-600'
-                  )}
-                  aria-current={active ? 'page' : undefined}
+                  className={`flex flex-col items-center justify-center py-2 transition-all duration-200 relative ${
+                    isActive 
+                      ? isDark ? 'text-white' : 'text-black'
+                      : isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-800'
+                  }`}
                 >
-                  <Icon className="h-5 w-5 mb-1" />
-                  <span className="text-xs font-medium truncate">{item.label}</span>
-                  {item.badge && item.badge > 0 && (
-                    <span className="absolute top-1 right-1/4 h-2 w-2 bg-error rounded-full" />
-                  )}
+                  <div className="relative">
+                    <Icon className="h-6 w-6" />
+                    {item.badge && item.badge > 0 && (
+                      <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                        {item.badge > 9 ? '9+' : item.badge}
+                      </span>
+                    )}
+                  </div>
                 </Link>
               );
             })}
           </div>
         </nav>
 
-        {/* Spacers */}
+        {/* Spacer for mobile layout */}
         <div className="h-14" />
-        <div className="h-16" />
       </>
     );
   }
 
-  // Desktop Sidebar
+  // Desktop Navigation with Hidden Sidebar
   return (
     <>
-      {/* Show/Hide Sidebar Toggle - when sidebar is hidden */}
-      {isHidden && (
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setIsHidden(false)}
-          className="fixed left-4 top-4 z-50 h-10 w-10 rounded-full shadow-lg hover:scale-110 transition-transform bg-background border-neutral-200"
-          aria-label="Show sidebar"
-        >
-          <Menu className="h-5 w-5" />
-        </Button>
-      )}
+      {/* Trigger Zone - invisible area at left edge */}
+      <div 
+        className="fixed left-0 top-0 w-12 h-full z-40 bg-transparent"
+        onMouseEnter={() => setIsSidebarVisible(true)}
+      />
 
-      {/* Hover Zone - invisible area on the left edge to trigger sidebar when hidden */}
-      {isHidden && (
-        <div
-          className="fixed left-0 top-0 w-16 h-full z-30"
-          onMouseEnter={() => setIsHidden(false)}
-        />
-      )}
-
-      {/* Hover Zone - invisible area on the right edge to trigger hover */}
-      {!isHidden && (
-        <div
-          ref={hoverZoneRef}
-          className={cn(
-            'fixed top-0 z-30 h-full transition-all duration-300',
-            isCollapsed ? 'left-16 w-8' : 'left-64 w-4'
-          )}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        />
-      )}
-
-      <aside
+      {/* Hidden Sidebar */}
+      <aside 
         ref={sidebarRef}
         className={cn(
-          'fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-out border-r',
-          'bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl', // glass effect
-          isDark ? 'border-gray-700' : 'border-neutral-200',
-          isHidden ? '-translate-x-full' : 
-          isCollapsed && !isHovered ? 'w-16' : 'w-64',
-          'shadow-xl' // optional: add shadow for depth
+          "fixed left-0 top-0 h-full z-50 transform transition-all duration-300 ease-in-out",
+          "w-72 backdrop-blur-xl border-r shadow-2xl",
+          isDark ? 'bg-black/90 border-gray-800' : 'bg-white/90 border-gray-200',
+          isSidebarVisible ? 'translate-x-0' : '-translate-x-full'
         )}
-        role="navigation"
-        aria-label="Main navigation"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
+        onMouseEnter={handleSidebarMouseEnter}
+        onMouseLeave={handleSidebarMouseLeave}
       >
-        {/* Header */}
-        <div className={cn(
-          'flex items-center justify-between h-16 px-4 border-b',
-          isDark ? 'border-gray-700' : 'border-neutral-200'
-        )}>
-          {!(isCollapsed && !isHovered) ? (
-        <Link to="/dashboard" className="flex items-center space-x-3">
-          <GraduationCap className="h-7 w-7 text-brand-primary" />
-          <span className={cn(
-            'text-lg font-semibold',
-            isDark ? 'text-white' : 'text-gray-900'
-          )}>AUT</span>
-        </Link>
-          ) : (
-        <Link to="/dashboard" className="flex justify-center w-full">
-          <GraduationCap className="h-7 w-7 text-brand-primary" />
-        </Link>
-          )}
-          
-          {/* Hide sidebar button */}
-          {!(isCollapsed && !isHovered) && (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setIsHidden(true)}
-          className={cn(
-            'h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700',
-            isDark ? 'text-gray-400 hover:text-gray-200' : 'text-neutral-500 hover:text-neutral-700'
-          )}
-          aria-label="Hide sidebar"
-        >
-          <X className="h-4 w-4" />
-        </Button>
-          )}
+        {/* Sidebar Header */}
+        <div className="p-6 border-b border-gray-200 dark:border-gray-800">
+          <div className="flex items-center space-x-3">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+              isDark ? 'bg-white' : 'bg-black'
+            }`}>
+              <Feather className={`h-5 w-5 ${isDark ? 'text-black' : 'text-white'}`} />
+            </div>
+            <div>
+              <h2 className={`font-semibold text-lg ${
+                isDark ? 'text-white' : 'text-gray-900'
+              }`}>
+                TalentLink
+              </h2>
+              <p className={`text-sm ${
+                isDark ? 'text-gray-400' : 'text-gray-600'
+              }`}>
+                Welcome back, {user?.full_name?.split(' ')[0]}
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Navigation Items */}
-        <div className="flex-1 py-4 overflow-y-auto scrollbar-hide">
-          <nav className="space-y-1 px-2">
-        {Object.entries(groupedItems).map(([group, items]) => (
-          <div key={group}>
-            {!(isCollapsed && !isHovered) && group !== 'main' && (
-          <button
-            onClick={() => toggleGroup(group)}
-            className={cn(
-              'flex items-center justify-between w-full px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-colors',
-              isDark 
-            ? 'text-gray-400 hover:text-gray-200' 
-            : 'text-neutral-500 hover:text-neutral-700'
-            )}
-            aria-expanded={isGroupOpen(group)}
-          >
-            <span>{group}</span>
-            <ChevronDown className={cn(
-              'h-3 w-3 transition-transform',
-              isGroupOpen(group) ? 'rotate-180' : ''
-            )} />
-          </button>
-            )}
+        <nav className="flex-1 px-4 py-6 space-y-1">
+          {navigationItems.map((item, index) => {
+            const Icon = item.icon;
+            const isActive = isCurrentPath(item.path);
             
-            {(isGroupOpen(group) || group === 'main') && (
-          <div className="space-y-1">
-            {items.map((item, index) => {
-              const Icon = item.icon;
-              const active = isCurrentPath(item.path);
-              
-              return (
-            <Link
-              key={`${group}-${index}`}
-              to={item.path}
+            return (
+              <Link
+                key={index}
+                to={item.path}
+                className={cn(
+                  "flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group relative",
+                  isActive
+                    ? isDark 
+                      ? 'bg-blue-600 text-white shadow-lg' 
+                      : 'bg-blue-600 text-white shadow-lg'
+                    : isDark
+                      ? 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                )}
+              >
+                <Icon className={cn(
+                  "h-5 w-5 transition-transform group-hover:scale-110",
+                  isActive ? 'text-white' : ''
+                )} />
+                <span className="font-medium">{item.label}</span>
+                {item.badge && item.badge > 0 && (
+                  <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full min-w-[18px] text-center">
+                    {item.badge > 9 ? '9+' : item.badge}
+                  </span>
+                )}
+                {isActive && (
+                  <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-white rounded-l-full" />
+                )}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Sidebar Footer */}
+        <div className="p-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
+          {/* User Profile Section */}
+          <div className="relative">
+            <button
+              onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
               className={cn(
-                'group flex items-center rounded-2xl px-3 py-2.5 text-sm font-medium  transition-all duration-300',
-                active
-              ? isDark
-                ? 'bg-blue-600/20 text-blue-400'
-                : 'bg-brand-primary/10 text-brand-primary'
-              : isDark
-                ? 'text-white hover:bg-gray-700 hover:text-white'
-                : 'text-black hover:bg-neutral-50 hover:text-neutral-900'
+                "w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-colors",
+                isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-100'
               )}
-              aria-current={active ? 'page' : undefined}
             >
-              <Icon className={cn(
-                'flex-shrink-0 h-5 w-5',
-                (isCollapsed && !isHovered) ? 'mx-auto' : 'mr-3'
+              <div className={cn(
+                "w-8 h-8 rounded-full flex items-center justify-center",
+                isDark ? 'bg-gray-700' : 'bg-gray-300'
+              )}>
+                <User className="h-4 w-4" />
+              </div>
+              <div className="flex-1 text-left">
+                <p className={cn(
+                  "font-medium text-sm",
+                  isDark ? 'text-white' : 'text-gray-900'
+                )}>
+                  {user?.full_name || 'User'}
+                </p>
+                <p className={cn(
+                  "text-xs",
+                  isDark ? 'text-gray-400' : 'text-gray-600'
+                )}>
+                  {user?.role || 'Member'}
+                </p>
+              </div>
+              <MoreHorizontal className={cn(
+                "h-4 w-4",
+                isDark ? 'text-gray-400' : 'text-gray-600'
               )} />
-              {!(isCollapsed && !isHovered) && (
-                <div className="flex items-center justify-between w-full">
-              <span>{item.label}</span>
-              {item.badge && item.badge > 0 && (
-                <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center">
-                  {item.badge > 99 ? '99+' : item.badge}
-                </span>
-              )}
-                </div>
-              )}
-            </Link>
-              );
-            })}
-          </div>
+            </button>
+
+            {/* Profile Menu */}
+            {isProfileMenuOpen && (
+              <div className={cn(
+                "absolute bottom-full left-4 right-4 mb-2 rounded-xl shadow-lg border overflow-hidden",
+                isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
+              )}>
+                <Link
+                  to="/settings"
+                  className={cn(
+                    "flex items-center space-x-3 px-4 py-3 transition-colors",
+                    isDark ? 'hover:bg-gray-800 text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                  )}
+                  onClick={() => setIsProfileMenuOpen(false)}
+                >
+                  <Settings className="h-4 w-4" />
+                  <span className="text-sm">Settings</span>
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center space-x-3 px-4 py-3 transition-colors text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="text-sm">Log out</span>
+                </button>
+              </div>
             )}
           </div>
-        ))}
-          </nav>
         </div>
-
-        {/* User Profile Section */}
-        <div className={cn(
-          'border-t px-2 py-4',
-          isDark ? 'border-gray-700' : 'border-neutral-200'
-        )}>
-          {!(isCollapsed && !isHovered) ? (
-        <Link 
-          to="/profile" 
-          className={cn(
-            'flex items-center px-3 py-2 rounded-lg transition-colors group',
-            isDark ? 'hover:bg-gray-700' : 'hover:bg-neutral-50'
-          )}
-        >
-          <div className={cn(
-            'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium mr-3',
-            isDark 
-          ? 'bg-blue-600/20 text-blue-400' 
-          : 'bg-brand-primary/10 text-brand-primary'
-          )}>
-            {user?.name?.charAt(0) || <User className="h-4 w-4" />}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className={cn(
-          'text-sm font-medium truncate group-hover:text-brand-primary transition-colors',
-          isDark ? 'text-white' : 'text-gray-900'
-            )}>
-          {user?.name || 'User'}
-            </p>
-            <p className={cn(
-          'text-xs truncate',
-          isDark ? 'text-gray-400' : 'text-neutral-500'
-            )}>
-          View Profile
-            </p>
-          </div>
-        </Link>
-          ) : (
-        <Link to="/profile" className="flex justify-center mb-3 hover:scale-110 transition-transform">
-          <div className={cn(
-            'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium',
-            isDark 
-          ? 'bg-blue-600/20 text-blue-400' 
-          : 'bg-brand-primary/10 text-brand-primary'
-          )}>
-            {user?.name?.charAt(0) || <User className="h-4 w-4" />}
-          </div>
-        </Link>
-          )}
-          
-          <div className={cn('mt-3', (isCollapsed && !isHovered) ? 'flex justify-center' : 'px-3')}>
-        <ThemeToggle />
-          </div>
-          
-          <Button
-        variant="ghost"
-        onClick={handleLogout}
-        className={cn(
-          'w-full mt-2 text-red-500 hover:bg-red-500/10',
-          (isCollapsed && !isHovered) ? 'px-2' : 'justify-start px-3'
-        )}
-          >
-        <LogOut className={cn(
-          'h-5 w-5',
-          (isCollapsed && !isHovered) ? 'mx-auto' : 'mr-3'
-        )} />
-        {!(isCollapsed && !isHovered) && <span>Logout</span>}
-          </Button>
-        </div>
-
-        {/* Collapse Toggle */}
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className={cn(
-        'absolute -right-3 top-1/2 transform -translate-y-1/2 h-6 w-6 rounded-full shadow-md hover:scale-110 transition-transform',
-        isDark 
-          ? 'bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700' 
-          : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
-          )}
-          aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          {isCollapsed ? (
-        <ChevronRight className="h-3 w-3" />
-          ) : (
-        <ChevronLeft className="h-3 w-3" />
-          )}
-        </Button>
       </aside>
 
-      {/* Main Content Spacer */}
-      <div className={cn(
-        'transition-all duration-300 ease-out',
-        isHidden ? 'ml-0' : 
-        (isCollapsed && !isHovered) ? 'ml-16' : 'ml-64'
-      )} />
+      {/* Main Content Overlay when sidebar is visible */}
+      {isSidebarVisible && (
+        <div 
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+          onClick={() => setIsSidebarVisible(false)}
+        />
+      )}
     </>
   );
 }

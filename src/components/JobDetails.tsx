@@ -2,24 +2,27 @@ import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { 
-  LocationOn,
-  Work,
-  AccessTime,
-  AttachMoney,
-  Business,
-  School,
-  Person,
-  Email,
+  MapPin,
+  Briefcase,
+  Clock,
+  DollarSign,
+  Building2,
+  GraduationCap,
+  User,
+  Mail,
   Phone,
-  Language,
+  Globe,
   Bookmark,
-  BookmarkBorder,
   Share,
-  ArrowBack,
-  Groups,
-  WorkOutline,
-  CalendarMonth
-} from '@mui/icons-material';
+  ArrowLeft,
+  Users,
+  Calendar,
+  Heart,
+  MessageCircle,
+  Repeat2,
+  MoreHorizontal,
+  CheckCircle
+} from 'lucide-react';
 import { useJobs } from '../hooks/useJobs';
 import { useTheme } from '../context/ThemeContext';
 import Typography from './ui/Typography';
@@ -133,393 +136,397 @@ export default function JobDetails() {
   };
 
   return (
-    <div ref={containerRef} className={`min-h-screen relative ${
-      isDark ? 'bg-dark-bg' : 'bg-gray-50'
+    <div className={`min-h-screen ${
+      isDark ? 'bg-black text-white' : 'bg-white text-gray-900'
     }`}>
-      {/* Remove decorative elements */}
-
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div ref={heroRef} className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <Button
-              variant="text"
-              onClick={() => navigate(-1)}
-              className="flex items-center space-x-2"
-            >
-              <ArrowBack className="h-5 w-5" />
-              <span>Back</span>
-            </Button>
-            <div className="flex items-center space-x-2">
+      <div className="max-w-4xl mx-auto">
+        {/* X-style Header */}
+        <div ref={heroRef} className={`sticky top-0 z-50 backdrop-blur-xl ${
+          isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
+        } border-b`}>
+          <div className="flex items-center justify-between px-4 py-3">
+            <div className="flex items-center gap-8">
               <Button
-                variant="text"
-                onClick={handleBookmark}
-                className={`p-2 ${isBookmarked ? 'text-yellow-500' : ''}`}
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate(-1)}
+                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900"
               >
-                {isBookmarked ? <Bookmark /> : <BookmarkBorder />}
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <div>
+                <Typography variant="h6" className="font-bold">
+                  Job Details
+                </Typography>
+                <Typography variant="body2" className="text-gray-500">
+                  {job?.company}
+                </Typography>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleBookmark}
+                className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 ${
+                  isBookmarked ? 'text-blue-500' : ''
+                }`}
+              >
+                <Bookmark className="h-5 w-5" />
               </Button>
               <Button
-                variant="text"
+                variant="ghost"
+                size="sm"
                 onClick={handleShare}
-                className="p-2"
+                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900"
               >
-                <Share />
+                <Share className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900"
+              >
+                <MoreHorizontal className="h-5 w-5" />
               </Button>
             </div>
           </div>
+        </div>
 
-          <Card className="overflow-hidden" elevation={3}>
-            <div className={`rounded-3xl p-8 text-white mb-8 relative overflow-hidden transition-colors duration-300 ${
-              isDark 
-                ? 'bg-gradient-to-r from-dark-surface to-lime' 
-                : 'bg-gradient-to-r from-asu-maroon to-asu-maroon'
-            }`}>
-              <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl ${
-                isDark ? 'bg-lime/20' : 'bg-white/20'
-              }`}></div>
-              <div className={`absolute bottom-0 left-0 w-24 h-24 rounded-full blur-xl ${
-                isDark ? 'bg-dark-accent/30' : 'bg-asu-gold/30'
-              }`}></div>
-              
-              <div className="relative z-10">
-                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
-                  <div className="flex-1 mb-6 lg:mb-0">
-                    <div className="flex items-center space-x-3 mb-4">
-                      <Badge variant="standard" color="secondary" className="bg-white/20 text-white">
-                        {job.type}
-                      </Badge>
-                      <span className={`text-sm ${
-                        isDark ? 'text-dark-muted' : 'text-white/80'
-                      }`}>
-                        Posted {new Date(job.posted_date).toLocaleDateString()}
-                      </span>
-                    </div>
-                    
-                    <Typography variant="h3" className="font-bold mb-3 text-white">
-                      {job.title}
-                    </Typography>
-                    
-                    <div className="flex items-center space-x-6 mb-4">
-                      <div className="flex items-center space-x-2">
-                        <Business className="h-5 w-5" />
-                        <span className="text-lg">{job.company}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <LocationOn className="h-5 w-5" />
-                        <span>{job.location}</span>
-                      </div>
-                      {job.salary && (
-                        <div className="flex items-center space-x-2">
-                          <AttachMoney className="h-5 w-5" />
-                          <span>{job.salary}</span>
-                        </div>
-                      )}
-                    </div>
+        <div className="px-4 py-6">
+          {/* Job Header - Twitter Post Style */}
+          <Card className={`p-6 mb-6 ${
+            isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
+          } border rounded-2xl hover:bg-opacity-80 transition-all duration-200`}>
+            <div className="flex gap-4">
+              <div className={`w-12 h-12 rounded-full ${
+                isDark ? 'bg-blue-600' : 'bg-blue-500'
+              } flex items-center justify-center flex-shrink-0`}>
+                <Building2 className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <Typography variant="h5" className="font-bold truncate">
+                    {job?.title}
+                  </Typography>
+                  <CheckCircle className="h-5 w-5 text-blue-500 flex-shrink-0" />
+                </div>
+                <div className="flex items-center gap-4 mb-3 text-gray-500">
+                  <span className="font-medium">{job?.company}</span>
+                  <span>•</span>
+                  <span className="flex items-center gap-1">
+                    <MapPin className="h-4 w-4" />
+                    {job?.location}
+                  </span>
+                  <span>•</span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="h-4 w-4" />
+                    {formatDate(job?.postedAt)}
+                  </span>
+                </div>
+                
+                {/* Job Type & Salary */}
+                <div className="flex items-center gap-3 mb-4">
+                  <Badge variant="outline" className="rounded-full">
+                    {job?.type}
+                  </Badge>
+                  <Badge variant="outline" className="rounded-full text-green-600">
+                    <DollarSign className="h-3 w-3 mr-1" />
+                    {job?.salary}
+                  </Badge>
+                </div>
 
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {job.skills.slice(0, 6).map((skill, index) => (
-                        <Badge 
-                          key={index} 
-                          variant="standard" 
-                          className="bg-white/20 text-white"
-                        >
-                          {skill}
-                        </Badge>
-                      ))}
-                    </div>
+                {/* Job Description Preview */}
+                <Typography variant="body1" className="mb-4 line-clamp-3">
+                  {job?.description}
+                </Typography>
 
-                    <div className="flex items-center space-x-4 text-sm">
-                      <div className="flex items-center space-x-2">
-                        <Groups className="h-4 w-4" />
-                        <span>{job.applicants_count || 0} applicants</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <WorkOutline className="h-4 w-4" />
-                        <span>{job.experience_level || 'Entry Level'}</span>
-                      </div>
-                      {job.deadline && (
-                        <div className="flex items-center space-x-2">
-                          <CalendarMonth className="h-4 w-4" />
-                          <span>Deadline: {new Date(job.deadline).toLocaleDateString()}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="lg:ml-8">
+                {/* Engagement Actions - Twitter Style */}
+                <div className="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-800">
+                  <div className="flex items-center gap-8">
                     <Button
-                      variant="contained"
-                      color="secondary"
-                      size="large"
-                      onClick={handleApply}
-                      className="w-full lg:w-auto bg-white text-asu-maroon hover:bg-gray-100"
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center gap-2 text-gray-500 hover:text-gray-900 dark:hover:text-gray-100"
                     >
-                      Apply Now
+                      <MessageCircle className="h-4 w-4" />
+                      <span className="text-sm">12</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center gap-2 text-gray-500 hover:text-green-600"
+                    >
+                      <Repeat2 className="h-4 w-4" />
+                      <span className="text-sm">8</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center gap-2 text-gray-500 hover:text-red-500"
+                    >
+                      <Heart className="h-4 w-4" />
+                      <span className="text-sm">24</span>
                     </Button>
                   </div>
+                  <Button
+                    className={`px-8 py-2 rounded-full font-semibold ${
+                      isDark 
+                        ? 'bg-white text-black hover:bg-gray-200' 
+                        : 'bg-black text-white hover:bg-gray-800'
+                    }`}
+                    onClick={handleApply}
+                  >
+                    Apply Now
+                  </Button>
                 </div>
               </div>
             </div>
           </Card>
-        </div>
 
-        {/* Content */}
-        <div ref={contentRef} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Job Description */}
-            <Card className="p-8" elevation={2}>
-              <Typography variant="h5" color="textPrimary" className="font-bold mb-6">
-                Job Description
-              </Typography>
-              <div className={`prose max-w-none ${
-                isDark ? 'prose-dark' : 'prose-gray'
-              }`}>
-                <Typography variant="body1" color="textSecondary" className="leading-relaxed">
-                  {job.description}
+          {/* Job Details Grid */}
+          <div className="grid gap-6 lg:grid-cols-3">
+            {/* Main Content */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Full Description */}
+              <Card className={`p-6 ${
+                isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
+              } border rounded-2xl`}>
+                <Typography variant="h6" className="font-bold mb-4">
+                  Job Description
                 </Typography>
-              </div>
-            </Card>
+                <div className="prose dark:prose-invert max-w-none">
+                  <Typography variant="body1" className="whitespace-pre-wrap leading-relaxed">
+                    {job?.description}
+                  </Typography>
+                </div>
+              </Card>
 
-            {/* Requirements */}
-            <Card className="p-8" elevation={2}>
-              <Typography variant="h5" color="textPrimary" className="font-bold mb-6">
-                Requirements
-              </Typography>
-              <ul className="space-y-3">
-                {job.requirements.map((req, index) => (
-                  <li key={index} className="flex items-start space-x-3">
-                    <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
-                      isDark ? 'bg-lime' : 'bg-asu-maroon'
-                    }`}></div>
-                    <Typography variant="body1" color="textSecondary">
-                      {req}
+              {/* Requirements */}
+              <Card className={`p-6 ${
+                isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
+              } border rounded-2xl`}>
+                <Typography variant="h6" className="font-bold mb-4">
+                  Requirements
+                </Typography>
+                <ul className="space-y-3">
+                  {job?.requirements?.map((req, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <div className={`w-1.5 h-1.5 rounded-full mt-2 ${
+                        isDark ? 'bg-blue-400' : 'bg-blue-600'
+                      }`}></div>
+                      <Typography variant="body1" className="flex-1">
+                        {req}
+                      </Typography>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+
+              {/* Skills */}
+              <Card className={`p-6 ${
+                isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
+              } border rounded-2xl`}>
+                <Typography variant="h6" className="font-bold mb-4">
+                  Required Skills
+                </Typography>
+                <div className="flex flex-wrap gap-2">
+                  {job?.skills?.map((skill, index) => (
+                    <Badge 
+                      key={index}
+                      variant="secondary"
+                      className="px-3 py-1 rounded-full text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                    >
+                      {skill}
+                    </Badge>
+                  ))}
+                </div>
+              </Card>
+
+              {/* Benefits */}
+              {job?.benefits && (
+                <Card className={`p-6 ${
+                  isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
+                } border rounded-2xl`}>
+                  <Typography variant="h6" className="font-bold mb-4">
+                    Benefits & Perks
+                  </Typography>
+                  <ul className="space-y-3">
+                    {job.benefits.map((benefit, index) => (
+                      <li key={index} className="flex items-start gap-3">
+                        <CheckCircle className={`h-5 w-5 mt-0.5 ${
+                          isDark ? 'text-green-400' : 'text-green-600'
+                        }`} />
+                        <Typography variant="body1" className="flex-1">
+                          {benefit}
+                        </Typography>
+                      </li>
+                    ))}
+                  </ul>
+                </Card>
+              )}
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-6">
+              {/* Company Info */}
+              <Card className={`p-6 ${
+                isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
+              } border rounded-2xl`}>
+                <Typography variant="h6" className="font-bold mb-4">
+                  About the Company
+                </Typography>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Building2 className={`h-5 w-5 ${
+                      isDark ? 'text-blue-400' : 'text-blue-600'
+                    }`} />
+                    <Typography variant="body2" className="font-medium">
+                      {job?.company}
                     </Typography>
-                  </li>
-                ))}
-              </ul>
-            </Card>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Users className={`h-5 w-5 ${
+                      isDark ? 'text-blue-400' : 'text-blue-600'
+                    }`} />
+                    <Typography variant="body2" className="text-gray-500">
+                      500+ employees
+                    </Typography>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Globe className={`h-5 w-5 ${
+                      isDark ? 'text-blue-400' : 'text-blue-600'
+                    }`} />
+                    <Typography variant="body2" className="text-gray-500">
+                      www.{job?.company.toLowerCase().replace(/\s+/g, '')}.com
+                    </Typography>
+                  </div>
+                </div>
+              </Card>
 
-            {/* Skills */}
-            <Card className="p-8" elevation={2}>
-              <Typography variant="h5" color="textPrimary" className="font-bold mb-6">
-                Required Skills
-              </Typography>
-              <div className="flex flex-wrap gap-3">
-                {job.skills.map((skill, index) => (
-                  <Badge 
-                    key={index} 
-                    variant="standard" 
-                    color="primary"
-                    className="px-4 py-2 text-sm"
-                  >
-                    {skill}
-                  </Badge>
-                ))}
-              </div>
-            </Card>
-
-            {/* Benefits */}
-            {job.benefits && (
-              <Card className="p-8" elevation={2}>
-                <Typography variant="h5" color="textPrimary" className="font-bold mb-6">
-                  Benefits & Perks
+              {/* Job Details */}
+              <Card className={`p-6 ${
+                isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
+              } border rounded-2xl`}>
+                <Typography variant="h6" className="font-bold mb-4">
+                  Job Details
                 </Typography>
-                <Typography variant="body1" color="textSecondary" className="leading-relaxed">
-                  {job.benefits}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Briefcase className={`h-5 w-5 ${
+                      isDark ? 'text-blue-400' : 'text-blue-600'
+                    }`} />
+                    <div>
+                      <Typography variant="body2" className="font-medium">
+                        {job?.type}
+                      </Typography>
+                      <Typography variant="caption" className="text-gray-500">
+                        Employment Type
+                      </Typography>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <DollarSign className={`h-5 w-5 ${
+                      isDark ? 'text-green-400' : 'text-green-600'
+                    }`} />
+                    <div>
+                      <Typography variant="body2" className="font-medium">
+                        {job?.salary}
+                      </Typography>
+                      <Typography variant="caption" className="text-gray-500">
+                        Salary Range
+                      </Typography>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Calendar className={`h-5 w-5 ${
+                      isDark ? 'text-blue-400' : 'text-blue-600'
+                    }`} />
+                    <div>
+                      <Typography variant="body2" className="font-medium">
+                        {formatDate(job?.postedAt)}
+                      </Typography>
+                      <Typography variant="caption" className="text-gray-500">
+                        Posted Date
+                      </Typography>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Quick Apply */}
+              <Card className={`p-6 ${
+                isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
+              } border rounded-2xl`}>
+                <Button
+                  className={`w-full py-3 rounded-full font-semibold ${
+                    isDark 
+                      ? 'bg-white text-black hover:bg-gray-200' 
+                      : 'bg-black text-white hover:bg-gray-800'
+                  }`}
+                  onClick={handleApply}
+                >
+                  Apply for this Position
+                </Button>
+                <Typography variant="body2" className="text-center mt-3 text-gray-500">
+                  Join 24 other applicants
                 </Typography>
               </Card>
-            )}
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-8">
-            {/* Job Details */}
-            <Card className="p-6" elevation={2}>
-              <Typography variant="h6" color="textPrimary" className="font-bold mb-6">
-                Job Details
-              </Typography>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <Work className={`h-5 w-5 ${
-                    isDark ? 'text-lime' : 'text-asu-maroon'
-                  }`} />
-                  <div>
-                    <Typography variant="body2" color="textSecondary">
-                      Job Type
-                    </Typography>
-                    <Typography variant="body1" color="textPrimary" className="font-medium">
-                      {job.type}
-                    </Typography>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-3">
-                  <LocationOn className={`h-5 w-5 ${
-                    isDark ? 'text-lime' : 'text-asu-maroon'
-                  }`} />
-                  <div>
-                    <Typography variant="body2" color="textSecondary">
-                      Location
-                    </Typography>
-                    <Typography variant="body1" color="textPrimary" className="font-medium">
-                      {job.location}
-                    </Typography>
-                  </div>
-                </div>
-
-                {job.salary && (
-                  <div className="flex items-center space-x-3">
-                    <AttachMoney className={`h-5 w-5 ${
-                      isDark ? 'text-lime' : 'text-asu-maroon'
-                    }`} />
-                    <div>
-                      <Typography variant="body2" color="textSecondary">
-                        Salary
-                      </Typography>
-                      <Typography variant="body1" color="textPrimary" className="font-medium">
-                        {job.salary}
-                      </Typography>
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex items-center space-x-3">
-                  <AccessTime className={`h-5 w-5 ${
-                    isDark ? 'text-lime' : 'text-asu-maroon'
-                  }`} />
-                  <div>
-                    <Typography variant="body2" color="textSecondary">
-                      Posted
-                    </Typography>
-                    <Typography variant="body1" color="textPrimary" className="font-medium">
-                      {new Date(job.posted_date).toLocaleDateString()}
-                    </Typography>
-                  </div>
-                </div>
-
-                {job.deadline && (
-                  <div className="flex items-center space-x-3">
-                    <CalendarMonth className={`h-5 w-5 ${
-                      isDark ? 'text-lime' : 'text-asu-maroon'
-                    }`} />
-                    <div>
-                      <Typography variant="body2" color="textSecondary">
-                        Deadline
-                      </Typography>
-                      <Typography variant="body1" color="textPrimary" className="font-medium">
-                        {new Date(job.deadline).toLocaleDateString()}
-                      </Typography>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </Card>
-
-            {/* Company Info */}
-            <Card className="p-6" elevation={2}>
-              <Typography variant="h6" color="textPrimary" className="font-bold mb-4">
-                About {job.company}
-              </Typography>
-              <div className="space-y-3">
-                <div className="flex items-center space-x-3">
-                  <Business className={`h-5 w-5 ${
-                    isDark ? 'text-lime' : 'text-asu-maroon'
-                  }`} />
-                  <Typography variant="body2" color="textSecondary">
-                    Technology Company
-                  </Typography>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Groups className={`h-5 w-5 ${
-                    isDark ? 'text-lime' : 'text-asu-maroon'
-                  }`} />
-                  <Typography variant="body2" color="textSecondary">
-                    500+ employees
-                  </Typography>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Language className={`h-5 w-5 ${
-                    isDark ? 'text-lime' : 'text-asu-maroon'
-                  }`} />
-                  <Typography variant="body2" color="textSecondary">
-                    www.{job.company.toLowerCase().replace(/\s+/g, '')}.com
-                  </Typography>
-                </div>
-              </div>
-            </Card>
-
-            {/* Apply Button */}
-            <Card className="p-6" elevation={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                onClick={handleApply}
-                className="w-full"
-              >
-                Apply for this Position
-              </Button>
-              <Typography variant="body2" color="textSecondary" className="text-center mt-3">
-                Join {job.applicants_count || 0} other applicants
-              </Typography>
-            </Card>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Apply Modal */}
-      {showApplyModal && (
-        <Modal
-          isOpen={showApplyModal}
-          onClose={() => setShowApplyModal(false)}
-          title="Apply for Position"
-        >
-          <div className="space-y-6">
-            <div>
-              <Typography variant="h6" color="textPrimary" className="mb-2">
-                {job.title}
-              </Typography>
-              <Typography variant="body2" color="textSecondary">
-                {job.company} • {job.location}
-              </Typography>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Cover Letter
-              </label>
-              <textarea
-                value={coverLetter}
-                onChange={(e) => setCoverLetter(e.target.value)}
-                rows={6}
-                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  isDark 
-                    ? 'bg-dark-surface border-dark-accent text-dark-text' 
-                    : 'bg-white border-gray-300 text-gray-900'
-                }`}
-                placeholder="Tell us why you're interested in this position..."
-              />
-            </div>
-
-            <div className="flex justify-end space-x-3">
-              <Button
-                variant="outlined"
-                onClick={() => setShowApplyModal(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSubmitApplication}
-              >
-                Submit Application
-              </Button>
-            </div>
+      {/* Application Modal */}
+      <Modal
+        isOpen={showApplyModal}
+        onClose={() => setShowApplyModal(false)}
+        title="Apply for Position"
+      >
+        <div className="space-y-6">
+          <div>
+            <Typography variant="h6" color="textPrimary" className="mb-2">
+              {job.title}
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              {job.company} • {job.location}
+            </Typography>
           </div>
-        </Modal>
-      )}
+          
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Cover Letter
+            </label>
+            <textarea
+              value={coverLetter}
+              onChange={(e) => setCoverLetter(e.target.value)}
+              rows={6}
+              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                isDark 
+                  ? 'bg-dark-surface border-dark-accent text-dark-text' 
+                  : 'bg-white border-gray-300 text-gray-900'
+              }`}
+              placeholder="Tell us why you're interested in this position..."
+            />
+          </div>
+
+          <div className="flex justify-end space-x-3">
+            <Button
+              variant="outlined"
+              onClick={() => setShowApplyModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleSubmitApplication}
+            >
+              Submit Application
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

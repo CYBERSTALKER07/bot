@@ -16,9 +16,6 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import { useSwiftUIAnimation, SwiftUITransitions } from '../../hooks/useSwiftUIAnimations';
-import { SwiftUICard, SwiftUIList, SwiftUIText } from '../ui/SwiftUICard';
-import SwiftUIButton from '../ui/SwiftUIButton';
 import { supabase } from '../../lib/supabase';
 import { StatsCard, Card } from '../ui/Card';
 import Button from '../ui/Button';
@@ -51,7 +48,6 @@ interface RecentUser {
 export default function AdminDashboard() {
   const { user } = useAuth();
   const { isDark } = useTheme();
-  const { animate, staggeredAnimate } = useSwiftUIAnimation();
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -73,41 +69,6 @@ export default function AdminDashboard() {
   useEffect(() => {
     fetchDashboardData();
   }, []);
-
-  // Animate components on mount
-  useEffect(() => {
-    // Animate stats cards
-    setTimeout(() => {
-      const statsCards = document.querySelectorAll('.admin-stats-card');
-      if (statsCards.length > 0) {
-        staggeredAnimate(
-          Array.from(statsCards),
-          { scale: 1, opacity: 1, y: 0, rotationX: 0 },
-          {
-            stagger: 0.2,
-            duration: 0.8,
-            ease: 'back.out(1.7)'
-          }
-        );
-      }
-    }, 500);
-
-    // Animate tab content
-    setTimeout(() => {
-      const contentElements = document.querySelectorAll('.admin-content-item');
-      if (contentElements.length > 0) {
-        staggeredAnimate(
-          Array.from(contentElements),
-          { scale: 1, opacity: 1, x: 0 },
-          {
-            stagger: 0.1,
-            duration: 0.6,
-            ease: 'back.out(1.4)'
-          }
-        );
-      }
-    }, 1200);
-  }, [staggeredAnimate, activeTab]);
 
   const fetchDashboardData = async () => {
     try {
@@ -225,95 +186,99 @@ export default function AdminDashboard() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-success/10 text-success border border-success/20';
+        return isDark 
+          ? 'bg-green-900/20 text-green-400 border border-green-800'
+          : 'bg-green-50 text-green-800 border border-green-200';
       case 'pending':
-        return 'bg-warning/10 text-warning border border-warning/20';
+        return isDark 
+          ? 'bg-yellow-900/20 text-yellow-400 border border-yellow-800'
+          : 'bg-yellow-50 text-yellow-800 border border-yellow-200';
       case 'suspended':
-        return 'bg-error/10 text-error border border-error/20';
+        return isDark 
+          ? 'bg-red-900/20 text-red-400 border border-red-800'
+          : 'bg-red-50 text-red-800 border border-red-200';
       default:
-        return 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400';
+        return isDark 
+          ? 'bg-gray-800 text-gray-400 border border-gray-700'
+          : 'bg-gray-100 text-gray-600 border border-gray-300';
     }
   };
 
   const renderOverview = () => (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="admin-stats-card opacity-0 scale-75 -rotate-x-90">
-          <StatsCard
-            title="Total Users"
-            value={userStats.totalUsers.toLocaleString()}
-            icon={Users}
-            subtitle="+12% from last month"
-            color="info"
-            animated={false}
-          />
-        </div>
-        <div className="admin-stats-card opacity-0 scale-75 -rotate-x-90">
-          <StatsCard
-            title="Active Jobs"
-            value={jobStats.activeJobs.toString()}
-            icon={Briefcase}
-            subtitle="+8% from last month"
-            color="success"
-            animated={false}
-          />
-        </div>
-        <div className="admin-stats-card opacity-0 scale-75 -rotate-x-90">
-          <StatsCard
-            title="Applications"
-            value={jobStats.applications.toLocaleString()}
-            icon={FileText}
-            subtitle="+24% from last month"
-            color="primary"
-            animated={false}
-          />
-        </div>
-        <div className="admin-stats-card opacity-0 scale-75 -rotate-x-90">
-          <StatsCard
-            title="Pending Approvals"
-            value={userStats.pendingApprovals.toString()}
-            icon={AlertTriangle}
-            subtitle="Requires attention"
-            color="warning"
-            animated={false}
-          />
-        </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <StatsCard
+          title="Total Users"
+          value={userStats.totalUsers.toLocaleString()}
+          icon={Users}
+          subtitle="+12% from last month"
+          color="info"
+          animated
+          delay={0.1}
+          className="text-center"
+        />
+        <StatsCard
+          title="Active Jobs"
+          value={jobStats.activeJobs.toString()}
+          icon={Briefcase}
+          subtitle="+8% from last month"
+          color="success"
+          animated
+          delay={0.2}
+          className="text-center"
+        />
+        <StatsCard
+          title="Applications"
+          value={jobStats.applications.toLocaleString()}
+          icon={FileText}
+          subtitle="+24% from last month"
+          color="primary"
+          animated
+          delay={0.3}
+          className="text-center"
+        />
+        <StatsCard
+          title="Pending Approvals"
+          value={userStats.pendingApprovals.toString()}
+          icon={AlertTriangle}
+          subtitle="Requires attention"
+          color="warning"
+          animated
+          delay={0.4}
+          className="text-center"
+        />
       </div>
 
       {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <SwiftUICard 
-          className="admin-content-item opacity-0 scale-95 translate-x-8"
-          variant="elevated"
-          slideDirection="right"
-          delay={0.3}
-          animateOnMount={false}
-          hoverScale={1.01}
-          springy
-        >
-          <div className="border-b border-neutral-200 dark:border-neutral-700 pb-4 mb-4">
-            <SwiftUIText className="text-lg font-semibold text-foreground">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+        <Card className={`p-4 sm:p-6 ${
+          isDark ? 'bg-gray-900 border-gray-800' : 'bg-gray-50 border-gray-200'
+        } border rounded-2xl`}>
+          <div className={`border-b pb-4 mb-4 ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+            <h3 className={`text-base sm:text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
               Recent User Registrations
-            </SwiftUIText>
+            </h3>
           </div>
-          <div className="space-y-4">
-            {recentUsers.map((user, index) => (
+          <div className="space-y-3 sm:space-y-4">
+            {recentUsers.slice(0, 5).map((user, index) => (
               <div key={user.id} className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
-                    <Users className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
+                <div className="flex items-center space-x-3 flex-1 min-w-0">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    isDark ? 'bg-gray-800' : 'bg-gray-100'
+                  }`}>
+                    <Users className={`h-4 w-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`} />
                   </div>
-                  <div>
-                    <SwiftUIText className="font-medium text-foreground" delay={0.1 * index}>
+                  <div className="flex-1 min-w-0">
+                    <p className={`font-medium text-sm sm:text-base truncate ${isDark ? 'text-white' : 'text-gray-900'}`}>
                       {user.name}
-                    </SwiftUIText>
-                    <SwiftUIText className="text-sm text-neutral-600 dark:text-neutral-400" delay={0.15 * index}>
+                    </p>
+                    <p className={`text-xs sm:text-sm truncate ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                       {user.email}
-                    </SwiftUIText>
+                    </p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 flex-shrink-0">
                   <span className={cn("px-2 py-1 rounded-full text-xs font-medium", getStatusColor(user.status))}>
                     {user.status}
                   </span>
@@ -322,127 +287,119 @@ export default function AdminDashboard() {
               </div>
             ))}
           </div>
-        </SwiftUICard>
+        </Card>
 
-        <SwiftUICard 
-          className="admin-content-item opacity-0 scale-95 -translate-x-8"
-          variant="elevated"
-          slideDirection="left"
-          delay={0.5}
-          animateOnMount={false}
-          hoverScale={1.01}
-          springy
-        >
-          <div className="border-b border-neutral-200 dark:border-neutral-700 pb-4 mb-4">
-            <SwiftUIText className="text-lg font-semibold text-foreground">
+        <Card className={`p-4 sm:p-6 ${
+          isDark ? 'bg-gray-900 border-gray-800' : 'bg-gray-50 border-gray-200'
+        } border rounded-2xl`}>
+          <div className={`border-b pb-4 mb-4 ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+            <h3 className={`text-base sm:text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
               Quick Actions
-            </SwiftUIText>
+            </h3>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
             {[
-              { icon: Users, label: "Manage Users", color: "text-info" },
-              { icon: Briefcase, label: "Review Jobs", color: "text-success" },
-              { icon: Calendar, label: "Create Event", color: "text-brand-primary" },
-              { icon: MessageSquare, label: "Send Announcement", color: "text-warning" }
+              { icon: Users, label: "Manage Users", color: isDark ? "text-blue-400" : "text-blue-600" },
+              { icon: Briefcase, label: "Review Jobs", color: isDark ? "text-green-400" : "text-green-600" },
+              { icon: Calendar, label: "Create Event", color: isDark ? "text-lime" : "text-asu-maroon" },
+              { icon: MessageSquare, label: "Send Announcement", color: isDark ? "text-yellow-400" : "text-yellow-600" }
             ].map((action, index) => (
-              <SwiftUIButton
+              <Button
                 key={index}
                 variant="outlined"
-                className="flex flex-col items-center p-4 h-auto"
-                springy
-                hoverScale={1.05}
+                className={`flex flex-col items-center p-3 sm:p-4 h-auto border-2 ${
+                  isDark 
+                    ? 'border-gray-600 hover:bg-gray-800 hover:border-lime' 
+                    : 'border-gray-300 hover:bg-gray-100 hover:border-asu-maroon'
+                }`}
               >
-                <action.icon className={`h-6 w-6 mb-2 ${action.color}`} />
-                <span className="text-sm font-medium text-foreground">{action.label}</span>
-              </SwiftUIButton>
+                <action.icon className={`h-5 w-5 sm:h-6 sm:w-6 mb-2 ${action.color}`} />
+                <span className={`text-xs sm:text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  {action.label}
+                </span>
+              </Button>
             ))}
           </div>
-        </SwiftUICard>
+        </Card>
       </div>
     </div>
   );
 
   const renderUserManagement = () => (
-    <SwiftUICard 
-      variant="elevated"
-      slideDirection="up"
-      delay={0.3}
-      hoverScale={1.005}
-      springy
-    >
-      <div className="border-b border-neutral-200 dark:border-neutral-700 pb-4 mb-6">
-        <SwiftUIText className="text-lg font-semibold text-foreground">
+    <Card className={`p-4 sm:p-6 ${
+      isDark ? 'bg-gray-900 border-gray-800' : 'bg-gray-50 border-gray-200'
+    } border rounded-2xl`}>
+      <div className={`border-b pb-4 mb-6 ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+        <h3 className={`text-base sm:text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
           User Management
-        </SwiftUIText>
+        </h3>
       </div>
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {recentUsers.map((user, index) => (
-          <SwiftUICard
+          <Card
             key={user.id}
-            className="admin-user-card"
-            variant="outlined"
-            padding="medium"
-            interactive
-            hoverScale={1.01}
-            delay={0.1 * index}
-            springy
+            className={`p-3 sm:p-4 transition-all duration-300 hover:shadow-md ${
+              isDark ? 'bg-black border-gray-800 hover:bg-gray-900' : 'bg-white border-gray-200 hover:shadow-lg'
+            } border rounded-xl`}
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
-                  <Users className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex items-center space-x-3 sm:space-x-4 flex-1 min-w-0">
+                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center ${
+                  isDark ? 'bg-gray-800' : 'bg-gray-100'
+                }`}>
+                  <Users className={`h-4 w-4 sm:h-5 sm:w-5 ${isDark ? 'text-gray-400' : 'text-gray-600'}`} />
                 </div>
-                <div>
-                  <SwiftUIText className="font-medium text-foreground">
+                <div className="flex-1 min-w-0">
+                  <p className={`font-medium text-sm sm:text-base truncate ${isDark ? 'text-white' : 'text-gray-900'}`}>
                     {user.name}
-                  </SwiftUIText>
-                  <SwiftUIText className="text-sm text-neutral-600 dark:text-neutral-400" delay={0.1}>
+                  </p>
+                  <p className={`text-xs sm:text-sm truncate ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                     {user.email}
-                  </SwiftUIText>
-                  <SwiftUIText className="text-sm text-neutral-600 dark:text-neutral-400" delay={0.2}>
+                  </p>
+                  <p className={`text-xs sm:text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                     Joined: {new Date(user.joinDate).toLocaleDateString()}
-                  </SwiftUIText>
+                  </p>
                 </div>
               </div>
-              <div className="flex items-center space-x-3">
-                <span className={cn("px-3 py-1 rounded-full text-sm font-medium", getStatusColor(user.status))}>
+              <div className="flex items-center justify-between sm:justify-end space-x-3 flex-shrink-0">
+                <span className={cn("px-3 py-1 rounded-full text-xs sm:text-sm font-medium", getStatusColor(user.status))}>
                   {user.status}
                 </span>
-                <SwiftUIButton 
-                  variant="text" 
-                  size="small" 
-                  className="text-neutral-500 hover:text-info"
-                  springy
-                  hoverScale={1.1}
-                >
-                  <Eye className="h-4 w-4" />
-                </SwiftUIButton>
-                <SwiftUIButton 
-                  variant="text" 
-                  size="small" 
-                  className="text-neutral-500 hover:text-error"
-                  springy
-                  hoverScale={1.1}
-                >
-                  <Ban className="h-4 w-4" />
-                </SwiftUIButton>
+                <div className="flex space-x-2">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className={`${isDark ? 'text-gray-500 hover:text-blue-400' : 'text-gray-500 hover:text-blue-600'}`}
+                  >
+                    <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className={`${isDark ? 'text-gray-500 hover:text-red-400' : 'text-gray-500 hover:text-red-600'}`}
+                  >
+                    <Ban className="h-3 w-3 sm:h-4 sm:w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
-          </SwiftUICard>
+          </Card>
         ))}
       </div>
-    </SwiftUICard>
+    </Card>
   );
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
+      <div className={`min-h-screen ${isDark ? 'bg-black' : 'bg-white'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary mx-auto mb-4"></div>
-            <SwiftUIText className="text-neutral-600 dark:text-neutral-400">
+            <div className={`animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4 ${
+              isDark ? 'border-lime' : 'border-asu-maroon'
+            }`}></div>
+            <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
               Loading admin dashboard...
-            </SwiftUIText>
+            </p>
           </div>
         </div>
       </div>
@@ -451,106 +408,113 @@ export default function AdminDashboard() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
+      <div className={`min-h-screen ${isDark ? 'bg-black' : 'bg-white'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <SwiftUICard variant="elevated" padding="large" className="text-center">
-            <h2 className="text-xl font-semibold text-error mb-2">
+          <Card className={`text-center p-6 sm:p-8 ${
+            isDark ? 'bg-gray-900 border-gray-800' : 'bg-gray-50 border-gray-200'
+          } border rounded-2xl`}>
+            <h2 className="text-xl font-semibold text-red-600 mb-2">
               Error Loading Dashboard
             </h2>
-            <SwiftUIText className="text-neutral-600 dark:text-neutral-400 mb-4">
+            <p className={`mb-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
               {error}
-            </SwiftUIText>
-            <SwiftUIButton onClick={fetchDashboardData} variant="outlined" springy>
+            </p>
+            <Button 
+              onClick={fetchDashboardData} 
+              variant="outlined"
+              className={`${
+                isDark 
+                  ? 'border-lime text-lime hover:bg-lime/10' 
+                  : 'border-asu-maroon text-asu-maroon hover:bg-asu-maroon/10'
+              }`}
+            >
               Try Again
-            </SwiftUIButton>
-          </SwiftUICard>
+            </Button>
+          </Card>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <SwiftUIText 
-            className="text-3xl font-bold text-foreground mb-2"
-            delay={0.2}
-          >
+    <div className={`min-h-screen ${isDark ? 'bg-black text-white' : 'bg-white text-black'}`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+        <div className="mb-6 sm:mb-8">
+          <h1 className={`text-2xl sm:text-3xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
             Admin Dashboard ⚡
-          </SwiftUIText>
-          <SwiftUIText 
-            className="text-neutral-600 dark:text-neutral-400"
-            delay={0.4}
-          >
+          </h1>
+          <p className={`text-sm sm:text-base ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
             Manage users, jobs, events, and platform settings
-          </SwiftUIText>
+          </p>
         </div>
 
-        {/* Navigation Tabs with SwiftUI animations */}
-        <div className="border-b border-neutral-200 dark:border-neutral-700 mb-8">
-          <nav className="flex space-x-8">
+        {/* Navigation Tabs */}
+        <div className={`border-b mb-6 sm:mb-8 ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+          <nav className="flex space-x-4 sm:space-x-8 overflow-x-auto scrollbar-hide">
             {tabs.map((tab, index) => {
               const Icon = tab.icon;
               return (
-                <SwiftUIButton
+                <button
                   key={tab.id}
-                  variant="text"
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
-                    "flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors",
+                    "flex items-center space-x-2 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm transition-colors whitespace-nowrap",
                     activeTab === tab.id
-                      ? "border-brand-primary text-brand-primary"
-                      : "border-transparent text-neutral-600 dark:text-neutral-400"
+                      ? `${isDark ? 'border-lime text-lime' : 'border-asu-maroon text-asu-maroon'}`
+                      : `border-transparent ${isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-700'}`
                   )}
-                  springy
-                  hoverScale={1.02}
-                  animateOnMount
-                  delay={0.1 * index}
                 >
-                  <Icon className="h-5 w-5" />
-                  <span>{tab.label}</span>
-                </SwiftUIButton>
+                  <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="hidden sm:inline">{tab.label}</span>
+                </button>
               );
             })}
           </nav>
         </div>
 
-        {/* Tab Content with SwiftUI transitions */}
+        {/* Tab Content */}
         <div className="tab-content">
           {activeTab === 'overview' && renderOverview()}
           {activeTab === 'users' && renderUserManagement()}
           {activeTab === 'jobs' && (
-            <SwiftUICard className="text-center py-12" slideDirection="up">
-              <Briefcase className="h-12 w-12 mx-auto mb-4 text-neutral-400" />
-              <SwiftUIText className="text-neutral-600 dark:text-neutral-400">
+            <Card className={`text-center py-8 sm:py-12 ${
+              isDark ? 'bg-gray-900 border-gray-800' : 'bg-gray-50 border-gray-200'
+            } border rounded-2xl`}>
+              <Briefcase className={`h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-4 ${isDark ? 'text-gray-600' : 'text-gray-400'}`} />
+              <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 Job moderation features coming soon
-              </SwiftUIText>
-            </SwiftUICard>
+              </p>
+            </Card>
           )}
           {activeTab === 'events' && (
-            <SwiftUICard className="text-center py-12" slideDirection="up">
-              <Calendar className="h-12 w-12 mx-auto mb-4 text-neutral-400" />
-              <SwiftUIText className="text-neutral-600 dark:text-neutral-400">
+            <Card className={`text-center py-8 sm:py-12 ${
+              isDark ? 'bg-gray-900 border-gray-800' : 'bg-gray-50 border-gray-200'
+            } border rounded-2xl`}>
+              <Calendar className={`h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-4 ${isDark ? 'text-gray-600' : 'text-gray-400'}`} />
+              <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 Event management features coming soon
-              </SwiftUIText>
-            </SwiftUICard>
+              </p>
+            </Card>
           )}
           {activeTab === 'resources' && (
-            <SwiftUICard className="text-center py-12" slideDirection="up">
-              <FileText className="h-12 w-12 mx-auto mb-4 text-neutral-400" />
-              <SwiftUIText className="text-neutral-600 dark:text-neutral-400">
+            <Card className={`text-center py-8 sm:py-12 ${
+              isDark ? 'bg-gray-900 border-gray-800' : 'bg-gray-50 border-gray-200'
+            } border rounded-2xl`}>
+              <FileText className={`h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-4 ${isDark ? 'text-gray-600' : 'text-gray-400'}`} />
+              <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 Resource management features coming soon
-              </SwiftUIText>
-            </SwiftUICard>
+              </p>
+            </Card>
           )}
           {activeTab === 'settings' && (
-            <SwiftUICard className="text-center py-12" slideDirection="up">
-              <Settings className="h-12 w-12 mx-auto mb-4 text-neutral-400" />
-              <SwiftUIText className="text-neutral-600 dark:text-neutral-400">
+            <Card className={`text-center py-8 sm:py-12 ${
+              isDark ? 'bg-gray-900 border-gray-800' : 'bg-gray-50 border-gray-200'
+            } border rounded-2xl`}>
+              <Settings className={`h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-4 ${isDark ? 'text-gray-600' : 'text-gray-400'}`} />
+              <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 Platform settings coming soon
-              </SwiftUIText>
-            </SwiftUICard>
+              </p>
+            </Card>
           )}
         </div>
       </div>

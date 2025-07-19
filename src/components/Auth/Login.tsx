@@ -1,26 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
-  Person,
-  Email,
+  Mail,
   Lock,
-  Business,
-  School,
-  Help,
-  LoginOutlined,
-  Security,
-  AutoAwesome,
-  RocketLaunch,
-  ArrowForward,
-  EmojiEvents,
-  Verified,
-  CheckCircle
-} from '@mui/icons-material';
+  User,
+  Building2,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Check,
+  AlertCircle,
+  X as XIcon
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import Typography from '../ui/Typography';
-import Input from '../ui/Input';
 import Button from '../ui/Button';
+import Input from '../ui/Input';
 import { Card } from '../ui/Card';
 
 interface FormData {
@@ -41,6 +36,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [showDemoAccounts, setShowDemoAccounts] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   
   const { login } = useAuth();
   const { isDark } = useTheme();
@@ -61,7 +57,6 @@ export default function Login() {
     const value = field === 'rememberMe' ? e.target.checked : e.target.value;
     setFormData(prev => ({ ...prev, [field]: value }));
     
-    // Clear validation error when user starts typing
     if (validationErrors[field]) {
       setValidationErrors(prev => ({ ...prev, [field]: '' }));
     }
@@ -99,7 +94,6 @@ export default function Login() {
     try {
       await login(formData.email, formData.password, formData.role);
       
-      // Save remember me preference
       if (formData.rememberMe) {
         localStorage.setItem('rememberMe', 'true');
         localStorage.setItem('savedEmail', formData.email);
@@ -108,11 +102,10 @@ export default function Login() {
         localStorage.removeItem('savedEmail');
       }
       
-      // Check for admin credentials and redirect appropriately
       if (formData.email === 'admin@aut.edu' && formData.password === 'admin123') {
         navigate('/admin');
       } else {
-        navigate(formData.role === 'student' ? '/dashboard' : '/employer-dashboard');
+        navigate('/feed');
       }
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Invalid credentials. Please check your email and password.');
@@ -133,7 +126,7 @@ export default function Login() {
 
     try {
       await login(demoEmail, demoPassword, demoRole);
-      navigate(demoRole === 'student' ? '/dashboard' : '/employer-dashboard');
+      navigate('/feed');
     } catch {
       setError('Demo login failed. Please try again.');
     } finally {
@@ -156,383 +149,289 @@ export default function Login() {
   }, []);
 
   return (
-    <div className={`min-h-screen flex transition-colors duration-300 ${
-      isDark ? 'bg-dark-bg' : 'bg-gray-50'
-    }`}>
-      {/* Left Side - Form */}
-      <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
-        <div className="mx-auto w-full max-w-md lg:w-[28rem]">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${
-              isDark ? 'bg-lime/20' : 'bg-asu-maroon/10'
-            }`}>
-              <School className={`h-8 w-8 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
-            </div>
-            <Typography variant="h3" color="textPrimary" className="font-bold mb-3">
-              Welcome Back
-            </Typography>
-            <Typography variant="subtitle1" color="textSecondary">
-              Sign in to continue your career journey at AUT
-            </Typography>
-          </div>
-
-          {/* Enhanced Role Selection */}
-          <Card className="p-1 mb-6" variant="outlined">
-            <div className="grid grid-cols-2 gap-1">
-              <button
-                type="button"
-                onClick={() => setFormData(prev => ({ ...prev, role: 'student' }))}
-                className={`p-4 rounded-lg transition-all duration-200 flex flex-col items-center space-y-2 ${
-                  formData.role === 'student'
-                    ? isDark
-                      ? 'bg-lime text-dark-surface shadow-md'
-                      : 'bg-asu-maroon text-white shadow-md'
-                    : isDark
-                      ? 'text-dark-muted hover:bg-dark-surface'
-                      : 'text-gray-600 hover:bg-gray-50'
-                }`}
-              >
-                <Person className="h-6 w-6" />
-                <span className="font-medium">Student</span>
-                <span className="text-xs opacity-75">Access your dashboard</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setFormData(prev => ({ ...prev, role: 'employer' }))}
-                className={`p-4 rounded-lg transition-all duration-200 flex flex-col items-center space-y-2 ${
-                  formData.role === 'employer'
-                    ? isDark
-                      ? 'bg-lime text-dark-surface shadow-md'
-                      : 'bg-asu-maroon text-white shadow-md'
-                    : isDark
-                      ? 'text-dark-muted hover:bg-dark-surface'
-                      : 'text-gray-600 hover:bg-gray-50'
-                }`}
-              >
-                <Business className="h-6 w-6" />
-                <span className="font-medium">Employer</span>
-                <span className="text-xs opacity-75">Manage your hiring</span>
-              </button>
-            </div>
-          </Card>
-
-          {/* Login Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <Input
-              label="Email Address "
-              type="email"
-              required
-              value={formData.email}
-              onChange={handleChange('email')}
-              placeholder={formData.role === 'student' ? 'your.name@aut.edu' : 'your.email@company.com '}
-              variant="outlined"
-              fullWidth
-              error={validationErrors.email}
-              startIcon={<Email className="h-5 w-5" />}
-            />
-
-            <Input
-              label="Password"
-              type="password"
-              required
-              value={formData.password}
-              onChange={handleChange('password')}
-              placeholder="Enter your password"
-              variant="outlined"
-              fullWidth
-              showPasswordToggle
-              error={validationErrors.password}
-              startIcon={<Lock className="h-5 w-5" />}
-            />
-
-            {/* Remember Me & Forgot Password */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="rememberMe"
-                  checked={formData.rememberMe}
-                  onChange={handleChange('rememberMe')}
-                  className={`h-4 w-4 rounded border-2 focus:ring-2 focus:ring-offset-0 ${
-                    isDark 
-                      ? 'border-gray-600 text-lime focus:ring-lime bg-dark-surface' 
-                      : 'border-gray-300 text-asu-maroon focus:ring-asu-maroon bg-white'
-                  }`}
-                />
-                <label htmlFor="rememberMe" className={`text-sm ${isDark ? 'text-dark-text' : 'text-gray-700'}`}>
-                  Remember me
-                </label>
-              </div>
-              <Link 
-                to="/forgot-password" 
-                className={`text-sm font-medium transition-colors duration-300 ${
-                  isDark ? 'text-lime hover:text-dark-accent' : 'text-asu-maroon hover:text-asu-maroon/80'
-                }`}
-              >
-                Forgot password?
-              </Link>
-            </div>
-
-            {error && (
-              <Card className={`p-4 border-l-4 ${
-                isDark 
-                  ? 'bg-red-900/20 border-red-500 text-red-300' 
-                  : 'bg-red-50 border-red-400 text-red-800'
+    <div className={`min-h-screen ${isDark ? 'bg-black text-white' : 'bg-white text-black'}`}>
+      <div className="min-h-screen flex">
+        {/* Left Side - Form */}
+        <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24 max-w-md mx-auto lg:max-w-none">
+          <div className="mx-auto w-full max-w-sm lg:w-96">
+            {/* X Logo */}
+            <div className="text-center mb-8">
+              <div className={`w-12 h-12 rounded-full mx-auto mb-6 flex items-center justify-center ${
+                isDark ? 'bg-white' : 'bg-black'
               }`}>
-                <Typography variant="body2">
-                  {error}
-                </Typography>
-              </Card>
-            )}
+                <XIcon className={`h-6 w-6 ${isDark ? 'text-black' : 'text-white'}`} />
+              </div>
+              <h1 className="text-3xl font-bold mb-2">Sign in to X</h1>
+            </div>
 
-            <Button
-              type="submit"
-              variant="elevated"
-              color="primary"
-              size="large"
-              fullWidth
-              loading={loading}
-              className="py-4 font-semibold"
-              endIcon={<LoginOutlined />}
-            >
-              Sign In as {formData.role === 'student' ? 'Student' : 'Employer'}
-            </Button>
-          </form>
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Role Selection - X Style */}
+              <div className="space-y-3">
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, role: 'student' }))}
+                  className={`w-full p-4 rounded-full border-2 transition-all duration-200 flex items-center justify-center space-x-3 ${
+                    formData.role === 'student'
+                      ? isDark
+                        ? 'border-white bg-white text-black'
+                        : 'border-black bg-black text-white'
+                      : isDark
+                        ? 'border-gray-600 text-gray-300 hover:border-gray-500'
+                        : 'border-gray-300 text-gray-700 hover:border-gray-400'
+                  }`}
+                >
+                  <User className="h-5 w-5" />
+                  <span className="font-medium">Continue as Student</span>
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, role: 'employer' }))}
+                  className={`w-full p-4 rounded-full border-2 transition-all duration-200 flex items-center justify-center space-x-3 ${
+                    formData.role === 'employer'
+                      ? isDark
+                        ? 'border-white bg-white text-black'
+                        : 'border-black bg-black text-white'
+                      : isDark
+                        ? 'border-gray-600 text-gray-300 hover:border-gray-500'
+                        : 'border-gray-300 text-gray-700 hover:border-gray-400'
+                  }`}
+                >
+                  <Building2 className="h-5 w-5" />
+                  <span className="font-medium">Continue as Employer</span>
+                </button>
+              </div>
 
-          {/* Demo Accounts Section */}
-          <div className="mt-6">
-            <Button
-              variant="outlined"
-              size="small"
-              fullWidth
-              onClick={() => setShowDemoAccounts(!showDemoAccounts)}
-              className={`${isDark ? 'border-gray-600 text-dark-muted' : 'border-gray-300 text-gray-600'}`}
-              startIcon={<Help className="h-4 w-4" />}
-            >
-              Try Demo Accounts
-            </Button>
-            
-            {showDemoAccounts && (
-              <Card className="mt-3 p-4 space-y-3" variant="outlined">
-                <Typography variant="body2" color="textSecondary" className="text-center mb-3">
-                  Quick access to demo accounts for testing
-                </Typography>
-                <div className="grid grid-cols-1 gap-2">
-                  <Button
-                    variant="outlined"
-                    size="small"
+              <div className="relative">
+                <div className={`absolute inset-0 flex items-center ${error ? 'opacity-100' : 'opacity-0'}`}>
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className={`px-2 ${isDark ? 'bg-black text-gray-400' : 'bg-white text-gray-500'}`}>
+                    Or
+                  </span>
+                </div>
+              </div>
+
+              {/* Email Input */}
+              <div className="space-y-1">
+                <div className="relative">
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange('email')}
+                    placeholder="Email"
+                    className={`w-full px-4 py-4 text-lg rounded-md border-2 bg-transparent transition-colors ${
+                      validationErrors.email
+                        ? 'border-red-500 focus:border-red-500'
+                        : isDark
+                          ? 'border-gray-600 focus:border-blue-500 text-white placeholder-gray-400'
+                          : 'border-gray-300 focus:border-blue-500 text-black placeholder-gray-500'
+                    } focus:outline-none`}
+                  />
+                  <Mail className={`absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 ${
+                    isDark ? 'text-gray-400' : 'text-gray-500'
+                  }`} />
+                </div>
+                {validationErrors.email && (
+                  <p className="text-red-500 text-sm flex items-center space-x-1">
+                    <AlertCircle className="h-4 w-4" />
+                    <span>{validationErrors.email}</span>
+                  </p>
+                )}
+              </div>
+
+              {/* Password Input */}
+              <div className="space-y-1">
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={formData.password}
+                    onChange={handleChange('password')}
+                    placeholder="Password"
+                    className={`w-full px-4 py-4 text-lg rounded-md border-2 bg-transparent transition-colors pr-12 ${
+                      validationErrors.password
+                        ? 'border-red-500 focus:border-red-500'
+                        : isDark
+                          ? 'border-gray-600 focus:border-blue-500 text-white placeholder-gray-400'
+                          : 'border-gray-300 focus:border-blue-500 text-black placeholder-gray-500'
+                    } focus:outline-none`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className={`absolute right-4 top-1/2 transform -translate-y-1/2 ${
+                      isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+                {validationErrors.password && (
+                  <p className="text-red-500 text-sm flex items-center space-x-1">
+                    <AlertCircle className="h-4 w-4" />
+                    <span>{validationErrors.password}</span>
+                  </p>
+                )}
+              </div>
+
+              {/* Error Message */}
+              {error && (
+                <div className={`p-4 rounded-lg border ${
+                  isDark 
+                    ? 'bg-red-900/20 border-red-800 text-red-300' 
+                    : 'bg-red-50 border-red-200 text-red-700'
+                }`}>
+                  <div className="flex items-center space-x-2">
+                    <AlertCircle className="h-5 w-5" />
+                    <span>{error}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                disabled={loading}
+                className={`w-full py-4 text-lg font-bold rounded-full transition-colors ${
+                  isDark
+                    ? 'bg-white text-black hover:bg-gray-200 disabled:bg-gray-800 disabled:text-gray-500'
+                    : 'bg-black text-white hover:bg-gray-800 disabled:bg-gray-300 disabled:text-gray-500'
+                }`}
+              >
+                {loading ? 'Signing in...' : 'Sign in'}
+              </Button>
+
+              {/* Remember Me */}
+              <div className="flex items-center justify-between text-sm">
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={formData.rememberMe}
+                    onChange={handleChange('rememberMe')}
+                    className={`w-4 h-4 rounded ${
+                      isDark 
+                        ? 'bg-gray-800 border-gray-600 text-blue-500' 
+                        : 'bg-white border-gray-300 text-blue-600'
+                    }`}
+                  />
+                  <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>
+                    Remember me
+                  </span>
+                </label>
+                <Link 
+                  to="/forgot-password" 
+                  className={`font-medium hover:underline ${
+                    isDark ? 'text-blue-400' : 'text-blue-600'
+                  }`}
+                >
+                  Forgot password?
+                </Link>
+              </div>
+            </form>
+
+            {/* Demo Accounts */}
+            <div className="mt-6">
+              <button
+                onClick={() => setShowDemoAccounts(!showDemoAccounts)}
+                className={`w-full p-3 text-sm rounded-md border ${
+                  isDark 
+                    ? 'border-gray-600 text-gray-400 hover:bg-gray-900' 
+                    : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                Try Demo Accounts
+              </button>
+              
+              {showDemoAccounts && (
+                <div className="mt-3 space-y-2">
+                  <button
                     onClick={() => handleDemoLogin('student@aut.edu', 'password123', 'student')}
-                    startIcon={<Person className="h-4 w-4" />}
-                    className="justify-start"
+                    className={`w-full p-3 text-sm text-left rounded-md border ${
+                      isDark 
+                        ? 'border-gray-700 hover:bg-gray-900' 
+                        : 'border-gray-200 hover:bg-gray-50'
+                    }`}
                   >
                     Demo Student Account
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
+                  </button>
+                  <button
                     onClick={() => handleDemoLogin('employer@intel.com', 'password123', 'employer')}
-                    startIcon={<Business className="h-4 w-4" />}
-                    className="justify-start"
+                    className={`w-full p-3 text-sm text-left rounded-md border ${
+                      isDark 
+                        ? 'border-gray-700 hover:bg-gray-900' 
+                        : 'border-gray-200 hover:bg-gray-50'
+                    }`}
                   >
                     Demo Employer Account
-                  </Button>
+                  </button>
                 </div>
-              </Card>
-            )}
-          </div>
+              )}
+            </div>
 
-          <div className="mt-6 text-center">
-            <Typography variant="body2" color="textSecondary">
-              Don't have an account?{' '}
-              <Link 
-                to={`/register?role=${formData.role}`}
-                className={`font-medium transition-colors duration-300 ${
-                  isDark ? 'text-lime hover:text-dark-accent' : 'text-asu-maroon hover:text-asu-maroon/80'
-                }`}
-              >
-                Sign up now
-              </Link>
-            </Typography>
-          </div>
-
-          {/* Security Badge */}
-          <div className={`mt-6 p-3 rounded-lg border ${
-            isDark ? 'bg-dark-surface border-gray-600' : 'bg-gray-50 border-gray-200'
-          }`}>
-            <div className="flex items-center justify-center space-x-2">
-              <Security className={`h-4 w-4 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
-              <Typography variant="caption" color="textSecondary">
-                Your login is secured with enterprise-grade encryption
-              </Typography>
+            {/* Sign Up Link */}
+            <div className="mt-8 text-center">
+              <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                Don't have an account?{' '}
+                <Link 
+                  to={`/register?role=${formData.role}`}
+                  className={`font-medium hover:underline ${
+                    isDark ? 'text-blue-400' : 'text-blue-600'
+                  }`}
+                >
+                  Sign up
+                </Link>
+              </span>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Right Side - Enhanced Hero */}
-      <div className="hidden lg:block relative w-0 flex-1">
-        <div className={`absolute inset-0 transition-colors duration-300 ${
-          isDark 
-            ? 'bg-gradient-to-br from-dark-surface via-dark-bg to-gray-900' 
-            : 'bg-gradient-to-br from-asu-maroon via-asu-maroon-dark to-asu-maroon'
-        }`}>
+        {/* Right Side - Hero */}
+        <div className="hidden lg:block relative flex-1">
           <div className={`absolute inset-0 ${
-            isDark ? 'bg-lime/5' : 'bg-black/20'
-          } flex flex-col justify-center items-center p-12`}>
-            <div className="text-center max-w-md">
-              <Typography 
-                variant="h3" 
-                className={`font-bold mb-6 leading-tight ${
-                  isDark ? 'text-dark-text' : 'text-white'
-                }`}
-              >
-                Welcome Back to <span className={`${
-                  isDark ? 'text-lime' : 'text-asu-gold'
-                }`}>AUT Handshake</span>
-              </Typography>
-              <Typography 
-                variant="subtitle1" 
-                className={`mb-8 leading-relaxed ${
-                  isDark ? 'text-dark-muted' : 'text-white/90'
-                }`}
-              >
-                Continue building your career with access to exclusive opportunities and our thriving community
-              </Typography>
-
-              {/* Quick Stats */}
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                <Card className={`backdrop-blur-xl border p-4 ${
-                  isDark 
-                    ? 'bg-dark-surface/15 border-lime/30' 
-                    : 'bg-white/15 border-white/30'
-                }`}>
-                  <Typography 
-                    variant="h4" 
-                    className={`font-bold ${
-                      isDark ? 'text-lime' : 'text-asu-gold'
-                    }`}
-                  >
-                    15k+
-                  </Typography>
-                  <Typography 
-                    variant="body2" 
-                    className={isDark ? 'text-dark-muted' : 'text-white/70'}
-                  >
-                    Active Students
-                  </Typography>
-                </Card>
-                <Card className={`backdrop-blur-xl border p-4 ${
-                  isDark 
-                    ? 'bg-dark-surface/15 border-lime/30' 
-                    : 'bg-white/15 border-white/30'
-                }`}>
-                  <Typography 
-                    variant="h4" 
-                    className={`font-bold ${
-                      isDark ? 'text-lime' : 'text-asu-gold'
-                    }`}
-                  >
-                    2.5k+
-                  </Typography>
-                  <Typography 
-                    variant="body2" 
-                    className={isDark ? 'text-dark-muted' : 'text-white/70'}
-                  >
-                    Jobs Posted
-                  </Typography>
-                </Card>
-              </div>
-
-              {/* New Features Highlight */}
-              <Card className={`backdrop-blur-xl border mb-6 ${
-                isDark 
-                  ? 'bg-dark-surface/15 border-lime/30' 
-                  : 'bg-white/15 border-white/30'
+            isDark 
+              ? 'bg-gradient-to-br from-gray-900 via-black to-gray-900' 
+              : 'bg-gradient-to-br from-gray-100 via-white to-gray-100'
+          }`}>
+            <div className="flex flex-col justify-center items-center h-full p-12 text-center">
+              <div className={`w-24 h-24 rounded-full mb-8 flex items-center justify-center ${
+                isDark ? 'bg-white' : 'bg-black'
               }`}>
-                <div className="flex items-center space-x-4 p-6">
-                  <div className={`w-14 h-14 rounded-full flex items-center justify-center ${
-                    isDark ? 'bg-lime' : 'bg-asu-gold'
-                  }`}>
-                    <AutoAwesome className={`h-8 w-8 ${
-                      isDark ? 'text-dark-surface' : 'text-asu-maroon'
-                    }`} />
+                <XIcon className={`h-12 w-12 ${isDark ? 'text-black' : 'text-white'}`} />
+              </div>
+              
+              <h2 className={`text-4xl font-bold mb-4 ${
+                isDark ? 'text-white' : 'text-black'
+              }`}>
+                Happening now
+              </h2>
+              
+              <p className={`text-xl mb-8 max-w-md ${
+                isDark ? 'text-gray-300' : 'text-gray-700'
+              }`}>
+                Join the professional network that's changing how students and employers connect.
+              </p>
+
+              {/* Stats */}
+              <div className="grid grid-cols-2 gap-8 max-w-xs">
+                <div className="text-center">
+                  <div className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>
+                    15k+
                   </div>
-                  <div className="text-left">
-                    <Typography 
-                      variant="h6" 
-                      className={`font-bold ${
-                        isDark ? 'text-dark-text' : 'text-white'
-                      }`}
-                    >
-                      New: AI Job Matching
-                    </Typography>
-                    <Typography 
-                      variant="caption" 
-                      className={isDark ? 'text-dark-muted' : 'text-white/70'}
-                    >
-                      Get personalized job recommendations
-                    </Typography>
+                  <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    Students
                   </div>
                 </div>
-              </Card>
-
-              {/* Call to Action for New Users */}
-              <div className="space-y-4">
-                <Typography 
-                  variant="h6" 
-                  className={`font-medium ${isDark ? 'text-dark-text' : 'text-white'}`}
-                >
-                  New to AUT Handshake?
-                </Typography>
-                <Button
-                  component={Link}
-                  to={`/register?role=${formData.role}`}
-                  variant="elevated"
-                  size="large"
-                  className={`shadow-lg hover:shadow-xl transition-all duration-200 ${
-                    isDark 
-                      ? 'bg-lime text-dark-surface hover:bg-lime/90' 
-                      : 'bg-asu-gold text-asu-maroon hover:bg-asu-gold/90'
-                  }`}
-                  startIcon={<RocketLaunch />}
-                  endIcon={<ArrowForward />}
-                >
-                  Create Your Account
-                </Button>
-              </div>
-            </div>
-
-            {/* Success Badge */}
-            <Card className={`absolute bottom-8 left-8 shadow-xl ${
-              isDark ? 'bg-dark-surface/98' : 'bg-white/95'
-            }`}>
-              <div className="flex items-center space-x-3 p-4">
-                <EmojiEvents className={`h-6 w-6 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
-                <div>
-                  <Typography variant="body2" className="font-bold">
-                    95% Success Rate
-                  </Typography>
-                  <Typography variant="caption" color="textSecondary">
-                    Students find opportunities
-                  </Typography>
+                <div className="text-center">
+                  <div className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>
+                    2.5k+
+                  </div>
+                  <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    Jobs
+                  </div>
                 </div>
               </div>
-            </Card>
-
-            {/* Floating Elements */}
-            <div className={`absolute top-8 right-8 rounded-full p-3 shadow-lg animate-pulse ${
-              isDark ? 'bg-lime/90' : 'bg-asu-gold/90'
-            }`}>
-              <Verified className={`h-6 w-6 ${
-                isDark ? 'text-dark-surface' : 'text-asu-maroon'
-              }`} />
-            </div>
-
-            <div className={`absolute top-1/4 left-8 rounded-full p-2 shadow-md ${
-              isDark ? 'bg-dark-surface/80' : 'bg-white/80'
-            }`}>
-              <CheckCircle className={`h-4 w-4 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
             </div>
           </div>
         </div>
