@@ -169,10 +169,10 @@ export default function JobDetails() {
           </div>
 
           <Card className="overflow-hidden" elevation={3}>
-            <div className={`p-8 text-white relative ${
+            <div className={`rounded-3xl p-8 text-white mb-8 relative overflow-hidden transition-colors duration-300 ${
               isDark 
-                ? 'bg-gradient-to-r from-dark-surface to-dark-bg' 
-                : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
+                ? 'bg-gradient-to-r from-dark-surface to-lime' 
+                : 'bg-gradient-to-r from-asu-maroon to-asu-maroon'
             }`}>
               <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl ${
                 isDark ? 'bg-lime/20' : 'bg-white/20'

@@ -354,7 +354,7 @@ export default function AdminDashboard() {
     return (
       <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Card variant="elevated" padding="lg" className="text-center">
+          <Card variant="elevated" padding="large" className="text-center">
             <h2 className="text-xl font-semibold text-error mb-2">
               Error Loading Dashboard
             </h2>

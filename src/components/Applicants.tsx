@@ -332,10 +332,10 @@ export default function Applicants() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <Card className="header-card overflow-hidden mb-8" elevation={3}>
-          <div className={`p-8 text-white relative ${
+          <div className={`rounded-2xl p-6 text-white shadow-lg transition-colors duration-300 ${
             isDark 
-              ? 'bg-gradient-to-r from-dark-surface to-dark-bg' 
-              : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
+              ? 'bg-gradient-to-r from-dark-surface to-lime' 
+              : 'bg-gradient-to-r from-asu-maroon to-asu-maroon'
           }`}>
             <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl ${
               isDark ? 'bg-lime/10' : 'bg-white/10'

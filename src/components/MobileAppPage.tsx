@@ -311,7 +311,7 @@ export default function MobileAppPage() {
       </nav>
 
       {/* Hero Section */}
-      <section ref={heroRef} className={`pt-24 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden ${
+      <section ref={heroRef} className={`pt-16 sm:pt-24 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden ${
         isDark ? 'bg-gradient-to-br from-dark-surface to-dark-bg' : 'bg-gradient-to-br from-white to-gray-50'
       }`}>
         {/* Floating decorative elements */}
@@ -328,14 +328,14 @@ export default function MobileAppPage() {
         </div>
 
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Text Content */}
-            <div className="hero-content">
-              <Badge variant="outline" className="mb-6">
+            <div className="hero-content text-center lg:text-left">
+              <Badge variant="outline" className="mb-4 sm:mb-6">
                 <Sparkles className="h-4 w-4 mr-2" />
                 Now Available
               </Badge>
-              <h1 className={`text-5xl md:text-6xl font-bold mb-6 leading-tight ${
+              <h1 className={`text-4xl sm:text-5xl md:text-6xl font-bold mb-4 sm:mb-6 leading-tight ${
                 isDark ? 'text-dark-text' : 'text-gray-900'
               }`}>
                 Your Career
@@ -347,17 +347,17 @@ export default function MobileAppPage() {
                   In Your Pocket
                 </span>
               </h1>
-              <p className={`text-xl mb-8 leading-relaxed ${
+              <p className={`text-lg sm:text-xl mb-6 sm:mb-8 leading-relaxed ${
                 isDark ? 'text-dark-muted' : 'text-gray-600'
               }`}>
                 Take control of your career journey with the ASU Handshake mobile app. 
                 Search jobs, track applications, and connect with employers - all on the go.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 mb-8">
+              <div className="flex flex-col sm:flex-row gap-4 mb-6 sm:mb-8 justify-center lg:justify-start">
                 <Button
                   variant="contained"
                   size="large"
-                  className="group transform hover:scale-105 transition-all duration-300"
+                  className="group transform hover:scale-105 transition-all duration-300 w-full sm:w-auto"
                 >
                   <Download className="h-5 w-5 mr-2 group-hover:rotate-12 transition-transform" />
                   Download Now
@@ -365,17 +365,17 @@ export default function MobileAppPage() {
                 <Button
                   variant="outlined"
                   size="large"
-                  className="group transform hover:scale-105 transition-all duration-300"
+                  className="group transform hover:scale-105 transition-all duration-300 w-full sm:w-auto"
                 >
                   <Play className="h-5 w-5 mr-2 group-hover:translate-x-1 transition-transform" />
                   Watch Demo
                 </Button>
               </div>
-              <div className="flex items-center space-x-6">
+              <div className="flex items-center justify-center lg:justify-start space-x-6">
                 <div className="flex items-center">
                   <div className="flex">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                      <Star key={i} className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400 fill-current" />
                     ))}
                   </div>
                   <span className={`ml-2 text-sm ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>
@@ -383,7 +383,7 @@ export default function MobileAppPage() {
                   </span>
                 </div>
                 <div className="flex items-center">
-                  <Users className="h-5 w-5 text-green-500 mr-2" />
+                  <Users className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 mr-2" />
                   <span className={`text-sm ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>
                     50K+ downloads
                   </span>
@@ -392,9 +392,9 @@ export default function MobileAppPage() {
             </div>
 
             {/* Phone Mockup */}
-            <div className="flex justify-center lg:justify-end">
+            <div className="flex justify-center lg:justify-end mt-8 lg:mt-0">
               <div className="phone-mockup relative">
-                <div className={`w-80 h-96 rounded-3xl shadow-2xl overflow-hidden border-8 ${
+                <div className={`w-72 sm:w-80 h-[500px] sm:h-96 rounded-3xl shadow-2xl overflow-hidden border-8 ${
                   isDark ? 'border-dark-surface bg-dark-bg' : 'border-gray-200 bg-white'
                 }`}>
                   {/* Phone status bar */}
@@ -410,9 +410,9 @@ export default function MobileAppPage() {
                   </div>
                   
                   {/* App interface */}
-                  <div className="p-6 h-full">
+                  <div className="p-4 sm:p-6 h-full">
                     <div className="mb-4">
-                      <h3 className={`text-lg font-bold ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
+                      <h3 className={`text-base sm:text-lg font-bold ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
                         Good morning, Sarah!
                       </h3>
                       <p className={`text-sm ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>

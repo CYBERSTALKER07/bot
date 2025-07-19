@@ -57,14 +57,7 @@ export default function StudentDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         {/* Header */}
-        <div className="mb-8">
-          <h1 className={`text-3xl font-bold mb-2 ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
-            Student Dashboard
-          </h1>
-          <p className={`${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>
-            Welcome back! Here's your career overview.
-          </p>
-        </div>
+       
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -106,16 +99,16 @@ export default function StudentDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <Card variant="elevated" padding="lg" className="mb-8">
-          <h2 className={`text-xl font-semibold mb-6 ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
+        <Card variant="elevated" padding="large" className="mb-8">
+          <h2 className={`text-xl font-semibold mb-6 ${isDark ? 'text-lime' : 'text-gray-900'}`}>
             Quick Actions
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link to="/jobs">
               <Button 
-                variant="outline" 
+                variant="outlined" 
                 fullWidth 
-                leftIcon={<Search className="h-4 w-4" />}
+                leftIcon={<Search className="h-4 w-4 " />}
                 className="justify-start h-12 text-left"
               >
                 Search Jobs
@@ -123,7 +116,7 @@ export default function StudentDashboard() {
             </Link>
             <Link to="/events">
               <Button 
-                variant="outline" 
+                variant="outlined" 
                 fullWidth 
                 leftIcon={<Calendar className="h-4 w-4" />}
                 className="justify-start h-12 text-left"
@@ -133,7 +126,7 @@ export default function StudentDashboard() {
             </Link>
             <Link to="/resources">
               <Button 
-                variant="outline" 
+                variant="outlined" 
                 fullWidth 
                 leftIcon={<BookOpen className="h-4 w-4" />}
                 className="justify-start h-12 text-left"
@@ -145,7 +138,7 @@ export default function StudentDashboard() {
         </Card>
 
         {/* Search and Filters */}
-        <Card variant="elevated" padding="lg" className="mb-8">
+        <Card variant="elevated" padding="large" className="mb-8">
           <h2 className={`text-xl font-semibold mb-6 ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
             Find Opportunities
           </h2>
@@ -202,7 +195,7 @@ export default function StudentDashboard() {
           </div>
 
           {error && (
-            <Card variant="outlined" padding="lg" className="mb-6 border-l-4 border-red-500">
+            <Card variant="outlined" padding="large" className="mb-6 border-l-4 border-red-500">
               <p className="text-red-600 font-medium">
                 Error loading jobs: {error}
               </p>
@@ -210,7 +203,7 @@ export default function StudentDashboard() {
           )}
 
           {filteredJobs.length === 0 ? (
-            <Card variant="elevated" padding="lg" className="text-center">
+            <Card variant="elevated" padding="large" className="text-center">
               <Briefcase className={`h-16 w-16 mx-auto mb-4 ${isDark ? 'text-dark-muted' : 'text-gray-400'}`} />
               <h3 className={`text-xl font-semibold mb-2 ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
                 No jobs found
@@ -219,7 +212,7 @@ export default function StudentDashboard() {
                 Try adjusting your search criteria or check back later
               </p>
               <Button 
-                variant="outline" 
+                variant="outlined" 
                 onClick={() => {
                   setSearchTerm('');
                   setLocationFilter('');
@@ -232,7 +225,7 @@ export default function StudentDashboard() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredJobs.map((job) => (
-                <Card key={job.id} variant="elevated" padding="lg" interactive className="group">
+                <Card key={job.id} variant="elevated" padding="large" interactive className="group">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <h3 className={`text-lg font-semibold mb-1 group-hover:${isDark ? 'text-lime' : 'text-asu-maroon'} transition-colors ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
@@ -269,10 +262,10 @@ export default function StudentDashboard() {
                   </p>
 
                   <div className="flex gap-2">
-                    <Button variant="primary" size="sm" fullWidth>
+                    <Button variant="filled" size="sm" fullWidth>
                       Apply Now
                     </Button>
-                    <Button variant="outline" size="sm" fullWidth>
+                    <Button variant="outlined" size="sm" fullWidth>
                       View Details
                     </Button>
                   </div>

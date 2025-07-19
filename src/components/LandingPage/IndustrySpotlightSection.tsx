@@ -139,7 +139,11 @@ export default function IndustrySpotlightSection({ industryRef }: IndustrySpotli
               <div className="relative p-6">
                 {/* Icon and title */}
                 <div className="flex items-center justify-between mb-4">
-                  <div className={`p-3 rounded-xl bg-gradient-to-br ${industry.color}`}>
+                  <div className={`p-8 rounded-2xl text-white relative overflow-hidden transition-colors duration-300 ${
+                    isDark 
+                      ? 'bg-gradient-to-r from-dark-surface to-lime' 
+                      : 'bg-gradient-to-r from-asu-maroon to-asu-maroon'
+                  }`}>
                     <div className="text-white">{industry.icon}</div>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${

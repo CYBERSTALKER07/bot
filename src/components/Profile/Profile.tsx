@@ -373,6 +373,9 @@ export default function Profile() {
     });
   };
 
+  const isStudent = user?.role === 'student';
+  const isEmployer = user?.role === 'employer';
+
   // Mobile Navigation Menu Items
   const getMobileNavigationItems = () => {
     const baseItems = [
@@ -408,104 +411,11 @@ export default function Profile() {
     return baseItems;
   };
 
-  // Add edit mode toggle animation
-  useEffect(() => {
-    if (isEditing) {
-      gsap.fromTo('.edit-field', {
-        opacity: 0,
-        scale: 0.95
-      }, {
-        opacity: 1,
-        scale: 1,
-        duration: 0.3,
-        ease: 'power2.out',
-        stagger: 0.05
-      });
-    }
-  }, [isEditing]);
-
-  // Add tab change animation
-  useEffect(() => {
-    gsap.fromTo('.tab-content', {
-      opacity: 0,
-      y: 20
-    }, {
-      opacity: 1,
-      y: 0,
-      duration: 0.5,
-      ease: 'power3.out'
-    });
-  }, [activeTab]);
-
-  const handleSave = () => {
-    // Save animation
-    gsap.to('.save-button', {
-      scale: 1.1,
-      duration: 0.1,
-      yoyo: true,
-      repeat: 1,
-      ease: 'power2.out',
-      onComplete: () => setIsEditing(false)
-    });
+  // Mobile menu navigation handler
+  const handleMobileMenuItemClick = (path: string) => {
+    setShowMobileMenu(false);
+    navigate(path);
   };
-
-  const addSkill = (skill: string) => {
-    if (skill && !profileData.skills.includes(skill)) {
-      setProfileData(prev => ({
-        ...prev,
-        skills: [...prev.skills, skill]
-      }));
-      
-      // Animate new skill
-      setTimeout(() => {
-        gsap.fromTo('.skill-tag:last-child', {
-          scale: 0,
-          opacity: 0,
-          y: 20
-        }, {
-          scale: 1,
-          opacity: 1,
-          y: 0,
-          duration: 0.5,
-          ease: 'back.out(1.7)'
-        });
-      }, 10);
-    }
-  };
-
-  const removeSkill = (skillToRemove: string) => {
-    const skillElement = document.querySelector(`[data-skill="${skillToRemove}"]`);
-    if (skillElement) {
-      gsap.to(skillElement, {
-        scale: 0,
-        opacity: 0,
-        duration: 0.3,
-        ease: 'power2.out',
-        onComplete: () => {
-          setProfileData(prev => ({
-            ...prev,
-            skills: prev.skills.filter(skill => skill !== skillToRemove)
-          }));
-        }
-      });
-    }
-  };
-
-  const handleTabChange = (tabId: string) => {
-    // Tab change animation
-    gsap.to('.tab-content', {
-      opacity: 0,
-      y: -20,
-      duration: 0.2,
-      ease: 'power2.out',
-      onComplete: () => {
-        setActiveTab(tabId);
-      }
-    });
-  };
-
-  const isStudent = user?.role === 'student';
-  const isEmployer = user?.role === 'employer';
 
   return (
     <div ref={containerRef} className={`min-h-screen transition-colors duration-300 ${
@@ -513,139 +423,6 @@ export default function Profile() {
         ? 'bg-gradient-to-br from-dark-bg to-dark-surface' 
         : 'bg-gradient-to-br from-gray-50 to-white'
     }`}>
-      {/* Mobile Navigation Menu */}
-      {showMobileMenu && isMobile && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" onClick={() => setShowMobileMenu(false)}>
-          <div 
-            className={`absolute right-0 top-0 h-full w-80 max-w-[80vw] ${
-              isDark ? 'bg-dark-surface' : 'bg-white'
-            } shadow-2xl transform transition-transform duration-300`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Menu Header */}
-            <div className={`p-6 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
-              <div className="flex items-center justify-between">
-                <h2 className={`text-xl font-bold ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
-                  Quick Access
-                </h2>
-                <button
-                  onClick={() => setShowMobileMenu(false)}
-                  className={`p-2 rounded-lg ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-              <p className={`text-sm mt-1 ${isDark ? 'text-dark-muted' : 'text-gray-600'}`}>
-                Access all platform features
-              </p>
-            </div>
-
-            {/* Menu Items */}
-            <div className="p-4 overflow-y-auto h-full pb-20">
-              <div className="space-y-2">
-                {getMobileNavigationItems().map((item, index) => {
-                  const Icon = item.icon;
-                  return (
-                    <Link
-                      key={index}
-                      to={item.path}
-                      onClick={() => setShowMobileMenu(false)}
-                      className={`flex items-center p-3 rounded-xl transition-all duration-200 group ${
-                        isDark 
-                          ? 'hover:bg-lime/10 hover:border-lime/20' 
-                          : 'hover:bg-asu-maroon/5 hover:border-asu-maroon/20'
-                      } border border-transparent`}
-                    >
-                      <div className={`p-2 rounded-lg mr-3 ${
-                        isDark ? 'bg-lime/20' : 'bg-asu-maroon/10'
-                      }`}>
-                        <Icon className={`h-5 w-5 ${
-                          isDark ? 'text-lime' : 'text-asu-maroon'
-                        }`} />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className={`font-medium ${
-                          isDark ? 'text-dark-text' : 'text-gray-900'
-                        }`}>
-                          {item.label}
-                        </h3>
-                        <p className={`text-xs ${
-                          isDark ? 'text-dark-muted' : 'text-gray-600'
-                        }`}>
-                          {item.description}
-                        </p>
-                      </div>
-                      <ChevronRight className={`h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity ${
-                        isDark ? 'text-lime' : 'text-asu-maroon'
-                      }`} />
-                    </Link>
-                  );
-                })}
-              </div>
-
-              {/* Quick Actions Section */}
-              <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <h3 className={`text-sm font-semibold mb-4 ${
-                  isDark ? 'text-dark-text' : 'text-gray-900'
-                }`}>
-                  Quick Actions
-                </h3>
-                <div className="space-y-2">
-                  {isStudent && (
-                    <>
-                      <Link
-                        to="/jobs"
-                        onClick={() => setShowMobileMenu(false)}
-                        className={`flex items-center justify-between p-3 rounded-lg ${
-                          isDark ? 'bg-blue-600/20 text-blue-400' : 'bg-blue-50 text-blue-600'
-                        }`}
-                      >
-                        <span className="font-medium">Find Your Dream Job</span>
-                        <ExternalLink className="h-4 w-4" />
-                      </Link>
-                      <Link
-                        to="/career-tips"
-                        onClick={() => setShowMobileMenu(false)}
-                        className={`flex items-center justify-between p-3 rounded-lg ${
-                          isDark ? 'bg-green-600/20 text-green-400' : 'bg-green-50 text-green-600'
-                        }`}
-                      >
-                        <span className="font-medium">Get Career Tips</span>
-                        <ExternalLink className="h-4 w-4" />
-                      </Link>
-                    </>
-                  )}
-                  {isEmployer && (
-                    <>
-                      <Link
-                        to="/post-job"
-                        onClick={() => setShowMobileMenu(false)}
-                        className={`flex items-center justify-between p-3 rounded-lg ${
-                          isDark ? 'bg-purple-600/20 text-purple-400' : 'bg-purple-50 text-purple-600'
-                        }`}
-                      >
-                        <span className="font-medium">Post New Job</span>
-                        <ExternalLink className="h-4 w-4" />
-                      </Link>
-                      <Link
-                        to="/applicants"
-                        onClick={() => setShowMobileMenu(false)}
-                        className={`flex items-center justify-between p-3 rounded-lg ${
-                          isDark ? 'bg-orange-600/20 text-orange-400' : 'bg-orange-50 text-orange-600'
-                        }`}
-                      >
-                        <span className="font-medium">Review Applicants</span>
-                        <ExternalLink className="h-4 w-4" />
-                      </Link>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Decorative elements */}
       <div className={`profile-decoration absolute top-20 right-20 w-4 h-4 rounded-full transition-colors ${
         isDark ? 'bg-lime/40' : 'bg-asu-gold/40'
@@ -660,12 +437,13 @@ export default function Profile() {
         isDark ? 'text-dark-accent/50' : 'text-asu-maroon/50'
       }`} />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
         {/* Enhanced Mobile Header */}
         <div ref={headerRef} className={`rounded-3xl p-4 sm:p-8 text-white mb-6 sm:mb-8 relative overflow-hidden transition-colors duration-300 ${
           isDark 
-            ? 'bg-gradient-to-r from-dark-surface to-dark-accent' 
-            : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
+            ? 'bg-gradient-to-r from-dark-surface to-lime' 
+            : 'bg-gradient-to-r from-asu-maroon to-asu-maroon'
         }`}>
           {/* Mobile Menu Button */}
           {isMobile && (
@@ -682,10 +460,10 @@ export default function Profile() {
             isDark ? 'bg-lime/20' : 'bg-asu-gold/20'
           }`}></div>
           
-          <div className="relative z-10 flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
-              <div className="relative mx-auto sm:mx-0">
-                <div className={`profile-avatar w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center text-3xl sm:text-4xl font-bold shadow-2xl transition-colors ${
+          <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between">
+            <div className="flex items-center space-x-6">
+              <div className="relative">
+                <div className={`profile-avatar w-24 h-24 rounded-full flex items-center justify-center text-4xl font-bold shadow-2xl transition-colors ${
                   isDark 
                     ? 'bg-gradient-to-br from-lime to-dark-accent text-dark-surface' 
                     : 'bg-gradient-to-br from-asu-gold to-yellow-300 text-asu-maroon'
@@ -693,7 +471,7 @@ export default function Profile() {
                   {profileData.name.charAt(0) || '👤'}
                 </div>
                 <button 
-                  className={`absolute -bottom-2 -right-2 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 ${
+                  className={`absolute -bottom-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 ${
                     isDark ? 'bg-dark-surface' : 'bg-white'
                   }`}
                   onClick={() => {
@@ -706,30 +484,30 @@ export default function Profile() {
                     });
                   }}
                 >
-                  <Camera className={`h-3 w-3 sm:h-4 sm:w-4 ${
+                  <Camera className={`h-4 w-4 ${
                     isDark ? 'text-lime' : 'text-asu-maroon'
                   }`} />
                 </button>
               </div>
               
-              <div className="text-center sm:text-left">
-                <h1 className="text-2xl sm:text-4xl font-bold mb-2">
+              <div>
+                <h1 className="text-4xl font-bold mb-2">
                   {profileData.name || 'Your Name'} 
                   {isStudent && ' 🎓'}
                   {isEmployer && ' 🏢'}
                 </h1>
-                <p className="text-lg sm:text-xl text-white/90 mb-2">
+                <p className="text-xl text-white/90 mb-2">
                   {isStudent && 'ASU Student'}
                   {isEmployer && (profileData.company_name || 'Company Representative')}
                 </p>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-1 sm:space-y-0 text-white/80 text-sm sm:text-base">
-                  <div className="flex items-center justify-center sm:justify-start space-x-2">
+                <div className="flex items-center space-x-4 text-white/80">
+                  <div className="flex items-center space-x-2">
                     <MapPin className="h-4 w-4" />
                     <span>{profileData.location || 'Phoenix, AZ'}</span>
                   </div>
-                  <div className="flex items-center justify-center sm:justify-start space-x-2">
+                  <div className="flex items-center space-x-2">
                     <Mail className="h-4 w-4" />
-                    <span className="truncate">{profileData.email}</span>
+                    <span>{profileData.email}</span>
                   </div>
                 </div>
               </div>
@@ -737,19 +515,19 @@ export default function Profile() {
             
             <button
               onClick={() => setIsEditing(!isEditing)}
-              className="bg-white/20 backdrop-blur-sm border-2 border-white/30 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-2xl hover:bg-white/30 transition-all duration-300 flex items-center justify-center space-x-2 w-full sm:w-auto"
+              className="mt-4 md:mt-0 bg-white/20 backdrop-blur-sm border-2 border-white/30 text-white px-6 py-3 rounded-2xl hover:bg-white/30 transition-all duration-300 flex items-center space-x-2"
             >
               {isEditing ? <X className="h-4 w-4" /> : <Edit3 className="h-4 w-4" />}
-              <span className="text-sm sm:text-base">{isEditing ? 'Cancel' : 'Edit Profile'}</span>
+              <span>{isEditing ? 'Cancel' : 'Edit Profile'}</span>
             </button>
           </div>
         </div>
 
-        {/* Mobile-First Navigation Tabs */}
-        <div ref={tabsRef} className={`rounded-2xl shadow-lg border mb-6 sm:mb-8 overflow-hidden transition-colors duration-300 ${
+        {/* Navigation Tabs */}
+        <div ref={tabsRef} className={`rounded-2xl shadow-lg border mb-8 overflow-hidden transition-colors duration-300 ${
           isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-200'
         }`}>
-          <div className="flex overflow-x-auto border-b border-inherit scrollbar-hide">
+          <div className="flex flex-wrap border-b border-inherit">
             {[
               { id: 'overview', label: 'Overview', icon: User, emoji: '👤' },
               { id: 'experience', label: 'Experience', icon: Briefcase, emoji: '💼' },
@@ -763,38 +541,38 @@ export default function Profile() {
                 <button
                   key={tab.id}
                   onClick={() => handleTabChange(tab.id)}
-                  className={`profile-tab flex items-center space-x-2 sm:space-x-3 px-4 sm:px-6 py-3 sm:py-4 font-medium transition-all duration-300 whitespace-nowrap ${
+                  className={`profile-tab flex items-center space-x-3 px-6 py-4 font-medium transition-all duration-300 ${
                     activeTab === tab.id
                       ? isDark 
                         ? 'bg-gradient-to-r from-lime to-dark-accent text-dark-surface shadow-lg' 
-                        : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white shadow-lg'
+                        : 'bg-gradient-to-r from-asu-maroon to-asu-maroon text-white shadow-lg'
                       : isDark 
                         ? 'text-dark-muted' 
                         : 'text-gray-600'
                   }`}
                 >
-                  <Icon className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
-                  <span className="text-sm sm:text-base hidden sm:inline">{tab.label}</span>
-                  <span className="text-sm sm:text-base">{tab.emoji}</span>
+                  <Icon className="h-5 w-5" />
+                  <span className="hidden md:inline">{tab.label}</span>
+                  <span>{tab.emoji}</span>
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* Mobile-First Content Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+        {/* Tab Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div ref={contentRef} className="lg:col-span-2">
             {activeTab === 'overview' && (
-              <div className={`tab-content rounded-2xl shadow-lg border p-4 sm:p-8 transition-colors duration-300 ${
+              <div className={`tab-content rounded-2xl shadow-lg border p-8 transition-colors duration-300 ${
                 isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-200'
               }`}>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 space-y-4 sm:space-y-0">
-                  <h2 className={`text-xl sm:text-2xl font-bold flex items-center transition-colors ${
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className={`text-2xl font-bold flex items-center transition-colors ${
                     isDark ? 'text-dark-text' : 'text-gray-900'
                   }`}>
-                    <User className="h-5 w-5 sm:h-6 sm:w-6 mr-2" />
+                    <User className="h-6 w-6 mr-2" />
                     About Me 👋
                   </h2>
                 </div>
@@ -804,14 +582,14 @@ export default function Profile() {
                     value={profileData.bio}
                     onChange={(e) => setProfileData(prev => ({...prev, bio: e.target.value}))}
                     placeholder="Tell us about yourself..."
-                    className={`edit-field w-full h-32 p-4 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent resize-none transition-colors text-sm sm:text-base ${
+                    className={`edit-field w-full h-32 p-4 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent resize-none transition-colors ${
                       isDark 
                         ? 'border-lime/20 focus:ring-lime bg-dark-bg text-dark-text placeholder-dark-muted' 
                         : 'border-gray-200 focus:ring-asu-maroon focus:border-transparent bg-white text-gray-900'
                     }`}
                   />
                 ) : (
-                  <p className={`leading-relaxed text-base sm:text-lg transition-colors ${
+                  <p className={`leading-relaxed text-lg transition-colors ${
                     isDark ? 'text-dark-muted' : 'text-gray-600'
                   }`}>
                     {profileData.bio || 'Passionate ASU student pursuing excellence in technology and innovation. Always eager to learn new skills and take on challenging projects that make a real impact! ✨'}
@@ -893,16 +671,15 @@ export default function Profile() {
               </div>
             )}
 
-            {/* Skills Section with Mobile Optimization */}
             {activeTab === 'skills' && (
-              <div className={`tab-content rounded-2xl shadow-lg border p-4 sm:p-8 transition-colors duration-300 ${
+              <div className={`tab-content rounded-2xl shadow-lg border p-8 transition-colors duration-300 ${
                 isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-200'
               }`}>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 space-y-4 sm:space-y-0">
-                  <h2 className={`text-xl sm:text-2xl font-bold flex items-center transition-colors ${
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className={`text-2xl font-bold flex items-center transition-colors ${
                     isDark ? 'text-dark-text' : 'text-gray-900'
                   }`}>
-                    <Zap className="h-5 w-5 sm:h-6 sm:w-6 mr-2" />
+                    <Zap className="h-6 w-6 mr-2" />
                     Skills & Expertise ⚡
                   </h2>
                   {isEditing && (
@@ -911,11 +688,25 @@ export default function Profile() {
                         const skill = prompt('Enter a skill:');
                         if (skill) addSkill(skill);
                       }}
-                      className={`px-3 py-2 sm:px-4 sm:py-2 rounded-xl transition-colors flex items-center space-x-2 text-sm sm:text-base ${
+                      className={`px-4 py-2 rounded-xl transition-colors flex items-center space-x-2 ${
                         isDark 
                           ? 'bg-lime text-dark-surface hover:bg-dark-accent' 
                           : 'bg-asu-maroon text-white hover:bg-asu-maroon-dark'
                       }`}
+                      onMouseEnter={() => {
+                        gsap.to(event?.currentTarget, {
+                          scale: 1.05,
+                          duration: 0.2,
+                          ease: 'power2.out'
+                        });
+                      }}
+                      onMouseLeave={() => {
+                        gsap.to(event?.currentTarget, {
+                          scale: 1,
+                          duration: 0.2,
+                          ease: 'power2.out'
+                        });
+                      }}
                     >
                       <Plus className="h-4 w-4" />
                       <span>Add Skill</span>
@@ -923,9 +714,9 @@ export default function Profile() {
                   )}
                 </div>
                 
-                <div className="flex flex-wrap gap-2 sm:gap-3">
+                <div className="flex flex-wrap gap-3">
                   {profileData.skills.length === 0 ? (
-                    <p className={`text-center w-full py-8 transition-colors text-sm sm:text-base ${
+                    <p className={`text-center w-full py-8 transition-colors ${
                       isDark ? 'text-dark-muted' : 'text-gray-500'
                     }`}>
                       No skills added yet. {isEditing && "Click 'Add Skill' to get started! 🚀"}
@@ -935,17 +726,31 @@ export default function Profile() {
                       <div
                         key={index}
                         data-skill={skill}
-                        className={`skill-tag text-white px-3 py-2 sm:px-4 sm:py-2 rounded-full font-medium shadow-lg hover:shadow-xl transition-shadow flex items-center space-x-2 text-sm sm:text-base ${
+                        className={`skill-tag text-white px-4 py-2 rounded-full font-medium shadow-lg hover:shadow-xl transition-shadow flex items-center space-x-2 ${
                           isDark 
                             ? 'bg-gradient-to-r from-lime to-dark-accent' 
-                            : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
+                            : 'bg-gradient-to-r from-asu-maroon to-asu-maroon'
                         }`}
+                        onMouseEnter={() => {
+                          gsap.to(event?.currentTarget, {
+                            scale: 1.05,
+                            duration: 0.2,
+                            ease: 'power2.out'
+                          });
+                        }}
+                        onMouseLeave={() => {
+                          gsap.to(event?.currentTarget, {
+                            scale: 1,
+                            duration: 0.2,
+                            ease: 'power2.out'
+                          });
+                        }}
                       >
                         <span>{skill}</span>
                         {isEditing && (
                           <button
                             onClick={() => removeSkill(skill)}
-                            className="ml-1 sm:ml-2 hover:text-red-200 transition-colors"
+                            className="ml-2 hover:text-red-200 transition-colors"
                           >
                             <X className="h-3 w-3" />
                           </button>
@@ -959,7 +764,7 @@ export default function Profile() {
 
             {/* Placeholder for other tabs */}
             {activeTab !== 'overview' && activeTab !== 'skills' && (
-              <div className={`tab-content rounded-2xl shadow-lg border p-4 sm:p-8 transition-colors duration-300 ${
+              <div className={`tab-content rounded-2xl shadow-lg border p-8 transition-colors duration-300 ${
                 isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-200'
               }`}>
                 <div className="text-center py-12">
@@ -987,54 +792,54 @@ export default function Profile() {
             )}
           </div>
 
-          {/* Mobile-Responsive Sidebar */}
-          <div ref={sidebarRef} className="space-y-4 sm:space-y-6">
-            {/* Contact Information - Mobile Optimized */}
-            <div className={`rounded-2xl shadow-lg border p-4 sm:p-6 transition-colors duration-300 ${
+          {/* Sidebar */}
+          <div ref={sidebarRef} className="space-y-6">
+            {/* Contact Information */}
+            <div className={`rounded-2xl shadow-lg border p-6 transition-colors duration-300 ${
               isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-200'
             }`}>
-              <h3 className={`text-lg sm:text-xl font-bold mb-4 flex items-center transition-colors ${
+              <h3 className={`text-xl font-bold mb-4 flex items-center transition-colors ${
                 isDark ? 'text-dark-text' : 'text-gray-900'
               }`}>
-                <Phone className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                <Phone className="h-5 w-5 mr-2" />
                 Contact Info 📞
               </h3>
               <div className="space-y-3">
                 <div className="contact-link flex items-center space-x-3">
-                  <Mail className={`h-4 w-4 flex-shrink-0 ${
+                  <Mail className={`h-4 w-4 ${
                     isDark ? 'text-dark-muted' : 'text-gray-400'
                   }`} />
-                  <span className={`transition-colors text-sm sm:text-base truncate ${
+                  <span className={`transition-colors ${
                     isDark ? 'text-dark-muted' : 'text-gray-600'
                   }`}>{profileData.email}</span>
                 </div>
                 <div className="contact-link flex items-center space-x-3">
-                  <Phone className={`h-4 w-4 flex-shrink-0 ${
+                  <Phone className={`h-4 w-4 ${
                     isDark ? 'text-dark-muted' : 'text-gray-400'
                   }`} />
-                  <span className={`transition-colors text-sm sm:text-base ${
+                  <span className={`transition-colors ${
                     isDark ? 'text-dark-muted' : 'text-gray-600'
                   }`}>{profileData.phone || '(480) 555-0123'}</span>
                 </div>
                 <div className="contact-link flex items-center space-x-3">
-                  <MapPin className={`h-4 w-4 flex-shrink-0 ${
+                  <MapPin className={`h-4 w-4 ${
                     isDark ? 'text-dark-muted' : 'text-gray-400'
                   }`} />
-                  <span className={`transition-colors text-sm sm:text-base ${
+                  <span className={`transition-colors ${
                     isDark ? 'text-dark-muted' : 'text-gray-600'
                   }`}>{profileData.location || 'Phoenix, AZ'}</span>
                 </div>
               </div>
             </div>
 
-            {/* Links Section - Mobile Optimized */}
-            <div className={`rounded-2xl shadow-lg border p-4 sm:p-6 transition-colors duration-300 ${
+            {/* Links */}
+            <div className={`rounded-2xl shadow-lg border p-6 transition-colors duration-300 ${
               isDark ? 'bg-dark-surface border-lime/20' : 'bg-white border-gray-200'
             }`}>
-              <h3 className={`text-lg sm:text-xl font-bold mb-4 flex items-center transition-colors ${
+              <h3 className={`text-xl font-bold mb-4 flex items-center transition-colors ${
                 isDark ? 'text-dark-text' : 'text-gray-900'
               }`}>
-                <LinkIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                <LinkIcon className="h-5 w-5 mr-2" />
                 Links 🔗
               </h3>
               <div className="space-y-3">
@@ -1044,22 +849,50 @@ export default function Profile() {
                       href={profileData.portfolio_url || '#'} 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className={`contact-link flex items-center space-x-3 transition-colors text-sm sm:text-base ${
+                      className={`contact-link flex items-center space-x-3 transition-colors ${
                         isDark ? 'text-lime hover:text-dark-accent' : 'text-asu-maroon hover:text-asu-maroon-dark'
                       }`}
+                      onMouseEnter={() => {
+                        gsap.to(event?.currentTarget, {
+                          x: 5,
+                          duration: 0.2,
+                          ease: 'power2.out'
+                        });
+                      }}
+                      onMouseLeave={() => {
+                        gsap.to(event?.currentTarget, {
+                          x: 0,
+                          duration: 0.2,
+                          ease: 'power2.out'
+                        });
+                      }}
                     >
-                      <FileText className="h-4 w-4 flex-shrink-0" />
+                      <FileText className="h-4 w-4" />
                       <span>Portfolio</span>
                     </a>
                     <a 
                       href={profileData.github_url || '#'} 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className={`contact-link flex items-center space-x-3 transition-colors text-sm sm:text-base ${
+                      className={`contact-link flex items-center space-x-3 transition-colors ${
                         isDark ? 'text-lime hover:text-dark-accent' : 'text-asu-maroon hover:text-asu-maroon-dark'
                       }`}
+                      onMouseEnter={() => {
+                        gsap.to(event?.currentTarget, {
+                          x: 5,
+                          duration: 0.2,
+                          ease: 'power2.out'
+                        });
+                      }}
+                      onMouseLeave={() => {
+                        gsap.to(event?.currentTarget, {
+                          x: 0,
+                          duration: 0.2,
+                          ease: 'power2.out'
+                        });
+                      }}
                     >
-                      <Code className="h-4 w-4 flex-shrink-0" />
+                      <Code className="h-4 w-4" />
                       <span>GitHub</span>
                     </a>
                   </>
@@ -1068,11 +901,25 @@ export default function Profile() {
                   href={profileData.linkedin_url || '#'} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className={`contact-link flex items-center space-x-3 transition-colors text-sm sm:text-base ${
+                  className={`contact-link flex items-center space-x-3 transition-colors ${
                     isDark ? 'text-lime hover:text-dark-accent' : 'text-asu-maroon hover:text-asu-maroon-dark'
                   }`}
+                  onMouseEnter={() => {
+                    gsap.to(event?.currentTarget, {
+                      x: 5,
+                      duration: 0.2,
+                      ease: 'power2.out'
+                    });
+                  }}
+                  onMouseLeave={() => {
+                    gsap.to(event?.currentTarget, {
+                      x: 0,
+                      duration: 0.2,
+                      ease: 'power2.out'
+                    });
+                  }}
                 >
-                  <Building2 className="h-4 w-4 flex-shrink-0" />
+                  <Building2 className="h-4 w-4" />
                   <span>LinkedIn</span>
                 </a>
                 {isEmployer && (
@@ -1080,15 +927,132 @@ export default function Profile() {
                     href={profileData.website || '#'} 
                     target="_blank" 
                     rel="noopener noreferrer" 
-                    className={`contact-link flex items-center space-x-3 transition-colors text-sm sm:text-base ${
+                    className={`contact-link flex items-center space-x-3 transition-colors ${
                       isDark ? 'text-lime hover:text-dark-accent' : 'text-asu-maroon hover:text-asu-maroon-dark'
                     }`}
+                    onMouseEnter={() => {
+                      gsap.to(event?.currentTarget, {
+                        x: 5,
+                        duration: 0.2,
+                        ease: 'power2.out'
+                      });
+                    }}
+                    onMouseLeave={() => {
+                      gsap.to(event?.currentTarget, {
+                        x: 0,
+                        duration: 0.2,
+                        ease: 'power2.out'
+                      });
+                    }}
                   >
-                    <LinkIcon className="h-4 w-4 flex-shrink-0" />
+                    <LinkIcon className="h-4 w-4" />
                     <span>Company Website</span>
                   </a>
                 )}
               </div>
             </div>
 
-            {/* Stats Section - Mobile Optimized */}
+            {/* Stats */}
+            <div className={`rounded-2xl p-6 text-white transition-colors duration-300 ${
+              isDark 
+                ? 'bg-gradient-to-br from-dark-surface to-lime' 
+                : 'bg-gradient-to-br from-asu-maroon to-asu-maroon'
+            }`}>
+              <h3 className="text-xl font-bold mb-4 flex items-center">
+                <TrendingUp className="h-5 w-5 mr-2" />
+                Profile Stats 📊
+              </h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span>Profile Views</span>
+                  <span className="stat-number font-bold" data-value="42">0</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Connections</span>
+                  <span className="stat-number font-bold" data-value="18">0</span>
+                </div>
+                {isStudent && (
+                  <div className="flex justify-between">
+                    <span>Applications</span>
+                    <span className="stat-number font-bold" data-value="7">0</span>
+                  </div>
+                )}
+                {isEmployer && (
+                  <div className="flex justify-between">
+                    <span>Job Posts</span>
+                    <span className="stat-number font-bold" data-value="3">0</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Save Button */}
+        {isEditing && (
+          <div className="fixed bottom-8 right-8 z-50">
+            <button
+              onClick={handleSave}
+              className="save-button bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-4 rounded-full shadow-2xl hover:shadow-3xl transition-shadow flex items-center space-x-3"
+            >
+              <Save className="h-5 w-5" />
+              <span className="font-semibold">Save Changes</span>
+            </button>
+          </div>
+        )}
+
+        {/* Mobile Menu */}
+        {showMobileMenu && (
+          <div className={`fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex flex-col md:hidden`}>
+            <div className={`bg-white rounded-t-3xl p-6 shadow-xl transition-transform ${
+              isDark ? 'bg-dark-surface' : 'bg-white'
+            }`}>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className={`text-xl font-bold transition-colors ${
+                  isDark ? 'text-dark-text' : 'text-gray-900'
+                }`}>
+                  Menu
+                </h2>
+                <button
+                  onClick={() => setShowMobileMenu(false)}
+                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="flex flex-col space-y-4">
+                {getMobileNavigationItems().map((item) => (
+                  <button
+                    key={item.label}
+                    onClick={() => handleMobileMenuItemClick(item.path)}
+                    className={`flex items-center space-x-3 p-3 rounded-lg transition-colors ${
+                      isDark 
+                        ? 'hover:bg-dark-accent/30' 
+                        : 'hover:bg-gray-100'
+                    }`}
+                  >
+                    <item.icon className={`h-5 w-5 transition-colors ${
+                      isDark ? 'text-dark-text' : 'text-gray-700'
+                    }`} />
+                    <div className="flex-1">
+                      <p className={`font-medium transition-colors ${
+                        isDark ? 'text-dark-text' : 'text-gray-900'
+                      }`}>{item.label}</p>
+                      <p className={`text-sm transition-colors ${
+                        isDark ? 'text-dark-muted' : 'text-gray-500'
+                      }`}>{item.description}</p>
+                    </div>
+                    <ChevronRight className={`h-5 w-5 transition-colors ${
+                      isDark ? 'text-dark-muted' : 'text-gray-400'
+                    }`} />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

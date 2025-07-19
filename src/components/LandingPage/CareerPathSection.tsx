@@ -333,7 +333,7 @@ export default function CareerPathSection() {
               <div className={`benefit-icon w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
                 isDark 
                   ? 'bg-gradient-to-r from-lime to-dark-accent' 
-                  : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
+                  : 'bg-gradient-to-r from-asu-maroon to-asu-maroon'
               }`}>
                 <User className={`h-6 w-6 ${
                   isDark ? 'text-dark-surface' : 'text-white'
@@ -373,7 +373,7 @@ export default function CareerPathSection() {
               <div className={`benefit-icon w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
                 isDark 
                   ? 'bg-gradient-to-r from-lime to-dark-accent' 
-                  : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
+                  : 'bg-gradient-to-r from-asu-maroon to-asu-maroon'
               }`}>
                 <Target className={`h-6 w-6 ${
                   isDark ? 'text-dark-surface' : 'text-white'

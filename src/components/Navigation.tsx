@@ -97,6 +97,11 @@ export default function Navigation() {
         { icon: Calendar, label: 'Events', path: '/events', group: 'communication' },
         { icon: BookOpen, label: 'Resources', path: '/resources', group: 'learning' },
         { icon: Settings, label: 'Profile Setup', path: '/profile-setup', group: 'profile' },
+        // Add new mobile-accessible pages
+        { icon: BookOpen, label: 'Career Tips', path: '/career-tips', group: 'learning' },
+        { icon: Users, label: 'Who\'s Hiring', path: '/whos-hiring', group: 'jobs' },
+        { icon: GraduationCap, label: 'For Students', path: '/for-students', group: 'tools' },
+        // { icon: Smartphone, label: 'Mobile App', path: '/mobile-app', group: 'tools' },
       ];
     }
 
@@ -110,6 +115,10 @@ export default function Navigation() {
         { icon: MessageSquare, label: 'Messages', path: '/messages', badge: unreadCount, group: 'communication' },
         { icon: FileText, label: 'Resources', path: '/resources', group: 'learning' },
         { icon: Settings, label: 'Profile Setup', path: '/profile-setup', group: 'profile' },
+        // Add new mobile-accessible pages
+        { icon: Building2, label: 'For Employers', path: '/for-employers', group: 'tools' },
+        { icon: BookOpen, label: 'Career Tips', path: '/career-tips', group: 'learning' },
+        // { icon: Smartphone, label: 'Mobile App', path: '/mobile-app', group: 'tools' },
       ];
     }
 
@@ -123,6 +132,12 @@ export default function Navigation() {
         { icon: FileText, label: 'Reports', path: '/reports', group: 'analytics' },
         { icon: Settings, label: 'Settings', path: '/settings', group: 'system' },
         { icon: User, label: 'Profile Setup', path: '/profile-setup', group: 'profile' },
+        // Add new mobile-accessible pages
+        { icon: BookOpen, label: 'Career Tips', path: '/career-tips', group: 'tools' },
+        { icon: Users, label: 'Who\'s Hiring', path: '/whos-hiring', group: 'tools' },
+        { icon: Smartphone, label: 'Mobile App', path: '/mobile-app', group: 'tools' },
+        { icon: GraduationCap, label: 'For Students', path: '/for-students', group: 'tools' },
+        { icon: Building2, label: 'For Employers', path: '/for-employers', group: 'tools' },
       ];
     }
 
@@ -135,6 +150,10 @@ export default function Navigation() {
       { icon: Calendar, label: 'Events', path: '/events', group: 'communication' },
       { icon: BookOpen, label: 'Resources', path: '/resources', group: 'learning' },
       { icon: Settings, label: 'Profile Setup', path: '/profile-setup', group: 'profile' },
+      // Add new mobile-accessible pages
+      { icon: BookOpen, label: 'Career Tips', path: '/career-tips', group: 'learning' },
+      { icon: Users, label: 'Who\'s Hiring', path: '/whos-hiring', group: 'jobs' },
+      { icon: Smartphone, label: 'Mobile App', path: '/mobile-app', group: 'tools' },
     ];
   };
 
@@ -373,10 +392,12 @@ export default function Navigation() {
       <aside
         ref={sidebarRef}
         className={cn(
-          'fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-out border-r bg-white dark:bg-black dark:border-gray-700',
+          'fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-out border-r',
+          'bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl', // glass effect
           isDark ? 'border-gray-700' : 'border-neutral-200',
           isHidden ? '-translate-x-full' : 
-          isCollapsed && !isHovered ? 'w-16' : 'w-64'
+          isCollapsed && !isHovered ? 'w-16' : 'w-64',
+          'shadow-xl' // optional: add shadow for depth
         )}
         role="navigation"
         aria-label="Main navigation"
@@ -389,103 +410,103 @@ export default function Navigation() {
           isDark ? 'border-gray-700' : 'border-neutral-200'
         )}>
           {!(isCollapsed && !isHovered) ? (
-            <Link to="/dashboard" className="flex items-center space-x-3">
-              <GraduationCap className="h-7 w-7 text-brand-primary" />
-              <span className={cn(
-                'text-lg font-semibold',
-                isDark ? 'text-white' : 'text-gray-900'
-              )}>AUT</span>
-            </Link>
+        <Link to="/dashboard" className="flex items-center space-x-3">
+          <GraduationCap className="h-7 w-7 text-brand-primary" />
+          <span className={cn(
+            'text-lg font-semibold',
+            isDark ? 'text-white' : 'text-gray-900'
+          )}>AUT</span>
+        </Link>
           ) : (
-            <Link to="/dashboard" className="flex justify-center w-full">
-              <GraduationCap className="h-7 w-7 text-brand-primary" />
-            </Link>
+        <Link to="/dashboard" className="flex justify-center w-full">
+          <GraduationCap className="h-7 w-7 text-brand-primary" />
+        </Link>
           )}
           
           {/* Hide sidebar button */}
           {!(isCollapsed && !isHovered) && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsHidden(true)}
-              className={cn(
-                'h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700',
-                isDark ? 'text-gray-400 hover:text-gray-200' : 'text-neutral-500 hover:text-neutral-700'
-              )}
-              aria-label="Hide sidebar"
-            >
-              <X className="h-4 w-4" />
-            </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsHidden(true)}
+          className={cn(
+            'h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700',
+            isDark ? 'text-gray-400 hover:text-gray-200' : 'text-neutral-500 hover:text-neutral-700'
+          )}
+          aria-label="Hide sidebar"
+        >
+          <X className="h-4 w-4" />
+        </Button>
           )}
         </div>
 
         {/* Navigation Items */}
         <div className="flex-1 py-4 overflow-y-auto scrollbar-hide">
           <nav className="space-y-1 px-2">
-            {Object.entries(groupedItems).map(([group, items]) => (
-              <div key={group}>
-                {!(isCollapsed && !isHovered) && group !== 'main' && (
-                  <button
-                    onClick={() => toggleGroup(group)}
-                    className={cn(
-                      'flex items-center justify-between w-full px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-colors',
-                      isDark 
-                        ? 'text-gray-400 hover:text-gray-200' 
-                        : 'text-neutral-500 hover:text-neutral-700'
-                    )}
-                    aria-expanded={expandedGroups.includes(group)}
-                  >
-                    <span>{group}</span>
-                    <ChevronDown className={cn(
-                      'h-3 w-3 transition-transform',
-                      expandedGroups.includes(group) ? 'rotate-180' : ''
-                    )} />
-                  </button>
-                )}
-                
-                {(expandedGroups.includes(group) || group === 'main') && (
-                  <div className="space-y-1">
-                    {items.map((item, index) => {
-                      const Icon = item.icon;
-                      const active = isCurrentPath(item.path);
-                      
-                      return (
-                        <Link
-                          key={`${group}-${index}`}
-                          to={item.path}
-                          className={cn(
-                            'group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200',
-                            active
-                              ? isDark
-                                ? 'bg-blue-600/20 text-blue-400'
-                                : 'bg-brand-primary/10 text-brand-primary'
-                              : isDark
-                                ? 'text-gray-300 hover:bg-gray-700 hover:text-white'
-                                : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
-                          )}
-                          aria-current={active ? 'page' : undefined}
-                        >
-                          <Icon className={cn(
-                            'flex-shrink-0 h-5 w-5',
-                            (isCollapsed && !isHovered) ? 'mx-auto' : 'mr-3'
-                          )} />
-                          {!(isCollapsed && !isHovered) && (
-                            <div className="flex items-center justify-between w-full">
-                              <span>{item.label}</span>
-                              {item.badge && item.badge > 0 && (
-                                <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center">
-                                  {item.badge > 99 ? '99+' : item.badge}
-                                </span>
-                              )}
-                            </div>
-                          )}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            ))}
+        {Object.entries(groupedItems).map(([group, items]) => (
+          <div key={group}>
+            {!(isCollapsed && !isHovered) && group !== 'main' && (
+          <button
+            onClick={() => toggleGroup(group)}
+            className={cn(
+              'flex items-center justify-between w-full px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-colors',
+              isDark 
+            ? 'text-gray-400 hover:text-gray-200' 
+            : 'text-neutral-500 hover:text-neutral-700'
+            )}
+            aria-expanded={expandedGroups.includes(group)}
+          >
+            <span>{group}</span>
+            <ChevronDown className={cn(
+              'h-3 w-3 transition-transform',
+              expandedGroups.includes(group) ? 'rotate-180' : ''
+            )} />
+          </button>
+            )}
+            
+            {(expandedGroups.includes(group) || group === 'main') && (
+          <div className="space-y-1">
+            {items.map((item, index) => {
+              const Icon = item.icon;
+              const active = isCurrentPath(item.path);
+              
+              return (
+            <Link
+              key={`${group}-${index}`}
+              to={item.path}
+              className={cn(
+                'group flex items-center rounded-2xl px-3 py-2.5 text-sm font-medium  transition-all duration-300',
+                active
+              ? isDark
+                ? 'bg-blue-600/20 text-blue-400'
+                : 'bg-brand-primary/10 text-brand-primary'
+              : isDark
+                ? 'text-white hover:bg-gray-700 hover:text-white'
+                : 'text-black hover:bg-neutral-50 hover:text-neutral-900'
+              )}
+              aria-current={active ? 'page' : undefined}
+            >
+              <Icon className={cn(
+                'flex-shrink-0 h-5 w-5',
+                (isCollapsed && !isHovered) ? 'mx-auto' : 'mr-3'
+              )} />
+              {!(isCollapsed && !isHovered) && (
+                <div className="flex items-center justify-between w-full">
+              <span>{item.label}</span>
+              {item.badge && item.badge > 0 && (
+                <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center">
+                  {item.badge > 99 ? '99+' : item.badge}
+                </span>
+              )}
+                </div>
+              )}
+            </Link>
+              );
+            })}
+          </div>
+            )}
+          </div>
+        ))}
           </nav>
         </div>
 
@@ -495,66 +516,66 @@ export default function Navigation() {
           isDark ? 'border-gray-700' : 'border-neutral-200'
         )}>
           {!(isCollapsed && !isHovered) ? (
-            <Link 
-              to="/profile" 
-              className={cn(
-                'flex items-center px-3 py-2 rounded-lg transition-colors group',
-                isDark ? 'hover:bg-gray-700' : 'hover:bg-neutral-50'
-              )}
-            >
-              <div className={cn(
-                'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium mr-3',
-                isDark 
-                  ? 'bg-blue-600/20 text-blue-400' 
-                  : 'bg-brand-primary/10 text-brand-primary'
-              )}>
-                {user?.name?.charAt(0) || <User className="h-4 w-4" />}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className={cn(
-                  'text-sm font-medium truncate group-hover:text-brand-primary transition-colors',
-                  isDark ? 'text-white' : 'text-gray-900'
-                )}>
-                  {user?.name || 'User'}
-                </p>
-                <p className={cn(
-                  'text-xs truncate',
-                  isDark ? 'text-gray-400' : 'text-neutral-500'
-                )}>
-                  View Profile
-                </p>
-              </div>
-            </Link>
+        <Link 
+          to="/profile" 
+          className={cn(
+            'flex items-center px-3 py-2 rounded-lg transition-colors group',
+            isDark ? 'hover:bg-gray-700' : 'hover:bg-neutral-50'
+          )}
+        >
+          <div className={cn(
+            'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium mr-3',
+            isDark 
+          ? 'bg-blue-600/20 text-blue-400' 
+          : 'bg-brand-primary/10 text-brand-primary'
+          )}>
+            {user?.name?.charAt(0) || <User className="h-4 w-4" />}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className={cn(
+          'text-sm font-medium truncate group-hover:text-brand-primary transition-colors',
+          isDark ? 'text-white' : 'text-gray-900'
+            )}>
+          {user?.name || 'User'}
+            </p>
+            <p className={cn(
+          'text-xs truncate',
+          isDark ? 'text-gray-400' : 'text-neutral-500'
+            )}>
+          View Profile
+            </p>
+          </div>
+        </Link>
           ) : (
-            <Link to="/profile" className="flex justify-center mb-3 hover:scale-110 transition-transform">
-              <div className={cn(
-                'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium',
-                isDark 
-                  ? 'bg-blue-600/20 text-blue-400' 
-                  : 'bg-brand-primary/10 text-brand-primary'
-              )}>
-                {user?.name?.charAt(0) || <User className="h-4 w-4" />}
-              </div>
-            </Link>
+        <Link to="/profile" className="flex justify-center mb-3 hover:scale-110 transition-transform">
+          <div className={cn(
+            'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium',
+            isDark 
+          ? 'bg-blue-600/20 text-blue-400' 
+          : 'bg-brand-primary/10 text-brand-primary'
+          )}>
+            {user?.name?.charAt(0) || <User className="h-4 w-4" />}
+          </div>
+        </Link>
           )}
           
           <div className={cn('mt-3', (isCollapsed && !isHovered) ? 'flex justify-center' : 'px-3')}>
-            <ThemeToggle />
+        <ThemeToggle />
           </div>
           
           <Button
-            variant="ghost"
-            onClick={handleLogout}
-            className={cn(
-              'w-full mt-2 text-red-500 hover:bg-red-500/10',
-              (isCollapsed && !isHovered) ? 'px-2' : 'justify-start px-3'
-            )}
+        variant="ghost"
+        onClick={handleLogout}
+        className={cn(
+          'w-full mt-2 text-red-500 hover:bg-red-500/10',
+          (isCollapsed && !isHovered) ? 'px-2' : 'justify-start px-3'
+        )}
           >
-            <LogOut className={cn(
-              'h-5 w-5',
-              (isCollapsed && !isHovered) ? 'mx-auto' : 'mr-3'
-            )} />
-            {!(isCollapsed && !isHovered) && <span>Logout</span>}
+        <LogOut className={cn(
+          'h-5 w-5',
+          (isCollapsed && !isHovered) ? 'mx-auto' : 'mr-3'
+        )} />
+        {!(isCollapsed && !isHovered) && <span>Logout</span>}
           </Button>
         </div>
 
@@ -564,17 +585,17 @@ export default function Navigation() {
           size="icon"
           onClick={() => setIsCollapsed(!isCollapsed)}
           className={cn(
-            'absolute -right-3 top-1/2 transform -translate-y-1/2 h-6 w-6 rounded-full shadow-md hover:scale-110 transition-transform',
-            isDark 
-              ? 'bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700' 
-              : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
+        'absolute -right-3 top-1/2 transform -translate-y-1/2 h-6 w-6 rounded-full shadow-md hover:scale-110 transition-transform',
+        isDark 
+          ? 'bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700' 
+          : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
           )}
           aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {isCollapsed ? (
-            <ChevronRight className="h-3 w-3" />
+        <ChevronRight className="h-3 w-3" />
           ) : (
-            <ChevronLeft className="h-3 w-3" />
+        <ChevronLeft className="h-3 w-3" />
           )}
         </Button>
       </aside>
