@@ -85,6 +85,11 @@ function DashboardRouter() {
   
   if (!user) return <Navigate to="/login" />;
   
+  // Check if user is admin and redirect to admin dashboard
+  if (user.role === 'admin') {
+    return <Navigate to="/admin" />;
+  }
+  
   // Always redirect to Feed as the main page
   return <Navigate to="/feed" />;
 }

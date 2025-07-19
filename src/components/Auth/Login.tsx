@@ -1,25 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { 
+import {
+  Person,
   Email,
   Lock,
-  Person, 
-  Business, 
-  AutoAwesome,
-  EmojiEvents,
-  CheckCircle, 
-  TrendingUp, 
-  Group,
+  Business,
   School,
+  Help,
+  LoginOutlined,
+  Security,
+  AutoAwesome,
   RocketLaunch,
   ArrowForward,
-  Security,
+  EmojiEvents,
   Verified,
-  Star,
-  LoginOutlined,
-  VpnKey,
-  RememberMe,
-  Help
+  CheckCircle
 } from '@mui/icons-material';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -113,9 +108,14 @@ export default function Login() {
         localStorage.removeItem('savedEmail');
       }
       
-      navigate(formData.role === 'student' ? '/dashboard' : '/employer-dashboard');
-    } catch (err: any) {
-      setError(err.message || 'Invalid credentials. Please check your email and password.');
+      // Check for admin credentials and redirect appropriately
+      if (formData.email === 'admin@aut.edu' && formData.password === 'admin123') {
+        navigate('/admin');
+      } else {
+        navigate(formData.role === 'student' ? '/dashboard' : '/employer-dashboard');
+      }
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Invalid credentials. Please check your email and password.');
     } finally {
       setLoading(false);
     }
@@ -134,7 +134,7 @@ export default function Login() {
     try {
       await login(demoEmail, demoPassword, demoRole);
       navigate(demoRole === 'student' ? '/dashboard' : '/employer-dashboard');
-    } catch (err: any) {
+    } catch {
       setError('Demo login failed. Please try again.');
     } finally {
       setLoading(false);
@@ -288,7 +288,7 @@ export default function Login() {
 
             <Button
               type="submit"
-              variant="contained"
+              variant="elevated"
               color="primary"
               size="large"
               fullWidth
@@ -488,7 +488,7 @@ export default function Login() {
                 <Button
                   component={Link}
                   to={`/register?role=${formData.role}`}
-                  variant="contained"
+                  variant="elevated"
                   size="large"
                   className={`shadow-lg hover:shadow-xl transition-all duration-200 ${
                     isDark 

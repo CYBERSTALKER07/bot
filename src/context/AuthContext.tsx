@@ -1,129 +1,131 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { User } from '../types';
+import { createContext, useContext, useState, ReactNode } from 'react';
+
+interface User {
+  id: string;
+  email: string;
+  role: 'student' | 'employer' | 'admin';
+  profile: {
+    full_name: string;
+    avatar_url?: string;
+    website?: string;
+  };
+}
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string, role: 'student' | 'employer') => Promise<void>;
-  logout: () => Promise<void>;
   register: (email: string, password: string, role: 'student' | 'employer') => Promise<void>;
-  updateProfile: (profile: any) => Promise<void>;
+  logout: () => void;
+  updateProfile: (profile: Partial<User['profile']>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  // Start with no user - users must log in to access protected routes
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
 
   const login = async (email: string, password: string, role: 'student' | 'employer') => {
     setLoading(true);
-    
     try {
-      // Simulate login delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Validate credentials based on role
-      const validCredentials = {
-        student: {
-          email: 'student@aut.edu',
-          password: 'student123'
-        },
-        employer: {
-          email: 'employer@intel.com',
-          password: 'employer123'
-        }
-      };
-      
-      const expectedCreds = validCredentials[role];
-      
-      // Check if credentials match
-      if (email !== expectedCreds.email || password !== expectedCreds.password) {
-        throw new Error(`Invalid credentials. Try: ${expectedCreds.email} with password: ${expectedCreds.password}`);
+      // Check for admin credentials first
+      if (email === 'admin@aut.edu' && password === 'admin123') {
+        const adminUser: User = {
+          id: 'admin-001',
+          email: 'admin@aut.edu',
+          role: 'admin',
+          profile: {
+            full_name: 'System Administrator',
+            avatar_url: undefined,
+            website: undefined
+          }
+        };
+        setUser(adminUser);
+        return;
       }
-      
-      // Set user based on role
-      if (role === 'student') {
-        setUser({
-          id: 'demo-student-1',
-          email: email,
+
+      // Demo student credentials
+      if (email === 'student@aut.edu' && password === 'password123' && role === 'student') {
+        const studentUser: User = {
+          id: 'student-001',
+          email: 'student@aut.edu',
           role: 'student',
           profile: {
-            id: 'demo-student-1',
-            username: email.split('@')[0],
-            full_name: 'Demo Student',
-            bio: 'Computer Science student at AUT',
-            avatar_url: null,
-            website: null
+            full_name: 'John Doe',
+            avatar_url: undefined,
+            website: undefined
           }
-        });
-      } else {
-        setUser({
-          id: 'demo-employer-1',
-          email: email,
+        };
+        setUser(studentUser);
+        return;
+      }
+
+      // Demo employer credentials
+      if (email === 'employer@intel.com' && password === 'password123' && role === 'employer') {
+        const employerUser: User = {
+          id: 'employer-001',
+          email: 'employer@intel.com',
           role: 'employer',
           profile: {
-            id: 'demo-employer-1',
-            username: email.split('@')[0],
-            full_name: 'Demo Employer',
-            bio: 'HR Manager at Intel',
-            avatar_url: null,
-            website: null
+            full_name: 'Jane Smith',
+            avatar_url: undefined,
+            website: undefined
           }
-        });
+        };
+        setUser(employerUser);
+        return;
       }
-    } catch (error) {
-      throw error; // Re-throw the error so it can be caught in the login component
+
+      // If no demo credentials match, throw error
+      throw new Error('Invalid credentials. Please check your email and password.');
     } finally {
       setLoading(false);
     }
   };
 
-  const logout = async () => {
+  const register = async (email: string, _password: string, role: 'student' | 'employer') => {
+    setLoading(true);
+    try {
+      // Create new user based on role
+      const newUser: User = role === 'student' 
+        ? {
+            id: `student-${Date.now()}`,
+            email,
+            role: 'student',
+            profile: {
+              full_name: 'New Student',
+              avatar_url: undefined,
+              website: undefined
+            }
+          }
+        : {
+            id: `employer-${Date.now()}`,
+            email,
+            role: 'employer',
+            profile: {
+              full_name: 'New Employer',
+              avatar_url: undefined,
+              website: undefined
+            }
+          };
+      
+      setUser(newUser);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logout = () => {
     setUser(null);
   };
 
-  const register = async (email: string, password: string, role: 'student' | 'employer') => {
-    setLoading(true);
-    // Simulate registration delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Set static user based on role
-    if (role === 'student') {
-      setUser({
-        id: 'demo-student-new',
-        email: email,
-        role: 'student',
-        profile: {
-          id: 'demo-student-new',
-          username: email.split('@')[0],
-          full_name: 'New Student',
-          bio: 'New AUT student',
-          avatar_url: null,
-          website: null
-        }
-      });
-    } else {
-      setUser({
-        id: 'demo-employer-new',
-        email: email,
-        role: 'employer',
-        profile: {
-          id: 'demo-employer-new',
-          username: email.split('@')[0],
-          full_name: 'New Employer',
-          bio: 'New employer partner',
-          avatar_url: null,
-          website: null
-        }
-      });
-    }
-    setLoading(false);
-  };
-
-  const updateProfile = async (profileData: any) => {
-    if (!user) throw new Error('No user logged in');
+  const updateProfile = async (profileData: Partial<User['profile']>) => {
+    if (!user) return;
     
     setUser({
       ...user,
@@ -134,11 +136,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  return (
-    <AuthContext.Provider value={{ user, loading, login, logout, register, updateProfile }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  const value = {
+    user,
+    loading,
+    login,
+    register,
+    logout,
+    updateProfile
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

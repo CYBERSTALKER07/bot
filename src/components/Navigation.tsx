@@ -21,13 +21,15 @@ import {
   FileText,
   BarChart3,
   Rss,
-  ChevronDown
+  ChevronDown,
+  Smartphone
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import ThemeToggle from './ui/ThemeToggle';
 import  Button from './ui/Button';
 import { cn } from '../lib/cva';
+import { useExclusiveAccordion } from '../hooks/useExclusiveState';
 
 interface NavigationItem {
   icon: React.ComponentType<any>;
@@ -47,7 +49,9 @@ export default function Navigation() {
   const [isHidden, setIsHidden] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [unreadCount, setUnreadCount] = useState(3);
-  const [expandedGroups, setExpandedGroups] = useState<string[]>(['main']);
+  
+  // Use exclusive accordion for navigation groups - only one group can be expanded at a time
+  const { toggle: toggleGroup, isOpen: isGroupOpen } = useExclusiveAccordion();
   
   const sidebarRef = useRef<HTMLDivElement>(null);
   const hoverZoneRef = useRef<HTMLDivElement>(null);
@@ -192,14 +196,6 @@ export default function Navigation() {
     acc[group].push(item);
     return acc;
   }, {} as Record<string, NavigationItem[]>);
-
-  const toggleGroup = (group: string) => {
-    setExpandedGroups(prev => 
-      prev.includes(group) 
-        ? prev.filter(g => g !== group)
-        : [...prev, group]
-    );
-  };
 
   // Mobile Navigation
   if (isMobile) {
@@ -454,17 +450,17 @@ export default function Navigation() {
             ? 'text-gray-400 hover:text-gray-200' 
             : 'text-neutral-500 hover:text-neutral-700'
             )}
-            aria-expanded={expandedGroups.includes(group)}
+            aria-expanded={isGroupOpen(group)}
           >
             <span>{group}</span>
             <ChevronDown className={cn(
               'h-3 w-3 transition-transform',
-              expandedGroups.includes(group) ? 'rotate-180' : ''
+              isGroupOpen(group) ? 'rotate-180' : ''
             )} />
           </button>
             )}
             
-            {(expandedGroups.includes(group) || group === 'main') && (
+            {(isGroupOpen(group) || group === 'main') && (
           <div className="space-y-1">
             {items.map((item, index) => {
               const Icon = item.icon;
