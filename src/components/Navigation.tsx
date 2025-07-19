@@ -68,27 +68,15 @@ export default function Navigation() {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Check if current route is public
-  const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname) || 
-    SEMI_PUBLIC_ROUTES.some(route => location.pathname.startsWith(route));
-  
-  // Don't render navigation on public routes when user is not authenticated
-  if (isPublicRoute && !user) {
-    return null;
-  }
-  
-  // Don't render navigation if user is not authenticated
-  if (!user) {
-    return null;
-  }
-
+  // Always call all hooks first, before any conditional logic
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [unreadCount, setUnreadCount] = useState(3);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   
-  // Use exclusive accordion for navigation groups - only one group can be expanded at a time
+  // Use exclusive accordion for navigation groups
   const { toggle: toggleGroup, isOpen: isGroupOpen } = useExclusiveAccordion();
   
   const sidebarRef = useRef<HTMLDivElement>(null);
@@ -103,6 +91,32 @@ export default function Navigation() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+      if (window.innerWidth >= 768) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // NOW check if we should render the navigation (after all hooks are called)
+  const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname) || 
+    SEMI_PUBLIC_ROUTES.some(route => location.pathname.startsWith(route));
+  
+  // Don't render navigation on public routes when user is not authenticated
+  if (isPublicRoute && !user) {
+    return null;
+  }
+  
+  // Don't render navigation if user is not authenticated
+  if (!user) {
+    return null;
+  }
 
   // Handle mouse enter to show sidebar
   const handleMouseEnter = () => {
@@ -213,20 +227,6 @@ export default function Navigation() {
   };
 
   const isCurrentPath = (path: string) => location.pathname === path;
-
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-      if (window.innerWidth >= 768) {
-        setIsMobileMenuOpen(false);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   // Group navigation items
   const groupedItems = navigationItems.reduce((acc, item) => {

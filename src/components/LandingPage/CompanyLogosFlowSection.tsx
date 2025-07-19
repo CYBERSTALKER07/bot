@@ -116,8 +116,8 @@ export default function CompanyLogosFlowSection({ companyLogosRef }: CompanyLogo
       if (mainTextElements.length > 0) {
         ScrollTrigger.create({
           trigger: companyLogosRef.current,
-          start: 'top 20%',
-          end: 'bottom 80%',
+          start: 'top 90%',
+          end: 'bottom 70%',
           scrub: 1, // Reduced scrub value for smoother animation
           onUpdate: (self) => {
             const progress = self.progress;
@@ -140,7 +140,7 @@ export default function CompanyLogosFlowSection({ companyLogosRef }: CompanyLogo
         ScrollTrigger.create({
           trigger: companyLogosRef.current,
           start: 'top 90%',
-          end: 'bottom 10%',
+          end: 'bottom 70%',
           scrub: 2, // Slower scrub for smoother performance
           onUpdate: (self) => {
             const progress = self.progress;
