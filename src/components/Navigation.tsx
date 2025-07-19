@@ -141,7 +141,9 @@ export default function Navigation() {
               {isMobileMenuOpen ? <XIcon className={cn(
                 isDark ? 'text-white' : 'text-gray-900',
                 "h-5 w-5 transition-transform duration-200"
-              )} /> : <Menu className="h-5 w-5" />}
+              )} /> : <div className="w-8 h-8 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center text-sm font-medium">
+                {user?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || <User className="h-5 w-5" />}
+              </div>}
             </Button>
           </div>
 
