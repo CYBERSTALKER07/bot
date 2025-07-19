@@ -162,7 +162,7 @@ export default function StatsSection({ statsRef }: StatsSectionProps) {
               isDark ? 'text-dark-muted' : 'text-gray-600'
             }`}
             align='center'
-            ml={30}
+            ml={1/2}
           >
             Join our growing community and achieve your career goals
           </Typography>

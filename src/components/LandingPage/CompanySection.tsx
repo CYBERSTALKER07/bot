@@ -318,7 +318,8 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 							isDark ? 'text-dark-muted' : 'text-gray-600'
 						}`}
 						align="center"
-						ml={35}
+						ml={1/2}
+						mr={1/2}
 					>
 						Join thousands of students who've found their dream jobs with these incredible companies!
 					</Typography>

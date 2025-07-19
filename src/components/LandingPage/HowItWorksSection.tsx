@@ -140,7 +140,7 @@ export default function HowItWorksSection({ howItWorksRef }: HowItWorksSectionPr
               isDark ? 'text-dark-muted' : 'text-gray-600'
             }`}
             align="center"
-            ml={30}
+            ml={1/2}
           >
             Get started in minutes and find your perfect opportunity with our streamlined process
           </Typography>

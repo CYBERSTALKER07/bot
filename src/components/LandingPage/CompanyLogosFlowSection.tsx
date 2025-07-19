@@ -331,89 +331,100 @@ export default function CompanyLogosFlowSection({ companyLogosRef }: CompanyLogo
       
       {/* Hero Section Company Logos - Visible and Animated */}
       <div className="absolute inset-0 pointer-events-none">
-        {/* Google */}
-        <div className="company-logo absolute top-10 left-1/4 w-20 h-20 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
-          <img src="https://logo.clearbit.com/google.com" alt="Google" className="w-14 h-14 object-contain" />
+        {/* Company Logos - Left Side */}
+        <div className="absolute left-0 top-0 bottom-0 w-1/6 pointer-events-none">
+          {/* Google - Left Side */}
+          <div className="company-logo absolute top-10 left-4 w-16 h-16 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
+            <img src="https://logo.clearbit.com/google.com" alt="Google" className="w-10 h-10 object-contain" />
+          </div>
+          
+          {/* Apple - Left Side */}
+          <div className="company-logo absolute top-32 left-8 w-14 h-14 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
+            <img src="https://logo.clearbit.com/apple.com" alt="Apple" className="w-8 h-8 object-contain" />
+          </div>
+          
+          {/* Tesla - Left Side */}
+          <div className="company-logo absolute top-96 left-2 w-20 h-20 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
+            <img src="https://logo.clearbit.com/tesla.com" alt="Tesla" className="w-14 h-14 object-contain" />
+          </div>
+          
+          {/* Meta - Left Side */}
+          <div className="company-logo absolute top-64 left-6 w-18 h-18 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
+            <img src="https://logo.clearbit.com/meta.com" alt="Meta" className="w-12 h-12 object-contain" />
+          </div>
+          
+          {/* Amazon - Left Side */}
+          <div className="company-logo absolute top-48 left-4 w-16 h-16 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
+            <img src="https://logo.clearbit.com/amazon.com" alt="Amazon" className="w-10 h-10 object-contain" />
+          </div>
+          
+          {/* Slack - Left Side */}
+          <div className="company-logo absolute bottom-48 left-8 w-14 h-14 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
+            <img src="https://logo.clearbit.com/slack.com" alt="Slack" className="w-8 h-8 object-contain" />
+          </div>
+          
+          {/* LinkedIn - Left Side */}
+          <div className="company-logo absolute bottom-80 left-2 w-18 h-18 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
+            <img src="https://logo.clearbit.com/linkedin.com" alt="LinkedIn" className="w-12 h-12 object-contain" />
+          </div>
+          
+          {/* Shopify - Left Side */}
+          <div className="company-logo absolute bottom-16 left-6 w-16 h-16 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
+            <img src="https://logo.clearbit.com/shopify.com" alt="Shopify" className="w-10 h-10 object-contain" />
+          </div>
         </div>
-        
-        {/* Microsoft */}
-        <div className="company-logo absolute top-32 right-1/4 w-18 h-18 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
-          <img src="https://logo.clearbit.com/microsoft.com" alt="Microsoft" className="w-12 h-12 object-contain" />
-        </div>
-        
-        {/* Apple */}
-        <div className="company-logo absolute top-20 left-3/4 w-16 h-16 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
-          <img src="https://logo.clearbit.com/apple.com" alt="Apple" className="w-10 h-10 object-contain" />
-        </div>
-        
-        {/* Tesla */}
-        <div className="company-logo absolute top-96 left-1/3 w-24 h-24 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
-          <img src="https://logo.clearbit.com/tesla.com" alt="Tesla" className="w-18 h-18 object-contain" />
-        </div>
-        
-        {/* Meta */}
-        <div className="company-logo absolute top-16 left-1/6 w-14 h-14 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
-          <img src="https://logo.clearbit.com/meta.com" alt="Meta" className="w-8 h-8 object-contain" />
-        </div>
-        
-        {/* Netflix */}
-        <div className="company-logo absolute top-80 right-1/3 w-22 h-22 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
-          <img src="https://logo.clearbit.com/netflix.com" alt="Netflix" className="w-16 h-16 object-contain" />
-        </div>
-        
-        {/* Amazon */}
-        <div className="company-logo absolute top-48 left-1/5 w-20 h-20 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
-          <img src="https://logo.clearbit.com/amazon.com" alt="Amazon" className="w-14 h-14 object-contain" />
-        </div>
-        
-        {/* Adobe */}
-        <div className="company-logo absolute top-64 right-1/6 w-18 h-18 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
-          <img src="https://logo.clearbit.com/adobe.com" alt="Adobe" className="w-12 h-12 object-contain" />
-        </div>
-        
-        {/* Spotify */}
-        <div className="company-logo absolute top-72 left-2/3 w-19 h-19 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
-          <img src="https://logo.clearbit.com/spotify.com" alt="Spotify" className="w-13 h-13 object-contain" />
-        </div>
-        
-        {/* Airbnb */}
-        <div className="company-logo absolute bottom-32 right-1/4 w-21 h-21 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
-          <img src="https://logo.clearbit.com/airbnb.com" alt="Airbnb" className="w-15 h-15 object-contain" />
-        </div>
-        
-        {/* Slack */}
-        <div className="company-logo absolute bottom-48 left-1/4 w-17 h-17 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
-          <img src="https://logo.clearbit.com/slack.com" alt="Slack" className="w-12 h-12 object-contain" />
-        </div>
-        
-        {/* Uber */}
-        <div className="company-logo absolute bottom-64 right-1/3 w-23 h-23 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
-          <img src="https://logo.clearbit.com/uber.com" alt="Uber" className="w-17 h-17 object-contain" />
-        </div>
-        
-        {/* LinkedIn */}
-        <div className="company-logo absolute bottom-80 left-1/3 w-18 h-18 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
-          <img src="https://logo.clearbit.com/linkedin.com" alt="LinkedIn" className="w-13 h-13 object-contain" />
-        </div>
-        
-        {/* Salesforce */}
-        <div className="company-logo absolute bottom-96 right-1/5 w-20 h-20 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
-          <img src="https://logo.clearbit.com/salesforce.com" alt="Salesforce" className="w-14 h-14 object-contain" />
-        </div>
-        
-        {/* Shopify */}
-        <div className="company-logo absolute bottom-16 left-1/6 w-19 h-19 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
-          <img src="https://logo.clearbit.com/shopify.com" alt="Shopify" className="w-13 h-13 object-contain" />
+
+        {/* Company Logos - Right Side */}
+        <div className="absolute right-0 top-0 bottom-0 w-1/6 pointer-events-none">
+          {/* Microsoft - Right Side */}
+          <div className="company-logo absolute top-32 right-4 w-16 h-16 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
+            <img src="https://logo.clearbit.com/microsoft.com" alt="Microsoft" className="w-10 h-10 object-contain" />
+          </div>
+          
+          {/* Netflix - Right Side */}
+          <div className="company-logo absolute top-80 right-8 w-18 h-18 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
+            <img src="https://logo.clearbit.com/netflix.com" alt="Netflix" className="w-12 h-12 object-contain" />
+          </div>
+          
+          {/* Adobe - Right Side */}
+          <div className="company-logo absolute top-64 right-6 w-14 h-14 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
+            <img src="https://logo.clearbit.com/adobe.com" alt="Adobe" className="w-8 h-8 object-contain" />
+          </div>
+          
+          {/* Spotify - Right Side */}
+          <div className="company-logo absolute top-20 right-2 w-20 h-20 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
+            <img src="https://logo.clearbit.com/spotify.com" alt="Spotify" className="w-14 h-14 object-contain" />
+          </div>
+          
+          {/* Airbnb - Right Side */}
+          <div className="company-logo absolute bottom-32 right-4 w-18 h-18 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
+            <img src="https://logo.clearbit.com/airbnb.com" alt="Airbnb" className="w-12 h-12 object-contain" />
+          </div>
+          
+          {/* Uber - Right Side */}
+          <div className="company-logo absolute bottom-64 right-8 w-20 h-20 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
+            <img src="https://logo.clearbit.com/uber.com" alt="Uber" className="w-14 h-14 object-contain" />
+          </div>
+          
+          {/* Salesforce - Right Side */}
+          <div className="company-logo absolute bottom-96 right-2 w-16 h-16 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
+            <img src="https://logo.clearbit.com/salesforce.com" alt="Salesforce" className="w-10 h-10 object-contain" />
+          </div>
+          
+          {/* PayPal - Right Side */}
+          <div className="company-logo absolute top-48 right-6 w-14 h-14 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl rounded-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
+            <img src="https://logo.clearbit.com/paypal.com" alt="PayPal" className="w-8 h-8 object-contain" />
+          </div>
         </div>
       </div>
     
       {/* Centered main text - Fixed Position */}
-      <div ref={trendsRef} className=" sticky top-1/2 ml-[1000px] transform -translate-x-1/2 -translate-y-1/2 text-center z-20 w-full max-w-7xl px-4">
+      <div ref={trendsRef} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center z-20 w-full max-w-4xl px-4 sm:px-6 lg:px-8">
         {/* Main headline with character reveal */}
-        <div className="mb-8 relative trend-item">
+        <div className="mb-6 sm:mb-8 relative trend-item">
           <Typography 
             variant="h1" 
-            className={`text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black leading-tight transition-colors duration-300 ${
+            className={`text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-tight transition-colors duration-300 ${
               isDark ? 'text-dark-text' : 'text-white'
             }`}
           >
@@ -428,10 +439,10 @@ export default function CompanyLogosFlowSection({ companyLogosRef }: CompanyLogo
           </Typography>
         </div>
 
-        <div className="mb-8 trend-item">
+        <div className="mb-6 sm:mb-8 trend-item">
           <Typography 
             variant="h2" 
-            className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold transition-colors duration-300 ${
+            className={`text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold transition-colors duration-300 ${
               isDark ? 'text-dark-text' : 'text-white'
             }`}
           >
@@ -439,10 +450,10 @@ export default function CompanyLogosFlowSection({ companyLogosRef }: CompanyLogo
           </Typography>
         </div>
 
-        <div className="mb-12 trend-item">
+        <div className="mb-8 sm:mb-12 trend-item">
           <Typography 
             variant="h3" 
-            className={`text-2xl sm:text-3xl md:text-4xl font-medium transition-colors duration-300 ${
+            className={`text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium transition-colors duration-300 ${
               isDark ? 'text-dark-muted' : 'text-white'
             }`}
           >
@@ -453,7 +464,7 @@ export default function CompanyLogosFlowSection({ companyLogosRef }: CompanyLogo
         <div className="space-y-4 relative trend-item">
           <Typography 
             variant="h2" 
-            className={`text-4xl sm:text-5xl md:text-6xl font-bold transition-colors duration-300 ${
+            className={`text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold transition-colors duration-300 ${
               isDark ? 'text-lime' : 'text-lime'
             }`}
           >
