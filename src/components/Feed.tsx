@@ -89,9 +89,27 @@ export default function Feed() {
         },
         {
           id: '2',
-          content: 'Career tip: Always follow up after an interview with a personalized thank you note. It shows professionalism and keeps you top of mind.',
+          content: '🔥 TRENDING: Tech salaries are up 15% this year! Software engineers are seeing the biggest increases. Now might be the perfect time to negotiate or job hunt. What\'s your experience been? #TechJobs #SalaryTrends',
           author: {
             id: '2',
+            name: 'TechSalary Insights',
+            username: 'techsalary',
+            verified: true,
+            avatar_url: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=40&h=40&fit=crop&crop=center'
+          },
+          created_at: '2024-01-15T11:15:00Z',
+          likes_count: 289,
+          retweets_count: 67,
+          replies_count: 43,
+          has_liked: true,
+          has_retweeted: false,
+          has_bookmarked: true
+        },
+        {
+          id: '3',
+          content: 'Career tip: Always follow up after an interview with a personalized thank you note. It shows professionalism and keeps you top of mind.',
+          author: {
+            id: '3',
             name: 'Career Coach Mike',
             username: 'careercoach',
             verified: true,
@@ -106,22 +124,166 @@ export default function Feed() {
           has_bookmarked: true
         },
         {
-          id: '3',
-          content: "We're hiring! Looking for talented software engineers to join our growing team. Remote-friendly, competitive salary, and amazing benefits. DM me for details! #hiring #jobs #tech",
+          id: '4',
+          content: "🎓 UPDATE: Just graduated from Stanford CS! Special thanks to @TalentLink for connecting me with amazing internship opportunities that led to my full-time offer at Meta. This platform really works! 💙",
           author: {
-            id: '3',
-            name: 'Tech Startup Inc.',
-            username: 'techstartup',
-            verified: true,
-            avatar_url: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=40&h=40&fit=crop&crop=center'
+            id: '4',
+            name: 'Alex Chen',
+            username: 'alexc_dev',
+            verified: false,
+            avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face'
           },
           created_at: '2024-01-15T08:45:00Z',
-          likes_count: 67,
+          likes_count: 156,
           retweets_count: 34,
           replies_count: 28,
           has_liked: false,
+          has_retweeted: false,
+          has_bookmarked: false
+        },
+        {
+          id: '5',
+          content: "🚨 URGENT HIRING: We need 5 Frontend Developers (React/TypeScript) for our fintech startup. $120-160k + equity. Remote OK 🌍\n\nMust have:\n✅ 3+ years React\n✅ TypeScript expert\n✅ Financial systems exp\n\nDM me your portfolio!",
+          author: {
+            id: '5',
+            name: 'FinTech Recruiting',
+            username: 'fintechcareers',
+            verified: true,
+            avatar_url: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=40&h=40&fit=crop&crop=center'
+          },
+          created_at: '2024-01-15T07:30:00Z',
+          likes_count: 234,
+          retweets_count: 89,
+          replies_count: 67,
+          has_liked: false,
+          has_retweeted: true,
+          has_bookmarked: true
+        },
+        {
+          id: '6',
+          content: "Just had the most inspiring conversation with a recent bootcamp grad who's now a senior engineer at Netflix. Your background doesn't define your potential - your dedication does! 💪 #CodingBootcamp #TechCareers",
+          author: {
+            id: '6',
+            name: 'Lisa Rodriguez',
+            username: 'lisacodes',
+            verified: false,
+            avatar_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face'
+          },
+          created_at: '2024-01-15T06:20:00Z',
+          likes_count: 445,
+          retweets_count: 123,
+          replies_count: 56,
+          has_liked: true,
           has_retweeted: true,
           has_bookmarked: false
+        },
+        {
+          id: '7',
+          content: "📊 MARKET UPDATE: AI/ML roles are growing 300% faster than traditional software roles. Time to upskill?\n\nTop skills in demand:\n🔥 PyTorch/TensorFlow\n🔥 MLOps\n🔥 Computer Vision\n🔥 NLP\n\nWhat are you learning?",
+          author: {
+            id: '7',
+            name: 'AI Career Hub',
+            username: 'aicareers',
+            verified: true,
+            avatar_url: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=40&h=40&fit=crop&crop=center'
+          },
+          created_at: '2024-01-15T05:45:00Z',
+          likes_count: 567,
+          retweets_count: 234,
+          replies_count: 89,
+          has_liked: false,
+          has_retweeted: false,
+          has_bookmarked: true
+        },
+        {
+          id: '8',
+          content: "Shoutout to my mentee who just got promoted to Tech Lead! 6 months ago they were afraid to speak up in meetings. Growth mindset + consistent effort = amazing results 🎯 #Mentorship #Leadership",
+          author: {
+            id: '8',
+            name: 'David Kim',
+            username: 'davidkimtech',
+            verified: false,
+            avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face'
+          },
+          created_at: '2024-01-15T04:30:00Z',
+          likes_count: 178,
+          retweets_count: 45,
+          replies_count: 23,
+          has_liked: true,
+          has_retweeted: false,
+          has_bookmarked: false
+        },
+        {
+          id: '9',
+          content: "🎯 PRO TIP: When negotiating salary, research isn't just about the number. Consider:\n💰 Base salary\n📈 Equity/stock options\n🏥 Healthcare quality\n🏖️ PTO policy\n📚 Learning budget\n🏠 Remote flexibility\n\nTotal comp matters!",
+          author: {
+            id: '9',
+            name: 'Salary Negotiation Pro',
+            username: 'salarynegotiator',
+            verified: true,
+            avatar_url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=40&h=40&fit=crop&crop=face'
+          },
+          created_at: '2024-01-15T03:15:00Z',
+          likes_count: 789,
+          retweets_count: 345,
+          replies_count: 123,
+          has_liked: true,
+          has_retweeted: true,
+          has_bookmarked: true
+        },
+        {
+          id: '10',
+          content: "COMPANY SPOTLIGHT 🌟 \n\nJoin our team at @TechInnovate! We're building the future of sustainable technology.\n\n🔍 Open roles:\n• Senior Full-Stack Dev\n• Product Designer\n• DevOps Engineer\n\nGreat culture, competitive pay, full remote! Apply now 👇",
+          author: {
+            id: '10',
+            name: 'TechInnovate',
+            username: 'techinnovate',
+            verified: true,
+            avatar_url: 'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=40&h=40&fit=crop&crop=center'
+          },
+          created_at: '2024-01-15T02:00:00Z',
+          likes_count: 156,
+          retweets_count: 78,
+          replies_count: 34,
+          has_liked: false,
+          has_retweeted: false,
+          has_bookmarked: true
+        },
+        {
+          id: '11',
+          content: "After 200+ interviews, here's what I learned:\n\n❌ Don't: Memorize algorithms\n✅ Do: Understand problem-solving patterns\n\n❌ Don't: Rush to code\n✅ Do: Ask clarifying questions\n\n❌ Don't: Stay silent when stuck\n✅ Do: Think out loud\n\nGood luck! 🍀",
+          author: {
+            id: '11',
+            name: 'Interview Master',
+            username: 'interviewguru',
+            verified: false,
+            avatar_url: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=40&h=40&fit=crop&crop=face'
+          },
+          created_at: '2024-01-15T01:30:00Z',
+          likes_count: 1234,
+          retweets_count: 456,
+          replies_count: 234,
+          has_liked: true,
+          has_retweeted: false,
+          has_bookmarked: true
+        },
+        {
+          id: '12',
+          content: "🎉 MILESTONE: TalentLink just hit 100K active users! Thank you to our amazing community of students, professionals, and employers. Together we're changing how talent connects with opportunity! What's been your best TalentLink moment?",
+          author: {
+            id: '12',
+            name: 'TalentLink',
+            username: 'talentlink',
+            verified: true,
+            avatar_url: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=40&h=40&fit=crop&crop=center'
+          },
+          created_at: '2024-01-15T00:45:00Z',
+          likes_count: 2567,
+          retweets_count: 678,
+          replies_count: 345,
+          has_liked: true,
+          has_retweeted: true,
+          has_bookmarked: true
         }
       ];
       
@@ -216,185 +378,351 @@ export default function Feed() {
   }
 
   return (
-    <PageLayout 
-      className={isDark ? 'bg-black text-white' : 'bg-white text-black'}
-      maxWidth="2xl"
-      padding="none"
-    >
-      {/* X-Style Header */}
-      <div className={`sticky top-0 z-10 backdrop-blur-xl border-b ${
-        isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
-      }`}>
-        <div className="flex items-center justify-between px-4 py-3">
-          <div>
-            <h1 className="text-xl font-bold">Home</h1>
+    <div className={cn(
+      'min-h-screen w-full flex',
+      isDark ? 'bg-black text-white' : 'bg-white text-black'
+    )}>
+      {/* Main Content */}
+      <main className="flex-1 ml-80 max-w-2xl mx-auto">
+        {/* X-Style Header */}
+        <div className={`sticky top-0 z-10 backdrop-blur-xl border-b ${
+          isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
+        }`}>
+          <div className="flex items-center justify-between px-4 py-3">
+            <div>
+              {/* <h1 className="text-xl font-bold">Home</h1> */}
+            </div>
+            {/* <Button variant="ghost" size="sm" className="p-2">
+              <Sparkles className="h-5 w-5" />
+            </Button> */}
           </div>
-          <Button variant="ghost" size="sm" className="p-2">
-            <Sparkles className="h-5 w-5" />
+        </div>
+
+        {/* Create Post Section */}
+        <div className={`border-b p-4 ${isDark ? 'border-gray-800' : 'border-gray-200'}`}>
+          <div className="flex space-x-3">
+            <div className={`w-10 h-10 rounded-full ${isDark ? 'bg-gray-800' : 'bg-gray-200'} flex items-center justify-center`}>
+              <User className="h-5 w-5" />
+            </div>
+            <div className="flex-1">
+              <textarea
+                placeholder="Share your career journey..."
+                className={`w-full bg-transparent rounded-[100px]  text-xl placeholder-gray-500 placeholder:pl-[10px] placeholder:pt-[10px] resize-none border-2 outline-none ${
+                  isDark ? 'text-white' : 'text-black'
+                }`}
+                rows={3}
+              />
+              <div className="flex items-center justify-between mt-3 pt-3">
+                <div className="flex items-center space-x-4">
+                  <Button variant="ghost" size="sm" className="p-2">
+                    <ImageIcon className="h-5 w-5" />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="p-2">
+                    <FileText className="h-5 w-5" />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="p-2">
+                    <Calendar className="h-5 w-5" />
+                  </Button>
+                </div>
+                <Button className={`px-6 py-2 rounded-full font-semibold ${
+                  isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800'
+                }`}>
+                  Post
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Posts Feed */}
+        <div className="border-gray-800 border-[0.5px] divide-gray-800">
+          {posts.map((post) => (
+            <div 
+              key={post.id} 
+              className={`p-4 hover:bg-gray-50/5 transition-colors cursor-pointer border-[0.5px] ${
+                isDark ? 'divide-gray-800 hover:bg-gray-950/50' : 'border-gray-200 hover:bg-gray-50/50'
+              }`}
+              onClick={() => setSelectedPost(post)}
+            >
+              <div className="flex space-x-3">
+                <Link to={`/profile/${post.author.username}`} onClick={(e) => e.stopPropagation()}>
+                  <img
+                    src={post.author.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author.name)}&background=random`}
+                    alt={post.author.name}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                </Link>
+                
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center space-x-2 mb-1">
+                    <Link 
+                      to={`/profile/${post.author.username}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="font-bold hover:underline"
+                    >
+                      {post.author.name}
+                    </Link>
+                    {post.author.verified && (
+                      <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                    )}
+                    <span className={`text-gray-500`}>@{post.author.username}</span>
+                    <span className="text-gray-500">·</span>
+                    <span className="text-gray-500">{formatTime(post.created_at)}</span>
+                  </div>
+                  
+                  <p className="text-base leading-normal mb-3 whitespace-pre-wrap">
+                    {post.content}
+                  </p>
+                  
+                  {/* Post Actions */}
+                  <div className="flex items-center justify-between max-w-md">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/post/${post.id}`);
+                      }}
+                      className="flex items-center space-x-2 p-2 text-gray-500 hover:text-blue-500 hover:bg-blue-500/10 rounded-full group"
+                    >
+                      <MessageCircle className="h-5 w-5" />
+                      <span className="text-sm">{post.replies_count}</span>
+                    </Button>
+                    
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRetweet(post.id);
+                      }}
+                      className={`flex items-center space-x-2 p-2 rounded-full group ${
+                        post.has_retweeted
+                          ? 'text-green-500'
+                          : 'text-gray-500 hover:text-green-500 hover:bg-green-500/10'
+                      }`}
+                    >
+                      <Repeat2 className="h-5 w-5" />
+                      <span className="text-sm">{post.retweets_count}</span>
+                    </Button>
+                    
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleLike(post.id);
+                      }}
+                      className={`flex items-center space-x-2 p-2 rounded-full group ${
+                        post.has_liked
+                          ? 'text-red-500'
+                          : 'text-gray-500 hover:text-red-500 hover:bg-red-500/10'
+                      }`}
+                    >
+                      <Heart className={`h-5 w-5 ${post.has_liked ? 'fill-current' : ''}`} />
+                      <span className="text-sm">{post.likes_count}</span>
+                    </Button>
+                    
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center space-x-2 p-2 text-gray-500 hover:text-blue-500 hover:bg-blue-500/10 rounded-full group"
+                    >
+                      <Share className="h-5 w-5" />
+                    </Button>
+                  </div>
+                </div>
+                
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => e.stopPropagation()}
+                  className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-500/10 rounded-full"
+                >
+                  <MoreHorizontal className="h-5 w-5" />
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Loading More */}
+        <div className="p-8 text-center">
+          <Button
+            variant="ghost"
+            className="text-blue-500 hover:bg-blue-500/10"
+          >
+            Show more posts
           </Button>
         </div>
-      </div>
+      </main>
 
-      {/* Create Post Section */}
-      <div className={`border p-4 ${isDark ? 'border-gray-800' : 'border-gray-200'}`}>
-        <div className="flex space-x-3">
-          <div className={`w-10 h-10 rounded-full ${isDark ? 'bg-gray-800' : 'bg-gray-200'} flex items-center justify-center`}>
-            <User className="h-5 w-5" />
-          </div>
-          <div className="flex-1">
-            <textarea
-              placeholder="Share your career journey..."
-              className={`w-full bg-transparent rounded-[100px]  text-xl placeholder-gray-500 placeholder:pl-[10px] placeholder:pt-[10px] resize-none border-2 outline-none ${
-                isDark ? 'text-white' : 'text-black'
-              }`}
-              rows={3}
-            />
-            <div className="flex items-center justify-between mt-3 pt-3">
-              <div className="flex items-center space-x-4">
-                <Button variant="ghost" size="sm" className="p-2">
-                  <ImageIcon className="h-5 w-5" />
-                </Button>
-                <Button variant="ghost" size="sm" className="p-2">
-                  <FileText className="h-5 w-5" />
-                </Button>
-                <Button variant="ghost" size="sm" className="p-2">
-                  <Calendar className="h-5 w-5" />
-                </Button>
-              </div>
-              <Button className={`px-6 py-2 rounded-full font-semibold ${
-                isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800'
-              }`}>
-                Post
-              </Button>
+      {/* Right Sidebar */}
+      <aside className={cn(
+        'hidden xl:block w-80 border-l sticky top-0 h-screen mr-20 overflow-y-auto',
+        isDark ? 'border-gray-800' : 'border-gray-200'
+      )}>
+        <div className="p-4 space-y-6">
+          {/* Job Recommendations */}
+          <div className={cn(
+            'rounded-xl p-4 border',
+            isDark ? 'bg-black border-gray-800' : 'bg-gray-50 border-gray-200'
+          )}>
+            <h3 className="font-bold text-lg mb-4 flex items-center">
+              <Bookmark className="h-5 w-5 mr-2" />
+              Jobs For You
+            </h3>
+            <div className="space-y-4">
+              {[
+                {
+                  title: 'Frontend Developer',
+                  company: 'Google',
+                  location: 'Remote',
+                  salary: '$120k - $180k',
+                  logo: 'https://images.unsplash.com/photo-1573804633927-bfcbcd909acd?w=40&h=40&fit=crop&crop=center'
+                },
+                {
+                  title: 'Product Manager',
+                  company: 'Meta',
+                  location: 'San Francisco',
+                  salary: '$150k - $200k',
+                  logo: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=40&h=40&fit=crop&crop=center'
+                },
+                {
+                  title: 'Data Scientist',
+                  company: 'Netflix',
+                  location: 'Los Angeles',
+                  salary: '$140k - $190k',
+                  logo: 'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=40&h=40&fit=crop&crop=center'
+                }
+              ].map((job, index) => (
+                <div key={index} className={cn(
+                  'p-3 rounded-lg hover:bg-gray-800/30 cursor-pointer transition-colors',
+                  isDark ? 'hover:bg-gray-800/30' : 'hover:bg-gray-100'
+                )}>
+                  <div className="flex items-center space-x-3 mb-2">
+                    <img src={job.logo} alt={job.company} className="w-10 h-10 rounded-lg" />
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-sm">{job.title}</h4>
+                      <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                        {job.company} • {job.location}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-sm font-medium text-green-500">{job.salary}</p>
+                </div>
+              ))}
             </div>
+            <Button variant="ghost" className="w-full mt-4 text-blue-500">
+              View All Jobs
+            </Button>
+          </div>
+
+          {/* Who to Follow */}
+          <div className={cn(
+            'rounded-xl p-4 border',
+            isDark ? 'bg-black border-gray-800' : 'bg-gray-50 border-gray-200'
+          )}>
+            <h3 className="font-bold text-lg mb-4 flex items-center">
+              <Users className="h-5 w-5 mr-2" />
+              Who to Follow
+            </h3>
+            <div className="space-y-4">
+              {[
+                {
+                  name: 'Emily Chen',
+                  username: 'emilychen_dev',
+                  title: 'Senior Engineer at Apple',
+                  avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b278?w=40&h=40&fit=crop&crop=face',
+                  verified: true
+                },
+                {
+                  name: 'Marcus Johnson',
+                  username: 'marcusj_pm',
+                  title: 'Product Lead at Stripe',
+                  avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face',
+                  verified: false
+                },
+                {
+                  name: 'Tesla Careers',
+                  username: 'teslacareers',
+                  title: 'Official Tesla Recruiting',
+                  avatar: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=40&h=40&fit=crop&crop=center',
+                  verified: true
+                }
+              ].map((user, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <img src={user.avatar} alt={user.name} className="w-10 h-10 rounded-full" />
+                    <div>
+                      <div className="flex items-center space-x-1">
+                        <h4 className="font-semibold text-sm">{user.name}</h4>
+                        {user.verified && (
+                          <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                            <span className="text-white text-xs">✓</span>
+                          </div>
+                        )}
+                      </div>
+                      <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                        @{user.username}
+                      </p>
+                      <p className={cn('text-xs', isDark ? 'text-gray-500' : 'text-gray-500')}>
+                        {user.title}
+                      </p>
+                    </div>
+                  </div>
+                  <Button size="sm" className="rounded-full">
+                    Follow
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <Button variant="ghost" className="w-full mt-4 text-blue-500">
+              Show More
+            </Button>
+          </div>
+
+          {/* Recent Activity */}
+          <div className={cn(
+            'rounded-xl p-4 border',
+            isDark ? 'bg-black border-gray-800' : 'bg-gray-50 border-gray-200'
+          )}>
+            <h3 className="font-bold text-lg mb-4">Recent Activity</h3>
+            <div className="space-y-3">
+              {[
+                { action: 'New job posted', detail: 'Senior Developer at Spotify', time: '2h ago' },
+                { action: 'Event reminder', detail: 'Tech Networking Meetup', time: '4h ago' },
+                { action: 'Profile view', detail: '12 people viewed your profile', time: '6h ago' },
+                { action: 'Application update', detail: 'Your Netflix application is under review', time: '1d ago' }
+              ].map((activity, index) => (
+                <div key={index} className="text-sm">
+                  <p className="font-medium">{activity.action}</p>
+                  <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                    {activity.detail}
+                  </p>
+                  <p className={cn('text-xs', isDark ? 'text-gray-500' : 'text-gray-500')}>
+                    {activity.time}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Footer Links */}
+          <div className={cn('text-xs space-y-2', isDark ? 'text-gray-500' : 'text-gray-500')}>
+            <div className="flex flex-wrap gap-2">
+              <a href="/about" className="hover:underline">About</a>
+              <a href="/privacy" className="hover:underline">Privacy</a>
+              <a href="/terms" className="hover:underline">Terms</a>
+              <a href="/help" className="hover:underline">Help</a>
+            </div>
+            <p>© 2025 TalentLink. All rights reserved.</p>
           </div>
         </div>
-      </div>
-
-      {/* Posts Feed */}
-      <div className=" border-gray-800  border-[0.5px]  divide-gray-800 ">
-        {posts.map((post) => (
-          <div 
-            key={post.id} 
-            className={`p-4 hover:bg-gray-50/5 transition-colors cursor-pointer border-[0.5px] ${
-              isDark ? 'divide-gray-800 hover:bg-gray-950/50' : 'border-gray-200 hover:bg-gray-50/50'
-            }`}
-            onClick={() => setSelectedPost(post)}
-          >
-            <div className="flex space-x-3">
-              <Link to={`/profile/${post.author.username}`} onClick={(e) => e.stopPropagation()}>
-                <img
-                  src={post.author.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author.name)}&background=random`}
-                  alt={post.author.name}
-                  className="w-12 h-12 rounded-full object-cover"
-                />
-              </Link>
-              
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center space-x-2 mb-1">
-                  <Link 
-                    to={`/profile/${post.author.username}`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="font-bold hover:underline"
-                  >
-                    {post.author.name}
-                  </Link>
-                  {post.author.verified && (
-                    <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs">✓</span>
-                    </div>
-                  )}
-                  <span className={`text-gray-500`}>@{post.author.username}</span>
-                  <span className="text-gray-500">·</span>
-                  <span className="text-gray-500">{formatTime(post.created_at)}</span>
-                </div>
-                
-                <p className="text-base leading-normal mb-3 whitespace-pre-wrap">
-                  {post.content}
-                </p>
-                
-                {/* Post Actions */}
-                <div className="flex items-center justify-between max-w-md">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/post/${post.id}`);
-                    }}
-                    className="flex items-center space-x-2 p-2 text-gray-500 hover:text-blue-500 hover:bg-blue-500/10 rounded-full group"
-                  >
-                    <MessageCircle className="h-5 w-5" />
-                    <span className="text-sm">{post.replies_count}</span>
-                  </Button>
-                  
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRetweet(post.id);
-                    }}
-                    className={`flex items-center space-x-2 p-2 rounded-full group ${
-                      post.has_retweeted
-                        ? 'text-green-500'
-                        : 'text-gray-500 hover:text-green-500 hover:bg-green-500/10'
-                    }`}
-                  >
-                    <Repeat2 className="h-5 w-5" />
-                    <span className="text-sm">{post.retweets_count}</span>
-                  </Button>
-                  
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleLike(post.id);
-                    }}
-                    className={`flex items-center space-x-2 p-2 rounded-full group ${
-                      post.has_liked
-                        ? 'text-red-500'
-                        : 'text-gray-500 hover:text-red-500 hover:bg-red-500/10'
-                    }`}
-                  >
-                    <Heart className={`h-5 w-5 ${post.has_liked ? 'fill-current' : ''}`} />
-                    <span className="text-sm">{post.likes_count}</span>
-                  </Button>
-                  
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => e.stopPropagation()}
-                    className="flex items-center space-x-2 p-2 text-gray-500 hover:text-blue-500 hover:bg-blue-500/10 rounded-full group"
-                  >
-                    <Share className="h-5 w-5" />
-                  </Button>
-                </div>
-              </div>
-              
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => e.stopPropagation()}
-                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-500/10 rounded-full"
-              >
-                <MoreHorizontal className="h-5 w-5" />
-              </Button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Loading More */}
-      <div className="p-8 text-center">
-        <Button
-          variant="ghost"
-          className="text-blue-500 hover:bg-blue-500/10"
-        >
-          Show more posts
-        </Button>
-      </div>
-    </PageLayout>
+      </aside>
+    </div>
   );
 }
