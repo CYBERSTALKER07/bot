@@ -1,5 +1,14 @@
 {
   "appId": "com.aut.handshake",
-  "appName": "handshake",
-  "webDir": "dist"
+  "appName": "AUT Handshake",
+  "webDir": "dist",
+  "ios": {
+    "scheme": "App",
+    "path": "ios"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  }
 }
