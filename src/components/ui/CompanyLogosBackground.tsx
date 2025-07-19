@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useTheme } from '../../context/ThemeContext';
@@ -11,6 +11,20 @@ interface CompanyLogosBackgroundProps {
   enableAnimation?: boolean;
 }
 
+// Memoized company data for better performance
+const COMPANIES = [
+  { name: 'Google', logo: 'https://logo.clearbit.com/google.com', color: '#4285F4' },
+  { name: 'Apple', logo: 'https://logo.clearbit.com/apple.com', color: '#000000' },
+  { name: 'Microsoft', logo: 'https://logo.clearbit.com/microsoft.com', color: '#00A4EF' },
+  { name: 'Amazon', logo: 'https://logo.clearbit.com/amazon.com', color: '#FF9900' },
+  { name: 'Tesla', logo: 'https://logo.clearbit.com/tesla.com', color: '#CC0000' },
+  { name: 'Netflix', logo: 'https://logo.clearbit.com/netflix.com', color: '#E50914' },
+  { name: 'Meta', logo: 'https://logo.clearbit.com/meta.com', color: '#1877F2' },
+  { name: 'Spotify', logo: 'https://logo.clearbit.com/spotify.com', color: '#1DB954' },
+  { name: 'Airbnb', logo: 'https://logo.clearbit.com/airbnb.com', color: '#FF5A5F' },
+  { name: 'Uber', logo: 'https://logo.clearbit.com/uber.com', color: '#000000' },
+] as const;
+
 export default function CompanyLogosBackground({ 
   density = 'medium', 
   opacity = 0.08,
@@ -18,730 +32,179 @@ export default function CompanyLogosBackground({
 }: CompanyLogosBackgroundProps) {
   const { isDark } = useTheme();
   const containerRef = useRef<HTMLDivElement>(null);
-  const trendsRef = useRef<HTMLDivElement>(null);
+  const rafId = useRef<number>(0);
+  const isVisible = useRef<boolean>(false);
 
-  // Company data with real logos and authentic brand colors
-  const companies = [
-    // Tech Giants with real brand colors
-    { 
-      name: 'Google', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg', 
-      category: 'tech', 
-      color: '#4285F4',
-      bgColor: '#FFFFFF',
-      textColor: '#EA4335'
-    },
-    { 
-      name: 'Microsoft', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg', 
-      category: 'tech', 
-      color: '#00A4EF',
-      bgColor: '#FFFFFF',
-      textColor: '#737373'
-    },
-    { 
-      name: 'Apple', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg', 
-      category: 'tech', 
-      color: '#000000',
-      bgColor: '#FFFFFF',
-      textColor: '#1D1D1F'
-    },
-    { 
-      name: 'Meta', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg', 
-      category: 'tech', 
-      color: '#1877F2',
-      bgColor: '#FFFFFF',
-      textColor: '#1C2B33'
-    },
-    { 
-      name: 'Amazon', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg', 
-      category: 'tech', 
-      color: '#FF9900',
-      bgColor: '#FFFFFF',
-      textColor: '#232F3E'
-    },
-    { 
-      name: 'Netflix', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg', 
-      category: 'tech', 
-      color: '#E50914',
-      bgColor: '#000000',
-      textColor: '#FFFFFF'
-    },
-    { 
-      name: 'Tesla', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/b/bb/Tesla_T_symbol.svg', 
-      category: 'automotive', 
-      color: '#CC0000',
-      bgColor: '#000000',
-      textColor: '#FFFFFF'
-    },
-    { 
-      name: 'SpaceX', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/d/de/SpaceX-Logo.svg', 
-      category: 'aerospace', 
-      color: '#005288',
-      bgColor: '#000000',
-      textColor: '#FFFFFF'
-    },
-    { 
-      name: 'Airbnb', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/6/69/Airbnb_Logo_Bélo.svg', 
-      category: 'tech', 
-      color: '#FF5A5F',
-      bgColor: '#FFFFFF',
-      textColor: '#484848'
-    },
-    { 
-      name: 'Uber', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png', 
-      category: 'tech', 
-      color: '#000000',
-      bgColor: '#FFFFFF',
-      textColor: '#000000'
-    },
-    { 
-      name: 'Spotify', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg', 
-      category: 'tech', 
-      color: '#1DB954',
-      bgColor: '#191414',
-      textColor: '#FFFFFF'
-    },
-    { 
-      name: 'Adobe', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Adobe_Systems_logo_and_wordmark.svg', 
-      category: 'tech', 
-      color: '#FF0000',
-      bgColor: '#FFFFFF',
-      textColor: '#FA0F00'
-    },
-    { 
-      name: 'GitHub', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg', 
-      category: 'tech', 
-      color: '#181717',
-      bgColor: '#FFFFFF',
-      textColor: '#24292E'
-    },
-    { 
-      name: 'LinkedIn', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png', 
-      category: 'tech', 
-      color: '#0A66C2',
-      bgColor: '#FFFFFF',
-      textColor: '#000000'
-    },
+  // Memoized logo configuration based on density
+  const logoConfig = useMemo(() => {
+    const densityMap = { low: 8, medium: 12, high: 16 };
+    const count = densityMap[density];
     
-    // Finance with real brand colors
-    { 
-      name: 'Goldman Sachs', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/6/61/Goldman_Sachs.svg', 
-      category: 'finance', 
-      color: '#0073B2',
-      bgColor: '#FFFFFF',
-      textColor: '#0073B2'
-    },
-    { 
-      name: 'JPMorgan', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f1/JPMorgan_Chase_Logo_2008.svg', 
-      category: 'finance', 
-      color: '#003C71',
-      bgColor: '#FFFFFF',
-      textColor: '#003C71'
-    },
-    { 
-      name: 'PayPal', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg', 
-      category: 'finance', 
-      color: '#003087',
-      bgColor: '#FFFFFF',
-      textColor: '#009CDE'
-    },
-    { 
-      name: 'Visa', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg', 
-      category: 'finance', 
-      color: '#1A1F71',
-      bgColor: '#FFFFFF',
-      textColor: '#1A1F71'
-    },
-    { 
-      name: 'Mastercard', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/b/b7/MasterCard_Logo.svg', 
-      category: 'finance', 
-      color: '#EB001B',
-      bgColor: '#FFFFFF',
-      textColor: '#FF5F00'
-    },
-    
-    // Consulting & Professional Services
-    { 
-      name: 'Deloitte', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/1/15/Deloitte_Logo.svg', 
-      category: 'consulting', 
-      color: '#86BC25',
-      bgColor: '#FFFFFF',
-      textColor: '#000000'
-    },
-    { 
-      name: 'Accenture', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/c/cd/Accenture.svg', 
-      category: 'consulting', 
-      color: '#A100FF',
-      bgColor: '#FFFFFF',
-      textColor: '#A100FF'
-    },
-    { 
-      name: 'IBM', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg', 
-      category: 'tech', 
-      color: '#052FAD',
-      bgColor: '#FFFFFF',
-      textColor: '#1F70C1'
-    },
-    
-    // Consumer Brands with real colors
-    { 
-      name: 'Coca Cola', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/c/ce/Coca-Cola_logo.svg', 
-      category: 'consumer', 
-      color: '#F40009',
-      bgColor: '#FFFFFF',
-      textColor: '#F40009'
-    },
-    { 
-      name: 'Nike', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg', 
-      category: 'consumer', 
-      color: '#FF7500',
-      bgColor: '#FFFFFF',
-      textColor: '#111111'
-    },
-    { 
-      name: 'McDonald\'s', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/3/36/McDonald%27s_Golden_Arches.svg', 
-      category: 'consumer', 
-      color: '#FFC72C',
-      bgColor: '#DA020E',
-      textColor: '#FFFFFF'
-    },
-    { 
-      name: 'Starbucks', 
-      logo: 'https://upload.wikimedia.org/wikipedia/en/d/d3/Starbucks_Corporation_Logo_2011.svg', 
-      category: 'consumer', 
-      color: '#00704A',
-      bgColor: '#FFFFFF',
-      textColor: '#00704A'
-    },
-    
-    // Automotive with real colors
-    { 
-      name: 'Toyota', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7d/Toyota_Motor_Logo.svg', 
-      category: 'automotive', 
-      color: '#C8102E',
-      bgColor: '#FFFFFF',
-      textColor: '#C8102E'
-    },
-    { 
-      name: 'BMW', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/4/44/BMW.svg', 
-      category: 'automotive', 
-      color: '#1C69D4',
-      bgColor: '#FFFFFF',
-      textColor: '#000000'
-    },
-    { 
-      name: 'Mercedes', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/9/90/Mercedes-Logo.svg', 
-      category: 'automotive', 
-      color: '#A6A6A6',
-      bgColor: '#FFFFFF',
-      textColor: '#000000'
-    },
-    
-    // Media & Entertainment
-    { 
-      name: 'Disney', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/3/3e/Disney%2B_logo.svg', 
-      category: 'media', 
-      color: '#003B7F',
-      bgColor: '#11161D',
-      textColor: '#F9F9F9'
-    },
-    { 
-      name: 'YouTube', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/b/b8/YouTube_Logo_2017.svg', 
-      category: 'media', 
-      color: '#FF0000',
-      bgColor: '#FFFFFF',
-      textColor: '#282828'
-    },
-    
-    // Cloud & Infrastructure with real colors
-    { 
-      name: 'Oracle', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg', 
-      category: 'tech', 
-      color: '#F80000',
-      bgColor: '#FFFFFF',
-      textColor: '#C74634'
-    },
-    { 
-      name: 'Salesforce', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f9/Salesforce.com_logo.svg', 
-      category: 'tech', 
-      color: '#00A1E0',
-      bgColor: '#FFFFFF',
-      textColor: '#032D60'
-    },
-    
-    // Airlines & Travel
-    { 
-      name: 'Boeing', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/4/4f/Boeing_full_logo.svg', 
-      category: 'aerospace', 
-      color: '#0039A6',
-      bgColor: '#FFFFFF',
-      textColor: '#0039A6'
-    },
-    
-    // Semiconductor with real colors
-    { 
-      name: 'Intel', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7d/Intel_logo_%282006-2020%29.svg', 
-      category: 'tech', 
-      color: '#0071C5',
-      bgColor: '#FFFFFF',
-      textColor: '#0071C5'
-    },
-    { 
-      name: 'NVIDIA', 
-      logo: 'https://upload.wikimedia.org/wikipedia/en/2/21/Nvidia_logo.svg', 
-      category: 'tech', 
-      color: '#76B900',
-      bgColor: '#000000',
-      textColor: '#76B900'
-    },
-    { 
-      name: 'AMD', 
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7c/AMD_Logo.svg', 
-      category: 'tech', 
-      color: '#ED1C24',
-      bgColor: '#FFFFFF',
-      textColor: '#000000'
-    }
-  ];
-
-  // Get number of logos based on density
-  const getLogoCount = () => {
-    switch (density) {
-      case 'low': return 20;
-      case 'medium': return 30;
-      case 'high': return 45;
-      default: return 30;
-    }
-  };
-
-  // Generate random positions for logos
-  const generateLogos = () => {
-    const logoCount = getLogoCount();
-    const logos = [];
-    
-    for (let i = 0; i < logoCount; i++) {
-      const company = companies[Math.floor(Math.random() * companies.length)];
-      const size = Math.random() * 50 + 30; // 30px to 80px for better visibility
-      const x = Math.random() * 100; // 0% to 100%
-      const y = Math.random() * 100; // 0% to 100%
-      const rotation = Math.random() * 360;
-      
-      logos.push({
+    return Array.from({ length: count }, (_, i) => {
+      const company = COMPANIES[i % COMPANIES.length];
+      return {
         ...company,
         id: `logo-${i}`,
-        size,
-        x,
-        y,
-        rotation,
-        animationDelay: Math.random() * 10
-      });
-    }
+        size: Math.random() * 20 + 40, // 40-60px
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        rotation: Math.random() * 360,
+        animationDelay: Math.random() * 5,
+        speed: Math.random() * 0.5 + 0.3, // 0.3-0.8
+      };
+    });
+  }, [density]);
+
+  // Optimized scroll handler with throttling
+  const handleScroll = useCallback(() => {
+    if (!containerRef.current || !isVisible.current) return;
+
+    const scrollY = window.scrollY;
+    const logos = containerRef.current.querySelectorAll('.floating-logo');
     
-    return logos;
-  };
+    // Batch DOM updates for better performance
+    gsap.set(logos, {
+      y: (i: number) => `${scrollY * logoConfig[i]?.speed || 0.5 * -0.3}px`,
+      ease: 'none'
+    });
+  }, [logoConfig]);
 
-  const [logos] = React.useState(generateLogos());
-
+  // Intersection observer for performance optimization
   useEffect(() => {
-    if (!enableAnimation || !containerRef.current) return;
+    if (!containerRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible.current = entry.isIntersecting;
+        
+        if (entry.isIntersecting && enableAnimation) {
+          // Start animations only when visible
+          const animate = () => {
+            handleScroll();
+            rafId.current = requestAnimationFrame(animate);
+          };
+          animate();
+        } else {
+          // Stop animations when not visible
+          if (rafId.current) {
+            cancelAnimationFrame(rafId.current);
+          }
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(containerRef.current);
+
+    return () => {
+      observer.disconnect();
+      if (rafId.current) {
+        cancelAnimationFrame(rafId.current);
+      }
+    };
+  }, [enableAnimation, handleScroll]);
+
+  // Optimized entrance animation
+  useEffect(() => {
+    if (!containerRef.current || !enableAnimation) return;
 
     const ctx = gsap.context(() => {
-      // Store initial positions and create animation data for each logo
-      const logoData = logos.map((logo, index) => {
-        const element = containerRef.current?.querySelector(`#${logo.id}`);
-        if (!element) return null;
-        
-        return {
-          element,
-          initialY: logo.y,
-          initialX: logo.x,
-          initialRotation: logo.rotation,
-          speed: (index % 5 + 1) * 0.3, // Varied upward movement speeds
-          floatRange: Math.random() * 20 + 10,
-          rotationRange: Math.random() * 60 - 30,
-          scaleRange: Math.random() * 0.3 + 0.8, // 0.8 to 1.1
-          horizontalDrift: Math.random() * 50 - 25 // -25 to 25px drift
-        };
-      }).filter(Boolean);
-
-      // Continuous upward floating animation for each logo
-      logoData.forEach((data, index) => {
-        if (!data) return;
-
-        // Main upward floating animation - logos move up continuously
-        gsap.to(data.element, {
-          y: `-=${data.floatRange}`,
-          x: `+=${data.horizontalDrift}`,
-          rotation: `+=${data.rotationRange}`,
-          duration: Math.random() * 8 + 12, // 12-20 seconds for natural movement
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-          delay: logos[index].animationDelay
-        });
-// Trends section with slide animation
-gsap.fromTo('.trend-item', {
-  opacity: 0,
-  x: -50,
-  scale: 0.9
-}, {
-  opacity: 1,
-  x: 0,
-  scale: 1,
-  duration: 0.8,
-  ease: 'power2.out',
-  stagger: 0.1,
-  scrollTrigger: {
-    trigger: trendsRef.current,
-    start: 'top 80%',   
-    toggleActions: 'play none none reverse'
-  } 
-});
-        // Independent scale pulsing
-        gsap.to(data.element, {
-          scale: data.scaleRange,
-          duration: Math.random() * 6 + 8, // 8-14 seconds
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-          delay: logos[index].animationDelay * 0.5
-        });
-
-        // Subtle opacity breathing
-        gsap.to(data.element, {
-          opacity: `+=${Math.random() * 0.2 + 0.1}`, // Vary opacity by 0.1-0.3
-          duration: Math.random() * 6 + 8,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-          delay: logos[index].animationDelay * 1.2
-        });
-      });
-
-      // Enhanced scroll-based upward movement animations
-      let previousProgress = 0;
-      let scrollVelocity = 0;
-      let velocityHistory = [];
-      const maxVelocityHistory = 8; // More history for smoother response
+      const logos = gsap.utils.toArray('.floating-logo');
       
-      ScrollTrigger.create({
-        trigger: containerRef.current,
-        start: 'top bottom',
-        end: 'bottom top',
-        scrub: 3, // Much slower response to scroll (increased from 0.3)
-        onUpdate: (self) => {
-          const progress = self.progress;
-          const currentVelocity = Math.abs(progress - previousProgress);
-          
-          // Track velocity history for smoother animations
-          velocityHistory.push(currentVelocity);
-          if (velocityHistory.length > maxVelocityHistory) {
-            velocityHistory.shift();
-          }
-          
-          // Calculate average velocity for smoother responses
-          const avgVelocity = velocityHistory.reduce((a, b) => a + b, 0) / velocityHistory.length;
-          const direction = progress > previousProgress ? 1 : -1;
-          
-          scrollVelocity = avgVelocity;
-          
-          logoData.forEach((data, index) => {
-            if (!data) return;
-            
-            // Much slower upward movement based on scroll
-            const baseUpwardMovement = progress * data.speed * 60; // Reduced from 300
-            const velocityBoost = avgVelocity * direction * 20; // Reduced from 150
-            const finalY = -(baseUpwardMovement + velocityBoost);
-            
-            // Much slower dynamic rotation
-            const upwardRotation = progress * 10 + (direction * avgVelocity * 15);
-            
-            // More subtle scale changes
-            const heightScale = Math.max(0.85, 1 - (progress * 0.1));
-            const velocityScale = Math.max(0.95, 1 - (avgVelocity * 0.2));
-            const finalScale = heightScale * velocityScale;
-            
-            // Smaller horizontal drift
-            const horizontalOffset = Math.sin(progress * Math.PI * 1.5 + index) * 10;
-            
-            // More gradual fade out
-            const fadeOpacity = Math.max(0.3, opacity * (1 - progress * 0.4));
-            
-            gsap.to(data.element, {
-              y: finalY,
-              x: horizontalOffset,
-              rotation: upwardRotation,
-              scale: finalScale,
-              opacity: fadeOpacity,
-              duration: 1.5, // Slower response time
-              ease: 'power1.out',
-              overwrite: 'auto'
-            });
-            
-            // Much more gradual disappearing effect
-            if (progress > 0.9) {
-              const disappearProgress = (progress - 0.9) / 0.1;
-              gsap.to(data.element, {
-                opacity: opacity * (1 - disappearProgress * 0.5),
-                scale: finalScale * (1 - disappearProgress * 0.2),
-                filter: `blur(${disappearProgress * 1}px)`,
-                duration: 1.0,
-                ease: 'power1.out'
-              });
-            }
-          });
-          
-          previousProgress = progress;
-        },
-        
-        onEnter: () => {
-          // Logos appear from bottom with staggered entrance
-          logoData.forEach((data, index) => {
-            if (!data) return;
-            gsap.fromTo(data.element, 
-              { 
-                opacity: 0, 
-                scale: 0.3,
-                rotation: -90,
-                y: 200 // Start from bottom
-              },
-              { 
-                opacity: opacity, 
-                scale: 1, 
-                rotation: data.initialRotation,
-                y: 0,
-                duration: 1.5, 
-                delay: index * 0.06,
-                ease: 'back.out(1.4)'
-              }
-            );
-          });
-        },
-        
-        onLeave: () => {
-          // Logos disappear upward when leaving viewport
-          logoData.forEach((data, index) => {
-            if (!data) return;
-            gsap.to(data.element, {
-              opacity: 0,
-              scale: 0.3,
-              rotation: `+=${90}`,
-              y: -300, // Exit upward
-              duration: 1.0,
-              delay: index * 0.02,
-              ease: 'power2.in'
-            });
-          });
-        },
-        
-        onEnterBack: () => {
-          // Re-entrance from top when scrolling back
-          logoData.forEach((data, index) => {
-            if (!data) return;
-            gsap.fromTo(data.element,
-              { 
-                opacity: 0, 
-                scale: 0.4,
-                rotation: 180,
-                y: -200 // Come from top
-              },
-              { 
-                opacity: opacity, 
-                scale: 1, 
-                rotation: data.initialRotation,
-                y: 0,
-                duration: 1.2, 
-                delay: index * 0.04,
-                ease: 'elastic.out(1, 0.6)'
-              }
-            );
-          });
-        },
-        
-        onLeaveBack: () => {
-          // Exit downward when scrolling back up past the trigger
-          logoData.forEach((data, index) => {
-            if (!data) return;
-            gsap.to(data.element, {
-              opacity: 0,
-              scale: 0.2,
-              rotation: `-=${120}`,
-              y: 300, // Exit downward
-              duration: 0.8,
-              delay: index * 0.015,
-              ease: 'power2.in'
-            });
-          });
+      // Simple entrance animation without complex scroll triggers
+      gsap.fromTo(logos, {
+        opacity: 0,
+        scale: 0,
+        rotation: 180
+      }, {
+        opacity: opacity,
+        scale: 1,
+        rotation: 0,
+        duration: 1.5,
+        ease: 'power2.out',
+        stagger: {
+          amount: 2,
+          from: 'random'
         }
       });
 
-      // Additional continuous upward movement effect
-      ScrollTrigger.create({
-        trigger: containerRef.current,
-        start: 'top bottom',
-        end: 'bottom top',
-        onUpdate: () => {
-          // Create ripple effect based on scroll velocity for upward movement
-          if (scrollVelocity > 0.015) {
-            logoData.forEach((data, index) => {
-              if (!data || Math.random() > 0.25) return; // Only affect 25% of logos randomly
-              
-              gsap.to(data.element, {
-                y: `-=${scrollVelocity * 100}`, // Additional upward boost
-                scale: `+=${scrollVelocity * 1.5}`,
-                duration: 0.4,
-                yoyo: true,
-                repeat: 1,
-                ease: 'power2.out'
-              });
-            });
-          }
+      // Simplified floating animation
+      gsap.to(logos, {
+        y: '+=15',
+        x: '+=8',
+        rotation: '+=360',
+        duration: 20,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        stagger: {
+          amount: 5,
+          from: 'random'
         }
       });
-
-      // Continuous logo regeneration effect for seamless upward flow
-      const logoRegenerationInterval = setInterval(() => {
-        logoData.forEach((data, index) => {
-          if (!data || Math.random() > 0.05) return; // 5% chance per cycle
-          
-          // Reset logos that have moved too far up
-          const currentY = gsap.getProperty(data.element, "y") as number;
-          if (currentY < -400) {
-            gsap.set(data.element, {
-              y: window.innerHeight + 100,
-              opacity: 0,
-              scale: 0.3
-            });
-            
-            // Animate back in from bottom
-            gsap.to(data.element, {
-              y: data.initialY,
-              opacity: opacity,
-              scale: 1,
-              duration: 1.5,
-              delay: Math.random() * 2,
-              ease: 'power2.out'
-            });
-          }
-        });
-      }, 2000); // Check every 2 seconds
-
-      // Cleanup interval on component unmount
-      return () => {
-        clearInterval(logoRegenerationInterval);
-      };
 
     }, containerRef);
 
     return () => ctx.revert();
-  }, [logos, enableAnimation, opacity]);
+  }, [opacity, enableAnimation]);
 
-  const BackgroundLogo = ({ logo }: { logo: any }) => (
-    <div
-      id={logo.id}
-      className="absolute pointer-events-none transition-opacity duration-500"
-      style={{
-        left: `${logo.x}%`,
-        top: `${logo.y}%`,
-        width: `${logo.size}px`,
-        height: `${logo.size}px`,
-        transform: `rotate(${logo.rotation}deg)`,
-        opacity: opacity
-      }}
-    >
+  if (!enableAnimation) {
+    return (
       <div 
-        className="w-full h-full rounded-2xl flex items-center justify-center p-3 relative overflow-hidden shadow-lg"
-        style={{
-          background: `linear-gradient(135deg, ${logo.bgColor}E6, ${logo.color}33)`,
-          border: `2px solid ${logo.color}66`,
-          backdropFilter: 'blur(4px)',
-        }}
+        ref={containerRef}
+        className="fixed inset-0 pointer-events-none z-0 overflow-hidden"
+        style={{ opacity }}
       >
-        <img 
-          src={logo.logo} 
-          alt={logo.name}
-          className="w-full h-full object-contain relative z-10"
-          style={{
-            filter: isDark 
-              ? `brightness(1.1) contrast(1.4) saturate(1.2) drop-shadow(0 0 8px ${logo.color}80)` 
-              : `brightness(1.0) contrast(1.2) saturate(1.1) drop-shadow(0 0 6px ${logo.color}60)`,
-            maxWidth: '100%',
-            maxHeight: '100%',
-            opacity: 1
-          }}
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            const parent = target.parentElement;
-            if (parent) {
-              parent.innerHTML = `
-                <div class="w-full h-full flex items-center justify-center text-sm font-bold rounded-xl" 
-                     style="background: ${logo.color}40; color: ${logo.color}; border: 2px solid ${logo.color}80; opacity: 1;">
-                  ${logo.name.split(' ').map((word: string) => word.charAt(0)).join('')}
-                </div>
-              `;
-            }
-          }}
-        />
-        {/* Enhanced brand color overlay */}
-        <div 
-          className="absolute inset-0 rounded-2xl mix-blend-soft-light opacity-30 pointer-events-none"
-          style={{ 
-            background: `linear-gradient(45deg, ${logo.color}40, ${logo.bgColor}20)`,
-          }}
-        />
-        {/* Stronger brand accent border */}
-        <div 
-          className="absolute inset-0 rounded-2xl border opacity-60 pointer-events-none"
-          style={{ 
-            borderColor: logo.color,
-            borderWidth: '2px'
-          }}
-        />
+        {logoConfig.map((logo) => (
+          <div
+            key={logo.id}
+            className="absolute w-12 h-12 bg-white/90 backdrop-blur-sm border border-gray-200/30 shadow-sm rounded-lg flex items-center justify-center"
+            style={{
+              left: `${logo.x}%`,
+              top: `${logo.y}%`,
+              transform: `rotate(${logo.rotation}deg)`,
+            }}
+          >
+            <img
+              src={logo.logo}
+              alt={logo.name}
+              className="w-8 h-8 object-contain"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        ))}
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
     <div 
       ref={containerRef}
-      className="absolute inset-0 pointer-events-none "
-    //   aria-hidden="true"
+      className="fixed inset-0 pointer-events-none z-0 overflow-hidden"
+      style={{ opacity }}
     >
-      {logos.map((logo) => (
-        <BackgroundLogo key={logo.id} logo={logo} />
+      {logoConfig.map((logo) => (
+        <div
+          key={logo.id}
+          id={logo.id}
+          className="floating-logo absolute bg-white/90 backdrop-blur-sm border border-gray-200/30 shadow-sm rounded-lg flex items-center justify-center will-change-transform"
+          style={{
+            width: `${logo.size}px`,
+            height: `${logo.size}px`,
+            left: `${logo.x}%`,
+            top: `${logo.y}%`,
+          }}
+        >
+          <img
+            src={logo.logo}
+            alt={logo.name}
+            className="w-8 h-8 object-contain"
+            loading="lazy"
+            decoding="async"
+
+          />
+        </div>
       ))}
     </div>
   );

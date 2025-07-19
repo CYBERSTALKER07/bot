@@ -39,11 +39,49 @@ interface NavigationItem {
   group?: string;
 }
 
+// Public routes that shouldn't show the sidebar
+const PUBLIC_ROUTES = [
+  '/',
+  '/login', 
+  '/register',
+  '/mobile-app',
+  '/for-students', 
+  '/for-employers',
+  '/career-tips',
+  '/whos-hiring'
+];
+
+// Semi-public routes that can be accessed without login but might show minimal nav
+const SEMI_PUBLIC_ROUTES = [
+  '/companies',
+  '/company',
+  '/events',
+  '/event',
+  '/resources',
+  '/resource',
+  '/job'
+];
+
 export default function Navigation() {
   const { user, logout } = useAuth();
   const { isDark } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
+  
+  // Check if current route is public
+  const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname) || 
+    SEMI_PUBLIC_ROUTES.some(route => location.pathname.startsWith(route));
+  
+  // Don't render navigation on public routes when user is not authenticated
+  if (isPublicRoute && !user) {
+    return null;
+  }
+  
+  // Don't render navigation if user is not authenticated
+  if (!user) {
+    return null;
+  }
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
@@ -92,11 +130,12 @@ export default function Navigation() {
     if (user?.role === 'student') {
       return [
         { icon: Rss, label: 'Feed', path: '/feed', group: 'main' },
-        { icon: BarChart3, label: 'Dashboard', path: '/job-search', group: 'main' },
+        { icon: BarChart3, label: 'Dashboard', path: '/dashboard', group: 'main' },
         { icon: Search, label: 'Find Jobs', path: '/jobs', group: 'jobs' },
         { icon: Building2, label: 'Companies', path: '/companies', group: 'jobs' },
-        { icon: FileText, label: 'Learning Passport', path: '/digital-learning-passport', group: 'learning' },
-        { icon: BarChart3, label: 'Skills Audit', path: '/skills-audit-system', group: 'learning' },
+        { icon: FileText, label: 'Applications', path: '/applications', group: 'jobs' },
+        { icon: FileText, label: 'Learning Passport', path: '/digital-passport', group: 'learning' },
+        { icon: BarChart3, label: 'Skills Audit', path: '/skills-audit', group: 'learning' },
         { icon: MessageSquare, label: 'Messages', path: '/messages', badge: unreadCount, group: 'communication' },
         { icon: Calendar, label: 'Events', path: '/events', group: 'communication' },
         { icon: BookOpen, label: 'Resources', path: '/resources', group: 'learning' },
@@ -105,14 +144,14 @@ export default function Navigation() {
         { icon: BookOpen, label: 'Career Tips', path: '/career-tips', group: 'learning' },
         { icon: Users, label: 'Who\'s Hiring', path: '/whos-hiring', group: 'jobs' },
         { icon: GraduationCap, label: 'For Students', path: '/for-students', group: 'tools' },
-        // { icon: Smartphone, label: 'Mobile App', path: '/mobile-app', group: 'tools' },
+        { icon: Smartphone, label: 'Mobile App', path: '/mobile-app', group: 'tools' },
       ];
     }
 
     if (user?.role === 'employer') {
       return [
         { icon: Rss, label: 'Feed', path: '/feed', group: 'main' },
-        { icon: BarChart3, label: 'Dashboard', path: '/employer-dashboard', group: 'main' },
+        { icon: BarChart3, label: 'Dashboard', path: '/dashboard', group: 'main' },
         { icon: Briefcase, label: 'Post Jobs', path: '/post-job', group: 'jobs' },
         { icon: Users, label: 'Applicants', path: '/applicants', group: 'jobs' },
         { icon: Building2, label: 'Companies', path: '/companies', group: 'jobs' },
@@ -122,7 +161,7 @@ export default function Navigation() {
         // Add new mobile-accessible pages
         { icon: Building2, label: 'For Employers', path: '/for-employers', group: 'tools' },
         { icon: BookOpen, label: 'Career Tips', path: '/career-tips', group: 'learning' },
-        // { icon: Smartphone, label: 'Mobile App', path: '/mobile-app', group: 'tools' },
+        { icon: Smartphone, label: 'Mobile App', path: '/mobile-app', group: 'tools' },
       ];
     }
 

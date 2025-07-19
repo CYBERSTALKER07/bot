@@ -1,53 +1,66 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Navigation from './components/Navigation';
-import LandingPage from './components/LandingPage';
-import Login from './components/Auth/Login';
-import Register from './components/Auth/Register';
-import ProfileSetup from './components/Profile/ProfileSetup';
-import Profile from './components/Profile/Profile';
-import StudentDashboard from './components/Dashboard/StudentDashboard';
-import EmployerDashboard from './components/Dashboard/EmployerDashboard';
-import JobDetails from './components/JobDetails';
-import Messages from './components/Messages';
-import Applications from './components/Applications';
-import Applicants from './components/Applicants';
-import PostJob from './components/PostJob';
-import Events from './components/Events';
-import EventDetails from './components/EventDetails';
-import ResourceCenter from './components/ResourceCenter';
-import ResourceDetails from './components/ResourceDetails';
-import AdminDashboard from './components/Dashboard/AdminDashboard';
-import SplashScreen from './components/SplashScreen';
 import { Loader2 } from 'lucide-react';
-import MobileAppPage from './components/MobileAppPage';
-import ForStudentsPage from './components/ForStudentsPage';
-import ForEmployersPage from './components/ForEmployersPage';
-import CareerTipsPage from './components/CareerTipsPage';
-import WhosHiringPage from './components/WhosHiringPage';
-import DigitalLearningPassport from './components/DigitalLearningPassport';
-import SkillsAuditSystem from './components/SkillsAuditSystem';
-import Feed from './components/Feed';
-import PostDetails from './components/PostDetails';
-import CompaniesPage from './components/CompaniesPage';
-import CompanyProfile from './components/CompanyProfile';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToastProvider } from './components/ui/Toast';
+import PerformanceMonitor from './components/ui/PerformanceMonitor';
+
+// Lazy load components for better performance
+const LandingPage = lazy(() => import('./components/LandingPage'));
+const Login = lazy(() => import('./components/Auth/Login'));
+const Register = lazy(() => import('./components/Auth/Register'));
+const ProfileSetup = lazy(() => import('./components/Profile/ProfileSetup'));
+const Profile = lazy(() => import('./components/Profile/Profile'));
+const StudentDashboard = lazy(() => import('./components/Dashboard/StudentDashboard'));
+const EmployerDashboard = lazy(() => import('./components/Dashboard/EmployerDashboard'));
+const AdminDashboard = lazy(() => import('./components/Dashboard/AdminDashboard'));
+const JobDetails = lazy(() => import('./components/JobDetails'));
+const Messages = lazy(() => import('./components/Messages'));
+const Applications = lazy(() => import('./components/Applications'));
+const Applicants = lazy(() => import('./components/Applicants'));
+const PostJob = lazy(() => import('./components/PostJob'));
+const Events = lazy(() => import('./components/Events'));
+const EventDetails = lazy(() => import('./components/EventDetails'));
+const ResourceCenter = lazy(() => import('./components/ResourceCenter'));
+const ResourceDetails = lazy(() => import('./components/ResourceDetails'));
+const SplashScreen = lazy(() => import('./components/SplashScreen'));
+const MobileAppPage = lazy(() => import('./components/MobileAppPage'));
+const ForStudentsPage = lazy(() => import('./components/ForStudentsPage'));
+const ForEmployersPage = lazy(() => import('./components/ForEmployersPage'));
+const CareerTipsPage = lazy(() => import('./components/CareerTipsPage'));
+const WhosHiringPage = lazy(() => import('./components/WhosHiringPage'));
+const DigitalLearningPassport = lazy(() => import('./components/DigitalLearningPassport'));
+const SkillsAuditSystem = lazy(() => import('./components/SkillsAuditSystem'));
+const Feed = lazy(() => import('./components/Feed'));
+const PostDetails = lazy(() => import('./components/PostDetails'));
+const CompaniesPage = lazy(() => import('./components/CompaniesPage'));
+const CompanyProfile = lazy(() => import('./components/CompanyProfile'));
+
+// Optimized loading component with better UX
+function LoadingFallback({ message = 'Loading...' }: { message?: string }) {
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-dark-bg flex items-center justify-center transition-colors duration-300">
+      <div className="flex flex-col items-center space-y-4">
+        <Loader2 className="h-8 w-8 animate-spin text-asu-maroon dark:text-lime" />
+        <span className="text-gray-600 dark:text-dark-muted text-sm font-medium">{message}</span>
+      </div>
+    </div>
+  );
+}
 
 // ScrollToTop component to handle automatic scrolling on route changes
 function ScrollToTop() {
-  const location = useLocation();
-
+  const { pathname } = useLocation();
+  
   useEffect(() => {
-    // Scroll to top whenever the pathname changes
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'smooth'
-    });
-  }, [location.pathname]);
+    // Only scroll to top if not navigating to an anchor
+    if (!pathname.includes('#')) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
+  }, [pathname]);
 
   return null;
 }
@@ -56,42 +69,41 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-dark-bg flex items-center justify-center transition-colors duration-300">
-        <div className="flex items-center space-x-2">
-          <Loader2 className="h-6 w-6 animate-spin text-asu-maroon dark:text-lime" />
-          <span className="text-gray-600 dark:text-dark-muted">Loading...</span>
-        </div>
-      </div>
-    );
+    return <LoadingFallback message="Authenticating..." />;
   }
   
-  return user ? <>{children}</> : <Navigate to="/login" />;
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return <>{children}</>;
 }
 
 function DashboardRouter() {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-dark-bg flex items-center justify-center transition-colors duration-300">
-        <div className="flex items-center space-x-2">
-          <Loader2 className="h-6 w-6 animate-spin text-asu-maroon dark:text-lime" />
-          <span className="text-gray-600 dark:text-dark-muted">Loading...</span>
-        </div>
-      </div>
-    );
+  if (!user) return <Navigate to="/login" replace />;
+  
+  switch (user.user_metadata?.role || 'student') {
+    case 'admin':
+      return (
+        <Suspense fallback={<LoadingFallback message="Loading dashboard..." />}>
+          <AdminDashboard />
+        </Suspense>
+      );
+    case 'employer':
+      return (
+        <Suspense fallback={<LoadingFallback message="Loading dashboard..." />}>
+          <EmployerDashboard />
+        </Suspense>
+      );
+    default:
+      return (
+        <Suspense fallback={<LoadingFallback message="Loading dashboard..." />}>
+          <StudentDashboard />
+        </Suspense>
+      );
   }
-  
-  if (!user) return <Navigate to="/login" />;
-  
-  // Check if user is admin and redirect to admin dashboard
-  if (user.role === 'admin') {
-    return <Navigate to="/admin" />;
-  }
-  
-  // Always redirect to Feed as the main page
-  return <Navigate to="/feed" />;
 }
 
 function AppContent() {
@@ -107,93 +119,210 @@ function AppContent() {
     sessionStorage.setItem('aut-handshake-splash-seen', 'true');
   };
 
-  if (showSplash) {
-    return <SplashScreen onComplete={handleSplashComplete} />;
-  }
+  // Performance issue handler
+  const handlePerformanceIssue = (fps: number) => {
+    console.warn(`Performance issue detected: ${fps} FPS. Reducing animation complexity.`);
+    
+    // You could also send analytics here
+    if (window.gtag) {
+      window.gtag('event', 'performance_issue', {
+        fps: fps,
+        timestamp: Date.now()
+      });
+    }
+  };
 
-  if (loading) {
+  if (showSplash) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-dark-bg flex items-center justify-center transition-colors duration-300">
-        <div className="flex items-center space-x-2">
-          <Loader2 className="h-6 w-6 animate-spin text-asu-maroon dark:text-lime" />
-          <span className="text-gray-600 dark:text-dark-muted">Loading...</span>
-        </div>
-      </div>
+      <Suspense fallback={<LoadingFallback message="Initializing..." />}>
+        <SplashScreen onComplete={handleSplashComplete} />
+      </Suspense>
     );
   }
 
+  if (loading) {
+    return <LoadingFallback message="Loading application..." />;
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-bg transition-colors duration-300">
-      {user && <Navigation />}
-      <ScrollToTop />
-      <Routes>
-        <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+    <div className="App">
+      <Router>
+        <ScrollToTop />
+        <Navigation />
+        <main className="min-h-screen">
+          <Routes>
+            {/* Public routes with lazy loading */}
+            <Route path="/" element={
+              <Suspense fallback={<LoadingFallback message="Loading homepage..." />}>
+                <LandingPage />
+              </Suspense>
+            } />
+            <Route path="/login" element={
+              <Suspense fallback={<LoadingFallback message="Loading login..." />}>
+                <Login />
+              </Suspense>
+            } />
+            <Route path="/register" element={
+              <Suspense fallback={<LoadingFallback message="Loading registration..." />}>
+                <Register />
+              </Suspense>
+            } />
+            <Route path="/mobile-app" element={
+              <Suspense fallback={<LoadingFallback message="Loading mobile app info..." />}>
+                <MobileAppPage />
+              </Suspense>
+            } />
+            <Route path="/for-students" element={
+              <Suspense fallback={<LoadingFallback message="Loading student resources..." />}>
+                <ForStudentsPage />
+              </Suspense>
+            } />
+            <Route path="/for-employers" element={
+              <Suspense fallback={<LoadingFallback message="Loading employer resources..." />}>
+                <ForEmployersPage />
+              </Suspense>
+            } />
+            <Route path="/career-tips" element={
+              <Suspense fallback={<LoadingFallback message="Loading career tips..." />}>
+                <CareerTipsPage />
+              </Suspense>
+            } />
+            <Route path="/whos-hiring" element={
+              <Suspense fallback={<LoadingFallback message="Loading hiring info..." />}>
+                <WhosHiringPage />
+              </Suspense>
+            } />
+            <Route path="/companies" element={
+              <Suspense fallback={<LoadingFallback message="Loading companies..." />}>
+                <CompaniesPage />
+              </Suspense>
+            } />
+            <Route path="/company/:companyId" element={
+              <Suspense fallback={<LoadingFallback message="Loading company profile..." />}>
+                <CompanyProfile />
+              </Suspense>
+            } />
+
+            {/* Protected routes with lazy loading */}
+            <Route path="/dashboard" element={<DashboardRouter />} />
+            <Route path="/profile-setup" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading profile setup..." />}>
+                  <ProfileSetup />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading profile..." />}>
+                  <Profile />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/job/:jobId" element={
+              <Suspense fallback={<LoadingFallback message="Loading job details..." />}>
+                <JobDetails />
+              </Suspense>
+            } />
+            <Route path="/messages" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading messages..." />}>
+                  <Messages />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/applications" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading applications..." />}>
+                  <Applications />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/applicants" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading applicants..." />}>
+                  <Applicants />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/post-job" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading job posting..." />}>
+                  <PostJob />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/events" element={
+              <Suspense fallback={<LoadingFallback message="Loading events..." />}>
+                <Events />
+              </Suspense>
+            } />
+            <Route path="/event/:eventId" element={
+              <Suspense fallback={<LoadingFallback message="Loading event details..." />}>
+                <EventDetails />
+              </Suspense>
+            } />
+            <Route path="/resources" element={
+              <Suspense fallback={<LoadingFallback message="Loading resources..." />}>
+                <ResourceCenter />
+              </Suspense>
+            } />
+            <Route path="/resource/:resourceId" element={
+              <Suspense fallback={<LoadingFallback message="Loading resource details..." />}>
+                <ResourceDetails />
+              </Suspense>
+            } />
+            <Route path="/digital-passport" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading digital passport..." />}>
+                  <DigitalLearningPassport />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/skills-audit" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading skills audit..." />}>
+                  <SkillsAuditSystem />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/feed" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading feed..." />}>
+                  <Feed />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/post/:postId" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading post details..." />}>
+                  <PostDetails />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+          </Routes>
+        </main>
         
-        {/* Public Routes */}
-        <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage />} />
-        <Route path="/mobile-app" element={<MobileAppPage />} />
-        <Route path="/for-students" element={<ForStudentsPage />} />
-        <Route path="/for-employers" element={<ForEmployersPage />} />
-        <Route path="/career-tips" element={<CareerTipsPage />} />
-        <Route path="/whos-hiring" element={<WhosHiringPage />} />
-        <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
-        <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
-        <Route path="/profile-setup" element={<ProtectedRoute><ProfileSetup /></ProtectedRoute>} />
-        <Route path="/dashboard" element={<ProtectedRoute><DashboardRouter /></ProtectedRoute>} />
-        
-        {/* Student Routes */}
-        <Route path="/job/:id" element={<ProtectedRoute><JobDetails /></ProtectedRoute>} />
-        <Route path="/job-search" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
-        <Route path="/applications" element={<ProtectedRoute><Applications /></ProtectedRoute>} />
-        <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
-        <Route path="/events" element={<ProtectedRoute><Events /></ProtectedRoute>} />
-        <Route path="/event/:id" element={<ProtectedRoute><EventDetails /></ProtectedRoute>} />
-        <Route path="/resources" element={<ProtectedRoute><ResourceCenter /></ProtectedRoute>} />
-        <Route path="/resource/:id" element={<ProtectedRoute><ResourceDetails /></ProtectedRoute>} />
-        
-        {/* Employer Routes */}
-        <Route path="/employer-dashboard" element={<ProtectedRoute><EmployerDashboard /></ProtectedRoute>} />
-        <Route path="/post-job" element={<ProtectedRoute><PostJob /></ProtectedRoute>} />
-        <Route path="/applicants" element={<ProtectedRoute><Applicants /></ProtectedRoute>} />
-        
-        {/* Profile Routes */}
-        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-        
-        {/* Digital Learning Passport Routes */}
-        <Route path="/digital-learning-passport" element={<ProtectedRoute><DigitalLearningPassport /></ProtectedRoute>} />
-        <Route path="/skills-audit-system" element={<ProtectedRoute><SkillsAuditSystem /></ProtectedRoute>} />
-        
-        {/* Social Media Routes */}
-        <Route path="/feed" element={<ProtectedRoute><Feed /></ProtectedRoute>} />
-        <Route path="/post/:id" element={<ProtectedRoute><PostDetails /></ProtectedRoute>} />
-        
-        {/* Company Routes */}
-        <Route path="/companies" element={<ProtectedRoute><CompaniesPage /></ProtectedRoute>} />
-        <Route path="/companies/:companyId" element={<ProtectedRoute><CompanyProfile /></ProtectedRoute>} />
-      </Routes>
+        {/* Performance Monitor - only shows in development */}
+        <PerformanceMonitor 
+          showInDev={true} 
+          onPerformanceIssue={handlePerformanceIssue}
+        />
+      </Router>
     </div>
   );
 }
 
-function App() {
+export default function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider>
-        <AuthProvider>
+      <AuthProvider>
+        <ThemeProvider>
           <ToastProvider>
-            <Router
-              future={{
-                v7_startTransition: true,
-                v7_relativeSplatPath: true
-              }}
-            >
-              <AppContent />
-            </Router>
+            <AppContent />
           </ToastProvider>
-        </AuthProvider>
-      </ThemeProvider>
+        </ThemeProvider>
+      </AuthProvider>
     </ErrorBoundary>
   );
 }
-
-export default App;

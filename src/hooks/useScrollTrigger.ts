@@ -1,141 +1,238 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-interface UseScrollTriggerOptions {
-  trigger?: string | Element | null;
-  start?: string;
-  end?: string;
-  scrub?: boolean | number;
-  pin?: boolean;
-  toggleActions?: string;
-  onUpdate?: (self: ScrollTrigger) => void;
-  onToggle?: (self: ScrollTrigger) => void;
-  onEnter?: (self: ScrollTrigger) => void;
-  onLeave?: (self: ScrollTrigger) => void;
-  onEnterBack?: (self: ScrollTrigger) => void;
-  onLeaveBack?: (self: ScrollTrigger) => void;
-}
-
+// Performance-optimized scroll trigger hook
 export const useScrollTrigger = (
-  elementRef: React.RefObject<HTMLElement>,
-  animation: (element: HTMLElement, progress: number) => void,
-  options: UseScrollTriggerOptions = {}
+  targetRef: React.RefObject<HTMLElement>,
+  callback: (element: HTMLElement, progress: number) => void,
+  options: {
+    start?: string;
+    end?: string;
+    scrub?: number | boolean;
+    once?: boolean;
+    threshold?: number;
+  } = {}
 ) => {
-  const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
+  const {
+    start = 'top 80%',
+    end = 'bottom 20%',
+    scrub = false,
+    once = false,
+    threshold = 0.1
+  } = options;
+
+  const isVisible = useRef(false);
+  const animationId = useRef<number>(0);
 
   useEffect(() => {
-    if (!elementRef.current) return;
+    if (!targetRef.current) return;
 
-    const element = elementRef.current;
-    
-    // Create scroll trigger with dynamic progress tracking
-    scrollTriggerRef.current = ScrollTrigger.create({
-      trigger: options.trigger || element,
-      start: options.start || 'top 80%',
-      end: options.end || 'bottom 20%',
-      scrub: options.scrub !== undefined ? options.scrub : true,
-      pin: options.pin || false,
-      toggleActions: options.toggleActions || 'play none none reverse',
-      
-      onUpdate: (self) => {
-        // Call animation with current progress (0-1)
-        animation(element, self.progress);
-        if (options.onUpdate) options.onUpdate(self);
+    const element = targetRef.current;
+    let scrollTrigger: ScrollTrigger | null = null;
+
+    // Use Intersection Observer for better performance
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible.current = entry.isIntersecting;
+        
+        if (entry.isIntersecting && !scrollTrigger) {
+          // Create scroll trigger only when element is visible
+          scrollTrigger = ScrollTrigger.create({
+            trigger: element,
+            start,
+            end,
+            scrub,
+            once,
+            onUpdate: (self) => {
+              if (isVisible.current) {
+                callback(element, self.progress);
+              }
+            },
+            onToggle: once ? (self) => {
+              if (self.isActive) {
+                callback(element, 1);
+              }
+            } : undefined
+          });
+        } else if (!entry.isIntersecting && scrollTrigger) {
+          // Clean up scroll trigger when not visible
+          scrollTrigger.kill();
+          scrollTrigger = null;
+        }
       },
-      
-      onToggle: (self) => {
-        if (options.onToggle) options.onToggle(self);
-      },
-      
-      onEnter: (self) => {
-        if (options.onEnter) options.onEnter(self);
-      },
-      
-      onLeave: (self) => {
-        if (options.onLeave) options.onLeave(self);
-      },
-      
-      onEnterBack: (self) => {
-        if (options.onEnterBack) options.onEnterBack(self);
-      },
-      
-      onLeaveBack: (self) => {
-        if (options.onLeaveBack) options.onLeaveBack(self);
-      }
-    });
+      { threshold }
+    );
+
+    observer.observe(element);
 
     return () => {
-      if (scrollTriggerRef.current) {
-        scrollTriggerRef.current.kill();
+      observer.disconnect();
+      if (scrollTrigger) {
+        scrollTrigger.kill();
+      }
+      if (animationId.current) {
+        cancelAnimationFrame(animationId.current);
       }
     };
-  }, [elementRef, animation, options]);
-
-  return scrollTriggerRef.current;
+  }, [targetRef, callback, start, end, scrub, once, threshold]);
 };
 
-// Hook for multiple elements with staggered animations
+// Optimized stagger animation hook
 export const useScrollTriggerStagger = (
   containerRef: React.RefObject<HTMLElement>,
   selector: string,
-  animation: (elements: Element[], progress: number) => void,
-  options: UseScrollTriggerOptions = {}
+  callback: (elements: Element[], progress: number) => void,
+  options: {
+    start?: string;
+    end?: string;
+    scrub?: number | boolean;
+    stagger?: number;
+    threshold?: number;
+  } = {}
 ) => {
-  const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
+  const {
+    start = 'top 80%',
+    end = 'bottom 20%',
+    scrub = false,
+    stagger = 0.1,
+    threshold = 0.1
+  } = options;
+
+  const cachedElements = useRef<Element[]>([]);
+  const isVisible = useRef(false);
+
+  // Memoize elements selection for better performance
+  const getElements = useCallback(() => {
+    if (!containerRef.current) return [];
+    
+    if (cachedElements.current.length === 0) {
+      cachedElements.current = gsap.utils.toArray(containerRef.current.querySelectorAll(selector));
+    }
+    
+    return cachedElements.current;
+  }, [containerRef, selector]);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
     const container = containerRef.current;
-    const elements = container.querySelectorAll(selector);
-    
-    if (elements.length === 0) return;
+    let scrollTrigger: ScrollTrigger | null = null;
 
-    scrollTriggerRef.current = ScrollTrigger.create({
-      trigger: options.trigger || container,
-      start: options.start || 'top 80%',
-      end: options.end || 'bottom 20%',
-      scrub: options.scrub !== undefined ? options.scrub : true,
-      pin: options.pin || false,
-      toggleActions: options.toggleActions || 'play none none reverse',
-      
-      onUpdate: (self) => {
-        animation(Array.from(elements), self.progress);
-        if (options.onUpdate) options.onUpdate(self);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible.current = entry.isIntersecting;
+        
+        if (entry.isIntersecting && !scrollTrigger) {
+          const elements = getElements();
+          
+          if (elements.length > 0) {
+            scrollTrigger = ScrollTrigger.create({
+              trigger: container,
+              start,
+              end,
+              scrub,
+              onUpdate: (self) => {
+                if (isVisible.current) {
+                  callback(elements, self.progress);
+                }
+              }
+            });
+          }
+        } else if (!entry.isIntersecting && scrollTrigger) {
+          scrollTrigger.kill();
+          scrollTrigger = null;
+        }
       },
-      
-      onToggle: (self) => {
-        if (options.onToggle) options.onToggle(self);
-      },
-      
-      onEnter: (self) => {
-        if (options.onEnter) options.onEnter(self);
-      },
-      
-      onLeave: (self) => {
-        if (options.onLeave) options.onLeave(self);
-      },
-      
-      onEnterBack: (self) => {
-        if (options.onEnterBack) options.onEnterBack(self);
-      },
-      
-      onLeaveBack: (self) => {
-        if (options.onLeaveBack) options.onLeaveBack(self);
-      }
-    });
+      { threshold }
+    );
+
+    observer.observe(container);
 
     return () => {
-      if (scrollTriggerRef.current) {
-        scrollTriggerRef.current.kill();
+      observer.disconnect();
+      if (scrollTrigger) {
+        scrollTrigger.kill();
+      }
+      // Clear cached elements on unmount
+      cachedElements.current = [];
+    };
+  }, [containerRef, callback, getElements, start, end, scrub, threshold]);
+};
+
+// Performance monitoring hook
+export const useAnimationPerformance = () => {
+  const [fps, setFps] = useState(60);
+  const frameCount = useRef(0);
+  const lastTime = useRef(performance.now());
+
+  const measureFPS = useCallback(() => {
+    const now = performance.now();
+    frameCount.current++;
+
+    if (now - lastTime.current >= 1000) {
+      setFps(frameCount.current);
+      frameCount.current = 0;
+      lastTime.current = now;
+    }
+
+    requestAnimationFrame(measureFPS);
+  }, []);
+
+  useEffect(() => {
+    const rafId = requestAnimationFrame(measureFPS);
+    return () => cancelAnimationFrame(rafId);
+  }, [measureFPS]);
+
+  // Reduce animation quality if performance is poor
+  const shouldReduceAnimations = useMemo(() => fps < 30, [fps]);
+
+  return { fps, shouldReduceAnimations };
+};
+
+// Debounced resize hook for responsive animations
+export const useDebouncedResize = (callback: () => void, delay = 250) => {
+  const timeoutRef = useRef<NodeJS.Timeout>();
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(callback, delay);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
       }
     };
-  }, [containerRef, selector, animation, options]);
+  }, [callback, delay]);
+};
 
-  return scrollTriggerRef.current;
+// Reduced motion preference hook
+export const useReducedMotion = () => {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  });
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    
+    const handleChange = (e: MediaQueryListEvent) => {
+      setPrefersReducedMotion(e.matches);
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  return prefersReducedMotion;
 };
 
 // Common animation functions for reuse

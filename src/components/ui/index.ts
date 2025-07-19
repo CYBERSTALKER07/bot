@@ -12,3 +12,9 @@ export { default as Carousel } from './Carousel';
 
 // Existing components (re-export for consistency)
 export { Card, StatsCard, JobCard } from './Card';
+
+// Performance components
+export { LoadingSpinner, LoadingOverlay, Skeleton, LoadingCard } from './Loading';
+
+// Optimized Image component with lazy loading
+export { default as OptimizedImage } from './OptimizedImage';
