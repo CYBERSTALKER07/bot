@@ -400,6 +400,18 @@ export default function Navigation() {
                 isExpanded ? 'left-3 right-3' : 'left-1/2 transform -translate-x-1/2 w-48'
               )}>
                 <Link
+                  to="/feed"
+                  className={cn(
+                    "flex items-center space-x-3 px-4 py-3 transition-all duration-200",
+                    "hover:translate-x-1 transform",
+                    isDark ? 'hover:bg-gray-800 text-gray-300 hover:text-white' : 'hover:bg-gray-50 text-gray-700 hover:text-gray-900'
+                  )}
+                  onClick={() => setIsProfileMenuOpen(false)}
+                >
+                  <Home className="h-4 w-4 transition-transform duration-200" />
+                  <span className="text-sm font-medium">Home Feed</span>
+                </Link>
+                <Link
                   to="/settings"
                   className={cn(
                     "flex items-center space-x-3 px-4 py-3 transition-all duration-200",
