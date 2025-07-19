@@ -1,0 +1,48 @@
+{
+  "name": "AUT Handshake - Connect. Grow. Succeed.",
+  "short_name": "AUT Handshake",
+  "description": "The premier platform connecting AUT students, graduates, and employers for career success.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#8C1D40",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["education", "business", "networking", "productivity"],
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Job Search",
+      "short_name": "Jobs",
+      "description": "Browse available job opportunities",
+      "url": "/jobs",
+      "icons": [
+        {
+          "src": "/vite.svg",
+          "sizes": "any"
+        }
+      ]
+    },
+    {
+      "name": "Events",
+      "short_name": "Events",
+      "description": "View upcoming career events",
+      "url": "/events",
+      "icons": [
+        {
+          "src": "/vite.svg",
+          "sizes": "any"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false
+}

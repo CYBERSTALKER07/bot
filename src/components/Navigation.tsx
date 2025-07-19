@@ -127,7 +127,7 @@ export default function Navigation() {
                 <Feather className={`h-4 w-4 ${isDark ? 'text-black' : 'text-white'}`} />
               </div>
               <span className={`font-bold text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                  
+                AUT Handshake
               </span>
             </div>
             
