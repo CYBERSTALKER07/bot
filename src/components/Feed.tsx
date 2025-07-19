@@ -13,7 +13,9 @@ import {
   MapPin,
   TrendingUp,
   Users,
-  Sparkles
+  Sparkles,
+  User,
+  FileText
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -55,6 +57,7 @@ export default function Feed() {
   const [loading, setLoading] = useState(true);
   const [newPostContent, setNewPostContent] = useState('');
   const [isPosting, setIsPosting] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   
   const timelineRef = useRef<HTMLDivElement>(null);
 
@@ -218,78 +221,65 @@ export default function Feed() {
       maxWidth="2xl"
       padding="none"
     >
-      {/* Header */}
+      {/* X-Style Header */}
       <div className={`sticky top-0 z-10 backdrop-blur-xl border-b ${
         isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
       }`}>
         <div className="flex items-center justify-between px-4 py-3">
-          <h1 className="text-xl font-bold">Home</h1>
+          <div>
+            <h1 className="text-xl font-bold">Home</h1>
+          </div>
           <Button variant="ghost" size="sm" className="p-2">
             <Sparkles className="h-5 w-5" />
           </Button>
         </div>
       </div>
 
-      {/* Compose Tweet */}
-      <div className={`border-b p-4 ${isDark ? 'border-gray-800' : 'border-gray-200'}`}>
+      {/* Create Post Section */}
+      <div className={`border p-4 ${isDark ? 'border-gray-800' : 'border-gray-200'}`}>
         <div className="flex space-x-3">
-          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-            isDark ? 'bg-gray-800' : 'bg-gray-200'
-          }`}>
-            <span className="text-xl">👤</span>
+          <div className={`w-10 h-10 rounded-full ${isDark ? 'bg-gray-800' : 'bg-gray-200'} flex items-center justify-center`}>
+            <User className="h-5 w-5" />
           </div>
           <div className="flex-1">
             <textarea
-              value={newPostContent}
-              onChange={(e) => setNewPostContent(e.target.value)}
-              placeholder="What's happening?"
-              className={`w-full text-xl placeholder-gray-500 bg-transparent border-none outline-none resize-none ${
+              placeholder="Share your career journey..."
+              className={`w-full bg-transparent rounded-[100px]  text-xl placeholder-gray-500 placeholder:pl-[10px] placeholder:pt-[10px] resize-none border-2 outline-none ${
                 isDark ? 'text-white' : 'text-black'
               }`}
               rows={3}
             />
-            
-            <div className="flex items-center justify-between mt-4">
+            <div className="flex items-center justify-between mt-3 pt-3">
               <div className="flex items-center space-x-4">
-                <Button variant="ghost" size="sm" className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-full">
+                <Button variant="ghost" size="sm" className="p-2">
                   <ImageIcon className="h-5 w-5" />
                 </Button>
-                <Button variant="ghost" size="sm" className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-full">
-                  <Smile className="h-5 w-5" />
+                <Button variant="ghost" size="sm" className="p-2">
+                  <FileText className="h-5 w-5" />
                 </Button>
-                <Button variant="ghost" size="sm" className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-full">
+                <Button variant="ghost" size="sm" className="p-2">
                   <Calendar className="h-5 w-5" />
                 </Button>
-                <Button variant="ghost" size="sm" className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-full">
-                  <MapPin className="h-5 w-5" />
-                </Button>
               </div>
-              
-              <Button
-                onClick={handlePost}
-                disabled={!newPostContent.trim() || isPosting}
-                className={`px-6 py-2 rounded-full font-bold ${
-                  newPostContent.trim()
-                    ? 'bg-blue-500 text-white hover:bg-blue-600' 
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                {isPosting ? 'Posting...' : 'Post'}
+              <Button className={`px-6 py-2 rounded-full font-semibold ${
+                isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800'
+              }`}>
+                Post
               </Button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Timeline */}
-      <div ref={timelineRef}>
-        {posts.map((post, index) => (
-          <article
-            key={post.id}
-            className={`border-b p-4 hover:bg-gray-50/5 transition-colors cursor-pointer ${
-              isDark ? 'border-gray-800' : 'border-gray-200'
+      {/* Posts Feed */}
+      <div className=" border-gray-800  border-[0.5px]  divide-gray-800 ">
+        {posts.map((post) => (
+          <div 
+            key={post.id} 
+            className={`p-4 hover:bg-gray-50/5 transition-colors cursor-pointer border-[0.5px] ${
+              isDark ? 'divide-gray-800 hover:bg-gray-950/50' : 'border-gray-200 hover:bg-gray-50/50'
             }`}
-            onClick={() => navigate(`/post/${post.id}`)}
+            onClick={() => setSelectedPost(post)}
           >
             <div className="flex space-x-3">
               <Link to={`/profile/${post.author.username}`} onClick={(e) => e.stopPropagation()}>
@@ -392,7 +382,7 @@ export default function Feed() {
                 <MoreHorizontal className="h-5 w-5" />
               </Button>
             </div>
-          </article>
+          </div>
         ))}
       </div>
 

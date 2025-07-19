@@ -18,17 +18,18 @@ import {
 import { useTheme } from '../../context/ThemeContext';
 import Badge from './Badge';
 import Button from './Button';
+import { cn } from '../../lib/cva';
 
 // Simple cn utility function to combine class names
-const cn = (...classes: (string | undefined | null | false)[]): string => {
+const cn2 = (...classes: (string | undefined | null | false)[]): string => {
   return classes.filter(Boolean).join(' ');
 };
 
 interface CardProps {
   children: React.ReactNode;
   className?: string;
-  variant?: 'elevated' | 'filled' | 'outlined';
-  padding?: 'none' | 'small' | 'medium' | 'large';
+  variant?: 'default' | 'outlined' | 'elevated' | 'x-style';
+  padding?: 'none' | 'sm' | 'md' | 'lg';
   interactive?: boolean;
   animated?: boolean;
   rotation?: number;
@@ -36,6 +37,7 @@ interface CardProps {
   scale?: number;
   clickable?: boolean;
   onClick?: () => void;
+  hover?: boolean;
 }
 
 interface StatsCardProps {
@@ -73,15 +75,16 @@ interface JobCardProps {
 export const Card: React.FC<CardProps> = ({
   children,
   className = '',
-  variant = 'elevated',
-  padding = 'medium',
+  variant = 'x-style',
+  padding = 'md',
   interactive = false,
   animated = true,
   rotation = 0,
   delay = 0,
   scale = 1,
   clickable = false,
-  onClick
+  onClick,
+  hover = true
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const { isDark } = useTheme();
@@ -113,12 +116,13 @@ export const Card: React.FC<CardProps> = ({
 
   const baseClasses = `
     transition-all duration-200 ease-material-standard
-    rounded-xl overflow-hidden
+    rounded-none
     ${clickable ? 'cursor-pointer' : ''}
     ${interactive ? 'hover:shadow-elevation-2 active:shadow-elevation-1' : ''}
   `;
 
   const variantClasses = {
+    default: 'bg-white dark:bg-gray-900',
     elevated: isDark 
       ? "bg-dark-surface shadow-elevation-1 hover:shadow-elevation-2 border-0" 
       : "bg-surface-50 shadow-elevation-1 hover:shadow-elevation-2 border-0",
@@ -127,25 +131,29 @@ export const Card: React.FC<CardProps> = ({
       : "bg-surface-200 border-0 shadow-none",
     outlined: isDark 
       ? "bg-dark-surface border border-gray-600 shadow-none hover:shadow-elevation-1" 
-      : "bg-surface-50 border border-gray-200 shadow-none hover:shadow-elevation-1"
+      : "bg-surface-50 border border-gray-200 shadow-none hover:shadow-elevation-1",
+    'x-style': 'border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-black'
   };
 
   const paddingClasses = {
     none: '',
-    small: 'p-4',
-    medium: 'p-6',
-    large: 'p-8'
+    sm: 'p-3',
+    md: 'p-4',
+    lg: 'p-6'
   };
 
   const interactiveClasses = interactive 
     ? "hover:scale-[1.02] active:scale-[0.98] transform" 
     : "";
 
-  const cardClasses = cn(
+  const hoverClasses = hover && variant === 'x-style' ? 'hover:bg-gray-50/50 dark:hover:bg-gray-950/50' : '';
+
+  const cardClasses = cn2(
     baseClasses,
     variantClasses[variant],
     paddingClasses[padding],
     interactiveClasses,
+    hoverClasses,
     className
   );
 

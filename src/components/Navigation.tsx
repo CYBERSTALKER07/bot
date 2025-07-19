@@ -44,16 +44,14 @@ export default function Navigation() {
   const navigate = useNavigate();
   
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024); // Changed to lg breakpoint
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
-  const sidebarTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const sidebarRef = useRef<HTMLDivElement>(null);
+  const [isExpanded, setIsExpanded] = useState(false); // For hover expansion
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-      if (window.innerWidth >= 768) {
+      setIsMobile(window.innerWidth < 1024); // Changed to lg breakpoint
+      if (window.innerWidth >= 1024) {
         setIsMobileMenuOpen(false);
       }
     };
@@ -62,63 +60,14 @@ export default function Navigation() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Handle mouse movement for sidebar trigger
-  useEffect(() => {
-    if (isMobile) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      // Show sidebar when cursor is within 50px of left edge
-      if (e.clientX <= 50) {
-        if (sidebarTimeoutRef.current) {
-          clearTimeout(sidebarTimeoutRef.current);
-        }
-        setIsSidebarVisible(true);
-      } else if (e.clientX > 300 && isSidebarVisible) {
-        // Hide sidebar when cursor moves away from sidebar area
-        if (sidebarTimeoutRef.current) {
-          clearTimeout(sidebarTimeoutRef.current);
-        }
-        sidebarTimeoutRef.current = setTimeout(() => {
-          setIsSidebarVisible(false);
-        }, 300); // 300ms delay before hiding
-      }
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      if (sidebarTimeoutRef.current) {
-        clearTimeout(sidebarTimeoutRef.current);
-      }
-    };
-  }, [isMobile, isSidebarVisible]);
-
-  // Handle sidebar mouse enter/leave
-  const handleSidebarMouseEnter = () => {
-    if (sidebarTimeoutRef.current) {
-      clearTimeout(sidebarTimeoutRef.current);
-    }
-    setIsSidebarVisible(true);
-  };
-
-  const handleSidebarMouseLeave = () => {
-    if (sidebarTimeoutRef.current) {
-      clearTimeout(sidebarTimeoutRef.current);
-    }
-    sidebarTimeoutRef.current = setTimeout(() => {
-      setIsSidebarVisible(false);
-    }, 500); // 500ms delay when leaving sidebar
-  };
-
   // X-style navigation items
   const getNavigationItems = (): NavigationItem[] => {
     const baseItems = [
       { icon: Home, label: 'Home', path: '/feed' },
       { icon: Search, label: 'Explore', path: '/jobs' },
       { icon: Bell, label: 'Notifications', path: '/notifications', badge: 3 },
-      { icon: Mail, label: 'Messages', path: '/messages', badge: 2 },
-      { icon: Bookmark, label: 'Bookmarks', path: '/bookmarks' },
+      // { icon: Mail, label: 'Messages', path: '/messages', badge: 2 },
+      // { icon: Bookmark, label: 'Bookmarks', path: '/bookmarks' },
     ];
 
     if (user?.role === 'student') {
@@ -274,52 +223,39 @@ export default function Navigation() {
     );
   }
 
-  // Desktop Navigation with Hidden Sidebar
+  // Desktop Navigation
   return (
     <>
-      {/* Trigger Zone - invisible area at left edge */}
-      <div 
-        className="fixed left-0 top-0 w-12 h-full z-40 bg-transparent"
-        onMouseEnter={() => setIsSidebarVisible(true)}
-      />
-
-      {/* Hidden Sidebar */}
-      <aside 
-        ref={sidebarRef}
-        className={cn(
-          "fixed left-0 top-0 h-full z-50 transform transition-all duration-300 ease-in-out",
-          "w-72 backdrop-blur-xl border-r shadow-2xl",
-          isDark ? 'bg-black/90 border-gray-800' : 'bg-white/90 border-gray-200',
-          isSidebarVisible ? 'translate-x-0' : '-translate-x-full'
-        )}
-        onMouseEnter={handleSidebarMouseEnter}
-        onMouseLeave={handleSidebarMouseLeave}
+      {/* Desktop Sidebar */}
+      <aside className={cn(
+        "fixed left-0 top-0 h-full z-40 transition-all duration-300",
+        "border-r backdrop-blur-xl",
+        isDark ? 'bg-black/95 border-gray-800' : 'bg-white/95 border-gray-200',
+        isExpanded ? 'w-64' : 'w-20'
+      )}
+      onMouseEnter={() => setIsExpanded(true)}
+      onMouseLeave={() => setIsExpanded(false)}
       >
-        {/* Sidebar Header */}
-        <div className="p-6 border-b border-gray-200 dark:border-gray-800">
-          <div className="flex items-center space-x-3">
+        {/* Logo/Brand */}
+        <div className="p-4 border-b border-gray-200 dark:border-gray-800">
+          <div className="flex items-center justify-center">
             <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
               isDark ? 'bg-white' : 'bg-black'
             }`}>
               <Feather className={`h-5 w-5 ${isDark ? 'text-black' : 'text-white'}`} />
             </div>
-            <div>
-              <h2 className={`font-semibold text-lg ${
-                isDark ? 'text-white' : 'text-gray-900'
-              }`}>
-                TalentLink
-              </h2>
-              <p className={`text-sm ${
-                isDark ? 'text-gray-400' : 'text-gray-600'
-              }`}>
-                Welcome back, {user?.full_name?.split(' ')[0]}
-              </p>
-            </div>
+            {isExpanded && (
+              <div className="ml-3 overflow-hidden">
+                <h2 className={`font-bold text-xl ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  TalentLink
+                </h2>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Navigation Items */}
-        <nav className="flex-1 px-4 py-6 space-y-1">
+        <nav className="flex flex-col flex-1 p-4 space-y-2">
           {navigationItems.map((item, index) => {
             const Icon = item.icon;
             const isActive = isCurrentPath(item.path);
@@ -329,94 +265,166 @@ export default function Navigation() {
                 key={index}
                 to={item.path}
                 className={cn(
-                  "flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group relative",
+                  "flex items-center px-3 py-3 rounded-xl transition-all duration-200 group relative",
+                  isExpanded ? 'space-x-3' : 'justify-center',
                   isActive
                     ? isDark 
-                      ? 'bg-blue-600 text-white shadow-lg' 
-                      : 'bg-blue-600 text-white shadow-lg'
+                      ? 'bg-white text-black' 
+                      : 'bg-black text-white'
                     : isDark
                       ? 'text-gray-300 hover:bg-gray-800 hover:text-white'
                       : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                 )}
               >
-                <Icon className={cn(
-                  "h-5 w-5 transition-transform group-hover:scale-110",
-                  isActive ? 'text-white' : ''
-                )} />
-                <span className="font-medium">{item.label}</span>
-                {item.badge && item.badge > 0 && (
-                  <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full min-w-[18px] text-center">
-                    {item.badge > 9 ? '9+' : item.badge}
-                  </span>
+                <div className="relative">
+                  <Icon className="h-6 w-6" />
+                  {item.badge && item.badge > 0 && !isExpanded && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                      {item.badge > 9 ? '9+' : item.badge}
+                    </span>
+                  )}
+                </div>
+                
+                {isExpanded && (
+                  <>
+                    <span className="font-medium text-xl">{item.label}</span>
+                    {item.badge && item.badge > 0 && (
+                      <span className="ml-auto bg-red-500 text-white text-sm px-2 py-1 rounded-full min-w-[20px] text-center">
+                        {item.badge > 9 ? '9+' : item.badge}
+                      </span>
+                    )}
+                  </>
                 )}
-                {isActive && (
-                  <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-white rounded-l-full" />
+
+                {/* Tooltip for collapsed state */}
+                {!isExpanded && (
+                  <div className={cn(
+                    "absolute left-full ml-4 px-3 py-2 rounded-lg text-sm font-medium",
+                    "opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50",
+                    "whitespace-nowrap shadow-lg",
+                    isDark ? 'bg-gray-800 text-white' : 'bg-white text-gray-900 border'
+                  )}>
+                    {item.label}
+                    {item.badge && item.badge > 0 && (
+                      <span className="ml-2 bg-red-500 text-white text-xs px-1 py-0.5 rounded-full">
+                        {item.badge}
+                      </span>
+                    )}
+                  </div>
                 )}
               </Link>
             );
           })}
         </nav>
 
-        {/* Sidebar Footer */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
-          {/* User Profile Section */}
+        {/* Post Button */}
+        <div className="p-4">
+          <Button
+            className={cn(
+              "w-full rounded-full font-bold transition-all duration-200",
+              isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800',
+              isExpanded ? 'py-3' : 'aspect-square p-3'
+            )}
+            onClick={() => navigate('/post-job')}
+          >
+            {isExpanded ? (
+              'Post'
+            ) : (
+              <Plus className="h-6 w-6" />
+            )}
+          </Button>
+        </div>
+
+        {/* User Profile */}
+        <div className="p-4 border-t border-gray-200 dark:border-gray-800">
           <div className="relative">
             <button
               onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
               className={cn(
-                "w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-colors",
+                "w-full flex items-center rounded-xl transition-all duration-200",
+                isExpanded ? 'space-x-3 p-3' : 'justify-center p-3',
                 isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-100'
               )}
             >
-              <div className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center",
-                isDark ? 'bg-gray-700' : 'bg-gray-300'
-              )}>
-                <User className="h-4 w-4" />
+              {/* Avatar */}
+              <div className="relative">
+                {user?.avatar_url ? (
+                  <img 
+                    src={user.avatar_url}
+                    alt={user?.full_name || 'User'}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className={cn(
+                    "w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold",
+                    isDark ? 'bg-gray-700 text-white' : 'bg-gray-300 text-gray-800'
+                  )}>
+                    {user?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
+                  </div>
+                )}
+                {/* Online indicator */}
+                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-900"></div>
               </div>
-              <div className="flex-1 text-left">
-                <p className={cn(
-                  "font-medium text-sm",
-                  isDark ? 'text-white' : 'text-gray-900'
-                )}>
-                  {user?.full_name || 'User'}
-                </p>
-                <p className={cn(
-                  "text-xs",
-                  isDark ? 'text-gray-400' : 'text-gray-600'
-                )}>
-                  {user?.role || 'Member'}
-                </p>
-              </div>
-              <MoreHorizontal className={cn(
-                "h-4 w-4",
-                isDark ? 'text-gray-400' : 'text-gray-600'
-              )} />
+              
+              {isExpanded && (
+                <>
+                  <div className="flex-1 text-left overflow-hidden">
+                    <p className={cn(
+                      "font-medium text-base truncate",
+                      isDark ? 'text-white' : 'text-gray-900'
+                    )}>
+                      {user?.full_name || 'User'}
+                    </p>
+                    <p className={cn(
+                      "text-sm truncate",
+                      isDark ? 'text-gray-400' : 'text-gray-600'
+                    )}>
+                      @{user?.email?.split('@')[0]}
+                    </p>
+                  </div>
+                  <MoreHorizontal className={cn(
+                    "h-5 w-5 flex-shrink-0",
+                    isDark ? 'text-gray-400' : 'text-gray-600'
+                  )} />
+                </>
+              )}
             </button>
 
             {/* Profile Menu */}
             {isProfileMenuOpen && (
               <div className={cn(
-                "absolute bottom-full left-4 right-4 mb-2 rounded-xl shadow-lg border overflow-hidden",
-                isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
+                "absolute bottom-full mb-2 rounded-3xl shadow-lg border overflow-hidden z-50",
+                "transition-all duration-300 ease-out",
+                "animate-in slide-in-from-bottom-2 fade-in-0",
+                isDark ? 'bg-black border-gray-800 backdrop-blur-xl' : 'bg-white/95 border-gray-200 backdrop-blur-xl',
+                isExpanded ? 'left-3 right-3' : 'left-1/2 transform -translate-x-1/2 w-48'
               )}>
                 <Link
                   to="/settings"
                   className={cn(
-                    "flex items-center space-x-3 px-4 py-3 transition-colors",
-                    isDark ? 'hover:bg-gray-800 text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                    "flex items-center space-x-3 px-4 py-3 transition-all duration-200",
+                    "hover:translate-x-1 transform",
+                    isDark ? 'hover:bg-gray-800 text-gray-300 hover:text-white' : 'hover:bg-gray-50 text-gray-700 hover:text-gray-900'
                   )}
                   onClick={() => setIsProfileMenuOpen(false)}
                 >
-                  <Settings className="h-4 w-4" />
-                  <span className="text-sm">Settings</span>
+                  <Settings className="h-4 w-4 transition-transform duration-200 group-hover:rotate-45" />
+                  <span className="text-sm font-medium">Settings & Privacy</span>
                 </Link>
+                <div className={cn(
+                  "border-t transition-colors duration-200",
+                  isDark ? 'border-gray-700' : 'border-gray-200'
+                )} />
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center space-x-3 px-4 py-3 transition-colors text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+                  className={cn(
+                    "w-full flex items-center space-x-3 px-4 py-3 transition-all duration-200",
+                    "hover:translate-x-1 transform",
+                    "text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600"
+                  )}
                 >
-                  <LogOut className="h-4 w-4" />
-                  <span className="text-sm">Log out</span>
+                  <LogOut className="h-4 w-4 transition-transform duration-200 hover:scale-110" />
+                  <span className="text-sm font-medium">Log out @{user?.email?.split('@')[0]}</span>
                 </button>
               </div>
             )}
@@ -424,11 +432,11 @@ export default function Navigation() {
         </div>
       </aside>
 
-      {/* Main Content Overlay when sidebar is visible */}
-      {isSidebarVisible && (
+      {/* Backdrop Blur Overlay when Navigation is Active/Expanded */}
+      {isExpanded && (
         <div 
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
-          onClick={() => setIsSidebarVisible(false)}
+          className="fixed inset-0 bg-black/10 backdrop-blur-sm z-30 transition-all duration-300"
+          onClick={() => setIsExpanded(false)}
         />
       )}
     </>

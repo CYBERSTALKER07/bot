@@ -248,9 +248,9 @@ export default function Applicants() {
       {/* Stats Overview */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
         {Object.entries(statusCounts).map(([status, count]) => (
-          <Card 
+          <div
             key={status}
-            className={`p-4 text-center hover:shadow-lg transition-all duration-200 ${
+            className={`p-4 text-center hover:shadow-lg transition-all duration-200 cursor-pointer border-b ${
               statusFilter === status 
                 ? (isDark ? 'bg-blue-900 border-blue-700' : 'bg-blue-50 border-blue-200')
                 : (isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200')
@@ -265,12 +265,12 @@ export default function Applicants() {
             }`}>
               {status === 'all' ? 'Total' : status}
             </div>
-          </Card>
+          </div>
         ))}
       </div>
 
       {/* Search and Filters */}
-      <Card className="p-6 mb-8">
+      <div className={`p-6 mb-8 border-b ${isDark ? 'border-gray-800' : 'border-gray-200'}`}>
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
@@ -352,16 +352,16 @@ export default function Applicants() {
             </div>
           </div>
         </div>
-      </Card>
+      </div>
 
       {/* Applicants Display */}
       {viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="space-y-0">
           {filteredApplicants.map((applicant) => (
-            <Card 
+            <div
               key={applicant.id}
-              className={`p-6 hover:shadow-xl transition-all duration-300 cursor-pointer group ${
-                isDark ? 'bg-gray-900 border-gray-800 hover:bg-gray-800' : 'bg-white border-gray-200 hover:shadow-lg'
+              className={`p-6 hover:bg-gray-50/50 transition-all duration-300 cursor-pointer border-b ${
+                isDark ? 'bg-black border-gray-800 hover:bg-gray-950/50' : 'bg-white border-gray-200 hover:bg-gray-50/50'
               }`}
               onClick={() => setSelectedApplicant(applicant)}
             >
@@ -482,15 +482,15 @@ export default function Applicants() {
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       ) : (
-        // List View
-        <Card className="overflow-hidden">
+        // List View with X-style borders
+        <div className="overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className={isDark ? 'bg-gray-900' : 'bg-gray-50'}>
+              <thead className={`border-b ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-gray-50 border-gray-200'}`}>
                 <tr>
                   <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">
                     Applicant
@@ -516,7 +516,9 @@ export default function Applicants() {
                 {filteredApplicants.map((applicant) => (
                   <tr 
                     key={applicant.id} 
-                    className={`hover:${isDark ? 'bg-gray-900' : 'bg-gray-50'} transition-colors cursor-pointer`}
+                    className={`hover:${isDark ? 'bg-gray-950/50' : 'bg-gray-50/50'} transition-colors cursor-pointer border-b ${
+                      isDark ? 'border-gray-800' : 'border-gray-200'
+                    }`}
                     onClick={() => setSelectedApplicant(applicant)}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -607,7 +609,7 @@ export default function Applicants() {
               </tbody>
             </table>
           </div>
-        </Card>
+        </div>
       )}
 
       {/* Empty State */}

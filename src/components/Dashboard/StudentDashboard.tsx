@@ -83,7 +83,7 @@ export default function StudentDashboard() {
       <div className="flex">
         
         {/* Main Content - Center Column */}
-        <div className="flex-1 max-w-2xl mx-auto border-x border-gray-800 dark:border-gray-200">
+        <div className="flex-1 max-w-4xl mx-auto border-x border-gray-800 dark:border-gray-200">
           {/* Header */}
           <div className={`sticky top-0 z-10 backdrop-blur-xl border-b ${
             isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
