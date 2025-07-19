@@ -127,10 +127,10 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
     return (
       <>
         {/* Landing Page Navigation */}
-        <nav className={`fixed top-0 w-full backdrop-blur-sm z-50 border-b transition-colors duration-300 ${
+        <nav className={`fixed top-0 w-full z-50 border-b transition-colors duration-300 ${
           isDark 
-            ? 'bg-dark-surface/95 border-gray-700' 
-            : 'bg-white/95 border-gray-200'
+            ? 'bg-dark-surface/95 backdrop-blur-sm border-gray-700' 
+            : 'bg-white/95 backdrop-blur-sm border-gray-200'
         }`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
@@ -280,10 +280,15 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                     aria-expanded={isMobileMenuOpen}
                     aria-label="Toggle menu"
+                    className="relative"
                   >
-                    {isMobileMenuOpen ? <X className="h-5 w-5" /> : <div className="w-8 h-8 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center text-sm font-medium">
-                      {user?.name?.charAt(0) || <User className="h-5 w-5" />}
-                    </div>}
+                    {isMobileMenuOpen ? (
+                      <X className="h-5 w-5" />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-sm font-medium">
+                        {user?.name?.charAt(0) || <User className="h-4 w-4" />}
+                      </div>
+                    )}
                   </Button>
                 </div>
               </div>
@@ -551,98 +556,138 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
               </Button>
             </div>
           </div>
+        </header>
 
-          {/* Mobile Menu Dropdown */}
-          {isMobileMenuOpen && (
-            <div className="border-t border-neutral-200 bg-background">
-              <nav className="py-2 max-h-[70vh] overflow-y-auto" role="navigation" aria-label="Mobile navigation">
-                {/* Profile Section */}
-                <div className="px-4 py-3 border-b border-neutral-200">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center text-sm font-medium">
-                      {user?.name?.charAt(0) || <User className="h-5 w-5" />}
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">{user?.name || 'User'}</p>
-                      <p className="text-xs text-neutral-500">{user?.email || 'user@example.com'}</p>
-                    </div>
+        {/* Sidebar Backdrop */}
+        {isMobileMenuOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300"
+            onClick={() => setIsMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+        )}
+
+        {/* Left Sidebar */}
+        <div
+          className="fixed top-0 left-0 h-full w-80 bg-background border-r border-neutral-200 z-50 shadow-xl"
+          style={{
+            transform: isMobileMenuOpen ? 'translateX(0px)' : 'translateX(-100%)',
+            transition: 'transform 300ms ease-out',
+            willChange: 'transform'
+          }}
+        >
+          {/* Sidebar Header */}
+          <div className="flex items-center justify-between h-14 px-4 border-b border-neutral-200 bg-background">
+            <div className="flex items-center space-x-3">
+              <GraduationCap className="h-6 w-6 text-brand-primary" />
+              <span className="font-semibold text-foreground">AUT Menu</span>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-neutral-500 hover:text-neutral-700"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
+
+          {/* Sidebar Content */}
+          <div className="flex-1 overflow-y-auto">
+            <nav className="py-2" role="navigation" aria-label="Mobile navigation">
+              {/* Profile Section */}
+              <div className="px-4 py-4 border-b border-neutral-200 bg-gradient-to-r from-brand-primary/5 to-transparent">
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center text-lg font-medium">
+                    {user?.name?.charAt(0) || <User className="h-6 w-6" />}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-base">{user?.name || 'User'}</p>
+                    <p className="text-sm text-neutral-500">{user?.email || 'user@example.com'}</p>
                   </div>
                 </div>
+              </div>
 
-                {/* Navigation Groups */}
+              {/* Navigation Groups */}
+              <div className="px-2 py-2">
                 {Object.entries(groupedItems).map(([group, items]) => (
-                  <div key={group} className="py-2">
+                  <div key={group} className="mb-4">
                     {group !== 'main' && (
-                      <div className="px-4 py-2">
+                      <div className="px-3 py-2">
                         <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
                           {group}
                         </h3>
                       </div>
                     )}
-                    {items.map((item, index) => {
-                      const Icon = item.icon;
-                      const active = isCurrentPath(item.path);
-                      
-                      return (
-                        <Link
-                          key={`${group}-${index}`}
-                          to={item.path}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className={cn(
-                            'flex items-center justify-between px-4 py-3 mx-2 rounded-lg transition-colors',
-                            active
-                              ? 'bg-brand-primary/10 text-brand-primary'
-                              : 'text-neutral-700 hover:bg-neutral-50'
-                          )}
-                          aria-current={active ? 'page' : undefined}
-                        >
-                          <div className="flex items-center space-x-3">
-                            <Icon className="h-5 w-5" />
-                            <span className="font-medium">{item.label}</span>
-                          </div>
-                          {item.badge && item.badge > 0 && (
-                            <span className="bg-error text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center">
-                              {item.badge > 99 ? '99+' : item.badge}
-                            </span>
-                          )}
-                        </Link>
-                      );
-                    })}
+                    <div className="space-y-1">
+                      {items.map((item, index) => {
+                        const Icon = item.icon;
+                        const active = isCurrentPath(item.path);
+                        
+                        return (
+                          <Link
+                            key={`${group}-${index}`}
+                            to={item.path}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className={cn(
+                              'flex items-center justify-between px-3 py-3 mx-1 rounded-xl transition-all duration-200',
+                              active
+                                ? 'bg-brand-primary/10 text-brand-primary shadow-sm'
+                                : 'text-neutral-700 hover:bg-neutral-50 hover:translate-x-1'
+                            )}
+                            aria-current={active ? 'page' : undefined}
+                          >
+                            <div className="flex items-center space-x-3">
+                              <Icon className="h-5 w-5 flex-shrink-0" />
+                              <span className="font-medium">{item.label}</span>
+                            </div>
+                            {item.badge && item.badge > 0 && (
+                              <span className="bg-error text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center flex-shrink-0">
+                                {item.badge > 99 ? '99+' : item.badge}
+                              </span>
+                            )}
+                          </Link>
+                        );
+                      })}
+                    </div>
                   </div>
                 ))}
                 
-                <div className="border-t border-neutral-200 mt-2 pt-2">
-                  <Link
-                    to="/profile"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={cn(
-                      'flex items-center space-x-3 px-4 py-3 mx-2 rounded-lg transition-colors',
-                      isCurrentPath('/profile')
-                        ? 'bg-brand-primary/10 text-brand-primary'
-                        : 'text-neutral-700 hover:bg-neutral-50'
-                    )}
-                    aria-current={isCurrentPath('/profile') ? 'page' : undefined}
-                  >
-                    <User className="h-5 w-5" />
-                    <span className="font-medium">My Profile</span>
-                  </Link>
-                  
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      handleLogout();
-                    }}
-                    className="w-full justify-start px-4 py-3 mx-2 text-error hover:bg-error/10 rounded-lg"
-                  >
-                    <LogOut className="h-5 w-5 mr-3" />
-                    Logout
-                  </Button>
+                {/* Profile and Logout Section */}
+                <div className="border-t border-neutral-200 mt-4 pt-4">
+                  <div className="space-y-1">
+                    <Link
+                      to="/profile"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={cn(
+                        'flex items-center space-x-3 px-3 py-3 mx-1 rounded-xl transition-all duration-200',
+                        isCurrentPath('/profile')
+                          ? 'bg-brand-primary/10 text-brand-primary shadow-sm'
+                          : 'text-neutral-700 hover:bg-neutral-50 hover:translate-x-1'
+                      )}
+                      aria-current={isCurrentPath('/profile') ? 'page' : undefined}
+                    >
+                      <User className="h-5 w-5" />
+                      <span className="font-medium">My Profile</span>
+                    </Link>
+                    
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        handleLogout();
+                      }}
+                      className="w-full justify-start px-3 py-3 mx-1 text-error hover:bg-error/10 rounded-xl transition-all duration-200 hover:translate-x-1"
+                    >
+                      <LogOut className="h-5 w-5 mr-3" />
+                      Logout
+                    </Button>
+                  </div>
                 </div>
-              </nav>
-            </div>
-            )}
-        </header>
+              </div>
+            </nav>
+          </div>
+        </div>
 
         {/* Bottom Navigation */}
         <nav 
@@ -676,9 +721,8 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
           </div>
         </nav>
 
-        {/* Spacers */}
+        {/* Spacers - Fix: Only add top spacer, remove duplicate bottom spacer */}
         <div className="h-14" />
-        <div className="h-16" />
       </>
     );
   }
@@ -849,98 +893,138 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
               </Button>
             </div>
           </div>
+        </header>
 
-          {/* Mobile Menu Dropdown */}
-          {isMobileMenuOpen && (
-            <div className="border-t border-neutral-200 bg-background">
-              <nav className="py-2 max-h-[70vh] overflow-y-auto" role="navigation" aria-label="Mobile navigation">
-                {/* Profile Section */}
-                <div className="px-4 py-3 border-b border-neutral-200">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center text-sm font-medium">
-                      {user?.name?.charAt(0) || <User className="h-5 w-5" />}
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">{user?.name || 'User'}</p>
-                      <p className="text-xs text-neutral-500">{user?.email || 'user@example.com'}</p>
-                    </div>
+        {/* Sidebar Backdrop */}
+        {isMobileMenuOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300"
+            onClick={() => setIsMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+        )}
+
+        {/* Left Sidebar */}
+        <div
+          className="fixed top-0 left-0 h-full w-80 bg-background border-r border-neutral-200 z-50 shadow-xl"
+          style={{
+            transform: isMobileMenuOpen ? 'translateX(0px)' : 'translateX(-100%)',
+            transition: 'transform 300ms ease-out',
+            willChange: 'transform'
+          }}
+        >
+          {/* Sidebar Header */}
+          <div className="flex items-center justify-between h-14 px-4 border-b border-neutral-200 bg-background">
+            <div className="flex items-center space-x-3">
+              <GraduationCap className="h-6 w-6 text-brand-primary" />
+              <span className="font-semibold text-foreground">AUT Menu</span>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-neutral-500 hover:text-neutral-700"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
+
+          {/* Sidebar Content */}
+          <div className="flex-1 overflow-y-auto">
+            <nav className="py-2" role="navigation" aria-label="Mobile navigation">
+              {/* Profile Section */}
+              <div className="px-4 py-4 border-b border-neutral-200 bg-gradient-to-r from-brand-primary/5 to-transparent">
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center text-lg font-medium">
+                    {user?.name?.charAt(0) || <User className="h-6 w-6" />}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-base">{user?.name || 'User'}</p>
+                    <p className="text-sm text-neutral-500">{user?.email || 'user@example.com'}</p>
                   </div>
                 </div>
+              </div>
 
-                {/* Navigation Groups */}
+              {/* Navigation Groups */}
+              <div className="px-2 py-2">
                 {Object.entries(groupedItems).map(([group, items]) => (
-                  <div key={group} className="py-2">
+                  <div key={group} className="mb-4">
                     {group !== 'main' && (
-                      <div className="px-4 py-2">
+                      <div className="px-3 py-2">
                         <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
                           {group}
                         </h3>
                       </div>
                     )}
-                    {items.map((item, index) => {
-                      const Icon = item.icon;
-                      const active = isCurrentPath(item.path);
-                      
-                      return (
-                        <Link
-                          key={`${group}-${index}`}
-                          to={item.path}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className={cn(
-                            'flex items-center justify-between px-4 py-3 mx-2 rounded-lg transition-colors',
-                            active
-                              ? 'bg-brand-primary/10 text-brand-primary'
-                              : 'text-neutral-700 hover:bg-neutral-50'
-                          )}
-                          aria-current={active ? 'page' : undefined}
-                        >
-                          <div className="flex items-center space-x-3">
-                            <Icon className="h-5 w-5" />
-                            <span className="font-medium">{item.label}</span>
-                          </div>
-                          {item.badge && item.badge > 0 && (
-                            <span className="bg-error text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center">
-                              {item.badge > 99 ? '99+' : item.badge}
-                            </span>
-                          )}
-                        </Link>
-                      );
-                    })}
+                    <div className="space-y-1">
+                      {items.map((item, index) => {
+                        const Icon = item.icon;
+                        const active = isCurrentPath(item.path);
+                        
+                        return (
+                          <Link
+                            key={`${group}-${index}`}
+                            to={item.path}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className={cn(
+                              'flex items-center justify-between px-3 py-3 mx-1 rounded-xl transition-all duration-200',
+                              active
+                                ? 'bg-brand-primary/10 text-brand-primary shadow-sm'
+                                : 'text-neutral-700 hover:bg-neutral-50 hover:translate-x-1'
+                            )}
+                            aria-current={active ? 'page' : undefined}
+                          >
+                            <div className="flex items-center space-x-3">
+                              <Icon className="h-5 w-5 flex-shrink-0" />
+                              <span className="font-medium">{item.label}</span>
+                            </div>
+                            {item.badge && item.badge > 0 && (
+                              <span className="bg-error text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center flex-shrink-0">
+                                {item.badge > 99 ? '99+' : item.badge}
+                              </span>
+                            )}
+                          </Link>
+                        );
+                      })}
+                    </div>
                   </div>
                 ))}
                 
-                <div className="border-t border-neutral-200 mt-2 pt-2">
-                  <Link
-                    to="/profile"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={cn(
-                      'flex items-center space-x-3 px-4 py-3 mx-2 rounded-lg transition-colors',
-                      isCurrentPath('/profile')
-                        ? 'bg-brand-primary/10 text-brand-primary'
-                        : 'text-neutral-700 hover:bg-neutral-50'
-                    )}
-                    aria-current={isCurrentPath('/profile') ? 'page' : undefined}
-                  >
-                    <User className="h-5 w-5" />
-                    <span className="font-medium">My Profile</span>
-                  </Link>
-                  
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      handleLogout();
-                    }}
-                    className="w-full justify-start px-4 py-3 mx-2 text-error hover:bg-error/10 rounded-lg"
-                  >
-                    <LogOut className="h-5 w-5 mr-3" />
-                    Logout
-                  </Button>
+                {/* Profile and Logout Section */}
+                <div className="border-t border-neutral-200 mt-4 pt-4">
+                  <div className="space-y-1">
+                    <Link
+                      to="/profile"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={cn(
+                        'flex items-center space-x-3 px-3 py-3 mx-1 rounded-xl transition-all duration-200',
+                        isCurrentPath('/profile')
+                          ? 'bg-brand-primary/10 text-brand-primary shadow-sm'
+                          : 'text-neutral-700 hover:bg-neutral-50 hover:translate-x-1'
+                      )}
+                      aria-current={isCurrentPath('/profile') ? 'page' : undefined}
+                    >
+                      <User className="h-5 w-5" />
+                      <span className="font-medium">My Profile</span>
+                    </Link>
+                    
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        handleLogout();
+                      }}
+                      className="w-full justify-start px-3 py-3 mx-1 text-error hover:bg-error/10 rounded-xl transition-all duration-200 hover:translate-x-1"
+                    >
+                      <LogOut className="h-5 w-5 mr-3" />
+                      Logout
+                    </Button>
+                  </div>
                 </div>
-              </nav>
-            </div>
-            )}
-        </header>
+              </div>
+            </nav>
+          </div>
+        </div>
 
         {/* Bottom Navigation */}
         <nav 
@@ -974,9 +1058,8 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
           </div>
         </nav>
 
-        {/* Spacers */}
+        {/* Spacers - Fix: Only add top spacer, remove duplicate bottom spacer */}
         <div className="h-14" />
-        <div className="h-16" />
       </>
     );
   }
@@ -1182,7 +1265,7 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                 isDark 
                   ? 'bg-blue-600/20 text-blue-400' 
                   : 'bg-brand-primary/10 text-brand-primary'
-              )}>
+              )}></div>
                 {user?.name?.charAt(0) || <User className="h-4 w-4" />}
               </div>
             </Link>

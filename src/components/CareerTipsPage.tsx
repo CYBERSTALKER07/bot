@@ -479,28 +479,26 @@ export default function CareerTipsPage() {
   };
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-white">
-      {/* Enhanced Navigation with Mobile Support */}
-      <nav className="fixed top-0 w-full backdrop-blur-xl z-50 bg-white/95 border-b border-gray-100 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            <div className="flex items-center space-x-4">
-              <div className="p-3 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 shadow-lg">
-                <GraduationCap className="h-8 w-8 text-white" />
-              </div>
-              <Link to="/" className="text-2xl font-bold text-gray-900 hover:text-purple-600 transition-colors">
-                CareerConnect
-              </Link>
-            </div>
-            
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+      {/* Navigation */}
+      <nav className="fixed top-0 w-full backdrop-blur-sm z-50 bg-white/90 border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo */}
+            <Link to="/" className="flex items-center space-x-3">
+              <GraduationCap className="h-8 w-8 text-purple-600" />
+              <span className="font-bold text-xl text-gray-900">
+                AUTHandshake
+              </span>
+            </Link>
+
+            {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
-              <Link to="/for-students" className="text-gray-700 hover:text-purple-600 font-medium transition-colors relative group">
+              <Link to="/for-students" className="text-gray-700 hover:text-purple-600 font-medium transition-colors">
                 For Students
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-purple-600 transition-all group-hover:w-full"></span>
               </Link>
-              <Link to="/whos-hiring" className="text-gray-700 hover:text-purple-600 font-medium transition-colors relative group">
+              <Link to="/whos-hiring" className="text-gray-700 hover:text-purple-600 font-medium transition-colors">
                 Who's hiring
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-purple-600 transition-all group-hover:w-full"></span>
               </Link>
               <Link to="/career-tips" className="text-purple-600 font-bold relative">
                 Career tips
@@ -514,41 +512,110 @@ export default function CareerTipsPage() {
               </Link>
             </div>
 
-            {/* Mobile Menu Button */}
-            <button 
-              className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              onClick={() => setShowMobileMenu(!showMobileMenu)}
-            >
-              {showMobileMenu ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
-
-          {/* Mobile Menu */}
-          {showMobileMenu && (
-            <div className="md:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-100 shadow-lg">
-              <div className="px-6 py-4 space-y-4">
-                <Link to="/for-students" className="block text-gray-700 hover:text-purple-600 font-medium transition-colors">
-                  For Students
-                </Link>
-                <Link to="/whos-hiring" className="block text-gray-700 hover:text-purple-600 font-medium transition-colors">
-                  Who's hiring
-                </Link>
-                <Link to="/career-tips" className="block text-purple-600 font-bold">
-                  Career tips
-                </Link>
-                <div className="pt-4 border-t border-gray-200 space-y-3">
-                  <Link to="/login" className="block px-6 py-2 text-center text-gray-700 hover:text-purple-600 font-medium transition-colors border border-gray-300 rounded-lg">
-                    Sign in
-                  </Link>
-                  <Link to="/register" className="block px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-800 text-white font-semibold rounded-lg text-center">
-                    Get Started
-                  </Link>
-                </div>
-              </div>
+            {/* Mobile Avatar Button */}
+            <div className="md:hidden">
+              <button 
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                onClick={() => setShowMobileMenu(!showMobileMenu)}
+                aria-expanded={showMobileMenu}
+                aria-label="Toggle menu"
+              >
+                {showMobileMenu ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-purple-600/10 text-purple-600 flex items-center justify-center text-sm font-medium">
+                    <User className="h-5 w-5" />
+                  </div>
+                )}
+              </button>
             </div>
-          )}
+          </div>
         </div>
       </nav>
+
+      {/* Mobile Sidebar Backdrop */}
+      {showMobileMenu && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300"
+          onClick={() => setShowMobileMenu(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Mobile Left Sidebar */}
+      <div
+        className="fixed top-0 left-0 h-full w-80 bg-white border-r border-gray-200 z-50 shadow-xl md:hidden"
+        style={{
+          transform: showMobileMenu ? 'translateX(0px)' : 'translateX(-100%)',
+          transition: 'transform 300ms ease-out',
+          willChange: 'transform'
+        }}
+      >
+        {/* Sidebar Header */}
+        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
+          <div className="flex items-center space-x-3">
+            <GraduationCap className="h-6 w-6 text-purple-600" />
+            <span className="font-semibold text-gray-900">Navigation</span>
+          </div>
+          <button
+            onClick={() => setShowMobileMenu(false)}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Sidebar Content */}
+        <div className="flex-1 overflow-y-auto p-4">
+          <nav className="space-y-2">
+            <Link
+              to="/for-students"
+              onClick={() => setShowMobileMenu(false)}
+              className="flex items-center space-x-3 px-3 py-3 rounded-xl text-gray-700 hover:bg-gray-50 hover:text-purple-600 transition-all duration-200 hover:translate-x-1"
+            >
+              <GraduationCap className="h-5 w-5" />
+              <span className="font-medium">For Students</span>
+            </Link>
+            
+            <Link
+              to="/whos-hiring"
+              onClick={() => setShowMobileMenu(false)}
+              className="flex items-center space-x-3 px-3 py-3 rounded-xl text-gray-700 hover:bg-gray-50 hover:text-purple-600 transition-all duration-200 hover:translate-x-1"
+            >
+              <Building2 className="h-5 w-5" />
+              <span className="font-medium">Who's Hiring</span>
+            </Link>
+            
+            <Link
+              to="/career-tips"
+              onClick={() => setShowMobileMenu(false)}
+              className="flex items-center space-x-3 px-3 py-3 rounded-xl bg-purple-600/10 text-purple-600 shadow-sm"
+            >
+              <BookOpen className="h-5 w-5" />
+              <span className="font-medium">Career Tips</span>
+            </Link>
+            
+            <div className="border-t border-gray-200 mt-4 pt-4">
+              <Link
+                to="/login"
+                onClick={() => setShowMobileMenu(false)}
+                className="flex items-center space-x-3 px-3 py-3 rounded-xl text-gray-700 hover:bg-gray-50 transition-all duration-200 hover:translate-x-1"
+              >
+                <User className="h-5 w-5" />
+                <span className="font-medium">Sign In</span>
+              </Link>
+              
+              <Link
+                to="/register"
+                onClick={() => setShowMobileMenu(false)}
+                className="flex items-center space-x-3 px-3 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-purple-800 text-white shadow-sm mt-2 hover:from-purple-700 hover:to-purple-900 transition-all duration-200"
+              >
+                <span className="font-medium">Get Started</span>
+              </Link>
+            </div>
+          </nav>
+        </div>
+      </div>
 
       {/* Enhanced Hero Section with Advanced Search */}
       <section ref={heroRef} className="pt-32 pb-20 px-6 lg:px-8 bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 relative overflow-hidden">

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Home,
@@ -44,13 +44,12 @@ export default function Navigation() {
   const navigate = useNavigate();
   
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024); // Changed to lg breakpoint
-  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false); // For hover expansion
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 1024); // Changed to lg breakpoint
+      setIsMobile(window.innerWidth < 1024);
       if (window.innerWidth >= 1024) {
         setIsMobileMenuOpen(false);
       }
@@ -117,17 +116,20 @@ export default function Navigation() {
     return (
       <>
         {/* Mobile Top Bar */}
-        <header className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-xl border-b ${
-          isDark ? 'bg-black  border-gray-800' : 'bg-white/80 border-gray-200'
+        <header className={`fixed top-0 left-0 right-0 z-50 border-b ${
+          isDark ? 'bg-black/95 backdrop-blur-xl border-gray-800' : 'bg-white/95 backdrop-blur-xl border-gray-200'
         }`}>
           <div className="flex items-center justify-between px-4 py-3">
-            {/* <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                 isDark ? 'bg-white' : 'bg-black'
               }`}>
-                <XIcon className={`h-4 w-4 ${isDark ? 'text-black' : 'text-white'}`} />
+                <Feather className={`h-4 w-4 ${isDark ? 'text-black' : 'text-white'}`} />
               </div>
-            </div> */}
+              <span className={`font-bold text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                TalentLink
+              </span>
+            </div>
             
             <Button
               variant="ghost"
@@ -137,62 +139,149 @@ export default function Navigation() {
                 "p-2 rounded-full transition-colors duration-200",
                 isDark ? 'hover:bg-black text-white' : 'hover:bg-gray-100'
               )}
+              aria-expanded={isMobileMenuOpen}
+              aria-label="Toggle menu"
             >
-              {isMobileMenuOpen ? <XIcon className={cn(
-                isDark ? 'text-white' : 'text-gray-900',
-                "h-5 w-5 transition-transform duration-200"
-              )} /> : <div className="w-8 h-8 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center text-sm font-medium">
-                {user?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || <User className="h-5 w-5" />}
-              </div>}
+              {isMobileMenuOpen ? (
+                <XIcon className="h-5 w-5" />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center text-sm font-medium">
+                  {user?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || <User className="h-5 w-5" />}
+                </div>
+              )}
+            </Button>
+          </div>
+        </header>
+
+        {/* Mobile Sidebar Backdrop */}
+        {isMobileMenuOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300"
+            onClick={() => setIsMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+        )}
+
+        {/* Mobile Left Sidebar */}
+        <div
+          className={cn(
+            'fixed top-0 left-0 h-full w-80 z-50 shadow-xl border-r',
+            isDark ? 'bg-black/95 border-gray-800' : 'bg-white/95 border-gray-200'
+          )}
+          style={{
+            transform: isMobileMenuOpen ? 'translateX(0px)' : 'translateX(-100%)',
+            transition: 'transform 300ms ease-out',
+            willChange: 'transform'
+          }}
+        >
+          {/* Sidebar Header */}
+          <div className={cn(
+            'flex items-center justify-between h-16 px-4 border-b',
+            isDark ? 'border-gray-800' : 'border-gray-200'
+          )}>
+            <div className="flex items-center space-x-3">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                isDark ? 'bg-white' : 'bg-black'
+              }`}>
+                <Feather className={`h-4 w-4 ${isDark ? 'text-black' : 'text-white'}`} />
+              </div>
+              <span className={`font-bold text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                Menu
+              </span>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'}
+            >
+              <XIcon className="h-5 w-5" />
             </Button>
           </div>
 
-          {/* Mobile Menu Dropdown */}
-          {isMobileMenuOpen && (
-            <div className={`absolute top-full left-0 right-0 ${
-              isDark ? 'bg-black/95' : 'bg-white/95'
-            } backdrop-blur-xl border-b ${isDark ? 'border-gray-800' : 'border-gray-200'} shadow-lg`}>
-              <div className="p-4 space-y-1">
-                {navigationItems.slice(5).map((item, index) => {
-                  const Icon = item.icon;
-                  const isActive = isCurrentPath(item.path);
-                  return (
-                    <Link
-                      key={index}
-                      to={item.path}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className={`flex items-center backdrop-blur-xl space-x-3 px-4 py-3 rounded-full transition-colors ${
-                        isActive
-                          ? isDark ? 'bg-gray-900' : 'bg-gray-100'
-                          : isDark ? 'hover:bg-gray-900 text-white' : 'hover:bg-gray-100'
-                      }`}
-                    >
-                      <Icon className="h-6 w-6" />
-                      <span className="text-xl font-normal">{item.label}</span>
-                      {item.badge && item.badge > 0 && (
-                        <span className="ml-auto bg-blue-500 text-white text-sm px-2 py-1 rounded-full min-w-[20px] text-center">
-                          {item.badge}
-                        </span>
-                      )}
-                    </Link>
-                  );
-                })}
-                <div className={`border-t pt-4 mt-4 ${isDark ? 'border-gray-800' : 'border-gray-200'}`}>
-                  <Button
-                    variant="ghost"
-                    onClick={handleLogout}
-                    className="w-full justify-start px-4 py-3 text-red-500 hover:bg-red-500/10 rounded-full"
-                  >
-                    <LogOut className="h-6 w-6 mr-3" />
-                    <span className="text-xl font-normal">Log out</span>
-                  </Button>
-                </div>
+          {/* Profile Section */}
+          <div className={cn(
+            'px-4 py-4 border-b',
+            isDark ? 'border-gray-800' : 'border-gray-200'
+          )}>
+            <div className="flex items-center space-x-3">
+              <div className={cn(
+                "w-12 h-12 rounded-full flex items-center justify-center text-lg font-semibold",
+                isDark ? 'bg-gray-700 text-white' : 'bg-gray-300 text-gray-800'
+              )}>
+                {user?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
+              </div>
+              <div>
+                <p className={cn(
+                  "font-medium text-base truncate",
+                  isDark ? 'text-white' : 'text-gray-900'
+                )}>
+                  {user?.full_name || 'User'}
+                </p>
+                <p className={cn(
+                  "text-sm text-gray-500 truncate"
+                )}>
+                  {user?.email || 'user@example.com'}
+                </p>
               </div>
             </div>
-          )}
-        </header>
+          </div>
 
-        {/* Mobile Bottom Navigation */}
+          {/* Navigation Items */}
+          <div className="flex-1 overflow-y-auto p-4">
+            <nav className="space-y-2">
+              {navigationItems.map((item, index) => {
+                const Icon = item.icon;
+                const isActive = isCurrentPath(item.path);
+                
+                return (
+                  <Link
+                    key={index}
+                    to={item.path}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={cn(
+                      "flex items-center justify-between px-3 py-3 rounded-xl transition-all duration-200",
+                      isActive
+                        ? isDark 
+                          ? 'bg-white/10 text-white' 
+                          : 'bg-gray-100 text-gray-900'
+                        : isDark
+                          ? 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                          : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                    )}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Icon className="h-5 w-5" />
+                      <span className="font-medium">{item.label}</span>
+                    </div>
+                    {item.badge && item.badge > 0 && (
+                      <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center">
+                        {item.badge > 9 ? '9+' : item.badge}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* Logout Button */}
+            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-800">
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  handleLogout();
+                }}
+                className="w-full justify-start px-3 py-3 text-red-500 hover:bg-red-500/10 rounded-xl"
+              >
+                <LogOut className="h-5 w-5 mr-3" />
+                <span className="font-medium">Logout</span>
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Navigation */}
         <nav className={`fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl border-t ${
           isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
         }`}>
@@ -225,7 +314,8 @@ export default function Navigation() {
           </div>
         </nav>
 
-        {/* Spacer for mobile layout */}
+        {/* Spacers */}
+        <div className="h-16" />
         <div className="h-14" />
       </>
     );
@@ -346,15 +436,14 @@ export default function Navigation() {
         {/* User Profile */}
         <div className="p-4 border-t border-gray-200 dark:border-gray-800">
           <div className="relative">
-            <button
-              onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+            <Link
+              to="/profile"
               className={cn(
                 "w-full flex items-center rounded-xl transition-all duration-200",
                 isExpanded ? 'space-x-3 p-3' : 'justify-center p-3',
                 isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-100'
               )}
             >
-              {/* Avatar */}
               <div className="relative">
                 {user?.avatar_url ? (
                   <img 
@@ -370,7 +459,6 @@ export default function Navigation() {
                     {user?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
                   </div>
                 )}
-                {/* Online indicator */}
                 <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-900"></div>
               </div>
               
@@ -396,69 +484,24 @@ export default function Navigation() {
                   )} />
                 </>
               )}
-            </button>
-
-            {/* Profile Menu */}
-            {isProfileMenuOpen && (
-              <div className={cn(
-                "absolute bottom-full mb-2 rounded-3xl shadow-lg border w-[300px] overflow-hidden z-50",
-                "transition-all duration-300 ease-out",
-                "animate-in slide-in-from-bottom-2 fade-in-0",
-                isDark ? 'bg-black border-gray-800 backdrop-blur-xl' : 'bg-white/95 border-gray-200 backdrop-blur-xl',
-                isExpanded ? 'left-3 right-3' : 'left-1/2 transform -translate-x-1/2 w-48'
-              )}>
-                <Link
-                  to="/feed"
-                  className={cn(
-                    "flex items-center space-x-3 px-4 py-3 transition-all duration-200",
-                    "hover:translate-x-1 transform",
-                    isDark ? 'hover:bg-gray-800 text-gray-300 hover:text-white' : 'hover:bg-gray-50 text-gray-700 hover:text-gray-900'
-                  )}
-                  onClick={() => setIsProfileMenuOpen(false)}
-                >
-                  <Home className="h-4 w-4 transition-transform duration-200" />
-                  <span className="text-sm font-medium">Home Feed</span>
-                </Link>
-                <Link
-                  to="/settings"
-                  className={cn(
-                    "flex items-center space-x-3 px-4 py-3 transition-all duration-200",
-                    "hover:translate-x-1 transform",
-                    isDark ? 'hover:bg-gray-800 text-gray-300 hover:text-white' : 'hover:bg-gray-50 text-gray-700 hover:text-gray-900'
-                  )}
-                  onClick={() => setIsProfileMenuOpen(false)}
-                >
-                  <Settings className="h-4 w-4 transition-transform duration-200 group-hover:rotate-45" />
-                  <span className="text-sm font-medium">Settings & Privacy</span>
-                </Link>
-                <div className={cn(
-                  "border-t transition-colors duration-200",
-                  isDark ? 'border-gray-700' : 'border-gray-200'
-                )} />
-                <button
-                  onClick={handleLogout}
-                  className={cn(
-                    "w-full flex items-center space-x-3 px-4 py-3 transition-all duration-200",
-                    "hover:translate-x-1 transform",
-                    "text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600"
-                  )}
-                >
-                  <LogOut className="h-4 w-4 transition-transform duration-200 hover:scale-110" />
-                  <span className="text-sm font-medium">Log out @{user?.email?.split('@')[0]}</span>
-                </button>
-              </div>
-            )}
+            </Link>
           </div>
         </div>
       </aside>
 
-      {/* Backdrop Blur Overlay when Navigation is Active/Expanded */}
+      {/* Backdrop for expanded sidebar */}
       {isExpanded && (
         <div 
           className="fixed inset-0 bg-black/10 backdrop-blur-sm z-30 transition-all duration-300"
           onClick={() => setIsExpanded(false)}
         />
       )}
+
+      {/* Main Content Spacer */}
+      <div className={cn(
+        'transition-all duration-300 ease-out',
+        isExpanded ? 'ml-64' : 'ml-20'
+      )} />
     </>
   );
 }
