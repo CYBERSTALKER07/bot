@@ -1,24 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Send, 
-  Search, 
-  Filter,
+import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
+import {
+  Search,
+  Plus,
   MoreHorizontal,
+  Send,
   Paperclip,
   Smile,
   Phone,
   Video,
-  Info,
-  ArrowLeft,
-  Plus,
-  Check,
-  CheckCheck,
-  Menu,
-  X as XIcon
+  Info
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import Button from './ui/Button';
+import Input from './ui/Input';
+import PageLayout from './ui/PageLayout';
 import { cn } from '../lib/cva';
 
 interface Message {
@@ -51,6 +48,7 @@ export default function Messages() {
   const [newMessage, setNewMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [showSidebar, setShowSidebar] = useState(true);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   // Mock data
   useEffect(() => {
@@ -173,295 +171,213 @@ export default function Messages() {
   };
 
   return (
-    <div className={`h-screen flex ${isDark ? 'bg-black text-white' : 'bg-white text-black'}`}>
-      
-      {/* Left Sidebar - X Style */}
-      <div className={`${
-        showSidebar ? 'flex' : 'hidden'
-      } lg:flex flex-col w-full lg:w-80 xl:w-96 border-r ${
-        isDark ? 'border-gray-800' : 'border-gray-200'
-      }`}>
-        
-        {/* Header */}
-        <div className={`p-4 border-b flex items-center justify-between ${
-          isDark ? 'border-gray-800' : 'border-gray-200'
+    <PageLayout 
+      className={isDark ? 'bg-black text-white' : 'bg-white text-black'}
+      maxWidth="full"
+      padding="none"
+    >
+      <div className="flex h-screen">
+        {/* Conversations List */}
+        <div className={`w-80 border-r ${
+          isDark ? 'border-gray-800 bg-black' : 'border-gray-200 bg-white'
         }`}>
-          <div className="flex items-center space-x-3">
-            <h1 className="text-xl font-bold">Messages</h1>
-            <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-              isDark ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'
-            }`}>
-              {conversations.reduce((sum, conv) => sum + conv.unread_count, 0)} unread
+          {/* Header */}
+          <div className={`p-4 border-b ${isDark ? 'border-gray-800' : 'border-gray-200'}`}>
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-xl font-bold">Messages</h1>
+              <Button variant="ghost" size="sm">
+                <Plus className="h-5 w-5" />
+              </Button>
+            </div>
+            
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+              <input
+                type="text"
+                placeholder="Search messages"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className={`w-full pl-10 pr-4 py-2 rounded-full text-sm ${
+                  isDark 
+                    ? 'bg-gray-900 border-gray-800 text-white placeholder-gray-400' 
+                    : 'bg-gray-100 border-gray-300 text-black placeholder-gray-600'
+                }`}
+              />
             </div>
           </div>
-          <Button variant="ghost" size="sm" className="p-2">
-            <Plus className="h-5 w-5" />
-          </Button>
-        </div>
 
-        {/* Search */}
-        <div className="p-4">
-          <div className={`relative rounded-2xl ${
-            isDark ? 'bg-gray-900' : 'bg-gray-100'
-          }`}>
-            <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 ${
-              isDark ? 'text-gray-400' : 'text-gray-500'
-            }`} />
-            <input
-              type="text"
-              placeholder="Search messages"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className={`w-full pl-12 pr-4 py-3 rounded-2xl bg-transparent border-none outline-none ${
-                isDark ? 'text-white placeholder-gray-400' : 'text-black placeholder-gray-600'
-              }`}
-            />
-          </div>
-        </div>
-
-        {/* Conversations List */}
-        <div className="flex-1 overflow-y-auto">
-          {filteredConversations.map((conversation) => (
-            <div
-              key={conversation.id}
-              onClick={() => {
-                setSelectedConversation(conversation.id);
-                setShowSidebar(false);
-              }}
-              className={cn(
-                'p-4 cursor-pointer transition-colors hover:bg-gray-50/5',
-                selectedConversation === conversation.id && (
-                  isDark ? 'bg-gray-900' : 'bg-gray-100'
-                )
-              )}
-            >
-              <div className="flex items-start space-x-3">
-                <div className="relative">
+          {/* Conversation List */}
+          <div className="overflow-y-auto flex-1">
+            {filteredConversations.map((conversation) => (
+              <div
+                key={conversation.id}
+                onClick={() => setSelectedConversation(conversation.id)}
+                className={`p-4 border-b cursor-pointer hover:bg-gray-50/5 transition-colors ${
+                  selectedConversation === conversation.id 
+                    ? (isDark ? 'bg-gray-900' : 'bg-blue-50') 
+                    : ''
+                } ${isDark ? 'border-gray-800' : 'border-gray-200'}`}
+              >
+                <div className="flex items-start space-x-3">
                   <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
                     isDark ? 'bg-gray-800' : 'bg-gray-200'
                   }`}>
-                    <span className="text-lg">
-                      {conversation.participant_avatar ? (
-                        <img 
-                          src={conversation.participant_avatar} 
-                          alt={conversation.participant_name}
-                          className="w-full h-full rounded-full object-cover"
-                        />
-                      ) : (
-                        conversation.participant_name[0]
-                      )}
+                    <span className="font-medium">
+                      {conversation.participant_name.charAt(0)}
                     </span>
                   </div>
-                  <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full ${getRoleColor(conversation.participant_role)}`} />
-                  {conversation.unread_count > 0 && (
-                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">
-                        {conversation.unread_count > 9 ? '9+' : conversation.unread_count}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <p className="font-medium truncate">
+                        {conversation.participant_name}
+                      </p>
+                      <span className={`text-xs ${
+                        isDark ? 'text-gray-400' : 'text-gray-500'
+                      }`}>
+                        {formatTime(conversation.last_message_time)}
                       </span>
                     </div>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="font-bold truncate">{conversation.participant_name}</p>
-                    <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                      {formatTime(conversation.last_message_time)}
-                    </span>
-                  </div>
-                  {conversation.job_title && (
-                    <p className={`text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                      Re: {conversation.job_title}
+                    <p className={`text-sm mt-1 truncate ${
+                      conversation.unread_count > 0 
+                        ? 'font-medium' 
+                        : (isDark ? 'text-gray-400' : 'text-gray-600')
+                    }`}>
+                      {conversation.last_message}
                     </p>
-                  )}
-                  <p className={`text-sm truncate ${
-                    conversation.unread_count > 0 
-                      ? isDark ? 'text-white' : 'text-black font-medium'
-                      : isDark ? 'text-gray-400' : 'text-gray-600'
-                  }`}>
-                    {conversation.last_message}
-                  </p>
+                    {conversation.unread_count > 0 && (
+                      <div className="flex justify-between items-center mt-2">
+                        <div></div>
+                        <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center">
+                          {conversation.unread_count}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Main Chat Area - X Style */}
-      <div className={`flex-1 flex flex-col ${
-        !showSidebar || selectedConversation ? 'flex' : 'hidden lg:flex'
-      }`}>
-        {selectedConversation && currentConversation ? (
-          <>
-            {/* Chat Header */}
-            <div className={`p-4 border-b flex items-center justify-between ${
-              isDark ? 'border-gray-800' : 'border-gray-200'
-            }`}>
-              <div className="flex items-center space-x-3">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowSidebar(true)}
-                  className="lg:hidden p-2"
-                >
-                  <ArrowLeft className="h-5 w-5" />
-                </Button>
-                <div className="relative">
+        {/* Chat Area */}
+        <div className="flex-1 flex flex-col">
+          {currentConversation ? (
+            <>
+              {/* Chat Header */}
+              <div className={`p-4 border-b flex items-center justify-between ${
+                isDark ? 'border-gray-800' : 'border-gray-200'
+              }`}>
+                <div className="flex items-center space-x-3">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                     isDark ? 'bg-gray-800' : 'bg-gray-200'
                   }`}>
-                    <span className="text-lg">
-                      {currentConversation.participant_avatar ? (
-                        <img 
-                          src={currentConversation.participant_avatar} 
-                          alt={currentConversation.participant_name}
-                          className="w-full h-full rounded-full object-cover"
-                        />
-                      ) : (
-                        currentConversation.participant_name[0]
-                      )}
+                    <span className="font-medium">
+                      {currentConversation.participant_name.charAt(0)}
                     </span>
                   </div>
-                  <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full ${getRoleColor(currentConversation.participant_role)}`} />
-                </div>
-                <div>
-                  <p className="font-bold">{currentConversation.participant_name}</p>
-                  {currentConversation.job_title && (
-                    <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                      Re: {currentConversation.job_title}
+                  <div>
+                    <h2 className="font-semibold">
+                      {currentConversation.participant_name}
+                    </h2>
+                    <p className={`text-sm ${
+                      isDark ? 'text-gray-400' : 'text-gray-600'
+                    }`}>
+                      {currentConversation.job_title}
                     </p>
-                  )}
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Button variant="ghost" size="sm">
+                    <Phone className="h-5 w-5" />
+                  </Button>
+                  <Button variant="ghost" size="sm">
+                    <Video className="h-5 w-5" />
+                  </Button>
+                  <Button variant="ghost" size="sm">
+                    <Info className="h-5 w-5" />
+                  </Button>
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="sm" className="p-2 hidden sm:flex">
-                  <Phone className="h-5 w-5" />
-                </Button>
-                <Button variant="ghost" size="sm" className="p-2 hidden sm:flex">
-                  <Video className="h-5 w-5" />
-                </Button>
-                <Button variant="ghost" size="sm" className="p-2">
-                  <MoreHorizontal className="h-5 w-5" />
-                </Button>
-              </div>
-            </div>
 
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {conversationMessages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
-                >
+              {/* Messages */}
+              <div 
+                ref={messagesEndRef}
+                className="flex-1 overflow-y-auto p-4 space-y-4"
+              >
+                {conversationMessages.map((message, index) => (
                   <div
-                    className={`max-w-xs sm:max-w-sm md:max-w-md px-4 py-3 rounded-2xl ${
-                      message.sender_id === user?.id
-                        ? isDark
-                          ? 'bg-blue-500 text-white rounded-br-md'
-                          : 'bg-blue-500 text-white rounded-br-md'
-                        : isDark
-                          ? 'bg-gray-900 text-white rounded-bl-md'
-                          : 'bg-gray-100 text-black rounded-bl-md'
+                    key={index}
+                    className={`flex ${
+                      message.sender_id === user?.id ? 'justify-end' : 'justify-start'
                     }`}
                   >
-                    <p className="break-words mb-2">{message.content}</p>
-                    <div className="flex items-center justify-between">
-                      <span className={`text-xs ${
+                    <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
+                      message.sender_id === user?.id
+                        ? 'bg-blue-500 text-white'
+                        : (isDark ? 'bg-gray-800' : 'bg-gray-100')
+                    }`}>
+                      <p className="text-sm">{message.content}</p>
+                      <p className={`text-xs mt-1 ${
                         message.sender_id === user?.id 
-                          ? 'text-white/70'
-                          : isDark 
-                            ? 'text-gray-400' 
-                            : 'text-gray-500'
+                          ? 'text-blue-200' 
+                          : (isDark ? 'text-gray-400' : 'text-gray-500')
                       }`}>
                         {formatTime(message.timestamp)}
-                      </span>
-                      {message.sender_id === user?.id && (
-                        <div className="ml-2">
-                          {message.read ? (
-                            <CheckCheck className="h-4 w-4 text-white/70" />
-                          ) : (
-                            <Check className="h-4 w-4 text-white/70" />
-                          )}
-                        </div>
-                      )}
+                      </p>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
 
-            {/* Message Input */}
-            <div className={`p-4 border-t ${
-              isDark ? 'border-gray-800' : 'border-gray-200'
-            }`}>
-              <div className="flex items-end space-x-2">
-                <Button variant="ghost" size="sm" className="p-2 mb-3 hidden sm:flex">
-                  <Paperclip className="h-5 w-5" />
-                </Button>
-                <div className="flex-1">
-                  <div className={`flex items-end rounded-2xl border ${
-                    isDark ? 'border-gray-700 bg-gray-900' : 'border-gray-300 bg-gray-50'
-                  }`}>
-                    <textarea
-                      value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          handleSendMessage();
-                        }
-                      }}
-                      placeholder="Start a new message"
-                      rows={1}
-                      className={`flex-1 px-4 py-3 bg-transparent border-none outline-none resize-none ${
-                        isDark ? 'text-white placeholder-gray-400' : 'text-black placeholder-gray-600'
-                      }`}
-                      style={{ minHeight: '20px', maxHeight: '100px' }}
-                    />
-                    <Button variant="ghost" size="sm" className="p-2 mr-2 hidden sm:flex">
-                      <Smile className="h-5 w-5" />
-                    </Button>
-                  </div>
+              {/* Message Input */}
+              <div className={`p-4 border-t ${isDark ? 'border-gray-800' : 'border-gray-200'}`}>
+                <div className={`flex items-center space-x-2 rounded-full border ${
+                  isDark ? 'border-gray-800 bg-gray-900' : 'border-gray-300 bg-white'
+                } p-2`}>
+                  <Button variant="ghost" size="sm">
+                    <Paperclip className="h-5 w-5" />
+                  </Button>
+                  <input
+                    type="text"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                    placeholder="Type a message..."
+                    className={`flex-1 bg-transparent outline-none ${
+                      isDark ? 'text-white placeholder-gray-400' : 'text-black placeholder-gray-600'
+                    }`}
+                  />
+                  <Button variant="ghost" size="sm">
+                    <Smile className="h-5 w-5" />
+                  </Button>
+                  <Button
+                    onClick={handleSendMessage}
+                    disabled={!newMessage.trim()}
+                    className={`rounded-full p-2 ${
+                      newMessage.trim() 
+                        ? 'bg-blue-500 text-white hover:bg-blue-600' 
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
                 </div>
-                <Button
-                  onClick={handleSendMessage}
-                  disabled={!newMessage.trim()}
-                  className={`p-3 rounded-full ${
-                    newMessage.trim()
-                      ? 'bg-blue-500 text-white hover:bg-blue-600' 
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  <Send className="h-5 w-5" />
-                </Button>
+              </div>
+            </>
+          ) : (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center">
+                <h3 className="text-lg font-medium mb-2">No conversation selected</h3>
+                <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>
+                  Choose a conversation to start messaging
+                </p>
               </div>
             </div>
-          </>
-        ) : (
-          /* No Conversation Selected */
-          <div className="flex-1 flex items-center justify-center p-8">
-            <div className="text-center">
-              <div className={`w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center ${
-                isDark ? 'bg-gray-900' : 'bg-gray-100'
-              }`}>
-                <XIcon className={`w-12 h-12 ${isDark ? 'text-white' : 'text-black'}`} />
-              </div>
-              <h2 className="text-2xl font-bold mb-2">Select a message</h2>
-              <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                Choose from your existing conversations, start a new one, or just keep swimming.
-              </p>
-              <Button 
-                className={`rounded-full px-6 py-3 font-bold ${
-                  isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800'
-                }`}
-                onClick={() => setShowSidebar(true)}
-              >
-                New message
-              </Button>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }

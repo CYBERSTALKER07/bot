@@ -1,29 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  MapPin,
-  Briefcase,
-  Clock,
-  DollarSign,
+import {
   Filter,
   Search,
+  Calendar,
   Building2,
-  FileText,
+  MapPin,
+  Clock,
   CheckCircle,
-  Clock as PendingIcon,
-  X,
-  MessageSquare,
+  XCircle,
+  AlertCircle,
   Eye,
-  Share,
-  TrendingUp
+  Trash2,
+  ExternalLink
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import Button from './ui/Button';
+import { Card } from './ui/Card';
+import PageLayout from './ui/PageLayout';
+import { cn } from '../lib/cva';
 import { Application } from '../types';
 import { supabase } from '../lib/supabase';
 import Typography from './ui/Typography';
-import Button from './ui/Button';
-import { Card } from './ui/Card';
 import SearchBox from './ui/SearchBox';
 import Select from './ui/Select';
 import StatusBadge from './ui/StatusBadge';
@@ -169,239 +168,234 @@ export default function Applications() {
   }
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        {/* Header */}
-        <div className="mb-8">
-          <Typography variant="h4" className="font-medium mb-2">
-            My Applications
-          </Typography>
-          <Typography variant="body1" color="textSecondary">
-            Track your job applications and stay updated on your application status.
-          </Typography>
-        </div>
+    <PageLayout 
+      className={isDark ? 'bg-black text-white' : 'bg-white text-black'}
+      maxWidth="6xl"
+    >
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">
+          My Applications
+        </h1>
+        <p className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+          Track your job applications and their status
+        </p>
+      </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
-          {Object.entries(statusCounts).map(([status, count], index) => (
-            <Card key={status} className="p-4" elevation={1}>
-              <div className="text-center">
-                <div className={`w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center ${
-                  status === 'all' 
-                    ? isDark ? 'bg-lime/10 text-lime' : 'bg-asu-maroon/10 text-asu-maroon'
-                    : getStatusColor(status)
-                }`}>
-                  {getStatusIcon(status)}
-                </div>
-                <Typography variant="h6" className="font-semibold mb-1">
-                  {count}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" className="capitalize text-sm">
-                  {status === 'all' ? 'Total' : status}
-                </Typography>
-              </div>
-            </Card>
-          ))}
-        </div>
-
-        {/* Search and Filters */}
-        <Card className="p-6 mb-8" elevation={1}>
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <SearchBox
-                placeholder="Search applications..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                variant="outlined"
-                fullWidth
-              />
-            </div>
-            <div className="flex gap-4">
-              <Select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className={`px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
-                  isDark 
-                    ? 'border-gray-600 bg-dark-surface text-dark-text focus:ring-lime' 
-                    : 'border-gray-300 bg-white text-gray-900 focus:ring-asu-maroon'
-                }`}
-              >
-                <option value="all">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="reviewed">Reviewed</option>
-                <option value="interview">Interview</option>
-                <option value="accepted">Accepted</option>
-                <option value="rejected">Rejected</option>
-              </Select>
-              <Select
-                value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value)}
-                className={`px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
-                  isDark 
-                    ? 'border-gray-600 bg-dark-surface text-dark-text focus:ring-lime' 
-                    : 'border-gray-300 bg-white text-gray-900 focus:ring-asu-maroon'
-                }`}
-              >
-                <option value="all">All Types</option>
-                <option value="full-time">Full Time</option>
-                <option value="part-time">Part Time</option>
-                <option value="internship">Internship</option>
-              </Select>
-            </div>
+      {/* Filters and Search */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-8">
+        <div className="flex-1">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search applications..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className={`w-full pl-10 pr-4 py-3 rounded-lg border ${
+                isDark 
+                  ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-400' 
+                  : 'bg-white border-gray-300 text-black placeholder-gray-500'
+              }`}
+            />
           </div>
-        </Card>
+        </div>
+        
+        <div className="flex gap-2">
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className={`px-4 py-3 rounded-lg border ${
+              isDark 
+                ? 'bg-gray-900 border-gray-700 text-white' 
+                : 'bg-white border-gray-300 text-black'
+            }`}
+          >
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="reviewed">Reviewed</option>
+            <option value="interview">Interview</option>
+            <option value="accepted">Accepted</option>
+            <option value="rejected">Rejected</option>
+          </select>
+          
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            className={`px-4 py-3 rounded-lg border ${
+              isDark 
+                ? 'bg-gray-900 border-gray-700 text-white' 
+                : 'bg-white border-gray-300 text-black'
+            }`}
+          >
+            <option value="all">All Types</option>
+            <option value="full-time">Full Time</option>
+            <option value="part-time">Part Time</option>
+            <option value="internship">Internship</option>
+          </select>
+        </div>
+      </div>
 
-        {/* Applications List */}
-        {filteredApplications.length === 0 ? (
-          <Card className="p-12 text-center" elevation={1}>
-            <FileText className={`h-16 w-16 mx-auto mb-4 ${
-              isDark ? 'text-dark-muted' : 'text-gray-400'
-            }`} />
-            <Typography variant="h6" className="mb-2">
-              No applications found
-            </Typography>
-            <Typography variant="body1" color="textSecondary" className="mb-4">
-              {searchTerm || statusFilter !== 'all' || typeFilter !== 'all' 
-                ? 'Try adjusting your search criteria'
-                : 'Start applying to jobs to see your applications here'
-              }
-            </Typography>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              {searchTerm || statusFilter !== 'all' || typeFilter !== 'all' ? (
-                <Button 
-                  variant="outlined"
-                  onClick={() => {
-                    setSearchTerm('');
-                    setStatusFilter('all');
-                    setTypeFilter('all');
-                  }}
-                >
-                  Clear Filters
-                </Button>
-              ) : (
-                <Link to="/jobs">
-                  <Button variant="contained" color="primary">
-                    Browse Jobs
-                  </Button>
-                </Link>
-              )}
-            </div>
-          </Card>
-        ) : (
-          <div className="space-y-4">
-            {filteredApplications.map((application) => (
-              <Card key={application.id} className="p-6 hover:shadow-lg transition-shadow" elevation={1}>
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-4">
-                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center font-bold text-white ${
-                        isDark ? 'bg-lime' : 'bg-asu-maroon'
-                      }`}>
-                        {application.company_name.charAt(0)}
-                      </div>
-                      <div>
-                        <Typography variant="h6" className="font-medium">
-                          {application.job_title}
-                        </Typography>
-                        <Typography variant="subtitle1" color="primary" className="font-medium">
-                          {application.company_name}
-                        </Typography>
-                        <div className="flex items-center space-x-4 mt-1">
-                          <div className="flex items-center space-x-1">
-                            <MapPin className={`h-4 w-4 ${isDark ? 'text-dark-muted' : 'text-gray-400'}`} />
-                            <Typography variant="body2" color="textSecondary">
-                              {application.location}
-                            </Typography>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Clock className={`h-4 w-4 ${isDark ? 'text-dark-muted' : 'text-gray-400'}`} />
-                            <Typography variant="body2" color="textSecondary">
-                              Applied {new Date(application.applied_date).toLocaleDateString()}
-                            </Typography>
-                          </div>
-                          {application.salary_range && (
-                            <div className="flex items-center space-x-1">
-                              <TrendingUp className={`h-4 w-4 ${isDark ? 'text-dark-muted' : 'text-gray-400'}`} />
-                              <Typography variant="body2" color="textSecondary">
-                                {application.salary_range}
-                              </Typography>
-                            </div>
-                          )}
-                        </div>
-                      </div>
+      {/* Applications Grid */}
+      <div className="grid gap-6">
+        {filteredApplications.map((application) => (
+          <Card 
+            key={application.id} 
+            className={`p-6 hover:shadow-lg transition-all duration-200 ${
+              isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
+            }`}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-start space-x-4">
+                <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                  isDark ? 'bg-gray-800' : 'bg-gray-100'
+                }`}>
+                  <Building2 className="h-6 w-6 text-blue-500" />
+                </div>
+                
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold mb-1">{application.job_title}</h3>
+                  <p className="text-blue-500 font-medium mb-2">{application.company_name}</p>
+                  
+                  <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
+                    <div className="flex items-center gap-1">
+                      <MapPin className="h-4 w-4" />
+                      {application.location}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-4 w-4" />
+                      Applied {new Date(application.applied_date).toLocaleDateString()}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-4 w-4" />
+                      {application.type}
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-4">
-                    <div className={`flex items-center space-x-2 px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(application.status)}`}>
+                  <div className="flex items-center gap-3">
+                    <span className={cn(
+                      "px-3 py-1 rounded-full text-sm font-medium",
+                      getStatusColor(application.status)
+                    )}>
                       {getStatusIcon(application.status)}
-                      <span className="capitalize">{application.status}</span>
-                    </div>
-                    <Button variant="text" size="small" className="min-w-0 p-2">
-                      <Share className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-
-                {application.description && (
-                  <div className={`p-4 rounded-lg mb-4 ${
-                    isDark ? 'bg-dark-surface' : 'bg-gray-50'
-                  }`}>
-                    <Typography variant="body2" color="textSecondary">
-                      {application.description}
-                    </Typography>
-                  </div>
-                )}
-
-                {application.requirements && (
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {application.requirements.slice(0, 4).map((req, reqIndex) => (
-                      <span
-                        key={reqIndex}
-                        className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          isDark ? 'bg-lime/10 text-lime' : 'bg-asu-maroon/10 text-asu-maroon'
-                        }`}
-                      >
-                        {req}
-                      </span>
-                    ))}
-                    {application.requirements.length > 4 && (
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'
-                      }`}>
-                        +{application.requirements.length - 4} more
+                      {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
+                    </span>
+                    
+                    {application.interview_date && (
+                      <span className="text-sm text-orange-600 font-medium">
+                        Interview: {new Date(application.interview_date).toLocaleDateString()}
                       </span>
                     )}
                   </div>
-                )}
-
-                <div className="flex justify-between items-center pt-4 border-t">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-2">
-                      <Building2 className={`h-4 w-4 ${isDark ? 'text-dark-muted' : 'text-gray-400'}`} />
-                      <Typography variant="body2" color="textSecondary" className="capitalize">
-                        {application.type.replace('-', ' ')}
-                      </Typography>
-                    </div>
-                    <Typography variant="body2" color="textSecondary">
-                      Updated {new Date(application.last_updated).toLocaleDateString()}
-                    </Typography>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button variant="outlined" size="small">
-                      View Details
-                    </Button>
-                    <Button variant="text" size="small">
-                      Contact
-                    </Button>
-                  </div>
                 </div>
-              </Card>
-            ))}
-          </div>
-        )}
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => window.open(`/job/${application.job_id}`, '_blank')}
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
+                
+                <Button
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setSelectedApplication(application)}
+                >
+                  <Eye className="h-4 w-4" />
+                </Button>
+                
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => handleDeleteApplication(application.id)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            
+            {application.description && (
+              <div className={`p-4 rounded-lg mb-4 ${
+                isDark ? 'bg-dark-surface' : 'bg-gray-50'
+              }`}>
+                <Typography variant="body2" color="textSecondary">
+                  {application.description}
+                </Typography>
+              </div>
+            )}
+
+            {application.requirements && (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {application.requirements.slice(0, 4).map((req, reqIndex) => (
+                  <span
+                    key={reqIndex}
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      isDark ? 'bg-lime/10 text-lime' : 'bg-asu-maroon/10 text-asu-maroon'
+                    }`}
+                  >
+                    {req}
+                  </span>
+                ))}
+                {application.requirements.length > 4 && (
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    +{application.requirements.length - 4} more
+                  </span>
+                )}
+              </div>
+            )}
+
+            <div className="flex justify-between items-center pt-4 border-t">
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <Building2 className={`h-4 w-4 ${isDark ? 'text-dark-muted' : 'text-gray-400'}`} />
+                  <Typography variant="body2" color="textSecondary" className="capitalize">
+                    {application.type.replace('-', ' ')}
+                  </Typography>
+                </div>
+                <Typography variant="body2" color="textSecondary">
+                  Updated {new Date(application.last_updated).toLocaleDateString()}
+                </Typography>
+              </div>
+              <div className="flex space-x-2">
+                <Button variant="outlined" size="small">
+                  View Details
+                </Button>
+                <Button variant="text" size="small">
+                  Contact
+                </Button>
+              </div>
+            </div>
+          </Card>
+        ))}
       </div>
-    </div>
+
+      {filteredApplications.length === 0 && (
+        <div className="text-center py-12">
+          <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
+            isDark ? 'bg-gray-800' : 'bg-gray-100'
+          }`}>
+            <Building2 className="h-8 w-8 text-gray-400" />
+          </div>
+          <h3 className="text-xl font-semibold mb-2">No applications found</h3>
+          <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+            {searchTerm || statusFilter !== 'all' 
+              ? 'Try adjusting your filters or search terms'
+              : "You haven't applied to any jobs yet"
+            }
+          </p>
+          <Link to="/jobs">
+            <Button className="px-6 py-3">
+              Browse Jobs
+            </Button>
+          </Link>
+        </div>
+      )}
+    </PageLayout>
   );
 }
