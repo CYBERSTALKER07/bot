@@ -293,6 +293,205 @@
   .safe-right {
     padding-right: env(safe-area-inset-right);
   }
+
+  /* Enhanced iOS-specific safe area utilities */
+  .ios-safe-top {
+    padding-top: max(env(safe-area-inset-top), 20px);
+  }
+  
+  .ios-safe-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 20px);
+  }
+  
+  /* Dynamic Island and Notch support - Enhanced */
+  .ios-header-safe {
+    padding-top: max(env(safe-area-inset-top), 44px);
+    min-height: max(env(safe-area-inset-top), 44px);
+  }
+  
+  .ios-bottom-safe {
+    padding-bottom: max(env(safe-area-inset-bottom), 34px);
+    margin-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Home indicator area protection - Enhanced */
+  .ios-home-indicator-safe {
+    padding-bottom: max(env(safe-area-inset-bottom), 34px);
+    min-height: 64px; /* Ensure minimum touch target */
+  }
+  
+  /* Full safe area for iOS */
+  .ios-safe-area {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  /* iOS-specific responsive breakpoints - Enhanced */
+  @media screen and (max-width: 430px) and (max-height: 932px) {
+    /* iPhone 14 Pro Max specific adjustments */
+    .ios-pro-max-adjust {
+      padding-top: max(env(safe-area-inset-top), 59px);
+    }
+    
+    .ios-pro-max-bottom {
+      padding-bottom: max(env(safe-area-inset-bottom), 34px);
+      margin-bottom: max(env(safe-area-inset-bottom), 8px);
+    }
+  }
+  
+  @media screen and (max-width: 393px) and (max-height: 852px) {
+    /* iPhone 14 Pro specific adjustments */
+    .ios-pro-adjust {
+      padding-top: max(env(safe-area-inset-top), 59px);
+    }
+    
+    .ios-pro-bottom {
+      padding-bottom: max(env(safe-area-inset-bottom), 34px);
+      margin-bottom: max(env(safe-area-inset-bottom), 8px);
+    }
+  }
+  
+  @media screen and (max-width: 390px) and (max-height: 844px) {
+    /* iPhone 12/13/14 standard specific adjustments */
+    .ios-standard-adjust {
+      padding-top: max(env(safe-area-inset-top), 47px);
+    }
+    
+    .ios-standard-bottom {
+      padding-bottom: max(env(safe-area-inset-bottom), 34px);
+    }
+  }
+
+  @media screen and (max-width: 375px) and (max-height: 812px) {
+    /* iPhone X/XS/11 Pro specific adjustments */
+    .ios-x-adjust {
+      padding-top: max(env(safe-area-inset-top), 44px);
+    }
+    
+    .ios-x-bottom {
+      padding-bottom: max(env(safe-area-inset-bottom), 34px);
+    }
+  }
+
+  @media screen and (max-width: 375px) and (max-height: 667px) {
+    /* iPhone SE 2nd/3rd gen adjustments */
+    .ios-se-adjust {
+      padding-top: max(env(safe-area-inset-top), 20px);
+    }
+    
+    .ios-se-bottom {
+      padding-bottom: max(env(safe-area-inset-bottom), 16px);
+    }
+  }
+
+  /* Landscape safe areas - Enhanced */
+  @media screen and (orientation: landscape) {
+    .ios-landscape-safe {
+      padding-left: max(env(safe-area-inset-left), 44px);
+      padding-right: max(env(safe-area-inset-right), 44px);
+    }
+    
+    .ios-landscape-header {
+      padding-top: max(env(safe-area-inset-top), 0px);
+      padding-left: max(env(safe-area-inset-left), 44px);
+      padding-right: max(env(safe-area-inset-right), 44px);
+    }
+    
+    .ios-landscape-bottom {
+      padding-bottom: max(env(safe-area-inset-bottom), 21px);
+      padding-left: max(env(safe-area-inset-left), 44px);
+      padding-right: max(env(safe-area-inset-right), 44px);
+    }
+  }
+
+  /* Touch-friendly utilities for iOS */
+  .ios-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .ios-touch-target-large {
+    min-height: 48px;
+    min-width: 48px;
+  }
+  
+  /* iOS-style scroll behavior */
+  .ios-scroll {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  /* iOS momentum scrolling */
+  .ios-momentum-scroll {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  /* iOS-style backdrop blur */
+  .ios-backdrop {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  
+  /* iOS-style border radius */
+  .ios-rounded {
+    border-radius: 12px;
+  }
+  
+  .ios-rounded-lg {
+    border-radius: 16px;
+  }
+  
+  /* Prevent bounce scrolling on iOS */
+  .ios-no-bounce {
+    overscroll-behavior: contain;
+  }
+
+  /* Enhanced iOS navigation spacing */
+  .ios-nav-spacing {
+    padding: 12px 16px;
+  }
+  
+  .ios-nav-item {
+    padding: 12px 16px;
+    min-height: 48px;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+  }
+  
+  .ios-nav-item:active {
+    transform: scale(0.98);
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  
+  /* iOS-specific bottom navigation */
+  .ios-bottom-nav {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .dark .ios-bottom-nav {
+    background: rgba(0, 0, 0, 0.8);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  /* iOS-specific header */
+  .ios-header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .dark .ios-header {
+    background: rgba(0, 0, 0, 0.95);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
 }
 
 /* Print styles */

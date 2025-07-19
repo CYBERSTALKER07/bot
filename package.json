@@ -4,6 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "ios": "npx cap sync ios && npx cap open ios",
+    "android": "npx cap sync android && npx cap open android",
     "dev": "vite",
     "build": "vite build",
     "build:analyze": "vite build && npx vite-bundle-analyzer dist",
