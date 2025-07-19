@@ -315,8 +315,8 @@ export default function Navigation() {
         </nav>
 
         {/* Spacers */}
-        <div className="h-16" />
-        <div className="h-14" />
+        <div className="h-0" />
+        <div className="h-0" />
       </>
     );
   }
