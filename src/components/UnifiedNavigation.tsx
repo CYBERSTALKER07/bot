@@ -416,10 +416,12 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
   // Handle mouse leave to hide sidebar after delay
   const handleMouseLeave = () => {
     setIsHovered(false);
-    // Collapse to icon view instead of hiding completely
-    hideTimeoutRef.current = setTimeout(() => {
-      setIsCollapsed(true);
-    }, 500); // 500ms delay
+    // Keep sidebar in collapsed mode instead of completely hiding
+    if (!isCollapsed) {
+      hideTimeoutRef.current = setTimeout(() => {
+        setIsCollapsed(true);
+      }, 300); // Reduced delay for better UX
+    }
   };
 
   // Enhanced navigation items with grouping
