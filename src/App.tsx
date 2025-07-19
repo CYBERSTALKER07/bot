@@ -122,6 +122,9 @@ function AppContent() {
       {user && <Navigation />}
       <ScrollToTop />
       <Routes>
+        <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+        
+        {/* Public Routes */}
         <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage />} />
         <Route path="/mobile-app" element={<MobileAppPage />} />
         <Route path="/for-students" element={<ForStudentsPage />} />
