@@ -393,7 +393,7 @@ export default function Navigation() {
             {/* Profile Menu */}
             {isProfileMenuOpen && (
               <div className={cn(
-                "absolute bottom-full mb-2 rounded-3xl shadow-lg border overflow-hidden z-50",
+                "absolute bottom-full mb-2 rounded-3xl shadow-lg border w-[300px] overflow-hidden z-50",
                 "transition-all duration-300 ease-out",
                 "animate-in slide-in-from-bottom-2 fade-in-0",
                 isDark ? 'bg-black border-gray-800 backdrop-blur-xl' : 'bg-white/95 border-gray-200 backdrop-blur-xl',
