@@ -716,7 +716,7 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
           'bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl', // glass effect
           isDark ? 'border-gray-700' : 'border-neutral-200',
           isHidden ? '-translate-x-full' : 
-          isCollapsed && !isHovered ? 'w-16' : 'w-64',
+          isCollapsed && !isHovered ? 'w-20' : 'w-64', // Wider collapsed state for better icon visibility
           'shadow-xl' // optional: add shadow for depth
         )}
         role="navigation"
@@ -924,7 +924,7 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
       <div className={cn(
         'transition-all duration-300 ease-out',
         isHidden ? 'ml-0' : 
-        (isCollapsed && !isHovered) ? 'ml-16' : 'ml-64'
+        (isCollapsed && !isHovered) ? 'ml-20' : 'ml-64'
       )} />
     </>
   );

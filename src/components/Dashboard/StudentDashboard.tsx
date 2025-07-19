@@ -24,6 +24,7 @@ import { useTheme } from '../../context/ThemeContext';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 import { Card } from '../ui/Card';
+import PageLayout from '../ui/PageLayout';
 import { cn } from '../../lib/cva';
 
 export default function StudentDashboard() {
@@ -62,20 +63,24 @@ export default function StudentDashboard() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen ${isDark ? 'bg-black' : 'bg-white'}`}>
+      <PageLayout className={isDark ? 'bg-black text-white' : 'bg-white text-black'}>
         <div className="flex justify-center items-center h-screen">
           <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${
             isDark ? 'border-white' : 'border-black'
           }`}></div>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-black text-white' : 'bg-white text-black'}`}>
+    <PageLayout 
+      className={isDark ? 'bg-black text-white' : 'bg-white text-black'}
+      maxWidth="7xl"
+      padding="none"
+    >
       {/* X-Style Three Column Layout */}
-      <div className="max-w-7xl mx-auto flex">
+      <div className="flex">
         
         {/* Main Content - Center Column */}
         <div className="flex-1 max-w-2xl mx-auto border-x border-gray-800 dark:border-gray-200">
@@ -328,6 +333,6 @@ export default function StudentDashboard() {
           </div>
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }
