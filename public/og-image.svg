@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8C1D40;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#B8336A;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <text x="600" y="250" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="72" font-weight="bold">AUT Handshake</text>
+  <text x="600" y="320" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="32">Connect. Grow. Succeed.</text>
+  <text x="600" y="420" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-family="Arial, sans-serif" font-size="28">The premier platform connecting AUT students,</text>
+  <text x="600" y="460" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-family="Arial, sans-serif" font-size="28">graduates, and employers for career success</text>
+  
+  <!-- Decorative elements -->
+  <circle cx="150" cy="150" r="30" fill="rgba(255,255,255,0.1)"/>
+  <circle cx="1050" cy="480" r="40" fill="rgba(255,255,255,0.1)"/>
+  <rect x="100" y="500" width="60" height="60" rx="10" fill="rgba(255,255,255,0.1)"/>
+  <rect x="1040" y="100" width="80" height="80" rx="15" fill="rgba(255,255,255,0.1)"/>
+</svg>
