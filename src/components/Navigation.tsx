@@ -26,7 +26,6 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import Button from './ui/Button';
-import UserCard from './ui/UserCard';
 import { cn } from '../lib/cva';
 
 interface NavigationItem {
@@ -331,11 +330,11 @@ export default function Navigation() {
         <div className="h-0" />
 
         {/* User Card for Mobile */}
-        <UserCard 
+        {/* <UserCard 
           isOpen={isUserCardOpen}
           onClose={() => setIsUserCardOpen(false)}
           position="bottom-right"
-        />
+        /> */}
       </>
     );
   }
@@ -456,7 +455,7 @@ export default function Navigation() {
         <div className="p-4 border-t border-gray-200 dark:border-gray-800">
           <div className="relative">
             <button
-              onClick={handleUserClick}
+              onClick={() => setIsUserCardOpen(!isUserCardOpen)}
               className={cn(
                 "w-full flex items-center rounded-xl transition-all duration-200 cursor-pointer",
                 isExpanded ? 'space-x-3 p-3' : 'justify-center p-3',
@@ -504,6 +503,53 @@ export default function Navigation() {
                 </>
               )}
             </button>
+
+            {/* Desktop Dropdown Menu */}
+            {isUserCardOpen && (
+              <>
+                <div 
+                  className="fixed inset-0 z-40"
+                  onClick={() => setIsUserCardOpen(false)}
+                />
+                <div className={cn(
+                  "absolute bottom-full mb-2 w-64 rounded-2xl shadow-2xl border py-2 z-50",
+                  isExpanded ? "left-0" : "left-full ml-4",
+                  isDark ? 'bg-black border-gray-600 shadow-gray-900/50' : 'bg-white border-gray-300 shadow-gray-900/20'
+                )}>
+                  {/* Settings */}
+                  <Link
+                    to="/settings"
+                    onClick={() => setIsUserCardOpen(false)}
+                    className={cn(
+                      "flex items-center px-4 py-3 transition-colors duration-200 w-full",
+                      isDark ? 'hover:bg-gray-900 text-white' : 'hover:bg-gray-50 text-gray-900'
+                    )}
+                  >
+                    <Settings className="h-5 w-5 mr-3" />
+                    <span className="font-normal text-sm">
+                      Settings and privacy
+                    </span>
+                  </Link>
+
+                  {/* Logout */}
+                  <button
+                    onClick={() => {
+                      setIsUserCardOpen(false);
+                      handleLogout();
+                    }}
+                    className={cn(
+                      "w-full flex items-center px-4 py-3 transition-colors duration-200 text-left",
+                      isDark ? 'hover:bg-gray-900 text-white' : 'hover:bg-gray-50 text-gray-900'
+                    )}
+                  >
+                    <LogOut className="h-5 w-5 mr-3" />
+                    <span className="font-normal text-sm">
+                      Log out @{user?.email?.split('@')[0]}
+                    </span>
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </aside>
@@ -517,11 +563,11 @@ export default function Navigation() {
       )}
 
       {/* User Card */}
-      <UserCard 
+      {/* <UserCard 
         isOpen={isUserCardOpen}
         onClose={() => setIsUserCardOpen(false)}
         position={isExpanded ? "bottom-right" : "bottom-left"}
-      />
+      /> */}
 
       {/* Main Content Spacer */}
       <div className={cn(
