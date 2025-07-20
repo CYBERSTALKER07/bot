@@ -26,6 +26,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import Button from './ui/Button';
+import UserCard from './ui/UserCard';
 import { cn } from '../lib/cva';
 
 interface NavigationItem {
@@ -46,6 +47,7 @@ export default function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isUserCardOpen, setIsUserCardOpen] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -107,6 +109,12 @@ export default function Navigation() {
     } catch (error) {
       console.error('Logout failed:', error);
     }
+  };
+
+  const handleUserClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsUserCardOpen(true);
   };
 
   if (!user) return null;
@@ -204,12 +212,16 @@ export default function Navigation() {
             'px-4 py-4 border-b',
             isDark ? 'border-gray-800' : 'border-gray-200'
           )}>
-            <div className="flex items-center space-x-3">
+            <button
+              onClick={handleUserClick}
+              className="flex items-center space-x-3 w-full text-left hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg p-2 -m-2 transition-colors duration-200"
+            >
               <div className={cn(
-                "w-12 h-12 rounded-full flex items-center justify-center text-lg font-semibold",
+                "w-12 h-12 rounded-full flex items-center justify-center text-lg font-semibold relative",
                 isDark ? 'bg-gray-700 text-white' : 'bg-gray-300 text-gray-800'
               )}>
                 {user?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
+                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-900"></div>
               </div>
               <div>
                 <p className={cn(
@@ -224,7 +236,7 @@ export default function Navigation() {
                   {user?.email || 'user@example.com'}
                 </p>
               </div>
-            </div>
+            </button>
           </div>
 
           {/* Navigation Items */}
@@ -317,6 +329,13 @@ export default function Navigation() {
         {/* Spacers */}
         <div className="h-0" />
         <div className="h-0" />
+
+        {/* User Card for Mobile */}
+        <UserCard 
+          isOpen={isUserCardOpen}
+          onClose={() => setIsUserCardOpen(false)}
+          position="bottom-right"
+        />
       </>
     );
   }
@@ -436,10 +455,10 @@ export default function Navigation() {
         {/* User Profile */}
         <div className="p-4 border-t border-gray-200 dark:border-gray-800">
           <div className="relative">
-            <Link
-              to="/profile"
+            <button
+              onClick={handleUserClick}
               className={cn(
-                "w-full flex items-center rounded-xl transition-all duration-200",
+                "w-full flex items-center rounded-xl transition-all duration-200 cursor-pointer",
                 isExpanded ? 'space-x-3 p-3' : 'justify-center p-3',
                 isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-100'
               )}
@@ -484,7 +503,7 @@ export default function Navigation() {
                   )} />
                 </>
               )}
-            </Link>
+            </button>
           </div>
         </div>
       </aside>
@@ -496,6 +515,13 @@ export default function Navigation() {
           onClick={() => setIsExpanded(false)}
         />
       )}
+
+      {/* User Card */}
+      <UserCard 
+        isOpen={isUserCardOpen}
+        onClose={() => setIsUserCardOpen(false)}
+        position={isExpanded ? "bottom-right" : "bottom-left"}
+      />
 
       {/* Main Content Spacer */}
       <div className={cn(

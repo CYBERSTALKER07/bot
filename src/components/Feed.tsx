@@ -425,7 +425,7 @@ export default function Feed() {
 
         {/* Create Post Section */}
         <div className={cn(
-          'border-b p-4',
+          'border-[1px] p-4',
           isDark ? 'border-gray-800' : 'border-gray-200'
         )}>
           <div className="flex space-x-3">
@@ -486,8 +486,8 @@ export default function Feed() {
 
         {/* Posts Feed */}
         <div className={cn(
-          'divide-y',
-          isDark ? 'divide-gray-800' : 'divide-gray-200'
+          'border-[1px] divide-y',
+          isDark ? 'border-gray-800 divide-gray-800' : 'divide-gray-200'
         )}>
           {posts.map((post) => (
             <div 
