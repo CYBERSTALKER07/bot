@@ -5,6 +5,12 @@ struct MainTabView: View {
     
     var body: some View {
         TabView {
+            DashboardView()
+                .tabItem {
+                    Image(systemName: "house.fill")
+                    Text("Dashboard")
+                }
+            
             JobsView()
                 .tabItem {
                     Image(systemName: "briefcase.fill")
@@ -15,6 +21,18 @@ struct MainTabView: View {
                 .tabItem {
                     Image(systemName: "doc.text.fill")
                     Text("Applications")
+                }
+            
+            MessagesView()
+                .tabItem {
+                    Image(systemName: "message.fill")
+                    Text("Messages")
+                }
+            
+            NotificationsView()
+                .tabItem {
+                    Image(systemName: "bell.fill")
+                    Text("Notifications")
                 }
             
             NetworkView()

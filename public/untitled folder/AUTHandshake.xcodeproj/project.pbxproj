@@ -23,6 +23,13 @@
 		1D92F4B62C8A1234567890B8 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4B72C8A1234567890B8 /* ProfileView.swift */; };
 		1D92F4B72C8A1234567890B9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1D92F4B82C8A1234567890B9 /* Assets.xcassets */; };
 		1D92F4B82C8A1234567890BA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1D92F4B92C8A1234567890BA /* Preview Assets.xcassets */; };
+		1D92F4D12C8A1234567890D1 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4D02C8A1234567890D0 /* DashboardView.swift */; };
+		1D92F4D22C8A1234567890D2 /* MessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4D12C8A1234567890D1 /* MessagesView.swift */; };
+		1D92F4D32C8A1234567890D3 /* MessageSupportingViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4D22C8A1234567890D2 /* MessageSupportingViews.swift */; };
+		1D92F4D42C8A1234567890D4 /* NotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4D32C8A1234567890D3 /* NotificationsView.swift */; };
+		1D92F4D52C8A1234567890D5 /* SearchDiscoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4D42C8A1234567890D4 /* SearchDiscoveryView.swift */; };
+		1D92F4D62C8A1234567890D6 /* CompanyProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4D52C8A1234567890D5 /* CompanyProfileView.swift */; };
+		1D92F4D72C8A1234567890D7 /* AdditionalServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4D62C8A1234567890D6 /* AdditionalServices.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +50,13 @@
 		1D92F4B72C8A1234567890B8 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		1D92F4B82C8A1234567890B9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1D92F4B92C8A1234567890BA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		1D92F4D02C8A1234567890D0 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		1D92F4D12C8A1234567890D1 /* MessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesView.swift; sourceTree = "<group>"; };
+		1D92F4D22C8A1234567890D2 /* MessageSupportingViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageSupportingViews.swift; sourceTree = "<group>"; };
+		1D92F4D32C8A1234567890D3 /* NotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsView.swift; sourceTree = "<group>"; };
+		1D92F4D42C8A1234567890D4 /* SearchDiscoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchDiscoveryView.swift; sourceTree = "<group>"; };
+		1D92F4D52C8A1234567890D5 /* CompanyProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanyProfileView.swift; sourceTree = "<group>"; };
+		1D92F4D62C8A1234567890D6 /* AdditionalServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdditionalServices.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,12 +109,18 @@
 				1D92F4AF2C8A1234567890B0 /* LoginView.swift */,
 				1D92F4B02C8A1234567890B1 /* SignUpView.swift */,
 				1D92F4B12C8A1234567890B2 /* MainTabView.swift */,
+				1D92F4D02C8A1234567890D0 /* DashboardView.swift */,
 				1D92F4B22C8A1234567890B3 /* JobsView.swift */,
 				1D92F4B32C8A1234567890B4 /* JobDetailView.swift */,
 				1D92F4B42C8A1234567890B5 /* ApplicationsView.swift */,
+				1D92F4D12C8A1234567890D1 /* MessagesView.swift */,
+				1D92F4D22C8A1234567890D2 /* MessageSupportingViews.swift */,
+				1D92F4D32C8A1234567890D3 /* NotificationsView.swift */,
 				1D92F4B52C8A1234567890B6 /* NetworkView.swift */,
 				1D92F4B62C8A1234567890B7 /* EventsView.swift */,
 				1D92F4B72C8A1234567890B8 /* ProfileView.swift */,
+				1D92F4D42C8A1234567890D4 /* SearchDiscoveryView.swift */,
+				1D92F4D52C8A1234567890D5 /* CompanyProfileView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -125,6 +145,7 @@
 			isa = PBXGroup;
 			children = (
 				1D92F4AE2C8A1234567890AF /* NetworkService.swift */,
+				1D92F4D62C8A1234567890D6 /* AdditionalServices.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -229,12 +250,19 @@
 				1D92F4AE2C8A1234567890B0 /* LoginView.swift in Sources */,
 				1D92F4AF2C8A1234567890B1 /* SignUpView.swift in Sources */,
 				1D92F4B02C8A1234567890B2 /* MainTabView.swift in Sources */,
+				1D92F4D12C8A1234567890D1 /* DashboardView.swift in Sources */,
 				1D92F4B12C8A1234567890B3 /* JobsView.swift in Sources */,
 				1D92F4B22C8A1234567890B4 /* JobDetailView.swift in Sources */,
 				1D92F4B32C8A1234567890B5 /* ApplicationsView.swift in Sources */,
+				1D92F4D22C8A1234567890D2 /* MessagesView.swift in Sources */,
+				1D92F4D32C8A1234567890D3 /* MessageSupportingViews.swift in Sources */,
+				1D92F4D42C8A1234567890D4 /* NotificationsView.swift in Sources */,
 				1D92F4B42C8A1234567890B6 /* NetworkView.swift in Sources */,
 				1D92F4B52C8A1234567890B7 /* EventsView.swift in Sources */,
 				1D92F4B62C8A1234567890B8 /* ProfileView.swift in Sources */,
+				1D92F4D52C8A1234567890D5 /* SearchDiscoveryView.swift in Sources */,
+				1D92F4D62C8A1234567890D6 /* CompanyProfileView.swift in Sources */,
+				1D92F4D72C8A1234567890D7 /* AdditionalServices.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

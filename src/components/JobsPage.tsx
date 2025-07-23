@@ -18,7 +18,7 @@ import { useTheme } from '../context/ThemeContext';
 import Button from './ui/Button';
 import { Card } from './ui/Card';
 import PageLayout from './ui/PageLayout';
-import Typography from './ui/Typography';z
+import Typography from './ui/Typography';
 import Input from './ui/Input';
 import Select from './ui/Select';
 import { cn } from '../lib/cva';

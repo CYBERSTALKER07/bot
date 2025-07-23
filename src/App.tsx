@@ -7,6 +7,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToastProvider } from './components/ui/Toast';
 import PerformanceMonitor from './components/ui/PerformanceMonitor';
 import Navigation from './components/Navigation';
+import PWAInstallBanner from './components/ui/PWAInstallBanner';
 
 // Import Capacitor for platform detection
 declare global {
@@ -15,8 +16,42 @@ declare global {
       isNativePlatform(): boolean;
       getPlatform(): string;
     };
+    gtag?: (command: string, action: string, parameters: any) => void;
   }
 }
+
+// PWA Update notification component
+const PWAUpdateNotification = () => {
+  const [showUpdateNotification, setShowUpdateNotification] = useState(false);
+
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        setShowUpdateNotification(true);
+      });
+    }
+  }, []);
+
+  const handleUpdate = () => {
+    window.location.reload();
+  };
+
+  if (!showUpdateNotification) return null;
+
+  return (
+    <div className="fixed bottom-4 left-4 right-4 z-50 bg-asu-maroon text-white p-4 rounded-lg shadow-lg">
+      <div className="flex items-center justify-between">
+        <span>App updated! Reload to see changes.</span>
+        <button 
+          onClick={handleUpdate}
+          className="bg-white text-asu-maroon px-3 py-1 rounded text-sm font-medium"
+        >
+          Reload
+        </button>
+      </div>
+    </div>
+  );
+};
 
 // Lazy load components for better performance
 const LandingPage = lazy(() => import('./components/LandingPage'));
@@ -25,19 +60,17 @@ const Register = lazy(() => import('./components/Auth/Register'));
 const ProfileSetup = lazy(() => import('./components/Profile/ProfileSetup'));
 const Profile = lazy(() => import('./components/Profile/Profile'));
 const Settings = lazy(() => import('./components/Settings'));
-const StudentDashboard = lazy(() => import('./components/Dashboard/StudentDashboard'));
-const EmployerDashboard = lazy(() => import('./components/Dashboard/EmployerDashboard'));
-const AdminDashboard = lazy(() => import('./components/Dashboard/AdminDashboard'));
-const JobDetails = lazy(() => import('./components/JobDetails'));
+const Dashboard = lazy(() => import('./components/Dashboard/Dashboard'));
+const SplashScreen = lazy(() => import('./components/SplashScreen'));
+const PostJob = lazy(() => import('./components/PostJob'));
 const Messages = lazy(() => import('./components/Messages'));
 const Applications = lazy(() => import('./components/Applications'));
 const Applicants = lazy(() => import('./components/Applicants'));
-const PostJob = lazy(() => import('./components/PostJob'));
 const Events = lazy(() => import('./components/Events'));
 const EventDetails = lazy(() => import('./components/EventDetails'));
 const ResourceCenter = lazy(() => import('./components/ResourceCenter'));
 const ResourceDetails = lazy(() => import('./components/ResourceDetails'));
-const SplashScreen = lazy(() => import('./components/SplashScreen'));
+const JobDetails = lazy(() => import('./components/JobDetails'));
 const MobileAppPage = lazy(() => import('./components/MobileAppPage'));
 const ForStudentsPage = lazy(() => import('./components/ForStudentsPage'));
 const ForEmployersPage = lazy(() => import('./components/ForEmployersPage'));
@@ -70,56 +103,42 @@ function LoadingFallback({ message = 'Loading...' }: { message?: string }) {
 // ScrollToTop component to handle automatic scrolling on route changes
 function ScrollToTop() {
   const { pathname } = useLocation();
-  
+
   useEffect(() => {
-    // Only scroll to top if not navigating to an anchor
-    if (!pathname.includes('#')) {
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    }
+    window.scrollTo(0, 0);
   }, [pathname]);
 
   return null;
 }
 
+// Protected Route component
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
-  
+
   if (loading) {
-    return <LoadingFallback message="Authenticating..." />;
+    return <LoadingFallback message="Checking authentication..." />;
   }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+// Dashboard Router component
+function DashboardRouter() {
+  const { user } = useAuth();
   
   if (!user) {
     return <Navigate to="/login" replace />;
   }
-  
-  return <>{children}</>;
-}
 
-function DashboardRouter() {
-  const { user } = useAuth();
-  
-  if (!user) return <Navigate to="/login" replace />;
-  
-  switch (user.role) {
-    case 'admin':
-      return (
-        <Suspense fallback={<LoadingFallback message="Loading dashboard..." />}>
-          <AdminDashboard />
-        </Suspense>
-      );
-    case 'employer':
-      return (
-        <Suspense fallback={<LoadingFallback message="Loading dashboard..." />}>
-          <EmployerDashboard />
-        </Suspense>
-      );
-    default:
-      return (
-        <Suspense fallback={<LoadingFallback message="Loading dashboard..." />}>
-          <StudentDashboard />
-        </Suspense>
-      );
-  }
+  return (
+    <Suspense fallback={<LoadingFallback message="Loading dashboard..." />}>
+      <Dashboard />
+    </Suspense>
+  );
 }
 
 function AppContent() {
@@ -138,6 +157,50 @@ function AppContent() {
     // Store in sessionStorage so it only persists for the current session
     sessionStorage.setItem('aut-handshake-splash-seen', 'true');
   };
+
+  // PWA Service Worker registration
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then((registration) => {
+          console.log('PWA: Service Worker registered successfully:', registration);
+          
+          // Check for updates
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            if (newWorker) {
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  // New update available
+                  console.log('PWA: New content available');
+                }
+              });
+            }
+          });
+        })
+        .catch((error) => {
+          console.log('PWA: Service Worker registration failed:', error);
+        });
+
+      // Listen for messages from service worker
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'SKIP_WAITING') {
+          window.location.reload();
+        }
+      });
+    }
+
+    // iOS specific PWA setup
+    if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+      document.body.classList.add('pwa-installed');
+      
+      // Handle iOS safe area
+      const meta = document.createElement('meta');
+      meta.name = 'viewport';
+      meta.content = 'width=device-width, initial-scale=1.0, viewport-fit=cover';
+      document.head.appendChild(meta);
+    }
+  }, []);
 
   // Performance issue handler
   const handlePerformanceIssue = (fps: number) => {
@@ -364,77 +427,16 @@ function AppContent() {
         </main>
         
         {/* Performance Monitor - only shows in development */}
-      
+        {process.env.NODE_ENV === 'development' && (
+          <PerformanceMonitor onPerformanceIssue={handlePerformanceIssue} />
+        )}
+        
+        {/* PWA Update Notification */}
+        <PWAUpdateNotification />
+        
+        {/* PWA Install Banner */}
+        <PWAInstallBanner />
       </Router>
-    </div>
-  );
-}
-
-// Minimal test component for iOS debugging
-function MinimalApp() {
-  const [debugInfo, setDebugInfo] = useState('Initializing...');
-
-  useEffect(() => {
-    try {
-      setDebugInfo('React loaded successfully');
-      
-      // Test platform detection
-      const platform = window.Capacitor?.getPlatform() || 'web';
-      setDebugInfo(prev => prev + `\nPlatform: ${platform}`);
-      
-      // Test if it's native
-      const isNative = window.Capacitor?.isNativePlatform() || false;
-      setDebugInfo(prev => prev + `\nIs Native: ${isNative}`);
-      
-      console.log('App initialized successfully', { platform, isNative });
-    } catch (error) {
-      console.error('Error in minimal app:', error);
-      setDebugInfo(`Error: ${error.message}`);
-    }
-  }, []);
-
-  return (
-    <div style={{
-      minHeight: '100vh',
-      backgroundColor: '#f0f0f0',
-      padding: '20px',
-      fontFamily: 'Arial, sans-serif',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center'
-    }}>
-      <h1 style={{ color: '#333', marginBottom: '20px' }}>iOS Debug Test</h1>
-      <div style={{
-        backgroundColor: 'white',
-        padding: '20px',
-        borderRadius: '8px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        maxWidth: '400px',
-        width: '100%'
-      }}>
-        <pre style={{ 
-          whiteSpace: 'pre-wrap', 
-          fontSize: '14px',
-          color: '#666'
-        }}>
-          {debugInfo}
-        </pre>
-      </div>
-      <button 
-        onClick={() => setDebugInfo('Button clicked at ' + new Date().toLocaleTimeString())}
-        style={{
-          marginTop: '20px',
-          padding: '10px 20px',
-          backgroundColor: '#007AFF',
-          color: 'white',
-          border: 'none',
-          borderRadius: '6px',
-          fontSize: '16px'
-        }}
-      >
-        Test Button
-      </button>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import Foundation
 
-struct Job {
+struct JobListing: Sendable {
     let id: String
     let title: String
     let company: String
@@ -16,7 +16,7 @@ struct Job {
     let experienceLevel: ExperienceLevel
     let benefits: [String]
     
-    enum JobType: String, CaseIterable {
+    enum JobType: String, CaseIterable, Sendable {
         case fullTime = "Full-time"
         case partTime = "Part-time"
         case internship = "Internship"
@@ -24,7 +24,7 @@ struct Job {
         case graduate = "Graduate Program"
     }
     
-    enum ExperienceLevel: String, CaseIterable {
+    enum ExperienceLevel: String, CaseIterable, Sendable {
         case entry = "Entry Level"
         case junior = "Junior (1-3 years)"
         case mid = "Mid Level (3-5 years)"
