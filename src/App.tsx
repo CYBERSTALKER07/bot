@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { Loader2 } from 'lucide-react';
@@ -7,6 +7,16 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToastProvider } from './components/ui/Toast';
 import PerformanceMonitor from './components/ui/PerformanceMonitor';
 import Navigation from './components/Navigation';
+
+// Import Capacitor for platform detection
+declare global {
+  interface Window {
+    Capacitor?: {
+      isNativePlatform(): boolean;
+      getPlatform(): string;
+    };
+  }
+}
 
 // Lazy load components for better performance
 const LandingPage = lazy(() => import('./components/LandingPage'));
@@ -115,6 +125,10 @@ function DashboardRouter() {
 function AppContent() {
   const { user, loading } = useAuth();
   const [showSplash, setShowSplash] = useState(() => {
+    // For iOS, disable splash screen initially to debug
+    if (window.Capacitor?.isNativePlatform() && window.Capacitor.getPlatform() === 'ios') {
+      return false;
+    }
     // Only show splash if user hasn't seen it in this session
     return !sessionStorage.getItem('aut-handshake-splash-seen');
   });
@@ -138,6 +152,7 @@ function AppContent() {
     }
   };
 
+  // Add error boundary fallback for iOS
   if (showSplash) {
     return (
       <Suspense fallback={<LoadingFallback message="Initializing..." />}>
@@ -351,6 +366,75 @@ function AppContent() {
         {/* Performance Monitor - only shows in development */}
       
       </Router>
+    </div>
+  );
+}
+
+// Minimal test component for iOS debugging
+function MinimalApp() {
+  const [debugInfo, setDebugInfo] = useState('Initializing...');
+
+  useEffect(() => {
+    try {
+      setDebugInfo('React loaded successfully');
+      
+      // Test platform detection
+      const platform = window.Capacitor?.getPlatform() || 'web';
+      setDebugInfo(prev => prev + `\nPlatform: ${platform}`);
+      
+      // Test if it's native
+      const isNative = window.Capacitor?.isNativePlatform() || false;
+      setDebugInfo(prev => prev + `\nIs Native: ${isNative}`);
+      
+      console.log('App initialized successfully', { platform, isNative });
+    } catch (error) {
+      console.error('Error in minimal app:', error);
+      setDebugInfo(`Error: ${error.message}`);
+    }
+  }, []);
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: '#f0f0f0',
+      padding: '20px',
+      fontFamily: 'Arial, sans-serif',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}>
+      <h1 style={{ color: '#333', marginBottom: '20px' }}>iOS Debug Test</h1>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '8px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        maxWidth: '400px',
+        width: '100%'
+      }}>
+        <pre style={{ 
+          whiteSpace: 'pre-wrap', 
+          fontSize: '14px',
+          color: '#666'
+        }}>
+          {debugInfo}
+        </pre>
+      </div>
+      <button 
+        onClick={() => setDebugInfo('Button clicked at ' + new Date().toLocaleTimeString())}
+        style={{
+          marginTop: '20px',
+          padding: '10px 20px',
+          backgroundColor: '#007AFF',
+          color: 'white',
+          border: 'none',
+          borderRadius: '6px',
+          fontSize: '16px'
+        }}
+      >
+        Test Button
+      </button>
     </div>
   );
 }

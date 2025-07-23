@@ -372,7 +372,7 @@ export default function Feed() {
           isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200',
           isMobile ? 'top-16' : 'top-0'
         )}>
-          <div className={cn(
+          {/* <div className={cn(
             'flex items-center justify-between py-3',
             isMobile ? 'px-4' : 'px-4'
           )}>
@@ -384,7 +384,7 @@ export default function Feed() {
                 {isMobile ? 'Feed' : 'Home'}
               </h1>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Posts Feed */}
