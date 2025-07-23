@@ -40,6 +40,11 @@ const PostDetails = lazy(() => import('./components/PostDetails'));
 const CompaniesPage = lazy(() => import('./components/CompaniesPage'));
 const CompanyProfile = lazy(() => import('./components/CompanyProfile'));
 
+// New pages
+const NotificationsPage = lazy(() => import('./components/NotificationsPage'));
+const JobsPage = lazy(() => import('./components/JobsPage'));
+const BookmarksPage = lazy(() => import('./components/BookmarksPage'));
+
 // Optimized loading component with better UX
 function LoadingFallback({ message = 'Loading...' }: { message?: string }) {
   return (
@@ -311,6 +316,27 @@ function AppContent() {
               <ProtectedRoute>
                 <Suspense fallback={<LoadingFallback message="Loading post details..." />}>
                   <PostDetails />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/notifications" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading notifications..." />}>
+                  <NotificationsPage />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/jobs" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading jobs..." />}>
+                  <JobsPage />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/bookmarks" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading bookmarks..." />}>
+                  <BookmarksPage />
                 </Suspense>
               </ProtectedRoute>
             } />

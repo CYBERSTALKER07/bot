@@ -55,8 +55,6 @@ export default function Feed() {
   
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-  const [newPostContent, setNewPostContent] = useState('');
-  const [isPosting, setIsPosting] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   
@@ -303,39 +301,6 @@ export default function Feed() {
     }
   };
 
-  const handlePost = async () => {
-    if (!newPostContent.trim() || isPosting) return;
-    
-    setIsPosting(true);
-    try {
-      // Mock posting - replace with actual Supabase mutation
-      const newPost: Post = {
-        id: Date.now().toString(),
-        content: newPostContent,
-        author: {
-          id: user?.id || '0',
-          name: user?.name || 'You',
-          username: user?.email?.split('@')[0] || 'you',
-          avatar_url: user?.avatar_url
-        },
-        created_at: new Date().toISOString(),
-        likes_count: 0,
-        retweets_count: 0,
-        replies_count: 0,
-        has_liked: false,
-        has_retweeted: false,
-        has_bookmarked: false
-      };
-      
-      setPosts([newPost, ...posts]);
-      setNewPostContent('');
-    } catch (error) {
-      console.error('Error posting:', error);
-    } finally {
-      setIsPosting(false);
-    }
-  };
-
   const handleLike = async (postId: string) => {
     setPosts(posts.map(post => {
       if (post.id === postId) {
@@ -416,70 +381,8 @@ export default function Feed() {
                 'font-bold',
                 isMobile ? 'text-lg' : 'text-xl'
               )}>
-                {isMobile ? '' : ''}
+                {isMobile ? 'Feed' : 'Home'}
               </h1>
-            </div>
-           
-          </div>
-        </div>
-
-        {/* Create Post Section */}
-        <div className={cn(
-          'border-[1px] p-4',
-          isDark ? 'border-gray-800' : 'border-gray-200'
-        )}>
-          <div className="flex space-x-3">
-            <div className={cn(
-              'rounded-full flex items-center justify-center flex-shrink-0',
-              isDark ? 'bg-gray-800' : 'bg-gray-200',
-              isMobile ? 'w-8 h-8' : 'w-10 h-10'
-            )}>
-              <User className={cn(isMobile ? 'h-4 w-4' : 'h-5 w-5')} />
-            </div>
-            <div className="flex-1">
-              <textarea
-                placeholder={isMobile ? "What's happening?" : "Share your career journey..."}
-                className={cn(
-                  'w-full bg-transparent placeholder-gray-500 resize-none border-0 outline-none',
-                  isDark ? 'text-white' : 'text-black',
-                  isMobile 
-                    ? 'text-base placeholder:text-sm' 
-                    : 'text-xl rounded-[100px] placeholder:pl-[10px] placeholder:pt-[10px] border-2'
-                )}
-                rows={isMobile ? 2 : 3}
-                value={newPostContent}
-                onChange={(e) => setNewPostContent(e.target.value)}
-              />
-              <div className={cn(
-                'flex items-center justify-between mt-3 pt-3',
-                isMobile ? 'flex-col space-y-3' : 'flex-row'
-              )}>
-                <div className={cn(
-                  'flex items-center space-x-4',
-                  isMobile ? 'w-full justify-start' : ''
-                )}>
-                  <Button variant="ghost" size="sm" className="p-2">
-                    <ImageIcon className={cn(isMobile ? 'h-4 w-4' : 'h-5 w-5')} />
-                  </Button>
-                  <Button variant="ghost" size="sm" className="p-2">
-                    <FileText className={cn(isMobile ? 'h-4 w-4' : 'h-5 w-5')} />
-                  </Button>
-                  <Button variant="ghost" size="sm" className="p-2">
-                    <Calendar className={cn(isMobile ? 'h-4 w-4' : 'h-5 w-5')} />
-                  </Button>
-                </div>
-                <Button 
-                  onClick={handlePost}
-                  disabled={isPosting || !newPostContent.trim()}
-                  className={cn(
-                    'rounded-full font-semibold',
-                    isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800',
-                    isMobile ? 'w-full px-4 py-2' : 'px-6 py-2'
-                  )}
-                >
-                  {isPosting ? 'Posting...' : 'Post'}
-                </Button>
-              </div>
             </div>
           </div>
         </div>

@@ -515,9 +515,9 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
   if (isMobile) {
     return (
       <>
-        {/* Top App Bar with Enhanced iOS Safe Area */}
-        <header className="fixed top-0 left-0 right-0 z-50 ios-header ios-header-safe ios-pro-max-adjust ios-pro-adjust ios-standard-adjust ios-x-adjust ios-se-adjust">
-          <div className="flex justify-between items-center h-14 px-4 ios-landscape-header">
+        {/* Top App Bar with Enhanced iOS Safe Area - Positioned Lower */}
+        <header className="fixed top-0 left-0 right-0 z-50 ios-header ios-safe-top ios-pro-max-adjust ios-pro-adjust ios-standard-adjust ios-x-adjust ios-se-adjust" style={{ paddingTop: 'max(env(safe-area-inset-top), 80px)' }}>
+          <div className="flex justify-between items-center h-16 px-4 ios-landscape-header">
             <Link to="/dashboard" className="flex items-center space-x-2">
               <GraduationCap className="h-6 w-6 text-brand-primary" />
               <span className="font-semibold text-foreground">AUT</span>

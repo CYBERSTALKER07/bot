@@ -296,17 +296,17 @@
 
   /* Enhanced iOS-specific safe area utilities */
   .ios-safe-top {
-    padding-top: max(env(safe-area-inset-top), 20px);
+    padding-top: max(env(safe-area-inset-top), 100px); /* Increased from 20px */
   }
   
   .ios-safe-bottom {
-    padding-bottom: max(env(safe-area-inset-bottom), 20px);
+    padding-bottom: max(env(safe-area-inset-bottom), 100px);
   }
   
   /* Dynamic Island and Notch support - Enhanced */
   .ios-header-safe {
-    padding-top: max(env(safe-area-inset-top), 44px);
-    min-height: max(env(safe-area-inset-top), 44px);
+    padding-top: max(env(safe-area-inset-top), 54px); /* Increased from 44px */
+    min-height: max(env(safe-area-inset-top), 54px); /* Increased from 44px */
   }
   
   .ios-bottom-safe {
@@ -332,7 +332,7 @@
   @media screen and (max-width: 430px) and (max-height: 932px) {
     /* iPhone 14 Pro Max specific adjustments */
     .ios-pro-max-adjust {
-      padding-top: max(env(safe-area-inset-top), 59px);
+      padding-top: max(env(safe-area-inset-top), 69px); /* Increased from 59px */
     }
     
     .ios-pro-max-bottom {
@@ -344,7 +344,7 @@
   @media screen and (max-width: 393px) and (max-height: 852px) {
     /* iPhone 14 Pro specific adjustments */
     .ios-pro-adjust {
-      padding-top: max(env(safe-area-inset-top), 59px);
+      padding-top: max(env(safe-area-inset-top), 69px); /* Increased from 59px */
     }
     
     .ios-pro-bottom {
@@ -356,7 +356,7 @@
   @media screen and (max-width: 390px) and (max-height: 844px) {
     /* iPhone 12/13/14 standard specific adjustments */
     .ios-standard-adjust {
-      padding-top: max(env(safe-area-inset-top), 47px);
+      padding-top: max(env(safe-area-inset-top), 57px); /* Increased from 47px */
     }
     
     .ios-standard-bottom {
@@ -367,7 +367,7 @@
   @media screen and (max-width: 375px) and (max-height: 812px) {
     /* iPhone X/XS/11 Pro specific adjustments */
     .ios-x-adjust {
-      padding-top: max(env(safe-area-inset-top), 44px);
+      padding-top: max(env(safe-area-inset-top), 54px); /* Increased from 44px */
     }
     
     .ios-x-bottom {
@@ -378,7 +378,7 @@
   @media screen and (max-width: 375px) and (max-height: 667px) {
     /* iPhone SE 2nd/3rd gen adjustments */
     .ios-se-adjust {
-      padding-top: max(env(safe-area-inset-top), 20px);
+      padding-top: max(env(safe-area-inset-top), 30px); /* Increased from 20px */
     }
     
     .ios-se-bottom {

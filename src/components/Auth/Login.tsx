@@ -10,7 +10,7 @@ import {
   ArrowRight,
   Check,
   AlertCircle,
-  X as XIcon
+  GraduationCap
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -154,14 +154,14 @@ export default function Login() {
         {/* Left Side - Form */}
         <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24 max-w-md mx-auto lg:max-w-none">
           <div className="mx-auto w-full max-w-sm lg:w-96">
-            {/* X Logo */}
+            {/* Logo */}
             <div className="text-center mb-8">
               <div className={`w-12 h-12 rounded-full mx-auto mb-6 flex items-center justify-center ${
-                isDark ? 'bg-white' : 'bg-black'
+                isDark ? 'bg-lime' : 'bg-asu-maroon'
               }`}>
-                <XIcon className={`h-6 w-6 ${isDark ? 'text-black' : 'text-white'}`} />
+                <GraduationCap className={`h-6 w-6 ${isDark ? 'text-black' : 'text-white'}`} />
               </div>
-              <h1 className="text-3xl font-bold mb-2">Sign in to X</h1>
+              <h1 className="text-3xl font-bold mb-2">Sign in</h1>
             </div>
 
             {/* Form */}
@@ -387,48 +387,89 @@ export default function Login() {
           </div>
         </div>
 
-        {/* Right Side - Hero */}
+        {/* Right Side - Hero with Student Images Grid */}
         <div className="hidden lg:block relative flex-1">
           <div className={`absolute inset-0 ${
             isDark 
               ? 'bg-gradient-to-br from-gray-900 via-black to-gray-900' 
               : 'bg-gradient-to-br from-gray-100 via-white to-gray-100'
           }`}>
-            <div className="flex flex-col justify-center items-center h-full p-12 text-center">
-              <div className={`w-24 h-24 rounded-full mb-8 flex items-center justify-center ${
-                isDark ? 'bg-white' : 'bg-black'
-              }`}>
-                <XIcon className={`h-12 w-12 ${isDark ? 'text-black' : 'text-white'}`} />
-              </div>
-              
-              <h2 className={`text-4xl font-bold mb-4 ${
-                isDark ? 'text-white' : 'text-black'
-              }`}>
-                Happening now
-              </h2>
-              
-              <p className={`text-xl mb-8 max-w-md ${
-                isDark ? 'text-gray-300' : 'text-gray-700'
-              }`}>
-                Join the professional network that's changing how students and employers connect.
-              </p>
-
-              {/* Stats */}
-              <div className="grid grid-cols-2 gap-8 max-w-xs">
-                <div className="text-center">
-                  <div className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>
-                    15k+
+            <div className="flex flex-col justify-center items-center h-full p-12 text-center relative">
+              {/* Student Images Grid */}
+              <div className="absolute inset-0 p-8 flex items-center justify-center">
+                <div className="grid grid-cols-2 gap-4 max-w-md w-full">
+                  <div className="space-y-4">
+                    <div className="relative overflow-hidden rounded-2xl shadow-lg transform rotate-2 hover:rotate-0 transition-transform duration-300">
+                      <img 
+                        src="/student1.jpg" 
+                        alt="Student studying" 
+                        className="w-full h-48 object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                    </div>
+                    <div className="relative overflow-hidden rounded-2xl shadow-lg transform -rotate-1 hover:rotate-0 transition-transform duration-300">
+                      <img 
+                        src="/student2.jpg" 
+                        alt="Students collaborating" 
+                        className="w-full h-32 object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                    </div>
                   </div>
-                  <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Students
+                  <div className="space-y-4 pt-8">
+                    <div className="relative overflow-hidden rounded-2xl shadow-lg transform -rotate-2 hover:rotate-0 transition-transform duration-300">
+                      <img 
+                        src="/student3.jpg" 
+                        alt="Student presenting" 
+                        className="w-full h-32 object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                    </div>
+                    <div className="relative overflow-hidden rounded-2xl shadow-lg transform rotate-1 hover:rotate-0 transition-transform duration-300">
+                      <img 
+                        src="/student1.jpg" 
+                        alt="Students learning" 
+                        className="w-full h-48 object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                    </div>
                   </div>
                 </div>
-                <div className="text-center">
-                  <div className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>
-                    2.5k+
+              </div>
+              
+              {/* Content overlay */}
+              <div className="relative z-10 bg-black/30 backdrop-blur-sm rounded-2xl p-8 text-white max-w-sm">
+                <div className={`w-16 h-16 rounded-full mb-6 flex items-center justify-center mx-auto ${
+                  isDark ? 'bg-lime' : 'bg-asu-maroon'
+                }`}>
+                  <GraduationCap className={`h-8 w-8 ${isDark ? 'text-black' : 'text-white'}`} />
+                </div>
+                
+                <h2 className="text-2xl font-bold mb-4 text-white">
+                  Join Your Peers
+                </h2>
+                
+                <p className="text-sm mb-6 text-white/90">
+                  Connect with fellow AUT students and launch your career.
+                </p>
+
+                {/* Stats */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <div className="text-xl font-bold text-white">
+                      15k+
+                    </div>
+                    <div className="text-xs text-white/70">
+                      Students
+                    </div>
                   </div>
-                  <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Jobs
+                  <div className="text-center">
+                    <div className="text-xl font-bold text-white">
+                      2.5k+
+                    </div>
+                    <div className="text-xs text-white/70">
+                      Jobs
+                    </div>
                   </div>
                 </div>
               </div>
