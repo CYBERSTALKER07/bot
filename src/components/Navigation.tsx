@@ -126,8 +126,8 @@ export default function Navigation() {
         <header className={`fixed top-0 left-0 right-0 z-50 border-b ${
           isDark ? 'bg-black/95 backdrop-blur-xl border-gray-800' : 'bg-white/95 backdrop-blur-xl border-gray-200'
         }`}>
-          <div className="h-5 bg-white" />
-          <div className="h-5 bg-white" />
+          <div className="h-5 bg-transparent" />
+          <div className="h-5 bg-transparent" />
           <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center space-x-3">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
@@ -184,7 +184,7 @@ export default function Navigation() {
           }}
         >
           {/* Sidebar Header */}
-          <div className={cn(
+          {/* <div className={cn(
             'flex items-center justify-between h-16 px-4 border-b',
             isDark ? 'border-gray-800' : 'border-gray-200'
           )}>
@@ -206,7 +206,7 @@ export default function Navigation() {
             >
               <XIcon className="h-5 w-5" />
             </Button>
-          </div>
+          </div> */}
 
           {/* Profile Section */}
           <div className={cn(
