@@ -3,6 +3,24 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   darkMode: 'class',
   theme: {
+    screens: {
+      'xs': '475px',
+      'sm': '640px',
+      'md': '768px',
+      'lg': '1024px',
+      'xl': '1280px',
+      '2xl': '1536px',
+      // Custom breakpoints for specific devices
+      'mobile': '320px',
+      'tablet': '768px',
+      'laptop': '1024px',
+      'desktop': '1280px',
+      // iOS specific breakpoints
+      'iphone-se': '375px',
+      'iphone': '390px',
+      'iphone-pro': '393px',
+      'iphone-pro-max': '430px',
+    },
     extend: {
       colors: {
         // Enhanced Brand Colors
@@ -168,7 +186,7 @@ export default {
         'dark-muted': '#71717A',
       },
 
-      // Enhanced Typography
+      // Enhanced Typography with responsive sizing
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
         mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'monospace'],
@@ -176,37 +194,48 @@ export default {
       },
 
       fontSize: {
-        // Professional typography scale
-        xs: ['0.75rem', { lineHeight: '1rem', letterSpacing: '0.025em' }],
-        sm: ['0.875rem', { lineHeight: '1.25rem', letterSpacing: '0.025em' }],
-        base: ['1rem', { lineHeight: '1.5rem', letterSpacing: '0rem' }],
-        lg: ['1.125rem', { lineHeight: '1.75rem', letterSpacing: '-0.025em' }],
-        xl: ['1.25rem', { lineHeight: '1.75rem', letterSpacing: '-0.025em' }],
-        '2xl': ['1.5rem', { lineHeight: '2rem', letterSpacing: '-0.025em' }],
-        '3xl': ['1.875rem', { lineHeight: '2.25rem', letterSpacing: '-0.025em' }],
-        '4xl': ['2.25rem', { lineHeight: '2.5rem', letterSpacing: '-0.025em' }],
-        '5xl': ['3rem', { lineHeight: '1', letterSpacing: '-0.025em' }],
-        '6xl': ['3.75rem', { lineHeight: '1', letterSpacing: '-0.025em' }],
-        '7xl': ['4.5rem', { lineHeight: '1', letterSpacing: '-0.025em' }],
-        '8xl': ['6rem', { lineHeight: '1', letterSpacing: '-0.025em' }],
-        '9xl': ['8rem', { lineHeight: '1', letterSpacing: '-0.025em' }],
+        // Professional typography scale with responsive sizing
+        xs: ['clamp(0.625rem, 1.5vw, 0.75rem)', { lineHeight: '1rem', letterSpacing: '0.025em' }],
+        sm: ['clamp(0.75rem, 2vw, 0.875rem)', { lineHeight: '1.25rem', letterSpacing: '0.025em' }],
+        base: ['clamp(0.875rem, 2.5vw, 1rem)', { lineHeight: '1.5rem', letterSpacing: '0rem' }],
+        lg: ['clamp(1rem, 3vw, 1.125rem)', { lineHeight: '1.75rem', letterSpacing: '-0.025em' }],
+        xl: ['clamp(1.125rem, 3.5vw, 1.25rem)', { lineHeight: '1.75rem', letterSpacing: '-0.025em' }],
+        '2xl': ['clamp(1.25rem, 4vw, 1.5rem)', { lineHeight: '2rem', letterSpacing: '-0.025em' }],
+        '3xl': ['clamp(1.5rem, 5vw, 1.875rem)', { lineHeight: '2.25rem', letterSpacing: '-0.025em' }],
+        '4xl': ['clamp(1.875rem, 6vw, 2.25rem)', { lineHeight: '2.5rem', letterSpacing: '-0.025em' }],
+        '5xl': ['clamp(2.25rem, 7vw, 3rem)', { lineHeight: '1', letterSpacing: '-0.025em' }],
+        '6xl': ['clamp(2.5rem, 8vw, 3.75rem)', { lineHeight: '1', letterSpacing: '-0.025em' }],
+        '7xl': ['clamp(3rem, 9vw, 4.5rem)', { lineHeight: '1', letterSpacing: '-0.025em' }],
+        '8xl': ['clamp(4rem, 10vw, 6rem)', { lineHeight: '1', letterSpacing: '-0.025em' }],
+        '9xl': ['clamp(5rem, 12vw, 8rem)', { lineHeight: '1', letterSpacing: '-0.025em' }],
       },
 
-      // Enhanced Spacing
+      // Enhanced Spacing with responsive values
       spacing: {
         18: '4.5rem',
         88: '22rem',
         128: '32rem',
         144: '36rem',
+        // Responsive spacing utilities
+        'responsive-xs': 'clamp(0.25rem, 1vw, 0.5rem)',
+        'responsive-sm': 'clamp(0.5rem, 2vw, 1rem)',
+        'responsive-md': 'clamp(1rem, 4vw, 2rem)',
+        'responsive-lg': 'clamp(1.5rem, 6vw, 3rem)',
+        'responsive-xl': 'clamp(2rem, 8vw, 4rem)',
+        'responsive-2xl': 'clamp(3rem, 10vw, 6rem)',
       },
 
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+        // iOS-style radius
+        'ios': '12px',
+        'ios-lg': '16px',
+        'ios-xl': '20px',
       },
 
-      // Professional Shadows
+      // Professional Shadows with responsive scaling
       boxShadow: {
         'xs': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
         'sm': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
@@ -225,7 +254,7 @@ export default {
         'elevation-5': '0 19px 38px 0 rgba(0, 0, 0, 0.30), 0 15px 12px 0 rgba(0, 0, 0, 0.22)',
       },
 
-      // Professional Animations
+      // Professional Animations with responsive considerations
       animation: {
         'fade-in': 'fadeIn 0.2s ease-out',
         'fade-out': 'fadeOut 0.2s ease-out',
@@ -308,7 +337,7 @@ export default {
         '900': '900ms',
       },
 
-      // Z-index scale
+      // Z-index scale for better layering
       zIndex: {
         '60': '60',
         '70': '70',
@@ -317,21 +346,176 @@ export default {
         '100': '100',
       },
 
-      // Backdrop blur
+      // Enhanced backdrop blur
       backdropBlur: {
         xs: '2px',
       },
 
-      // Grid template columns
+      // Grid template columns for responsive layouts
       gridTemplateColumns: {
         '13': 'repeat(13, minmax(0, 1fr))',
         '14': 'repeat(14, minmax(0, 1fr))',
         '15': 'repeat(15, minmax(0, 1fr))',
         '16': 'repeat(16, minmax(0, 1fr))',
+        // Responsive grid patterns
+        'responsive-1': 'repeat(1, minmax(0, 1fr))',
+        'responsive-2': 'repeat(auto-fit, minmax(min(250px, 100%), 1fr))',
+        'responsive-3': 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))',
+        'responsive-4': 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))',
+      },
+
+      // Enhanced container sizes
+      container: {
+        center: true,
+        padding: {
+          DEFAULT: '1rem',
+          xs: '0.5rem',
+          sm: '1rem',
+          md: '1.5rem',
+          lg: '2rem',
+          xl: '2.5rem',
+          '2xl': '3rem',
+        },
+        screens: {
+          xs: '475px',
+          sm: '640px',
+          md: '768px',
+          lg: '1024px',
+          xl: '1280px',
+          '2xl': '1400px',
+        },
+      },
+
+      // Enhanced aspect ratios for responsive images and videos
+      aspectRatio: {
+        '4/3': '4 / 3',
+        '3/2': '3 / 2',
+        '2/3': '2 / 3',
+        '9/16': '9 / 16',
+        '1/2': '1 / 2',
+        '2/1': '2 / 1',
+      },
+
+      // Enhanced line height for better readability
+      lineHeight: {
+        'extra-tight': '1.1',
+        'tight': '1.2',
+        'snug': '1.3',
+        'relaxed': '1.6',
+        'loose': '1.8',
+        'extra-loose': '2',
+      },
+
+      // Enhanced letter spacing
+      letterSpacing: {
+        'tighter': '-0.05em',
+        'tight': '-0.025em',
+        'normal': '0em',
+        'wide': '0.025em',
+        'wider': '0.05em',
+        'widest': '0.1em',
+        'ultra-wide': '0.25em',
+      },
+
+      // Enhanced max width utilities
+      maxWidth: {
+        'responsive-xs': 'min(100% - 2rem, 320px)',
+        'responsive-sm': 'min(100% - 2rem, 480px)',
+        'responsive-md': 'min(100% - 2rem, 640px)',
+        'responsive-lg': 'min(100% - 2rem, 800px)',
+        'responsive-xl': 'min(100% - 2rem, 1024px)',
+        'responsive-2xl': 'min(100% - 2rem, 1280px)',
+      },
+
+      // Enhanced min height utilities
+      minHeight: {
+        'screen-1/2': '50vh',
+        'screen-1/3': '33.333333vh',
+        'screen-2/3': '66.666667vh',
+        'screen-1/4': '25vh',
+        'screen-3/4': '75vh',
+        'touch-target': '44px',
+        'touch-target-lg': '48px',
       },
     },
   },
   plugins: [
-    // Add any Tailwind plugins here
+    // Custom plugin for responsive utilities
+    function({ addUtilities, theme }) {
+      const newUtilities = {
+        // Responsive text utilities
+        '.text-responsive': {
+          'font-size': 'clamp(0.875rem, 2.5vw, 1rem)',
+          'line-height': '1.6',
+        },
+        '.text-responsive-lg': {
+          'font-size': 'clamp(1rem, 3vw, 1.25rem)',
+          'line-height': '1.5',
+        },
+        '.text-responsive-xl': {
+          'font-size': 'clamp(1.25rem, 4vw, 1.5rem)',
+          'line-height': '1.4',
+        },
+        '.text-responsive-2xl': {
+          'font-size': 'clamp(1.5rem, 5vw, 2rem)',
+          'line-height': '1.3',
+        },
+        
+        // Responsive spacing utilities
+        '.p-responsive': {
+          'padding': 'clamp(1rem, 4vw, 2rem)',
+        },
+        '.px-responsive': {
+          'padding-left': 'clamp(1rem, 4vw, 2rem)',
+          'padding-right': 'clamp(1rem, 4vw, 2rem)',
+        },
+        '.py-responsive': {
+          'padding-top': 'clamp(1rem, 4vw, 2rem)',
+          'padding-bottom': 'clamp(1rem, 4vw, 2rem)',
+        },
+        '.m-responsive': {
+          'margin': 'clamp(1rem, 4vw, 2rem)',
+        },
+        
+        // Responsive grid utilities
+        '.grid-responsive': {
+          'display': 'grid',
+          'grid-template-columns': 'repeat(auto-fit, minmax(min(250px, 100%), 1fr))',
+          'gap': 'clamp(1rem, 4vw, 2rem)',
+        },
+        '.grid-responsive-sm': {
+          'display': 'grid',
+          'grid-template-columns': 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))',
+          'gap': 'clamp(0.75rem, 3vw, 1.5rem)',
+        },
+        '.grid-responsive-lg': {
+          'display': 'grid',
+          'grid-template-columns': 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))',
+          'gap': 'clamp(1.5rem, 5vw, 3rem)',
+        },
+        
+        // Responsive flex utilities
+        '.flex-responsive': {
+          'display': 'flex',
+          'flex-direction': 'column',
+          'gap': 'clamp(1rem, 4vw, 2rem)',
+          '@media (min-width: 768px)': {
+            'flex-direction': 'row',
+          },
+        },
+        
+        // Touch-friendly utilities
+        '.touch-target': {
+          'min-height': '44px',
+          'min-width': '44px',
+        },
+        '.touch-target-lg': {
+          'min-height': '48px',
+          'min-width': '48px',
+        },
+      };
+      
+      addUtilities(newUtilities);
+    },
   ],
 };
