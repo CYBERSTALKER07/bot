@@ -1,62 +1,73 @@
-/* Enhanced Global Styles for Professional Design */
+/* Enhanced Global Styles for University Academic Design */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* CSS Variables for consistent theming */
+/* CSS Variables for University theming */
 :root {
-  /* Light theme */
-  --color-primary: 140 29 64; /* ASU Maroon */
-  --color-secondary: 255 198 39; /* ASU Gold */
-  --color-accent: 227 255 112; /* Lime */
+  /* University Brand Colors */
+  --color-university-navy: 27 54 93; /* #1B365D */
+  --color-university-gold: 212 175 55; /* #D4AF37 */
+  --color-university-burgundy: 140 29 64; /* #8C1D40 */
+  --color-university-sage: 156 175 136; /* #9CAF88 */
+  --color-university-cream: 247 245 243; /* #F7F5F3 */
+  --color-university-ink: 44 62 80; /* #2C3E50 */
+  --color-university-scholar: 93 78 117; /* #5D4E75 */
+  
+  /* Academic semantic colors */
+  --color-primary: var(--color-university-navy);
+  --color-secondary: var(--color-university-gold);
+  --color-accent: var(--color-university-burgundy);
   
   --color-background: 255 255 255;
-  --color-foreground: 24 24 27;
-  --color-muted: 113 113 122;
-  --color-muted-foreground: 161 161 170;
+  --color-foreground: 32 33 35;
+  --color-muted: 95 99 104;
+  --color-muted-foreground: 154 160 166;
   
-  --color-border: 228 228 231;
-  --color-input: 228 228 231;
-  --color-ring: 140 29 64;
+  --color-border: 232 234 237;
+  --color-input: 232 234 237;
+  --color-ring: var(--color-university-navy);
   
-  --color-success: 34 197 94;
-  --color-warning: 245 158 11;
-  --color-error: 239 68 68;
-  --color-info: 59 130 246;
+  /* Academic spacing using golden ratio */
+  --spacing-academic: 1.618rem;
+  --shadow-academic: 0 2px 8px 0 rgb(var(--color-university-navy) / 0.1);
+  --shadow-paper: 0 4px 12px 0 rgb(0 0 0 / 0.08);
   
+  /* University-appropriate border radius */
+  --radius-academic: 0.375rem;
+  --radius-traditional: 0.25rem;
   --radius: 0.5rem;
-  --shadow-color: 0 0 0;
-  --shadow-elevation-low: 0 1px 2px 0 rgb(var(--shadow-color) / 0.05);
-  --shadow-elevation-medium: 0 4px 6px -1px rgb(var(--shadow-color) / 0.1), 0 2px 4px -2px rgb(var(--shadow-color) / 0.1);
-  --shadow-elevation-high: 0 20px 25px -5px rgb(var(--shadow-color) / 0.1), 0 8px 10px -6px rgb(var(--shadow-color) / 0.1);
 }
 
 .dark {
-  /* Dark theme */
+  /* Dark theme for university */
   --color-background: 10 10 10;
-  --color-foreground: 244 244 245;
-  --color-muted: 113 113 122;
-  --color-muted-foreground: 161 161 170;
+  --color-foreground: 248 249 250;
+  --color-muted: 154 160 166;
+  --color-muted-foreground: 95 99 104;
   
-  --color-border: 39 39 70;
-  --color-input: 39 39 70;
-  --color-ring: 227 255 112;
+  --color-border: 60 64 67;
+  --color-input: 60 64 67;
+  --color-ring: var(--color-university-gold);
   
-  --shadow-color: 0 0 0;
+  --shadow-academic: 0 2px 8px 0 rgb(0 0 0 / 0.3);
 }
 
-/* Base layer enhancements */
+/* Base layer enhancements for academic design */
 @layer base {
   * {
-    @apply border-neutral-200 dark:border-neutral-800;
+    @apply border-neutral-200 dark:border-neutral-700;
   }
   
   html {
     @apply scroll-smooth;
     font-feature-settings: 'cv11', 'ss01';
     font-variant-numeric: tabular-nums;
+    font-display: swap;
   }
   
   body {
@@ -66,189 +77,209 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    line-height: 1.6; /* Academic reading comfort */
   }
   
+  /* University typography hierarchy */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold tracking-tight;
+    @apply font-serif font-semibold tracking-tight text-university-navy;
     text-wrap: balance;
+    font-family: 'Playfair Display', Georgia, serif;
   }
   
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl font-bold;
+    line-height: 1.1;
+  }
+  
+  h2 {
+    @apply text-3xl md:text-4xl font-bold;
+    line-height: 1.2;
+  }
+  
+  h3 {
+    @apply text-2xl md:text-3xl font-semibold;
+    line-height: 1.3;
+  }
+  
+  /* Academic paragraph styling */
   p {
     text-wrap: pretty;
+    @apply leading-relaxed text-neutral-700;
   }
   
-  /* Focus styles */
+  /* Academic link styling */
+  a {
+    @apply text-university-navy hover:text-university-burgundy transition-colors duration-200;
+    text-decoration-skip-ink: auto;
+  }
+  
+  /* Focus styles for accessibility */
   *:focus-visible {
-    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background;
+    @apply outline-none ring-2 ring-university-gold ring-offset-2 ring-offset-background;
   }
   
-  /* Remove default button styles */
+  /* Academic button reset */
   button {
     @apply focus-visible:outline-none;
   }
   
-  /* Custom scrollbar */
+  /* University-themed scrollbar */
   ::-webkit-scrollbar {
     @apply w-2;
   }
   
   ::-webkit-scrollbar-track {
-    @apply bg-neutral-100 dark:bg-neutral-800;
+    @apply bg-university-cream;
   }
   
   ::-webkit-scrollbar-thumb {
-    @apply bg-neutral-300 dark:bg-neutral-600 rounded-full;
-  }
-  
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-neutral-400 dark:bg-neutral-500;
+    @apply bg-university-navy/30 rounded-full hover:bg-university-navy/50;
   }
 }
 
-/* Component layer enhancements */
+/* Academic component layer */
 @layer components {
-  /* Professional button base */
-  .btn {
-    @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50;
+  /* University button styles */
+  .btn-university {
+    @apply inline-flex items-center justify-center whitespace-nowrap rounded-academic text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-university-gold disabled:pointer-events-none disabled:opacity-50;
   }
   
   .btn-primary {
-    @apply bg-primary text-primary-foreground shadow hover:bg-primary/90 active:bg-primary/80;
+    @apply btn-university bg-university-navy text-white shadow-academic hover:bg-university-navy/90 active:bg-university-navy/80;
   }
   
   .btn-secondary {
-    @apply bg-secondary text-secondary-foreground shadow hover:bg-secondary/90 active:bg-secondary/80;
+    @apply btn-university bg-university-gold text-university-navy shadow-academic hover:bg-university-gold/90;
+  }
+  
+  .btn-academic {
+    @apply btn-university bg-university-burgundy text-white shadow-academic hover:bg-university-burgundy/90;
   }
   
   .btn-outline {
-    @apply border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground;
+    @apply btn-university border-2 border-university-navy bg-transparent text-university-navy hover:bg-university-navy hover:text-white;
   }
   
   .btn-ghost {
-    @apply hover:bg-accent hover:text-accent-foreground;
+    @apply btn-university hover:bg-university-cream hover:text-university-navy;
   }
   
-  /* Card component */
-  .card {
-    @apply rounded-lg border bg-card text-card-foreground shadow-sm;
+  /* Academic card component */
+  .card-university {
+    @apply rounded-academic border bg-card text-card-foreground shadow-paper;
   }
   
-  .card-header {
-    @apply flex flex-col space-y-1.5 p-6;
+  .card-academic {
+    @apply card-university bg-university-cream border-l-4 border-university-gold;
   }
   
-  .card-title {
-    @apply text-2xl font-semibold leading-none tracking-tight;
+  .card-elevated {
+    @apply card-university shadow-academic border-university-gold/20;
   }
   
-  .card-description {
-    @apply text-sm text-muted-foreground;
+  /* University navigation */
+  .nav-university {
+    @apply flex items-center gap-2 rounded-academic px-4 py-2 text-sm font-medium transition-colors hover:bg-university-cream hover:text-university-navy focus:bg-university-cream focus:text-university-navy focus:outline-none;
   }
   
-  .card-content {
-    @apply p-6 pt-0;
+  .nav-university.active {
+    @apply bg-university-navy text-white;
   }
   
-  .card-footer {
-    @apply flex items-center p-6 pt-0;
+  /* Academic input styling */
+  .input-university {
+    @apply flex h-10 w-full rounded-academic border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-university-gold focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
   }
   
-  /* Form elements */
-  .form-input {
-    @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50;
+  /* University typography classes */
+  .text-academic {
+    @apply font-academic text-neutral-600 leading-loose;
   }
   
-  .form-textarea {
-    @apply flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50;
+  .text-university-heading {
+    @apply font-serif font-bold text-university-navy;
   }
   
-  .form-label {
-    @apply text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70;
+  .text-scholar {
+    @apply font-academic font-semibold text-university-scholar;
   }
   
-  /* Navigation styles */
-  .nav-link {
-    @apply flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none;
+  /* Academic layout utilities */
+  .container-university {
+    @apply mx-auto max-w-university px-4 sm:px-6 lg:px-8;
   }
   
-  .nav-link.active {
-    @apply bg-accent text-accent-foreground;
+  .container-academic {
+    @apply mx-auto max-w-academic px-6;
   }
   
-  /* Layout utilities */
-  .container {
-    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+  .section-university {
+    @apply py-16 sm:py-20 lg:py-24;
   }
   
-  .section {
-    @apply py-12 sm:py-16 lg:py-20;
+  /* University spacing utilities */
+  .space-academic {
+    @apply space-y-academic;
   }
   
-  .prose {
+  .gap-academic {
+    @apply gap-academic;
+  }
+  
+  /* Academic prose styling */
+  .prose-university {
     @apply max-w-none text-foreground;
   }
   
-  .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-    @apply text-foreground;
+  .prose-university h1, 
+  .prose-university h2, 
+  .prose-university h3, 
+  .prose-university h4, 
+  .prose-university h5, 
+  .prose-university h6 {
+    @apply text-university-navy font-serif;
   }
   
-  .prose p {
-    @apply text-muted-foreground;
+  .prose-university p {
+    @apply leading-relaxed;
   }
   
-  /* Animation classes */
-  .animate-in {
-    @apply animate-fade-in;
+  .prose-university a {
+    @apply text-university-burgundy hover:text-university-navy;
   }
   
-  .animate-out {
-    @apply animate-fade-out;
+  /* University gradient backgrounds */
+  .bg-university-gradient {
+    background: linear-gradient(135deg, rgb(27, 54, 93) 0%, rgb(212, 175, 55) 100%);
   }
   
-  /* Glass morphism effect */
-  .glass {
-    @apply bg-white/10 backdrop-blur-md border border-white/20;
+  .bg-academic-gradient {
+    background: linear-gradient(135deg, rgb(27, 54, 93) 0%, rgb(140, 29, 64) 50%, rgb(212, 175, 55) 100%);
   }
   
-  .glass.dark {
-    @apply bg-black/10 border-white/10;
-  }
-  
-  /* Gradient backgrounds */
-  .gradient-primary {
-    background: linear-gradient(135deg, rgb(140, 29, 64) 0%, rgb(255, 198, 39) 100%);
-  }
-  
-  .gradient-accent {
-    background: linear-gradient(135deg, rgb(227, 255, 112) 0%, rgb(140, 29, 64) 100%);
-  }
-  
-  /* Professional spacing */
-  .space-section {
-    @apply space-y-16 lg:space-y-24;
-  }
-  
-  .space-content {
-    @apply space-y-8 lg:space-y-12;
-  }
-  
-  .space-items {
-    @apply space-y-4 lg:space-y-6;
+  .bg-scholar-gradient {
+    background: linear-gradient(135deg, rgb(93, 78, 117) 0%, rgb(27, 54, 93) 100%);
   }
 }
 
-/* Utility layer enhancements */
+/* Academic utility layer */
 @layer utilities {
-  /* Text selection */
+  /* University text selection */
   ::selection {
-    @apply bg-primary/20 text-primary;
+    @apply bg-university-gold/20 text-university-navy;
   }
   
   .dark ::selection {
-    @apply bg-primary/20 text-primary-foreground;
+    @apply bg-university-gold/30 text-white;
   }
   
-  /* Hide scrollbar but keep functionality */
+  /* Academic scrollbar utilities */
+  .scrollbar-university {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(27 54 93 / 0.3) rgb(247 245 243);
+  }
+  
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -258,7 +289,7 @@
     display: none;
   }
   
-  /* Text utilities */
+  /* Academic text utilities */
   .text-balance {
     text-wrap: balance;
   }
@@ -267,204 +298,173 @@
     text-wrap: pretty;
   }
   
-  /* Accessibility */
+  /* University accessibility */
   .sr-only {
     @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
   }
   
-  /* Focus utilities */
-  .focus-ring {
-    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  /* Academic focus utilities */
+  .focus-university {
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-university-gold focus-visible:ring-offset-2 focus-visible:ring-offset-background;
   }
   
-  /* Safe area utilities for mobile */
-  .safe-top {
-    padding-top: env(safe-area-inset-top);
+  /* University animation utilities */
+  .animate-academic-fade {
+    animation: academicFade 0.4s ease-in-out;
   }
   
-  .safe-bottom {
-    padding-bottom: env(safe-area-inset-bottom);
+  .animate-academic-slide {
+    animation: academicSlide 0.4s ease-out;
   }
   
-  .safe-left {
-    padding-left: env(safe-area-inset-left);
+  /* University hover effects */
+  .hover-university {
+    @apply transition-all duration-300 hover:shadow-academic hover:-translate-y-1;
   }
   
-  .safe-right {
-    padding-right: env(safe-area-inset-right);
+  .hover-academic {
+    @apply transition-colors duration-200 hover:bg-university-cream hover:text-university-navy;
   }
+}
 
-  /* Enhanced iOS-specific safe area utilities */
-  .ios-safe-top {
-    padding-top: max(env(safe-area-inset-top), 100px); /* Increased from 20px */
-  }
-  
-  .ios-safe-bottom {
-    padding-bottom: max(env(safe-area-inset-bottom), 100px);
-  }
-  
-  /* Dynamic Island and Notch support - Enhanced */
-  .ios-header-safe {
-    padding-top: max(env(safe-area-inset-top), 54px); /* Increased from 44px */
-    min-height: max(env(safe-area-inset-top), 54px); /* Increased from 44px */
-  }
-  
-  .ios-bottom-safe {
-    padding-bottom: max(env(safe-area-inset-bottom), 34px);
-    margin-bottom: env(safe-area-inset-bottom);
-  }
-  
-  /* Home indicator area protection - Enhanced */
-  .ios-home-indicator-safe {
-    padding-bottom: max(env(safe-area-inset-bottom), 34px);
-    min-height: 64px; /* Ensure minimum touch target */
-  }
-  
-  /* Full safe area for iOS */
-  .ios-safe-area {
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-  }
+/* University-specific keyframes */
+@keyframes academicFade {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
 
-  /* iOS-specific responsive breakpoints - Enhanced */
-  @media screen and (max-width: 430px) and (max-height: 932px) {
-    /* iPhone 14 Pro Max specific adjustments */
-    .ios-pro-max-adjust {
-      padding-top: max(env(safe-area-inset-top), 69px); /* Increased from 59px */
-    }
-    
-    .ios-pro-max-bottom {
-      padding-bottom: max(env(safe-area-inset-bottom), 34px);
-      margin-bottom: max(env(safe-area-inset-bottom), 8px);
-    }
-  }
-  
-  @media screen and (max-width: 393px) and (max-height: 852px) {
-    /* iPhone 14 Pro specific adjustments */
-    .ios-pro-adjust {
-      padding-top: max(env(safe-area-inset-top), 69px); /* Increased from 59px */
-    }
-    
-    .ios-pro-bottom {
-      padding-bottom: max(env(safe-area-inset-bottom), 34px);
-      margin-bottom: max(env(safe-area-inset-bottom), 8px);
-    }
-  }
-  
-  @media screen and (max-width: 390px) and (max-height: 844px) {
-    /* iPhone 12/13/14 standard specific adjustments */
-    .ios-standard-adjust {
-      padding-top: max(env(safe-area-inset-top), 57px); /* Increased from 47px */
-    }
-    
-    .ios-standard-bottom {
-      padding-bottom: max(env(safe-area-inset-bottom), 34px);
-    }
-  }
+@keyframes academicSlide {
+  0% { transform: translateX(-20px); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
 
-  @media screen and (max-width: 375px) and (max-height: 812px) {
-    /* iPhone X/XS/11 Pro specific adjustments */
-    .ios-x-adjust {
-      padding-top: max(env(safe-area-inset-top), 54px); /* Increased from 44px */
-    }
-    
-    .ios-x-bottom {
-      padding-bottom: max(env(safe-area-inset-bottom), 34px);
-    }
+/* University responsive design enhancements */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
+}
 
-  @media screen and (max-width: 375px) and (max-height: 667px) {
-    /* iPhone SE 2nd/3rd gen adjustments */
-    .ios-se-adjust {
-      padding-top: max(env(safe-area-inset-top), 30px); /* Increased from 20px */
-    }
-    
-    .ios-se-bottom {
-      padding-bottom: max(env(safe-area-inset-bottom), 16px);
-    }
+/* High contrast for accessibility */
+@media (prefers-contrast: high) {
+  :root {
+    --color-border: 0 0 0;
+    --color-input: 0 0 0;
   }
+  
+  .dark {
+    --color-border: 255 255 255;
+    --color-input: 255 255 255;
+  }
+}
 
-  /* Landscape safe areas - Enhanced */
-  @media screen and (orientation: landscape) {
-    .ios-landscape-safe {
-      padding-left: max(env(safe-area-inset-left), 44px);
-      padding-right: max(env(safe-area-inset-right), 44px);
-    }
-    
-    .ios-landscape-header {
-      padding-top: max(env(safe-area-inset-top), 0px);
-      padding-left: max(env(safe-area-inset-left), 44px);
-      padding-right: max(env(safe-area-inset-right), 44px);
-    }
-    
-    .ios-landscape-bottom {
-      padding-bottom: max(env(safe-area-inset-bottom), 21px);
-      padding-left: max(env(safe-area-inset-left), 44px);
-      padding-right: max(env(safe-area-inset-right), 44px);
-    }
+/* University print styles */
+@media print {
+  .no-print {
+    display: none !important;
   }
+  
+  body {
+    font-family: 'Crimson Text', 'Times New Roman', serif;
+    line-height: 1.6;
+    color: black;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: black;
+    page-break-after: avoid;
+  }
+  
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+}
 
-  /* Touch-friendly utilities for iOS */
-  .ios-touch-target {
-    min-height: 44px;
-    min-width: 44px;
-  }
-  
-  .ios-touch-target-large {
-    min-height: 48px;
-    min-width: 48px;
-  }
-  
-  /* iOS-style scroll behavior */
-  .ios-scroll {
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-  }
-  
-  /* iOS momentum scrolling */
-  .ios-momentum-scroll {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-  }
-  
-  /* iOS-style backdrop blur */
-  .ios-backdrop {
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-  }
-  
-  /* iOS-style border radius */
-  .ios-rounded {
-    border-radius: 12px;
-  }
-  
-  .ios-rounded-lg {
-    border-radius: 16px;
-  }
-  
-  /* Prevent bounce scrolling on iOS */
-  .ios-no-bounce {
-    overscroll-behavior: contain;
-  }
+/* Additional university-themed animations */
+.floating-decoration {
+  animation: float 6s ease-in-out infinite;
+}
 
-  /* Enhanced iOS navigation spacing */
-  .ios-nav-spacing {
-    padding: 12px 16px;
-  }
-  
-  .ios-nav-item {
-    padding: 12px 16px;
-    min-height: 48px;
-    border-radius: 12px;
-    transition: all 0.2s ease;
-  }
-  
-  .ios-nav-item:active {
-    transform: scale(0.98);
-    background-color: rgba(0, 0, 0, 0.05);
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(5deg); }
+}
+
+/* Academic hero button styles */
+.hero-btn-university {
+  position: relative;
+  padding: 1rem 2rem;
+  font-weight: 600;
+  border-radius: var(--radius-academic);
+  overflow: hidden;
+  background: linear-gradient(135deg, rgb(27, 54, 93) 0%, rgb(140, 29, 64) 100%);
+  color: white;
+  box-shadow: var(--shadow-academic);
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.hero-btn-university:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 25px rgba(27, 54, 93, 0.3);
+}
+
+.hero-btn-university::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.hero-btn-university:hover::before {
+  left: 100%;
+}
+
+/* Academic feature cards */
+.feature-card-university {
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+  background: white;
+  border: 1px solid rgb(232, 234, 237);
+  border-radius: var(--radius-academic);
+  box-shadow: var(--shadow-paper);
+}
+
+.feature-card-university:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-academic);
+  border-color: rgb(212, 175, 55);
+}
+
+/* University testimonial cards */
+.testimonial-university {
+  background: rgb(247, 245, 243);
+  border-left: 4px solid rgb(212, 175, 55);
+  border-radius: var(--radius-academic);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-paper);
+}
+
+/* Academic stats counter */
+.stats-university {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  color: rgb(27, 54, 93);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* University CTA sections */
+.cta-university {
+  background: linear-gradient(135deg, rgb(27, 54, 93) 0%, rgb(140, 29, 64) 100%);
+  position: relative;
   }
   
   /* iOS-specific bottom navigation */
