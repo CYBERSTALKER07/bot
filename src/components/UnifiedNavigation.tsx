@@ -47,6 +47,7 @@ interface UnifiedNavigationProps {
 
 // Public routes that should show the landing navigation
 const LANDING_ROUTES = [
+  '/',
   '/login', 
   '/register',
   '/mobile-app',

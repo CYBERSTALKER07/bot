@@ -54,6 +54,7 @@ const PWAUpdateNotification = () => {
 };
 
 // Lazy load components for better performance
+const LandingPage = lazy(() => import('./components/LandingPage'));
 const Login = lazy(() => import('./components/Auth/Login'));
 const Register = lazy(() => import('./components/Auth/Register'));
 const ProfileSetup = lazy(() => import('./components/Profile/ProfileSetup'));
@@ -136,6 +137,42 @@ function DashboardRouter() {
   return (
     <Suspense fallback={<LoadingFallback message="Loading dashboard..." />}>
       <Dashboard />
+    </Suspense>
+  );
+}
+
+// Utility function to detect if app is running as PWA
+const isPWA = () => {
+  // Check if running in standalone mode (installed PWA)
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+  
+  // Check if running through Capacitor (mobile app)
+  const isCapacitor = window.Capacitor?.isNativePlatform();
+  
+  // Check iOS standalone mode
+  const isIOSStandalone = (window.navigator as any).standalone === true;
+  
+  return isStandalone || isCapacitor || isIOSStandalone;
+};
+
+// Component to handle smart routing based on PWA vs Web
+function SmartHomeRoute() {
+  const { user } = useAuth();
+  
+  // If user is authenticated, go to feed
+  if (user) {
+    return <Navigate to="/feed" replace />;
+  }
+  
+  // If running as PWA, skip landing page and go to login
+  if (isPWA()) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  // If running in web browser, show landing page
+  return (
+    <Suspense fallback={<LoadingFallback message="Loading homepage..." />}>
+      <LandingPage />
     </Suspense>
   );
 }
@@ -413,10 +450,8 @@ function AppContent() {
               </ProtectedRoute>
             } />
 
-            {/* Root route - redirect based on authentication */}
-            <Route path="/" element={
-              user ? <Navigate to="/feed" replace /> : <Navigate to="/login" replace />
-            } />
+            {/* Smart root route - shows landing page for web, redirects to login for PWA */}
+            <Route path="/" element={<SmartHomeRoute />} />
 
             {/* Catch all route - redirect to appropriate home */}
             <Route path="*" element={
