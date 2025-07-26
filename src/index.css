@@ -52,7 +52,7 @@
   
   --color-border: 60 64 67;
   --color-input: 60 64 67;
-  --color-ring: var(--color-university-gold);
+  --color-ring: var(--color-gold);
   
   --shadow-academic: 0 2px 8px 0 rgb(0 0 0 / 0.3);
 }
@@ -82,9 +82,10 @@
   
   /* University typography hierarchy */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-serif font-semibold tracking-tight text-university-navy;
+    @apply font-serif font-semibold tracking-tight;
     text-wrap: balance;
     font-family: 'Playfair Display', Georgia, serif;
+    color: rgb(27, 54, 93);
   }
   
   h1 {
@@ -110,13 +111,19 @@
   
   /* Academic link styling */
   a {
-    @apply text-university-navy hover:text-university-burgundy transition-colors duration-200;
+    @apply transition-colors duration-200;
+    color: rgb(27, 54, 93);
     text-decoration-skip-ink: auto;
+  }
+  
+  a:hover {
+    color: rgb(140, 29, 64);
   }
   
   /* Focus styles for accessibility */
   *:focus-visible {
-    @apply outline-none ring-2 ring-university-gold ring-offset-2 ring-offset-background;
+    @apply outline-none ring-2 ring-offset-2 ring-offset-background;
+    --tw-ring-color: rgb(212, 175, 55);
   }
   
   /* Academic button reset */
@@ -130,11 +137,16 @@
   }
   
   ::-webkit-scrollbar-track {
-    @apply bg-university-cream;
+    background: rgb(247, 245, 243);
   }
   
   ::-webkit-scrollbar-thumb {
-    @apply bg-university-navy/30 rounded-full hover:bg-university-navy/50;
+    @apply rounded-full;
+    background: rgba(27, 54, 93, 0.3);
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(27, 54, 93, 0.5);
   }
 }
 
@@ -142,76 +154,130 @@
 @layer components {
   /* University button styles */
   .btn-university {
-    @apply inline-flex items-center justify-center whitespace-nowrap rounded-academic text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-university-gold disabled:pointer-events-none disabled:opacity-50;
+    @apply inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all duration-300 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50;
+    border-radius: var(--radius-academic);
   }
   
   .btn-primary {
-    @apply btn-university bg-university-navy text-white shadow-academic hover:bg-university-navy/90 active:bg-university-navy/80;
+    background: rgb(27, 54, 93);
+    color: white;
+    box-shadow: var(--shadow-academic);
+  }
+  
+  .btn-primary:hover {
+    background: rgba(27, 54, 93, 0.9);
+  }
+  
+  .btn-primary:active {
+    background: rgba(27, 54, 93, 0.8);
   }
   
   .btn-secondary {
-    @apply btn-university bg-university-gold text-university-navy shadow-academic hover:bg-university-gold/90;
+    background: rgb(212, 175, 55);
+    color: rgb(27, 54, 93);
+    box-shadow: var(--shadow-academic);
+  }
+  
+  .btn-secondary:hover {
+    background: rgba(212, 175, 55, 0.9);
   }
   
   .btn-academic {
-    @apply btn-university bg-university-burgundy text-white shadow-academic hover:bg-university-burgundy/90;
+    background: rgb(140, 29, 64);
+    color: white;
+    box-shadow: var(--shadow-academic);
+  }
+  
+  .btn-academic:hover {
+    background: rgba(140, 29, 64, 0.9);
   }
   
   .btn-outline {
-    @apply btn-university border-2 border-university-navy bg-transparent text-university-navy hover:bg-university-navy hover:text-white;
+    border: 2px solid rgb(27, 54, 93);
+    background: transparent;
+    color: rgb(27, 54, 93);
   }
   
-  .btn-ghost {
-    @apply btn-university hover:bg-university-cream hover:text-university-navy;
+  .btn-outline:hover {
+    background: rgb(27, 54, 93);
+    color: white;
+  }
+  
+  .btn-ghost:hover {
+    background: rgb(247, 245, 243);
+    color: rgb(27, 54, 93);
   }
   
   /* Academic card component */
   .card-university {
-    @apply rounded-academic border bg-card text-card-foreground shadow-paper;
+    @apply border bg-card text-card-foreground;
+    border-radius: var(--radius-academic);
+    box-shadow: var(--shadow-paper);
   }
   
   .card-academic {
-    @apply card-university bg-university-cream border-l-4 border-university-gold;
+    background: rgb(247, 245, 243);
+    border-left: 4px solid rgb(212, 175, 55);
+    border-radius: var(--radius-academic);
   }
   
   .card-elevated {
-    @apply card-university shadow-academic border-university-gold/20;
+    box-shadow: var(--shadow-academic);
+    border-color: rgba(212, 175, 55, 0.2);
   }
   
   /* University navigation */
   .nav-university {
-    @apply flex items-center gap-2 rounded-academic px-4 py-2 text-sm font-medium transition-colors hover:bg-university-cream hover:text-university-navy focus:bg-university-cream focus:text-university-navy focus:outline-none;
+    @apply flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors focus:outline-none;
+    border-radius: var(--radius-academic);
+  }
+  
+  .nav-university:hover,
+  .nav-university:focus {
+    background: rgb(247, 245, 243);
+    color: rgb(27, 54, 93);
   }
   
   .nav-university.active {
-    @apply bg-university-navy text-white;
+    background: rgb(27, 54, 93);
+    color: white;
   }
   
   /* Academic input styling */
   .input-university {
-    @apply flex h-10 w-full rounded-academic border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-university-gold focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply flex h-10 w-full border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50;
+    border-radius: var(--radius-academic);
+  }
+  
+  .input-university:focus-visible {
+    --tw-ring-color: rgb(212, 175, 55);
+    @apply ring-2 ring-offset-2;
   }
   
   /* University typography classes */
   .text-academic {
-    @apply font-academic text-neutral-600 leading-loose;
+    @apply text-neutral-600 leading-loose;
   }
   
   .text-university-heading {
-    @apply font-serif font-bold text-university-navy;
+    @apply font-serif font-bold;
+    color: rgb(27, 54, 93);
   }
   
   .text-scholar {
-    @apply font-academic font-semibold text-university-scholar;
+    @apply font-semibold;
+    color: rgb(93, 78, 117);
   }
   
   /* Academic layout utilities */
   .container-university {
-    @apply mx-auto max-w-university px-4 sm:px-6 lg:px-8;
+    @apply mx-auto px-4 sm:px-6 lg:px-8;
+    max-width: 1200px;
   }
   
   .container-academic {
-    @apply mx-auto max-w-academic px-6;
+    @apply mx-auto px-6;
+    max-width: 800px;
   }
   
   .section-university {
@@ -220,11 +286,11 @@
   
   /* University spacing utilities */
   .space-academic {
-    @apply space-y-academic;
+    gap: var(--spacing-academic);
   }
   
   .gap-academic {
-    @apply gap-academic;
+    gap: var(--spacing-academic);
   }
   
   /* Academic prose styling */
@@ -238,7 +304,8 @@
   .prose-university h4, 
   .prose-university h5, 
   .prose-university h6 {
-    @apply text-university-navy font-serif;
+    @apply font-serif;
+    color: rgb(27, 54, 93);
   }
   
   .prose-university p {
@@ -246,7 +313,11 @@
   }
   
   .prose-university a {
-    @apply text-university-burgundy hover:text-university-navy;
+    color: rgb(140, 29, 64);
+  }
+  
+  .prose-university a:hover {
+    color: rgb(27, 54, 93);
   }
   
   /* University gradient backgrounds */
@@ -267,11 +338,13 @@
 @layer utilities {
   /* University text selection */
   ::selection {
-    @apply bg-university-gold/20 text-university-navy;
+    background: rgba(212, 175, 55, 0.2);
+    color: rgb(27, 54, 93);
   }
   
   .dark ::selection {
-    @apply bg-university-gold/30 text-white;
+    background: rgba(212, 175, 55, 0.3);
+    color: white;
   }
   
   /* Academic scrollbar utilities */
@@ -305,7 +378,11 @@
   
   /* Academic focus utilities */
   .focus-university {
-    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-university-gold focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+  
+  .focus-university:focus-visible {
+    --tw-ring-color: rgb(212, 175, 55);
   }
   
   /* University animation utilities */
@@ -319,11 +396,20 @@
   
   /* University hover effects */
   .hover-university {
-    @apply transition-all duration-300 hover:shadow-academic hover:-translate-y-1;
+    @apply transition-all duration-300 hover:-translate-y-1;
+  }
+  
+  .hover-university:hover {
+    box-shadow: var(--shadow-academic);
   }
   
   .hover-academic {
-    @apply transition-colors duration-200 hover:bg-university-cream hover:text-university-navy;
+    @apply transition-colors duration-200;
+  }
+  
+  .hover-academic:hover {
+    background: rgb(247, 245, 243);
+    color: rgb(27, 54, 93);
   }
 }
 
@@ -465,33 +551,32 @@
 .cta-university {
   background: linear-gradient(135deg, rgb(27, 54, 93) 0%, rgb(140, 29, 64) 100%);
   position: relative;
-  }
-  
-  /* iOS-specific bottom navigation */
-  .ios-bottom-nav {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-  }
-  
-  .dark .ios-bottom-nav {
-    background: rgba(0, 0, 0, 0.8);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  /* iOS-specific header */
-  .ios-header {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  }
-  
-  .dark .ios-header {
-    background: rgba(0, 0, 0, 0.95);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
+}
+
+/* iOS-specific bottom navigation */
+.ios-bottom-nav {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dark .ios-bottom-nav {
+  background: rgba(0, 0, 0, 0.8);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* iOS-specific header */
+.ios-header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dark .ios-header {
+  background: rgba(0, 0, 0, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Print styles */
