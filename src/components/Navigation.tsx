@@ -36,7 +36,7 @@ interface NavigationItem {
   isActive?: boolean;
 }
 
-// Enhanced responsive X-Style Navigation
+// X-Style Navigation
 export default function Navigation() {
   const { user, logout } = useAuth();
   const { isDark } = useTheme();
@@ -45,17 +45,13 @@ export default function Navigation() {
   
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
-  const [isTablet, setIsTablet] = useState(window.innerWidth >= 768 && window.innerWidth < 1024);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isUserCardOpen, setIsUserCardOpen] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
-      const width = window.innerWidth;
-      setIsMobile(width < 1024);
-      setIsTablet(width >= 768 && width < 1024);
-      
-      if (width >= 1024) {
+      setIsMobile(window.innerWidth < 1024);
+      if (window.innerWidth >= 1024) {
         setIsMobileMenuOpen(false);
       }
     };
@@ -64,12 +60,14 @@ export default function Navigation() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Enhanced navigation items with better responsive considerations
+  // X-style navigation items
   const getNavigationItems = (): NavigationItem[] => {
     const baseItems = [
       { icon: Home, label: 'Home', path: '/feed' },
       { icon: Search, label: 'Explore', path: '/jobs' },
       { icon: Bell, label: 'Notifications', path: '/notifications', badge: 3 },
+      // { icon: Mail, label: 'Messages', path: '/messages', badge: 2 },
+      // { icon: Bookmark, label: 'Bookmarks', path: '/bookmarks' },
     ];
 
     if (user?.role === 'student') {
@@ -120,30 +118,24 @@ export default function Navigation() {
 
   if (!user) return null;
 
-  // Mobile Navigation (screens < 1024px)
+  // Mobile Navigation
   if (isMobile) {
     return (
       <>
-        {/* Enhanced Mobile Top Bar with safe area support */}
-        <header className={cn(
-          "fixed top-0 left-0 right-0 z-50 border-none safe-top ios-header-safe",
+        {/* Mobile Top Bar */} 
+        <header className={`fixed top-0 left-0 right-0 z-50 border-b ${
           isDark ? 'bg-black/95 backdrop-blur-xl border-gray-800' : 'bg-white/95 backdrop-blur-xl border-gray-200'
-        )}>
-          <div className="flex items-center justify-between px-responsive py-3 min-h-[64px]">
+        }`}>
+          {/* <div className="h-5 bg-transparent" />
+          <div className="h-5 bg-transparent" /> */}
+          <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center space-x-3">
-              <div className={cn(
-                "w-8 h-8 xs:w-10 xs:h-10 rounded-full flex items-center justify-center transition-all duration-200",
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                 isDark ? 'bg-white' : 'bg-black'
-              )}>
-                <Feather className={cn(
-                  "h-4 w-4 xs:h-5 xs:w-5 transition-all duration-200",
-                  isDark ? 'text-black' : 'text-white'
-                )} />
+              }`}>
+                <Feather className={`h-4 w-4 ${isDark ? 'text-black' : 'text-white'}`} />
               </div>
-              <span className={cn(
-                "font-bold text-responsive-lg transition-colors duration-200",
-                isDark ? 'text-white' : 'text-gray-900'
-              )}>
+              <span className={`font-bold text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 AUT Handshake
               </span>
             </div>
@@ -153,7 +145,7 @@ export default function Navigation() {
               size="sm"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className={cn(
-                "p-2 rounded-full transition-all duration-200 touch-target",
+                "p-2 rounded-full transition-colors duration-200",
                 isDark ? 'hover:bg-black text-white' : 'hover:bg-gray-100'
               )}
               aria-expanded={isMobileMenuOpen}
@@ -162,66 +154,85 @@ export default function Navigation() {
               {isMobileMenuOpen ? (
                 <XIcon className="h-5 w-5" />
               ) : (
-                <div className={cn(
-                  "w-8 h-8 xs:w-9 xs:h-9 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-200",
-                  "bg-brand-primary/10 text-brand-primary"
-                )}>
-                  {user?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || <User className="h-4 w-4" />}
+                <div className="w-8 h-8 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center text-sm font-medium">
+                  {user?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || <User className="h-5 w-5" />}
                 </div>
               )}
             </Button>
           </div>
         </header>
 
-        {/* Enhanced Mobile Sidebar Backdrop */}
+        {/* Mobile Sidebar Backdrop */}
         {isMobileMenuOpen && (
           <div
-            className="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300"
             onClick={() => setIsMobileMenuOpen(false)}
             aria-hidden="true"
           />
         )}
 
-        {/* Enhanced Mobile Left Sidebar */}
+        {/* Mobile Left Sidebar */}
         <div
           className={cn(
-            'fixed top-0 left-0 h-full w-80 xs:w-96 z-50 shadow-2xl border-r safe-top',
-            isDark ? 'bg-black/98 border-gray-800' : 'bg-white/98 border-gray-200'
+            'fixed top-0 left-0 h-full w-80 z-50 shadow-xl border-r',
+            isDark ? 'bg-black/95 border-gray-800' : 'bg-white/95 border-gray-200'
           )}
           style={{
             transform: isMobileMenuOpen ? 'translateX(0px)' : 'translateX(-100%)',
-            transition: 'transform 300ms cubic-bezier(0.4, 0, 0.2, 1)',
+            transition: 'transform 300ms ease-out',
             willChange: 'transform'
           }}
         >
-          {/* Enhanced Profile Section */}
+          {/* Sidebar Header */}
+          {/* <div className={cn(
+            'flex items-center justify-between h-16 px-4 border-b',
+            isDark ? 'border-gray-800' : 'border-gray-200'
+          )}>
+            <div className="flex items-center space-x-3">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                isDark ? 'bg-white' : 'bg-black'
+              }`}>
+                <Feather className={`h-4 w-4 ${isDark ? 'text-black' : 'text-white'}`} />
+              </div>
+              <span className={`font-bold text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                Menu
+              </span>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'}
+            >
+              <XIcon className="h-5 w-5" />
+            </Button>
+          </div> */}
+
+          {/* Profile Section */}
           <div className={cn(
-            'px-responsive py-4 border-b ios-header-safe',
+            'px-4 py-4 border-b',
             isDark ? 'border-gray-800' : 'border-gray-200'
           )}>
             <button
               onClick={handleUserClick}
-              className={cn(
-                "flex items-center space-x-3 w-full text-left p-3 -m-3 rounded-xl transition-all duration-200",
-                "hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-primary touch-target"
-              )}
+              className="flex items-center space-x-3 w-full text-left hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg p-2 -m-2 transition-colors duration-200"
             >
               <div className={cn(
-                "w-12 h-12 xs:w-14 xs:h-14 rounded-full flex items-center justify-center text-lg font-semibold relative transition-all duration-200",
+                "w-12 h-12 rounded-full flex items-center justify-center text-lg font-semibold relative",
                 isDark ? 'bg-gray-700 text-white' : 'bg-gray-300 text-gray-800'
               )}>
                 {user?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
-                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 xs:w-4 xs:h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-900"></div>
+                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-900"></div>
               </div>
-              <div className="flex-1 min-w-0">
+              <div>
                 <p className={cn(
-                  "font-medium text-responsive truncate",
+                  "font-medium text-base truncate",
                   isDark ? 'text-white' : 'text-gray-900'
                 )}>
                   {user?.full_name || 'User'}
                 </p>
                 <p className={cn(
-                  "text-responsive-sm text-gray-500 truncate"
+                  "text-sm text-gray-500 truncate"
                 )}>
                   {user?.email || 'user@example.com'}
                 </p>
@@ -229,8 +240,8 @@ export default function Navigation() {
             </button>
           </div>
 
-          {/* Enhanced Navigation Items */}
-          <div className="flex-1 overflow-y-auto p-responsive ios-momentum-scroll">
+          {/* Navigation Items */}
+          <div className="flex-1 overflow-y-auto p-4">
             <nav className="space-y-2">
               {navigationItems.map((item, index) => {
                 const Icon = item.icon;
@@ -242,22 +253,22 @@ export default function Navigation() {
                     to={item.path}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={cn(
-                      "flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 touch-target focus:ring-2 focus:ring-primary",
+                      "flex items-center justify-between px-3 py-3 rounded-xl transition-all duration-200",
                       isActive
                         ? isDark 
-                          ? 'bg-white/10 text-white shadow-sm' 
-                          : 'bg-gray-100 text-gray-900 shadow-sm'
+                          ? 'bg-white/10 text-white' 
+                          : 'bg-gray-100 text-gray-900'
                         : isDark
-                          ? 'text-gray-300 hover:bg-gray-800 hover:text-white active:bg-gray-700'
-                          : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 active:bg-gray-50'
+                          ? 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                          : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                     )}
                   >
                     <div className="flex items-center space-x-3">
-                      <Icon className="h-5 w-5 xs:h-6 xs:w-6 flex-shrink-0" />
-                      <span className="font-medium text-responsive">{item.label}</span>
+                      <Icon className="h-5 w-5" />
+                      <span className="font-medium">{item.label}</span>
                     </div>
                     {item.badge && item.badge > 0 && (
-                      <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center font-medium">
+                      <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center">
                         {item.badge > 9 ? '9+' : item.badge}
                       </span>
                     )}
@@ -266,7 +277,7 @@ export default function Navigation() {
               })}
             </nav>
 
-            {/* Enhanced Logout Button */}
+            {/* Logout Button */}
             <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-800">
               <Button
                 variant="ghost"
@@ -274,21 +285,20 @@ export default function Navigation() {
                   setIsMobileMenuOpen(false);
                   handleLogout();
                 }}
-                className="w-full justify-start px-4 py-3 text-red-500 hover:bg-red-500/10 focus:bg-red-500/10 rounded-xl touch-target"
+                className="w-full justify-start px-3 py-3 text-red-500 hover:bg-red-500/10 rounded-xl"
               >
-                <LogOut className="h-5 w-5 xs:h-6 xs:w-6 mr-3 flex-shrink-0" />
-                <span className="font-medium text-responsive">Logout</span>
+                <LogOut className="h-5 w-5 mr-3" />
+                <span className="font-medium">Logout</span>
               </Button>
             </div>
           </div>
         </div>
 
-        {/* Enhanced Bottom Navigation with safe area support */}
-        <nav className={cn(
-          "fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl border-t safe-bottom ios-bottom-safe",
-          isDark ? 'bg-black/95 border-gray-800' : 'bg-white/95 border-gray-200'
-        )}>
-          <div className="grid grid-cols-5 min-h-[60px] xs:min-h-[64px]">
+        {/* Bottom Navigation */}
+        <nav className={`fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl border-t ${
+          isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
+        }`}>
+          <div className="grid grid-cols-5 h-14">
             {navigationItems.slice(0, 5).map((item, index) => {
               const Icon = item.icon;
               const isActive = isCurrentPath(item.path);
@@ -297,71 +307,63 @@ export default function Navigation() {
                 <Link
                   key={index}
                   to={item.path}
-                  className={cn(
-                    "flex flex-col items-center justify-center py-2 px-1 transition-all duration-200 relative touch-target group",
+                  className={`flex flex-col items-center justify-center py-2 transition-all duration-200 relative ${
                     isActive 
                       ? isDark ? 'text-white' : 'text-black'
-                      : isDark ? 'text-gray-400 hover:text-gray-300 active:text-gray-200' : 'text-gray-600 hover:text-gray-800 active:text-gray-900'
-                  )}
+                      : isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-800'
+                  }`}
                 >
                   <div className="relative">
-                    <Icon className="h-5 w-5 xs:h-6 xs:w-6 transition-transform duration-200 group-active:scale-95" />
+                    <Icon className="h-6 w-6" />
                     {item.badge && item.badge > 0 && (
-                      <span className="absolute -top-1 -right-1 w-4 h-4 xs:w-5 xs:h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
+                      <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
                         {item.badge > 9 ? '9+' : item.badge}
                       </span>
                     )}
                   </div>
-                  <span className="text-xs xs:text-sm mt-1 font-medium truncate max-w-full px-1">
-                    {item.label}
-                  </span>
                 </Link>
               );
             })}
           </div>
         </nav>
 
-        {/* Mobile layout spacers with safe area support */}
-        <div className="h-16 xs:h-20 safe-top ios-header-safe" />
-        <div className="h-16 xs:h-20 safe-bottom ios-bottom-safe" />
+        {/* Spacers */}
+        
+
+        {/* User Card for Mobile */}
+        {/* <UserCard 
+          isOpen={isUserCardOpen}
+          onClose={() => setIsUserCardOpen(false)}
+          position="bottom-right"
+        /> */}
       </>
     );
   }
 
-  // Desktop Navigation (screens >= 1024px)
+  // Desktop Navigation
   return (
     <>
-      {/* Enhanced Desktop Sidebar with responsive width */}
+      {/* Desktop Sidebar */}
       <aside className={cn(
-        "fixed left-0 top-0 h-full z-40 transition-all duration-300 group",
+        "fixed left-0 top-0 h-full z-40 transition-all duration-300",
         "border-r backdrop-blur-xl",
-        isDark ? 'bg-black/98 border-gray-800' : 'bg-white/98 border-gray-200',
-        isExpanded ? 'w-72 xl:w-80' : 'w-20 xl:w-24'
+        isDark ? 'bg-black/95 border-gray-800' : 'bg-white/95 border-gray-200',
+        isExpanded ? 'w-64' : 'w-20'
       )}
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => setIsExpanded(false)}
       >
-        {/* Enhanced Logo/Brand */}
-        <div className="p-4 xl:p-6 border-b border-gray-200 dark:border-gray-800">
+        {/* Logo/Brand */}
+        <div className="p-4 border-b border-gray-200 dark:border-gray-800">
           <div className="flex items-center justify-center">
-            <div className={cn(
-              "flex items-center justify-center transition-all duration-300",
-              isExpanded ? 'w-12 h-12 xl:w-14 xl:h-14' : 'w-10 h-10 xl:w-12 xl:h-12',
-              isDark ? 'bg-white' : 'bg-black',
-              'rounded-full'
-            )}>
-              <Feather className={cn(
-                "transition-all duration-300",
-                isExpanded ? 'h-6 w-6 xl:h-7 xl:w-7' : 'h-5 w-5 xl:h-6 xl:w-6',
-                isDark ? 'text-black' : 'text-white'
-              )} />
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+              isDark ? 'bg-white' : 'bg-black'
+            }`}>
+              <Feather className={`h-5 w-5 ${isDark ? 'text-black' : 'text-white'}`} />
             </div>
             {isExpanded && (
-              <div className="ml-4 overflow-hidden">
-                <h2 className={cn(
-                  "font-bold text-responsive-xl xl:text-2xl transition-colors duration-300",
-                  isDark ? 'text-white' : 'text-gray-900'
-                )}>
+              <div className="ml-3 overflow-hidden">
+                <h2 className={`font-bold text-xl ${isDark ? 'text-white' : 'text-gray-900'}`}>
                   TalentLink
                 </h2>
               </div>
@@ -369,8 +371,8 @@ export default function Navigation() {
           </div>
         </div>
 
-        {/* Enhanced Navigation Items */}
-        <nav className="flex flex-col flex-1 p-4 xl:p-6 space-y-2">
+        {/* Navigation Items */}
+        <nav className="flex flex-col flex-1 p-4 space-y-2">
           {navigationItems.map((item, index) => {
             const Icon = item.icon;
             const isActive = isCurrentPath(item.path);
@@ -380,21 +382,21 @@ export default function Navigation() {
                 key={index}
                 to={item.path}
                 className={cn(
-                  "flex items-center rounded-xl transition-all duration-200 group relative touch-target-lg focus:ring-2 focus:ring-primary",
-                  isExpanded ? 'px-4 py-3 xl:px-5 xl:py-4 space-x-4' : 'justify-center p-3 xl:p-4',
+                  "flex items-center px-3 py-3 rounded-xl transition-all duration-200 group relative",
+                  isExpanded ? 'space-x-3' : 'justify-center',
                   isActive
                     ? isDark 
-                      ? 'bg-white text-black shadow-lg' 
-                      : 'bg-black text-white shadow-lg'
+                      ? 'bg-white text-black' 
+                      : 'bg-black text-white'
                     : isDark
-                      ? 'text-gray-300 hover:bg-gray-800 hover:text-white active:bg-gray-700'
-                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 active:bg-gray-50'
+                      ? 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                 )}
               >
-                <div className="relative flex-shrink-0">
-                  <Icon className="h-6 w-6 xl:h-7 xl:w-7 transition-transform duration-200 group-active:scale-95" />
+                <div className="relative">
+                  <Icon className="h-6 w-6" />
                   {item.badge && item.badge > 0 && !isExpanded && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 xl:w-5 xl:h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
                       {item.badge > 9 ? '9+' : item.badge}
                     </span>
                   )}
@@ -402,26 +404,26 @@ export default function Navigation() {
                 
                 {isExpanded && (
                   <>
-                    <span className="font-medium text-responsive-lg xl:text-xl flex-1 truncate">{item.label}</span>
+                    <span className="font-medium text-xl">{item.label}</span>
                     {item.badge && item.badge > 0 && (
-                      <span className="ml-auto bg-red-500 text-white text-sm px-2 py-1 rounded-full min-w-[24px] text-center font-medium">
+                      <span className="ml-auto bg-red-500 text-white text-sm px-2 py-1 rounded-full min-w-[20px] text-center">
                         {item.badge > 9 ? '9+' : item.badge}
                       </span>
                     )}
                   </>
                 )}
 
-                {/* Enhanced Tooltip for collapsed state */}
+                {/* Tooltip for collapsed state */}
                 {!isExpanded && (
                   <div className={cn(
-                    "absolute left-full ml-4 px-3 py-2 rounded-lg text-sm font-medium z-50",
-                    "opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none",
-                    "whitespace-nowrap shadow-xl border",
-                    isDark ? 'bg-gray-800 text-white border-gray-600' : 'bg-white text-gray-900 border-gray-300'
+                    "absolute left-full ml-4 px-3 py-2 rounded-lg text-sm font-medium",
+                    "opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50",
+                    "whitespace-nowrap shadow-lg",
+                    isDark ? 'bg-gray-800 text-white' : 'bg-white text-gray-900 border'
                   )}>
                     {item.label}
                     {item.badge && item.badge > 0 && (
-                      <span className="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+                      <span className="ml-2 bg-red-500 text-white text-xs px-1 py-0.5 rounded-full">
                         {item.badge}
                       </span>
                     )}
@@ -432,78 +434,78 @@ export default function Navigation() {
           })}
         </nav>
 
-        {/* Enhanced Post Button */}
-        <div className="p-4 xl:p-6">
+        {/* Post Button */}
+        <div className="p-4">
           <Button
             className={cn(
-              "w-full rounded-full font-bold transition-all duration-200 touch-target-lg",
-              isDark ? 'bg-white text-black hover:bg-gray-200 active:bg-gray-300' : 'bg-black text-white hover:bg-gray-800 active:bg-gray-900',
-              isExpanded ? 'py-3 xl:py-4 text-responsive-lg' : 'aspect-square p-3 xl:p-4'
+              "w-full rounded-full font-bold transition-all duration-200",
+              isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800',
+              isExpanded ? 'py-3' : 'aspect-square p-3'
             )}
             onClick={() => navigate('/post-job')}
           >
             {isExpanded ? (
               'Post'
             ) : (
-              <Plus className="h-6 w-6 xl:h-7 xl:w-7" />
+              <Plus className="h-6 w-6" />
             )}
           </Button>
         </div>
 
-        {/* Enhanced User Profile */}
-        <div className="p-4 xl:p-6 border-t border-gray-200 dark:border-gray-800">
+        {/* User Profile */}
+        <div className="p-4 border-t border-gray-200 dark:border-gray-800">
           <div className="relative">
             <button
               onClick={() => setIsUserCardOpen(!isUserCardOpen)}
               className={cn(
-                "w-full flex items-center rounded-xl transition-all duration-200 cursor-pointer touch-target-lg focus:ring-2 focus:ring-primary",
-                isExpanded ? 'space-x-4 p-3 xl:p-4' : 'justify-center p-3 xl:p-4',
-                isDark ? 'hover:bg-gray-800 active:bg-gray-700' : 'hover:bg-gray-100 active:bg-gray-50'
+                "w-full flex items-center rounded-xl transition-all duration-200 cursor-pointer",
+                isExpanded ? 'space-x-3 p-3' : 'justify-center p-3',
+                isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-100'
               )}
             >
-              <div className="relative flex-shrink-0">
+              <div className="relative">
                 {user?.avatar_url ? (
                   <img 
                     src={user.avatar_url}
                     alt={user?.full_name || 'User'}
-                    className="w-10 h-10 xl:w-12 xl:h-12 rounded-full object-cover transition-all duration-200"
+                    className="w-10 h-10 rounded-full object-cover"
                   />
                 ) : (
                   <div className={cn(
-                    "w-10 h-10 xl:w-12 xl:h-12 rounded-full flex items-center justify-center text-sm xl:text-base font-semibold transition-all duration-200",
+                    "w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold",
                     isDark ? 'bg-gray-700 text-white' : 'bg-gray-300 text-gray-800'
                   )}>
                     {user?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
                   </div>
                 )}
-                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 xl:w-4 xl:h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-900"></div>
+                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-900"></div>
               </div>
               
               {isExpanded && (
                 <>
                   <div className="flex-1 text-left overflow-hidden">
                     <p className={cn(
-                      "font-medium text-responsive truncate",
+                      "font-medium text-base truncate",
                       isDark ? 'text-white' : 'text-gray-900'
                     )}>
                       {user?.full_name || 'User'}
                     </p>
                     <p className={cn(
-                      "text-responsive-sm truncate",
+                      "text-sm truncate",
                       isDark ? 'text-gray-400' : 'text-gray-600'
                     )}>
                       @{user?.email?.split('@')[0]}
                     </p>
                   </div>
                   <MoreHorizontal className={cn(
-                    "h-5 w-5 xl:h-6 xl:w-6 flex-shrink-0 transition-colors duration-200",
+                    "h-5 w-5 flex-shrink-0",
                     isDark ? 'text-gray-400' : 'text-gray-600'
                   )} />
                 </>
               )}
             </button>
 
-            {/* Enhanced Desktop Dropdown Menu */}
+            {/* Desktop Dropdown Menu */}
             {isUserCardOpen && (
               <>
                 <div 
@@ -511,7 +513,7 @@ export default function Navigation() {
                   onClick={() => setIsUserCardOpen(false)}
                 />
                 <div className={cn(
-                  "absolute bottom-full mb-2 w-72 xl:w-80 rounded-2xl shadow-2xl border py-2 z-50 transition-all duration-200",
+                  "absolute bottom-full mb-2 w-64 rounded-2xl shadow-2xl border py-2 z-50",
                   isExpanded ? "left-0" : "left-full ml-4",
                   isDark ? 'bg-black border-gray-600 shadow-gray-900/50' : 'bg-white border-gray-300 shadow-gray-900/20'
                 )}>
@@ -520,12 +522,12 @@ export default function Navigation() {
                     to="/settings"
                     onClick={() => setIsUserCardOpen(false)}
                     className={cn(
-                      "flex items-center px-4 py-3 xl:px-5 xl:py-4 transition-colors duration-200 w-full touch-target focus:ring-2 focus:ring-primary",
+                      "flex items-center px-4 py-3 transition-colors duration-200 w-full",
                       isDark ? 'hover:bg-gray-900 text-white' : 'hover:bg-gray-50 text-gray-900'
                     )}
                   >
-                    <Settings className="h-5 w-5 xl:h-6 xl:w-6 mr-3 flex-shrink-0" />
-                    <span className="font-normal text-responsive">
+                    <Settings className="h-5 w-5 mr-3" />
+                    <span className="font-normal text-sm">
                       Settings and privacy
                     </span>
                   </Link>
@@ -537,12 +539,12 @@ export default function Navigation() {
                       handleLogout();
                     }}
                     className={cn(
-                      "w-full flex items-center px-4 py-3 xl:px-5 xl:py-4 transition-colors duration-200 text-left touch-target focus:ring-2 focus:ring-primary",
+                      "w-full flex items-center px-4 py-3 transition-colors duration-200 text-left",
                       isDark ? 'hover:bg-gray-900 text-white' : 'hover:bg-gray-50 text-gray-900'
                     )}
                   >
-                    <LogOut className="h-5 w-5 xl:h-6 xl:w-6 mr-3 flex-shrink-0" />
-                    <span className="font-normal text-responsive">
+                    <LogOut className="h-5 w-5 mr-3" />
+                    <span className="font-normal text-sm">
                       Log out @{user?.email?.split('@')[0]}
                     </span>
                   </button>
@@ -553,18 +555,25 @@ export default function Navigation() {
         </div>
       </aside>
 
-      {/* Enhanced Backdrop for expanded sidebar */}
+      {/* Backdrop for expanded sidebar */}
       {isExpanded && (
         <div 
-          className="fixed inset-0 bg-black/10 backdrop-blur-sm z-30 transition-all duration-300 xl:hidden"
+          className="fixed inset-0 bg-black/10 backdrop-blur-sm z-30 transition-all duration-300"
           onClick={() => setIsExpanded(false)}
         />
       )}
 
-      {/* Enhanced Main Content Spacer */}
+      {/* User Card */}
+      {/* <UserCard 
+        isOpen={isUserCardOpen}
+        onClose={() => setIsUserCardOpen(false)}
+        position={isExpanded ? "bottom-right" : "bottom-left"}
+      /> */}
+
+      {/* Main Content Spacer */}
       <div className={cn(
         'transition-all duration-300 ease-out',
-        isExpanded ? 'ml-72 xl:ml-80' : 'ml-20 xl:ml-24'
+        isExpanded ? 'ml-64' : 'ml-20'
       )} />
     </>
   );
