@@ -1,136 +1,97 @@
-import type { Config } from 'tailwindcss'
-
-const config: Config = {
-  content: [
-    './index.html',
-    './src/**/*.{js,ts,jsx,tsx}',
-  ],
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   darkMode: 'class',
   theme: {
     extend: {
-      // University-themed color palette
       colors: {
-        // University Brand Colors
-        'university-navy': '#1B365D',
-        'university-gold': '#D4AF37',
-        'university-burgundy': '#8C1D40',
-        'university-sage': '#9CAF88',
-        'university-cream': '#F7F5F3',
-        'university-parchment': '#F4F1EA',
-        'university-ink': '#2C3E50',
-        'university-scholar': '#5D4E75',
+        // Enhanced Brand Colors
+        brand: {
+          primary: '#8C1D40',
+          secondary: '#FFC627',
+          accent: '#E3FF70',
+        },
 
-        // ASU Traditional Colors (keeping for compatibility)
-        'asu-maroon': '#8C1D40',
-        'asu-gold': '#FFC627',
-        'asu-maroon-dark': '#7A1A39',
-
-        // Academic color variants
+        // Professional Color System
         primary: {
-          50: '#E8EDF5',
-          100: '#D1DBEB',
-          200: '#A3B7D7',
-          300: '#7593C3',
-          400: '#476FAF',
-          500: '#1B365D', // University Navy
-          600: '#162B4A',
-          700: '#112037',
-          800: '#0C1524',
-          900: '#070A11',
-          DEFAULT: '#1B365D',
-          foreground: '#FFFFFF',
-        },
-
-        secondary: {
-          50: '#FAF7F0',
-          100: '#F5EFE1',
-          200: '#EBDFC3',
-          300: '#E1CFA5',
-          400: '#D7BF87',
-          500: '#D4AF37', // Academic Gold
-          600: '#AA8C2C',
-          700: '#7F6921',
-          800: '#554616',
-          900: '#2A230B',
-          DEFAULT: '#D4AF37',
-          foreground: '#1B365D',
-        },
-
-        accent: {
-          50: '#F5F0F4',
-          100: '#EBE1E9',
-          200: '#D7C3D3',
-          300: '#C3A5BD',
-          400: '#AF87A7',
-          500: '#8C1D40', // University Burgundy
-          600: '#701733',
-          700: '#541126',
-          800: '#380C19',
-          900: '#1C060D',
+          50: '#fef2f2',
+          100: '#fee2e2',
+          200: '#fecaca',
+          300: '#fca5a5',
+          400: '#f87171',
+          500: '#ef4444',
+          600: '#8C1D40', // ASU Maroon
+          700: '#7A1B3A',
+          800: '#6B1A33',
+          900: '#5C182D',
+          950: '#4D1526',
           DEFAULT: '#8C1D40',
           foreground: '#FFFFFF',
         },
 
-        // Academic semantic colors
-        academic: {
-          navy: '#1B365D',
-          gold: '#D4AF37', 
-          burgundy: '#8C1D40',
-          sage: '#9CAF88',
-          cream: '#F7F5F3',
-          parchment: '#F4F1EA',
-          ink: '#2C3E50',
-          scholar: '#5D4E75',
+        secondary: {
+          50: '#fffbeb',
+          100: '#fef3c7',
+          200: '#fde68a',
+          300: '#fcd34d',
+          400: '#fbbf24',
+          500: '#FFC627', // ASU Gold
+          600: '#E6B122',
+          700: '#CC9E1E',
+          800: '#B38B1A',
+          900: '#997816',
+          DEFAULT: '#FFC627',
+          foreground: '#18181B',
         },
 
-        // Enhanced neutral palette for academic readability
-        neutral: {
-          0: '#FFFFFF',
-          50: '#F8F9FA',
-          100: '#F1F3F4',
-          200: '#E8EAED',
-          300: '#DADCE0',
-          400: '#9AA0A6',
-          500: '#5F6368',
-          600: '#3C4043',
-          700: '#202124',
-          800: '#1A1A1A',
-          900: '#0F0F0F',
-          950: '#080808',
-        },
-
-        // Semantic colors
-        border: '#E8EAED',
-        input: '#E8EAED',
-        ring: '#1B365D',
+        // Neutral Palette (Enhanced)
+        border: '#E4E4E7',
+        input: '#E4E4E7',
+        ring: '#8C1D40',
         background: '#FFFFFF',
-        foreground: '#202124',
+        foreground: '#18181B',
         
         muted: {
-          DEFAULT: '#F1F3F4',
-          foreground: '#5F6368',
+          DEFAULT: '#F4F4F5',
+          foreground: '#71717A',
+        },
+        
+        accent: {
+          DEFAULT: '#F4F4F5',
+          foreground: '#18181B',
         },
         
         popover: {
           DEFAULT: '#FFFFFF',
-          foreground: '#202124',
+          foreground: '#18181B',
         },
         
         card: {
           DEFAULT: '#FFFFFF',
-          foreground: '#202124',
+          foreground: '#18181B',
         },
 
-        // Dark theme colors
-        dark: {
-          bg: '#0A0A0A',
-          surface: '#111111',
-          text: '#F8F9FA',
-          muted: '#9AA0A6',
-          accent: '#D4AF37',
+        neutral: {
+          0: '#FFFFFF',
+          50: '#FAFAFA',
+          100: '#F4F4F5',
+          200: '#E4E4E7',
+          300: '#D4D4D8',
+          400: '#A1A1AA',
+          500: '#71717A',
+          600: '#52525B',
+          700: '#3F3F46',
+          800: '#27272A',
+          900: '#18181B',
+          950: '#09090B',
         },
 
-        // Status colors for university context
+        // Semantic Colors
+        destructive: {
+          DEFAULT: '#EF4444',
+          foreground: '#FFFFFF',
+        },
+        
         success: {
           50: '#f0fdf4',
           100: '#dcfce7',
@@ -143,7 +104,6 @@ const config: Config = {
           800: '#166534',
           900: '#14532d',
           DEFAULT: '#22c55e',
-          foreground: '#FFFFFF',
         },
 
         warning: {
@@ -158,53 +118,126 @@ const config: Config = {
           800: '#92400e',
           900: '#78350f',
           DEFAULT: '#f59e0b',
-          foreground: '#FFFFFF',
         },
 
-        destructive: {
-          DEFAULT: '#EF4444',
-          foreground: '#FFFFFF',
+        error: {
+          50: '#fef2f2',
+          100: '#fee2e2',
+          200: '#fecaca',
+          300: '#fca5a5',
+          400: '#f87171',
+          500: '#ef4444',
+          600: '#dc2626',
+          700: '#b91c1c',
+          800: '#991b1b',
+          900: '#7f1d1d',
+          DEFAULT: '#ef4444',
         },
+
+        info: {
+          50: '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#3b82f6',
+          600: '#2563eb',
+          700: '#1d4ed8',
+          800: '#1e40af',
+          900: '#1e3a8a',
+          DEFAULT: '#3b82f6',
+        },
+
+        // Dark theme colors
+        dark: {
+          bg: '#0A0A0A',
+          surface: '#111111',
+          border: '#27272A',
+          text: '#F4F4F5',
+          muted: '#71717A',
+        },
+
+        // Legacy support (keeping for compatibility)
+        'asu-maroon': '#8C1D40',
+        'asu-gold': '#FFC627',
+        lime: '#E3FF70',
+        'dark-bg': '#0A0A0A',
+        'dark-surface': '#111111',
+        'dark-accent': '#E3FF70',
+        'dark-text': '#F4F4F5',
+        'dark-muted': '#71717A',
       },
 
-      // University-appropriate typography
+      // Enhanced Typography
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        serif: ['Playfair Display', 'Georgia', 'serif'],
-        academic: ['Crimson Text', 'Times New Roman', 'serif'],
-        mono: ['JetBrains Mono', 'Menlo', 'Monaco', 'monospace'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'monospace'],
+        display: ['Cal Sans', 'Inter', 'system-ui', 'sans-serif'],
       },
 
-      // Academic spacing scale
+      fontSize: {
+        // Professional typography scale
+        xs: ['0.75rem', { lineHeight: '1rem', letterSpacing: '0.025em' }],
+        sm: ['0.875rem', { lineHeight: '1.25rem', letterSpacing: '0.025em' }],
+        base: ['1rem', { lineHeight: '1.5rem', letterSpacing: '0rem' }],
+        lg: ['1.125rem', { lineHeight: '1.75rem', letterSpacing: '-0.025em' }],
+        xl: ['1.25rem', { lineHeight: '1.75rem', letterSpacing: '-0.025em' }],
+        '2xl': ['1.5rem', { lineHeight: '2rem', letterSpacing: '-0.025em' }],
+        '3xl': ['1.875rem', { lineHeight: '2.25rem', letterSpacing: '-0.025em' }],
+        '4xl': ['2.25rem', { lineHeight: '2.5rem', letterSpacing: '-0.025em' }],
+        '5xl': ['3rem', { lineHeight: '1', letterSpacing: '-0.025em' }],
+        '6xl': ['3.75rem', { lineHeight: '1', letterSpacing: '-0.025em' }],
+        '7xl': ['4.5rem', { lineHeight: '1', letterSpacing: '-0.025em' }],
+        '8xl': ['6rem', { lineHeight: '1', letterSpacing: '-0.025em' }],
+        '9xl': ['8rem', { lineHeight: '1', letterSpacing: '-0.025em' }],
+      },
+
+      // Enhanced Spacing
       spacing: {
-        'academic': '1.618rem', // Golden ratio
-        '18': '4.5rem',
-        '72': '18rem',
-        '84': '21rem',
-        '96': '24rem',
+        18: '4.5rem',
+        88: '22rem',
+        128: '32rem',
+        144: '36rem',
       },
 
-      // University-appropriate border radius
       borderRadius: {
-        'academic': '0.375rem',
-        'traditional': '0.25rem',
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
 
-      // Academic shadows
+      // Professional Shadows
       boxShadow: {
-        'academic': '0 2px 8px 0 rgb(27 54 93 / 0.1)',
-        'paper': '0 4px 12px 0 rgb(0 0 0 / 0.08)',
-        'university': '0 8px 24px 0 rgb(27 54 93 / 0.12)',
+        'xs': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+        'sm': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+        'md': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+        'lg': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+        'xl': '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+        '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+        'inner': 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
+        'none': 'none',
+        
+        // Material Design elevation
+        'elevation-1': '0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 1px 2px 0 rgba(0, 0, 0, 0.24)',
+        'elevation-2': '0 3px 6px 0 rgba(0, 0, 0, 0.16), 0 3px 6px 0 rgba(0, 0, 0, 0.23)',
+        'elevation-3': '0 10px 20px 0 rgba(0, 0, 0, 0.19), 0 6px 6px 0 rgba(0, 0, 0, 0.23)',
+        'elevation-4': '0 14px 28px 0 rgba(0, 0, 0, 0.25), 0 10px 10px 0 rgba(0, 0, 0, 0.22)',
+        'elevation-5': '0 19px 38px 0 rgba(0, 0, 0, 0.30), 0 15px 12px 0 rgba(0, 0, 0, 0.22)',
       },
 
-      // Academic animations
+      // Professional Animations
       animation: {
-        'fade-in': 'fadeIn 0.4s ease-in-out',
-        'slide-up': 'slideUp 0.4s ease-out',
-        'academic-bounce': 'academicBounce 0.6s ease-out',
+        'fade-in': 'fadeIn 0.2s ease-out',
+        'fade-out': 'fadeOut 0.2s ease-out',
+        'slide-down': 'slideDown 0.2s ease-out',
+        'slide-up': 'slideUp 0.2s ease-out',
+        'slide-left': 'slideLeft 0.2s ease-out',
+        'slide-right': 'slideRight 0.2s ease-out',
+        'scale-up': 'scaleUp 0.15s ease-out',
+        'scale-down': 'scaleDown 0.15s ease-out',
+        'bounce-subtle': 'bounceSubtle 0.5s ease-out',
+        'pulse-subtle': 'pulseSubtle 2s infinite',
+        'shimmer': 'shimmer 2s infinite',
       },
 
       keyframes: {
@@ -212,57 +245,93 @@ const config: Config = {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },
         },
-        slideUp: {
-          '0%': { transform: 'translateY(20px)', opacity: '0' },
+        fadeOut: {
+          '0%': { opacity: '1' },
+          '100%': { opacity: '0' },
+        },
+        slideDown: {
+          '0%': { transform: 'translateY(-10px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
         },
-        academicBounce: {
-          '0%, 20%, 53%, 80%, 100%': { transform: 'translate3d(0,0,0)' },
-          '40%, 43%': { transform: 'translate3d(0,-8px,0)' },
-          '70%': { transform: 'translate3d(0,-4px,0)' },
-          '90%': { transform: 'translate3d(0,-2px,0)' },
+        slideUp: {
+          '0%': { transform: 'translateY(10px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        slideLeft: {
+          '0%': { transform: 'translateX(10px)', opacity: '0' },
+          '100%': { transform: 'translateX(0)', opacity: '1' },
+        },
+        slideRight: {
+          '0%': { transform: 'translateX(-10px)', opacity: '0' },
+          '100%': { transform: 'translateX(0)', opacity: '1' },
+        },
+        scaleUp: {
+          '0%': { transform: 'scale(0.95)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        scaleDown: {
+          '0%': { transform: 'scale(1.05)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        bounceSubtle: {
+          '0%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.05)' },
+          '100%': { transform: 'scale(1)' },
+        },
+        pulseSubtle: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.8' },
+        },
+        shimmer: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
         },
       },
 
-      // Academic line heights for better readability
-      lineHeight: {
-        'academic': '1.618', // Golden ratio
-        'relaxed': '1.6',
-        'loose': '1.8',
+      // Enhanced Transitions
+      transitionTimingFunction: {
+        'ease-out-quart': 'cubic-bezier(0.25, 1, 0.5, 1)',
+        'ease-in-quart': 'cubic-bezier(0.5, 0, 0.75, 0)',
+        'ease-in-out-quart': 'cubic-bezier(0.76, 0, 0.24, 1)',
+        'material-standard': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'material-decelerate': 'cubic-bezier(0, 0, 0.2, 1)',
+        'material-accelerate': 'cubic-bezier(0.4, 0, 1, 1)',
       },
 
-      // Typography scale for academic content
-      fontSize: {
-        'academic-sm': ['0.875rem', { lineHeight: '1.6' }],
-        'academic-base': ['1rem', { lineHeight: '1.618' }],
-        'academic-lg': ['1.125rem', { lineHeight: '1.618' }],
-        'academic-xl': ['1.25rem', { lineHeight: '1.618' }],
+      transitionDuration: {
+        '50': '50ms',
+        '250': '250ms',
+        '350': '350ms',
+        '400': '400ms',
+        '600': '600ms',
+        '800': '800ms',
+        '900': '900ms',
       },
 
-      // Academic grid systems
+      // Z-index scale
+      zIndex: {
+        '60': '60',
+        '70': '70',
+        '80': '80',
+        '90': '90',
+        '100': '100',
+      },
+
+      // Backdrop blur
+      backdropBlur: {
+        xs: '2px',
+      },
+
+      // Grid template columns
       gridTemplateColumns: {
-        'academic': '1fr 2fr 1fr', // Academic layout proportions
-        'sidebar': '280px 1fr',
-        'content': '1fr 800px 1fr', // Optimal reading width
-      },
-
-      // University-themed gradients
-      backgroundImage: {
-        'university-gradient': 'linear-gradient(135deg, #1B365D 0%, #D4AF37 100%)',
-        'academic-gradient': 'linear-gradient(135deg, #1B365D 0%, #8C1D40 50%, #D4AF37 100%)',
-        'scholar-gradient': 'linear-gradient(135deg, #5D4E75 0%, #1B365D 100%)',
-      },
-
-      // Academic container sizes
-      maxWidth: {
-        'academic': '800px', // Optimal reading width
-        'university': '1200px',
+        '13': 'repeat(13, minmax(0, 1fr))',
+        '14': 'repeat(14, minmax(0, 1fr))',
+        '15': 'repeat(15, minmax(0, 1fr))',
+        '16': 'repeat(16, minmax(0, 1fr))',
       },
     },
   },
   plugins: [
-    // Add any additional plugins for university design
+    // Add any Tailwind plugins here
   ],
-} satisfies Config
-
-export default config
+};

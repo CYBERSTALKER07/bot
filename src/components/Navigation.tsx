@@ -126,8 +126,8 @@ export default function Navigation() {
         <header className={`fixed top-0 left-0 right-0 z-50 border-b ${
           isDark ? 'bg-black/95 backdrop-blur-xl border-gray-800' : 'bg-white/95 backdrop-blur-xl border-gray-200'
         }`}>
-          <div className="h-5 bg-transparent" />
-          <div className="h-5 bg-transparent" />
+          {/* <div className="h-5 bg-transparent" />
+          <div className="h-5 bg-transparent" /> */}
           <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center space-x-3">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
