@@ -54,7 +54,6 @@ const PWAUpdateNotification = () => {
 };
 
 // Lazy load components for better performance
-const LandingPage = lazy(() => import('./components/LandingPage'));
 const Login = lazy(() => import('./components/Auth/Login'));
 const Register = lazy(() => import('./components/Auth/Register'));
 const ProfileSetup = lazy(() => import('./components/Profile/ProfileSetup'));
@@ -71,7 +70,7 @@ const EventDetails = lazy(() => import('./components/EventDetails'));
 const ResourceCenter = lazy(() => import('./components/ResourceCenter'));
 const ResourceDetails = lazy(() => import('./components/ResourceDetails'));
 const JobDetails = lazy(() => import('./components/JobDetails'));
-const MobileAppPage = lazy(() => import('./components/MobileAppPage'));
+const MobileAppPage = lazy(() => import('./components/MobileAppPage')); 
 const ForStudentsPage = lazy(() => import('./components/ForStudentsPage'));
 const ForEmployersPage = lazy(() => import('./components/ForEmployersPage'));
 const CareerTipsPage = lazy(() => import('./components/CareerTipsPage'));
@@ -238,11 +237,6 @@ function AppContent() {
         <main className="min-h-screen">
           <Routes>
             {/* Public routes with lazy loading */}
-            <Route path="/" element={
-              <Suspense fallback={<LoadingFallback message="Loading homepage..." />}>
-                <LandingPage />
-              </Suspense>
-            } />
             <Route path="/login" element={
               <Suspense fallback={<LoadingFallback message="Loading login..." />}>
                 <Login />
@@ -419,9 +413,14 @@ function AppContent() {
               </ProtectedRoute>
             } />
 
+            {/* Root route - redirect based on authentication */}
+            <Route path="/" element={
+              user ? <Navigate to="/feed" replace /> : <Navigate to="/login" replace />
+            } />
+
             {/* Catch all route - redirect to appropriate home */}
             <Route path="*" element={
-              user ? <Navigate to="/feed" replace /> : <Navigate to="/" replace />
+              user ? <Navigate to="/feed" replace /> : <Navigate to="/login" replace />
             } />
           </Routes>
         </main>

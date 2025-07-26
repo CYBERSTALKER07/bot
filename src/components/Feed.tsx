@@ -368,7 +368,7 @@ export default function Feed() {
       )}>
         {/* Mobile/Desktop Header */}
         <div className={cn(
-          'sticky top-0 z-10 backdrop-blur-xl border-b',
+          'sticky top-0 z-10 backdrop-blur-xl border-none',
           isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200',
           isMobile ? 'top-16' : 'top-0'
         )}>
@@ -389,7 +389,7 @@ export default function Feed() {
 
         {/* Posts Feed */}
         <div className={cn(
-          'border-[1px] divide-y',
+          'border-[0.5px] divide-y',
           isDark ? 'border-gray-800 divide-gray-800' : 'divide-gray-200'
         )}>
           {posts.map((post) => (

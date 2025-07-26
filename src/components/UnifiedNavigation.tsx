@@ -47,7 +47,6 @@ interface UnifiedNavigationProps {
 
 // Public routes that should show the landing navigation
 const LANDING_ROUTES = [
-  '/',
   '/login', 
   '/register',
   '/mobile-app',
@@ -135,7 +134,7 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               {/* Left side - Logo */}
-              <Link to="/" className="flex items-center space-x-3">
+              <Link to="/login" className="flex items-center space-x-3">
                 <GraduationCap className={`h-8 w-8 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
                 <span className={`font-bold text-xl -skew-x-12 ${
                   isDark ? 'text-lime' : 'text-asu-maroon'
@@ -495,7 +494,7 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
   const handleLogout = async () => {
     try {
       await logout();
-      navigate('/');
+      navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error);
     }
@@ -692,3 +691,135 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
             </nav>
           </div>
         </div>
+      </>
+    );
+  }
+
+  // DESKTOP NAVIGATION
+  return (
+    <div 
+      ref={sidebarRef} 
+      className={`fixed top-0 left-0 h-full w-64 bg-background border-r border-neutral-200 z-50 transition-transform duration-300 ${
+        isCollapsed ? '-translate-x-full' : ''
+      }`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* Logo and Toggle Button */}
+      <div className="flex items-center justify-between h-16 px-4 border-b border-neutral-200 bg-background">
+        <Link to="/dashboard" className="flex items-center space-x-2">
+          <GraduationCap className="h-8 w-8 text-brand-primary" />
+          <span className="font-bold text-xl text-foreground">
+            AUTHandshake
+          </span>
+        </Link>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="text-neutral-500 hover:text-neutral-700"
+          aria-label="Toggle navigation"
+        >
+          {isCollapsed ? (
+            <ChevronRight className="h-5 w-5" />
+          ) : (
+            <ChevronLeft className="h-5 w-5" />
+          )}
+        </Button>
+      </div>
+
+      {/* Navigation Links */}
+      <div className="flex-1 overflow-y-auto">
+        <nav className="py-4" role="navigation" aria-label="Sidebar navigation">
+          {/* Profile Section */}
+          <div className="px-4 py-3 border-b border-neutral-200">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center text-sm font-medium">
+                {user?.name?.charAt(0) || <User className="h-5 w-5" />}
+              </div>
+              <div>
+                <p className="font-medium text-sm">{user?.name || 'User'}</p>
+                <p className="text-xs text-neutral-500">{user?.email || 'user@example.com'}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Navigation Groups */}
+          {Object.entries(groupedItems).map(([group, items]) => (
+            <div key={group} className="py-2">
+              {group !== 'main' && (
+                <div className="px-4 py-2">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+                    {group}
+                  </h3>
+                </div>
+              )}
+              {items.map((item, index) => {
+                const Icon = item.icon;
+                const active = isCurrentPath(item.path);
+                
+                return (
+                  <Link
+                    key={`${group}-${index}`}
+                    to={item.path}
+                    onClick={() => {
+                      setIsCollapsed(true);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={cn(
+                      'flex items-center justify-between px-4 py-3 mx-2 rounded-lg transition-colors',
+                      active
+                        ? 'bg-brand-primary/10 text-brand-primary'
+                        : 'text-neutral-700 hover:bg-neutral-50'
+                    )}
+                    aria-current={active ? 'page' : undefined}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Icon className="h-5 w-5" />
+                      <span className="font-medium">{item.label}</span>
+                    </div>
+                    {item.badge && item.badge > 0 && (
+                      <span className="bg-error text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center">
+                        {item.badge > 99 ? '99+' : item.badge}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
+          
+          {/* Profile and Logout Section */}
+          <div className="border-t border-neutral-200 mt-2 pt-2">
+            <Link
+              to="/profile"
+              onClick={() => {
+                setIsCollapsed(true);
+                setIsMobileMenuOpen(false);
+              }}
+              className={cn(
+                'flex items-center space-x-3 px-4 py-3 mx-2 rounded-lg transition-colors',
+                isCurrentPath('/profile')
+                  ? 'bg-brand-primary/10 text-brand-primary'
+                  : 'text-neutral-700 hover:bg-neutral-50'
+              )}
+              aria-current={isCurrentPath('/profile') ? 'page' : undefined}
+            >
+              <User className="h-5 w-5" />
+              <span className="font-medium">My Profile</span>
+            </Link>
+            
+            <Button
+              variant="ghost"
+              onClick={handleLogout}
+              className="w-full justify-start px-4 py-3 mx-2 text-error hover:bg-error/10 rounded-lg"
+            >
+              <LogOut className="h-5 w-5 mr-3" />
+              Logout
+            </Button>
+          </div>
+        </nav>
+      </div>
+    </div>
+  );
+}
