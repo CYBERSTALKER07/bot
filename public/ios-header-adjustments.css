@@ -2,8 +2,8 @@
 
 /* Base iOS header safe area - increased from 44px to 64px */
 .ios-header-safe {
-  padding-top: max(env(safe-area-inset-top), 64px) !important;
-  min-height: max(env(safe-area-inset-top), 64px) !important;
+  padding-top: max(env(safe-area-inset-top), 44px) !important;
+  min-height: max(env(safe-area-inset-top), 44px) !important;
 }
 
 /* iOS header styling with lower position */
@@ -12,7 +12,7 @@
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
-  padding-top: max(env(safe-area-inset-top), 64px) !important;
+  padding-top: max(env(safe-area-inset-top), 44px) !important;
 }
 
 /* Dark mode header */
