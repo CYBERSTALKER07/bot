@@ -18,75 +18,137 @@ struct SignUpView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(spacing: 20) {
-                    Text("Create Account")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .padding(.top)
+                VStack(spacing: AUTDesignSystem.Spacing.xl) {
+                    VStack(spacing: AUTDesignSystem.Spacing.md) {
+                        Text("Create Account")
+                            .font(AUTDesignSystem.Typography.pageTitle)
+                            .foregroundColor(AUTDesignSystem.Colors.Neutral.foreground)
+                        
+                        Text("Join the AUT community")
+                            .font(AUTDesignSystem.Typography.subtitle)
+                            .foregroundColor(AUTDesignSystem.Colors.Neutral.muted)
+                    }
+                    .padding(.top, AUTDesignSystem.Spacing.lg)
                     
-                    VStack(spacing: 16) {
-                        HStack(spacing: 12) {
-                            TextField("First Name", text: $firstName)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                    VStack(spacing: AUTDesignSystem.Spacing.lg) {
+                        HStack(spacing: AUTDesignSystem.Spacing.md) {
+                            AUTTextField(
+                                text: $firstName,
+                                placeholder: "First Name"
+                            )
                             
-                            TextField("Last Name", text: $lastName)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                            AUTTextField(
+                                text: $lastName,
+                                placeholder: "Last Name"
+                            )
                         }
                         
-                        TextField("Email", text: $email)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .keyboardType(.emailAddress)
-                            .autocapitalization(.none)
+                        AUTTextField(
+                            text: $email,
+                            placeholder: "Email",
+                            keyboardType: .emailAddress,
+                            autocapitalization: .never
+                        )
                         
-                        SecureField("Password", text: $password)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                        AUTTextField(
+                            text: $password,
+                            placeholder: "Password",
+                            isSecure: true
+                        )
                         
-                        SecureField("Confirm Password", text: $confirmPassword)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                        AUTTextField(
+                            text: $confirmPassword,
+                            placeholder: "Confirm Password",
+                            isSecure: true
+                        )
                         
-                        Toggle("I am an employer", isOn: $isEmployer)
-                            .padding(.horizontal)
+                        // Account Type Toggle
+                        AUTCard {
+                            VStack(spacing: AUTDesignSystem.Spacing.md) {
+                                HStack {
+                                    Text("Account Type")
+                                        .font(AUTDesignSystem.Typography.cardTitle)
+                                        .foregroundColor(AUTDesignSystem.Colors.Neutral.foreground)
+                                    Spacer()
+                                }
+                                
+                                HStack(spacing: AUTDesignSystem.Spacing.lg) {
+                                    Button(action: { isEmployer = false }) {
+                                        HStack(spacing: AUTDesignSystem.Spacing.sm) {
+                                            Image(systemName: isEmployer ? "circle" : "checkmark.circle.fill")
+                                                .foregroundColor(isEmployer ? AUTDesignSystem.Colors.Neutral.muted : AUTDesignSystem.Colors.Primary.primary)
+                                            Text("Student")
+                                                .font(AUTDesignSystem.Typography.body)
+                                                .foregroundColor(AUTDesignSystem.Colors.Neutral.foreground)
+                                        }
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    Button(action: { isEmployer = true }) {
+                                        HStack(spacing: AUTDesignSystem.Spacing.sm) {
+                                            Image(systemName: isEmployer ? "checkmark.circle.fill" : "circle")
+                                                .foregroundColor(isEmployer ? AUTDesignSystem.Colors.Primary.primary : AUTDesignSystem.Colors.Neutral.muted)
+                                            Text("Employer")
+                                                .font(AUTDesignSystem.Typography.body)
+                                                .foregroundColor(AUTDesignSystem.Colors.Neutral.foreground)
+                                        }
+                                    }
+                                }
+                            }
+                            .padding(AUTDesignSystem.Spacing.lg)
+                        }
                         
                         if isEmployer {
-                            TextField("Company Name", text: $companyName)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                            AUTTextField(
+                                text: $companyName,
+                                placeholder: "Company Name"
+                            )
                         } else {
-                            TextField("Student ID", text: $studentId)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                            
-                            TextField("Major", text: $major)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                            
-                            TextField("Graduation Year", text: $graduationYear)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .keyboardType(.numberPad)
+                            VStack(spacing: AUTDesignSystem.Spacing.md) {
+                                AUTTextField(
+                                    text: $studentId,
+                                    placeholder: "Student ID"
+                                )
+                                
+                                AUTTextField(
+                                    text: $major,
+                                    placeholder: "Major"
+                                )
+                                
+                                AUTTextField(
+                                    text: $graduationYear,
+                                    placeholder: "Graduation Year",
+                                    keyboardType: .numberPad
+                                )
+                            }
                         }
                     }
                     
                     if let errorMessage = authManager.errorMessage {
-                        Text(errorMessage)
-                            .foregroundColor(.red)
-                            .font(.caption)
+                        HStack {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundColor(AUTDesignSystem.Colors.System.error)
+                            Text(errorMessage)
+                                .font(AUTDesignSystem.Typography.caption)
+                                .foregroundColor(AUTDesignSystem.Colors.System.error)
+                            Spacer()
+                        }
+                        .padding(.horizontal, AUTDesignSystem.Spacing.sm)
                     }
                     
-                    Button(action: createAccount) {
-                        HStack {
-                            if authManager.isLoading {
-                                ProgressView()
-                                    .scaleEffect(0.8)
-                            }
-                            Text("Create Account")
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
+                    AUTPrimaryButton(
+                        title: "Create Account",
+                        isLoading: authManager.isLoading,
+                        isDisabled: !isFormValid
+                    ) {
+                        createAccount()
                     }
-                    .disabled(authManager.isLoading || !isFormValid)
                 }
-                .padding(.horizontal, 40)
+                .padding(.horizontal, AUTDesignSystem.Spacing.xl)
+                .padding(.bottom, AUTDesignSystem.Spacing.xl)
             }
+            .background(AUTDesignSystem.Colors.Neutral.background)
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
             .toolbar {
@@ -94,6 +156,7 @@ struct SignUpView: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .foregroundColor(AUTDesignSystem.Colors.Primary.primary)
                 }
             }
         }

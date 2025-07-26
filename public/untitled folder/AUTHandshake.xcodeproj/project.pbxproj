@@ -7,60 +7,62 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1D92F4A82C8A1234567890AB /* AUTHandshakeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4A72C8A1234567890AB /* AUTHandshakeApp.swift */; };
-		1D92F4AA2C8A1234567890AC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4A92C8A1234567890AC /* ContentView.swift */; };
-		1D92F4AB2C8A1234567890AD /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4AC2C8A1234567890AD /* Models.swift */; };
-		1D92F4AC2C8A1234567890AE /* AuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4AD2C8A1234567890AE /* AuthenticationManager.swift */; };
-		1D92F4AD2C8A1234567890AF /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4AE2C8A1234567890AF /* NetworkService.swift */; };
-		1D92F4AE2C8A1234567890B0 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4AF2C8A1234567890B0 /* LoginView.swift */; };
-		1D92F4AF2C8A1234567890B1 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4B02C8A1234567890B1 /* SignUpView.swift */; };
-		1D92F4B02C8A1234567890B2 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4B12C8A1234567890B2 /* MainTabView.swift */; };
-		1D92F4B12C8A1234567890B3 /* JobsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4B22C8A1234567890B3 /* JobsView.swift */; };
-		1D92F4B22C8A1234567890B4 /* JobDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4B32C8A1234567890B4 /* JobDetailView.swift */; };
-		1D92F4B32C8A1234567890B5 /* ApplicationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4B42C8A1234567890B5 /* ApplicationsView.swift */; };
-		1D92F4B42C8A1234567890B6 /* NetworkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4B52C8A1234567890B6 /* NetworkView.swift */; };
-		1D92F4B52C8A1234567890B7 /* EventsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4B62C8A1234567890B7 /* EventsView.swift */; };
-		1D92F4B62C8A1234567890B8 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4B72C8A1234567890B8 /* ProfileView.swift */; };
-		1D92F4B72C8A1234567890B9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1D92F4B82C8A1234567890B9 /* Assets.xcassets */; };
-		1D92F4B82C8A1234567890BA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1D92F4B92C8A1234567890BA /* Preview Assets.xcassets */; };
-		1D92F4D12C8A1234567890D1 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4D02C8A1234567890D0 /* DashboardView.swift */; };
-		1D92F4D22C8A1234567890D2 /* MessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4D12C8A1234567890D1 /* MessagesView.swift */; };
-		1D92F4D32C8A1234567890D3 /* MessageSupportingViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4D22C8A1234567890D2 /* MessageSupportingViews.swift */; };
-		1D92F4D42C8A1234567890D4 /* NotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4D32C8A1234567890D3 /* NotificationsView.swift */; };
-		1D92F4D52C8A1234567890D5 /* SearchDiscoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4D42C8A1234567890D4 /* SearchDiscoveryView.swift */; };
-		1D92F4D62C8A1234567890D6 /* CompanyProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4D52C8A1234567890D5 /* CompanyProfileView.swift */; };
-		1D92F4D72C8A1234567890D7 /* AdditionalServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D92F4D62C8A1234567890D6 /* AdditionalServices.swift */; };
+		C001F001200000000001 /* AUTHandshakeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001F002200000000002 /* AUTHandshakeApp.swift */; };
+		C001F003200000000003 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001F004200000000004 /* ContentView.swift */; };
+		C001F005200000000005 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001F006200000000006 /* Models.swift */; };
+		C001F007200000000007 /* AuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001F008200000000008 /* AuthenticationManager.swift */; };
+		C001F009200000000009 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001F010200000000010 /* NetworkService.swift */; };
+		C001F011200000000011 /* AdditionalServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001F012200000000012 /* AdditionalServices.swift */; };
+		C001F013200000000013 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001F014200000000014 /* LoginView.swift */; };
+		C001F015200000000015 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001F016200000000016 /* SignUpView.swift */; };
+		C001F017200000000017 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001F018200000000018 /* MainTabView.swift */; };
+		C001F019200000000019 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001F020200000000020 /* DashboardView.swift */; };
+		C001F021200000000021 /* JobsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001F022200000000022 /* JobsView.swift */; };
+		C001F023200000000023 /* JobDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001F024200000000024 /* JobDetailView.swift */; };
+		C001F025200000000025 /* ApplicationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001F026200000000026 /* ApplicationsView.swift */; };
+		C001F027200000000027 /* MessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001F028200000000028 /* MessagesView.swift */; };
+		C001F029200000000029 /* MessageSupportingViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001F030200000000030 /* MessageSupportingViews.swift */; };
+		C001F031200000000031 /* NotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001F032200000000032 /* NotificationsView.swift */; };
+		C001F033200000000033 /* NetworkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001F034200000000034 /* NetworkView.swift */; };
+		C001F035200000000035 /* EventsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001F036200000000036 /* EventsView.swift */; };
+		C001F037200000000037 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001F038200000000038 /* ProfileView.swift */; };
+		C001F039200000000039 /* SearchDiscoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001F040200000000040 /* SearchDiscoveryView.swift */; };
+		C001F041200000000041 /* CompanyProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001F042200000000042 /* CompanyProfileView.swift */; };
+		C001F047200000000047 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001F048200000000048 /* DesignSystem.swift */; };
+		C001F043200000000043 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C001F044200000000044 /* Assets.xcassets */; };
+		C001F045200000000045 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C001F046200000000046 /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1D92F4A42C8A1234567890AB /* AUTHandshake.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AUTHandshake.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		1D92F4A72C8A1234567890AB /* AUTHandshakeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AUTHandshakeApp.swift; sourceTree = "<group>"; };
-		1D92F4A92C8A1234567890AC /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		1D92F4AC2C8A1234567890AD /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
-		1D92F4AD2C8A1234567890AE /* AuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationManager.swift; sourceTree = "<group>"; };
-		1D92F4AE2C8A1234567890AF /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
-		1D92F4AF2C8A1234567890B0 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
-		1D92F4B02C8A1234567890B1 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
-		1D92F4B12C8A1234567890B2 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
-		1D92F4B22C8A1234567890B3 /* JobsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobsView.swift; sourceTree = "<group>"; };
-		1D92F4B32C8A1234567890B4 /* JobDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobDetailView.swift; sourceTree = "<group>"; };
-		1D92F4B42C8A1234567890B5 /* ApplicationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationsView.swift; sourceTree = "<group>"; };
-		1D92F4B52C8A1234567890B6 /* NetworkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkView.swift; sourceTree = "<group>"; };
-		1D92F4B62C8A1234567890B7 /* EventsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventsView.swift; sourceTree = "<group>"; };
-		1D92F4B72C8A1234567890B8 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
-		1D92F4B82C8A1234567890B9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		1D92F4B92C8A1234567890BA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		1D92F4D02C8A1234567890D0 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
-		1D92F4D12C8A1234567890D1 /* MessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesView.swift; sourceTree = "<group>"; };
-		1D92F4D22C8A1234567890D2 /* MessageSupportingViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageSupportingViews.swift; sourceTree = "<group>"; };
-		1D92F4D32C8A1234567890D3 /* NotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsView.swift; sourceTree = "<group>"; };
-		1D92F4D42C8A1234567890D4 /* SearchDiscoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchDiscoveryView.swift; sourceTree = "<group>"; };
-		1D92F4D52C8A1234567890D5 /* CompanyProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanyProfileView.swift; sourceTree = "<group>"; };
-		1D92F4D62C8A1234567890D6 /* AdditionalServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdditionalServices.swift; sourceTree = "<group>"; };
+		C001F050200000000050 /* AUTHandshake.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AUTHandshake.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C001F002200000000002 /* AUTHandshakeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AUTHandshakeApp.swift; sourceTree = "<group>"; };
+		C001F004200000000004 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		C001F006200000000006 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		C001F008200000000008 /* AuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationManager.swift; sourceTree = "<group>"; };
+		C001F010200000000010 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
+		C001F012200000000012 /* AdditionalServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdditionalServices.swift; sourceTree = "<group>"; };
+		C001F014200000000014 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		C001F016200000000016 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
+		C001F018200000000018 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		C001F020200000000020 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		C001F022200000000022 /* JobsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobsView.swift; sourceTree = "<group>"; };
+		C001F024200000000024 /* JobDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobDetailView.swift; sourceTree = "<group>"; };
+		C001F026200000000026 /* ApplicationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationsView.swift; sourceTree = "<group>"; };
+		C001F028200000000028 /* MessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesView.swift; sourceTree = "<group>"; };
+		C001F030200000000030 /* MessageSupportingViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageSupportingViews.swift; sourceTree = "<group>"; };
+		C001F032200000000032 /* NotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsView.swift; sourceTree = "<group>"; };
+		C001F034200000000034 /* NetworkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkView.swift; sourceTree = "<group>"; };
+		C001F036200000000036 /* EventsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventsView.swift; sourceTree = "<group>"; };
+		C001F038200000000038 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		C001F040200000000040 /* SearchDiscoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchDiscoveryView.swift; sourceTree = "<group>"; };
+		C001F042200000000042 /* CompanyProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanyProfileView.swift; sourceTree = "<group>"; };
+		C001F044200000000044 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C001F046200000000046 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		C001F048200000000048 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		1D92F4A12C8A1234567890AB /* Frameworks */ = {
+		C001F051200000000051 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -70,104 +72,105 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1D92F49B2C8A1234567890AB = {
+		C001F052200000000052 = {
 			isa = PBXGroup;
 			children = (
-				1D92F4A62C8A1234567890AB /* AUTHandshake */,
-				1D92F4A52C8A1234567890AB /* Products */,
+				C001F053200000000053 /* AUTHandshake */,
+				C001F054200000000054 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		1D92F4A52C8A1234567890AB /* Products */ = {
+		C001F054200000000054 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1D92F4A42C8A1234567890AB /* AUTHandshake.app */,
+				C001F050200000000050 /* AUTHandshake.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		1D92F4A62C8A1234567890AB /* AUTHandshake */ = {
+		C001F053200000000053 /* AUTHandshake */ = {
 			isa = PBXGroup;
 			children = (
-				1D92F4A72C8A1234567890AB /* AUTHandshakeApp.swift */,
-				1D92F4BB2C8A1234567890BB /* Views */,
-				1D92F4BC2C8A1234567890BC /* Models */,
-				1D92F4BD2C8A1234567890BD /* ViewModels */,
-				1D92F4BE2C8A1234567890BE /* Services */,
-				1D92F4BF2C8A1234567890BF /* Utils */,
-				1D92F4C02C8A1234567890C0 /* Resources */,
-				1D92F4B82C8A1234567890B9 /* Assets.xcassets */,
-				1D92F4C12C8A1234567890C1 /* Preview Content */,
+				C001F002200000000002 /* AUTHandshakeApp.swift */,
+				C001F055200000000055 /* Views */,
+				C001F056200000000056 /* Models */,
+				C001F057200000000057 /* ViewModels */,
+				C001F058200000000058 /* Services */,
+				C001F059200000000059 /* Utils */,
+				C001F060200000000060 /* Resources */,
+				C001F044200000000044 /* Assets.xcassets */,
+				C001F061200000000061 /* Preview Content */,
 			);
 			path = AUTHandshake;
 			sourceTree = "<group>";
 		};
-		1D92F4BB2C8A1234567890BB /* Views */ = {
+		C001F055200000000055 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				1D92F4A92C8A1234567890AC /* ContentView.swift */,
-				1D92F4AF2C8A1234567890B0 /* LoginView.swift */,
-				1D92F4B02C8A1234567890B1 /* SignUpView.swift */,
-				1D92F4B12C8A1234567890B2 /* MainTabView.swift */,
-				1D92F4D02C8A1234567890D0 /* DashboardView.swift */,
-				1D92F4B22C8A1234567890B3 /* JobsView.swift */,
-				1D92F4B32C8A1234567890B4 /* JobDetailView.swift */,
-				1D92F4B42C8A1234567890B5 /* ApplicationsView.swift */,
-				1D92F4D12C8A1234567890D1 /* MessagesView.swift */,
-				1D92F4D22C8A1234567890D2 /* MessageSupportingViews.swift */,
-				1D92F4D32C8A1234567890D3 /* NotificationsView.swift */,
-				1D92F4B52C8A1234567890B6 /* NetworkView.swift */,
-				1D92F4B62C8A1234567890B7 /* EventsView.swift */,
-				1D92F4B72C8A1234567890B8 /* ProfileView.swift */,
-				1D92F4D42C8A1234567890D4 /* SearchDiscoveryView.swift */,
-				1D92F4D52C8A1234567890D5 /* CompanyProfileView.swift */,
+				C001F004200000000004 /* ContentView.swift */,
+				C001F014200000000014 /* LoginView.swift */,
+				C001F016200000000016 /* SignUpView.swift */,
+				C001F018200000000018 /* MainTabView.swift */,
+				C001F020200000000020 /* DashboardView.swift */,
+				C001F022200000000022 /* JobsView.swift */,
+				C001F024200000000024 /* JobDetailView.swift */,
+				C001F026200000000026 /* ApplicationsView.swift */,
+				C001F028200000000028 /* MessagesView.swift */,
+				C001F030200000000030 /* MessageSupportingViews.swift */,
+				C001F032200000000032 /* NotificationsView.swift */,
+				C001F034200000000034 /* NetworkView.swift */,
+				C001F036200000000036 /* EventsView.swift */,
+				C001F038200000000038 /* ProfileView.swift */,
+				C001F040200000000040 /* SearchDiscoveryView.swift */,
+				C001F042200000000042 /* CompanyProfileView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
 		};
-		1D92F4BC2C8A1234567890BC /* Models */ = {
+		C001F056200000000056 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				1D92F4AC2C8A1234567890AD /* Models.swift */,
+				C001F006200000000006 /* Models.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
 		};
-		1D92F4BD2C8A1234567890BD /* ViewModels */ = {
+		C001F057200000000057 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				1D92F4AD2C8A1234567890AE /* AuthenticationManager.swift */,
+				C001F008200000000008 /* AuthenticationManager.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
 		};
-		1D92F4BE2C8A1234567890BE /* Services */ = {
+		C001F058200000000058 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				1D92F4AE2C8A1234567890AF /* NetworkService.swift */,
-				1D92F4D62C8A1234567890D6 /* AdditionalServices.swift */,
+				C001F010200000000010 /* NetworkService.swift */,
+				C001F012200000000012 /* AdditionalServices.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
 		};
-		1D92F4BF2C8A1234567890BF /* Utils */ = {
+		C001F059200000000059 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				C001F048200000000048 /* DesignSystem.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
 		};
-		1D92F4C02C8A1234567890C0 /* Resources */ = {
+		C001F060200000000060 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		1D92F4C12C8A1234567890C1 /* Preview Content */ = {
+		C001F061200000000061 /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
-				1D92F4B92C8A1234567890BA /* Preview Assets.xcassets */,
+				C001F046200000000046 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
 			sourceTree = "<group>";
@@ -175,13 +178,13 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		1D92F4A32C8A1234567890AB /* AUTHandshake */ = {
+		C001F062200000000062 /* AUTHandshake */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1D92F4B22C8A1234567890AE /* Build configuration list for PBXNativeTarget "AUTHandshake" */;
+			buildConfigurationList = C001F063200000000063 /* Build configuration list for PBXNativeTarget "AUTHandshake" */;
 			buildPhases = (
-				1D92F4A02C8A1234567890AB /* Sources */,
-				1D92F4A12C8A1234567890AB /* Frameworks */,
-				1D92F4A22C8A1234567890AB /* Resources */,
+				C001F064200000000064 /* Sources */,
+				C001F051200000000051 /* Frameworks */,
+				C001F065200000000065 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -189,25 +192,25 @@
 			);
 			name = AUTHandshake;
 			productName = AUTHandshake;
-			productReference = 1D92F4A42C8A1234567890AB /* AUTHandshake.app */;
+			productReference = C001F050200000000050 /* AUTHandshake.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		1D92F49C2C8A1234567890AB /* Project object */ = {
+		C001F066200000000066 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1540;
 				LastUpgradeCheck = 1540;
 				TargetAttributes = {
-					1D92F4A32C8A1234567890AB = {
+					C001F062200000000062 = {
 						CreatedOnToolsVersion = 15.4;
 					};
 				};
 			};
-			buildConfigurationList = 1D92F49F2C8A1234567890AB /* Build configuration list for PBXProject "AUTHandshake" */;
+			buildConfigurationList = C001F067200000000067 /* Build configuration list for PBXProject "AUTHandshake" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -215,61 +218,62 @@
 				en,
 				Base,
 			);
-			mainGroup = 1D92F49B2C8A1234567890AB;
-			productRefGroup = 1D92F4A52C8A1234567890AB /* Products */;
+			mainGroup = C001F052200000000052;
+			productRefGroup = C001F054200000000054 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				1D92F4A32C8A1234567890AB /* AUTHandshake */,
+				C001F062200000000062 /* AUTHandshake */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		1D92F4A22C8A1234567890AB /* Resources */ = {
+		C001F065200000000065 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1D92F4B82C8A1234567890BA /* Preview Assets.xcassets in Resources */,
-				1D92F4B72C8A1234567890B9 /* Assets.xcassets in Resources */,
+				C001F045200000000045 /* Preview Assets.xcassets in Resources */,
+				C001F043200000000043 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		1D92F4A02C8A1234567890AB /* Sources */ = {
+		C001F064200000000064 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1D92F4A82C8A1234567890AB /* AUTHandshakeApp.swift in Sources */,
-				1D92F4AA2C8A1234567890AC /* ContentView.swift in Sources */,
-				1D92F4AB2C8A1234567890AD /* Models.swift in Sources */,
-				1D92F4AC2C8A1234567890AE /* AuthenticationManager.swift in Sources */,
-				1D92F4AD2C8A1234567890AF /* NetworkService.swift in Sources */,
-				1D92F4AE2C8A1234567890B0 /* LoginView.swift in Sources */,
-				1D92F4AF2C8A1234567890B1 /* SignUpView.swift in Sources */,
-				1D92F4B02C8A1234567890B2 /* MainTabView.swift in Sources */,
-				1D92F4D12C8A1234567890D1 /* DashboardView.swift in Sources */,
-				1D92F4B12C8A1234567890B3 /* JobsView.swift in Sources */,
-				1D92F4B22C8A1234567890B4 /* JobDetailView.swift in Sources */,
-				1D92F4B32C8A1234567890B5 /* ApplicationsView.swift in Sources */,
-				1D92F4D22C8A1234567890D2 /* MessagesView.swift in Sources */,
-				1D92F4D32C8A1234567890D3 /* MessageSupportingViews.swift in Sources */,
-				1D92F4D42C8A1234567890D4 /* NotificationsView.swift in Sources */,
-				1D92F4B42C8A1234567890B6 /* NetworkView.swift in Sources */,
-				1D92F4B52C8A1234567890B7 /* EventsView.swift in Sources */,
-				1D92F4B62C8A1234567890B8 /* ProfileView.swift in Sources */,
-				1D92F4D52C8A1234567890D5 /* SearchDiscoveryView.swift in Sources */,
-				1D92F4D62C8A1234567890D6 /* CompanyProfileView.swift in Sources */,
-				1D92F4D72C8A1234567890D7 /* AdditionalServices.swift in Sources */,
+				C001F001200000000001 /* AUTHandshakeApp.swift in Sources */,
+				C001F003200000000003 /* ContentView.swift in Sources */,
+				C001F005200000000005 /* Models.swift in Sources */,
+				C001F007200000000007 /* AuthenticationManager.swift in Sources */,
+				C001F009200000000009 /* NetworkService.swift in Sources */,
+				C001F011200000000011 /* AdditionalServices.swift in Sources */,
+				C001F013200000000013 /* LoginView.swift in Sources */,
+				C001F015200000000015 /* SignUpView.swift in Sources */,
+				C001F017200000000017 /* MainTabView.swift in Sources */,
+				C001F019200000000019 /* DashboardView.swift in Sources */,
+				C001F021200000000021 /* JobsView.swift in Sources */,
+				C001F023200000000023 /* JobDetailView.swift in Sources */,
+				C001F025200000000025 /* ApplicationsView.swift in Sources */,
+				C001F027200000000027 /* MessagesView.swift in Sources */,
+				C001F029200000000029 /* MessageSupportingViews.swift in Sources */,
+				C001F031200000000031 /* NotificationsView.swift in Sources */,
+				C001F033200000000033 /* NetworkView.swift in Sources */,
+				C001F035200000000035 /* EventsView.swift in Sources */,
+				C001F037200000000037 /* ProfileView.swift in Sources */,
+				C001F039200000000039 /* SearchDiscoveryView.swift in Sources */,
+				C001F041200000000041 /* CompanyProfileView.swift in Sources */,
+				C001F047200000000047 /* DesignSystem.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		1D92F4B02C8A1234567890AE /* Debug */ = {
+		C001F068200000000068 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -332,7 +336,7 @@
 			};
 			name = Debug;
 		};
-		1D92F4B12C8A1234567890AE /* Release */ = {
+		C001F069200000000069 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -388,7 +392,7 @@
 			};
 			name = Release;
 		};
-		1D92F4B32C8A1234567890AE /* Debug */ = {
+		C001F070200000000070 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -416,7 +420,7 @@
 			};
 			name = Debug;
 		};
-		1D92F4B42C8A1234567890AE /* Release */ = {
+		C001F071200000000071 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -447,25 +451,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1D92F49F2C8A1234567890AB /* Build configuration list for PBXProject "AUTHandshake" */ = {
+		C001F067200000000067 /* Build configuration list for PBXProject "AUTHandshake" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				1D92F4B02C8A1234567890AE /* Debug */,
-				1D92F4B12C8A1234567890AE /* Release */,
+				C001F068200000000068 /* Debug */,
+				C001F069200000000069 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		1D92F4B22C8A1234567890AE /* Build configuration list for PBXNativeTarget "AUTHandshake" */ = {
+		C001F063200000000063 /* Build configuration list for PBXNativeTarget "AUTHandshake" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				1D92F4B32C8A1234567890AE /* Debug */,
-				1D92F4B42C8A1234567890AE /* Release */,
+				C001F070200000000070 /* Debug */,
+				C001F071200000000071 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 1D92F49C2C8A1234567890AB /* Project object */;
+	rootObject = C001F066200000000066 /* Project object */;
 }

@@ -50,7 +50,7 @@ struct SearchDiscoveryView: View {
                 
                 TextField("Search jobs, companies, people...", text: $searchText)
                     .textFieldStyle(PlainTextFieldStyle())
-                    .onChange(of: searchText) { newValue in
+                    .onChange(of: searchText) { oldValue, newValue in
                         searchManager.performSearch(query: newValue, scope: selectedScope, filters: selectedFilters)
                     }
                 
@@ -72,7 +72,7 @@ struct SearchDiscoveryView: View {
                 }
             }
             .pickerStyle(SegmentedPickerStyle())
-            .onChange(of: selectedScope) { _ in
+            .onChange(of: selectedScope) { oldValue, newValue in
                 if !searchText.isEmpty {
                     searchManager.performSearch(query: searchText, scope: selectedScope, filters: selectedFilters)
                 }
@@ -298,7 +298,7 @@ struct SearchDiscoveryView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
                     ForEach(searchManager.featuredCompanies) { company in
-                        FeaturedCompanyCard(company: company)
+                        FeaturedCompanyCard(company: company, jobCount: searchManager.getJobCount(for: company.id))
                     }
                 }
                 .padding(.horizontal, 1)
@@ -420,6 +420,7 @@ struct QuickSearchCard: View {
 
 struct FeaturedCompanyCard: View {
     let company: Company
+    let jobCount: Int
     
     var body: some View {
         VStack(spacing: 8) {
@@ -449,7 +450,7 @@ struct FeaturedCompanyCard: View {
                 .font(.caption)
                 .foregroundColor(.blue)
             
-            Text("\(searchManager.getJobCount(for: company.id)) jobs")
+            Text("\(jobCount) jobs")
                 .font(.caption)
                 .foregroundColor(.secondary)
         }

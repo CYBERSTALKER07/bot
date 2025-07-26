@@ -88,6 +88,10 @@ enum ApplicationStatus: String, CaseIterable, Codable {
     case rejected = "Rejected"
     case accepted = "Accepted"
     case withdrawn = "Withdrawn"
+    
+    var displayName: String {
+        return self.rawValue
+    }
 }
 
 struct Event: Codable, Identifiable {

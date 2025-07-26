@@ -217,7 +217,7 @@ struct ConversationDetailView: View {
             Divider()
             
             // Messages
-            ScrollViewReader { proxy in
+                ScrollViewReader { proxy in
                 ScrollView {
                     LazyVStack(spacing: 8) {
                         ForEach(messagesManager.messages) { message in
@@ -234,7 +234,7 @@ struct ConversationDetailView: View {
                 .onAppear {
                     scrollToBottom(proxy: proxy)
                 }
-                .onChange(of: messagesManager.messages.count) { _ in
+                .onChange(of: messagesManager.messages.count) { _, _ in
                     scrollToBottom(proxy: proxy)
                 }
             }
@@ -265,7 +265,7 @@ struct ConversationDetailView: View {
         messageText = ""
     }
     
-    private func scrollToBottom(proxy: ScrollViewReader) {
+    private func scrollToBottom(proxy: ScrollViewProxy) {
         if let lastMessage = messagesManager.messages.last {
             withAnimation(.easeOut(duration: 0.3)) {
                 proxy.scrollTo(lastMessage.id, anchor: .bottom)

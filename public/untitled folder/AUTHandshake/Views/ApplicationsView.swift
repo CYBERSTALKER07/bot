@@ -13,10 +13,10 @@ struct ApplicationsView: View {
     
     var body: some View {
         NavigationView {
-            VStack {
+            VStack(spacing: 0) {
                 // Status Filter
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
+                    HStack(spacing: AUTDesignSystem.Spacing.md) {
                         StatusFilterChip(
                             title: "All",
                             isSelected: selectedStatus == nil,
@@ -38,35 +38,41 @@ struct ApplicationsView: View {
                             }
                         }
                     }
-                    .padding(.horizontal)
+                    .padding(.horizontal, AUTDesignSystem.Spacing.lg)
                 }
-                .padding(.vertical, 8)
+                .padding(.vertical, AUTDesignSystem.Spacing.sm)
+                .background(AUTDesignSystem.Colors.Neutral.background)
                 
                 // Applications List
                 if jobManager.isLoading {
-                    ProgressView("Loading applications...")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if filteredApplications.isEmpty {
-                    VStack(spacing: 16) {
-                        Image(systemName: "doc.text")
-                            .font(.system(size: 60))
-                            .foregroundColor(.gray)
-                        Text("No applications found")
-                            .font(.title2)
-                            .foregroundColor(.secondary)
-                        Text("Start applying to jobs to see them here")
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    AUTLoadingView()
+//                } else if filteredApplications.isEmpty {
+//                    AUTEmptyStateView(
+//                        title: "No Applications Found",
+//                        message: selectedStatus == nil ? 
+//                            "Start applying to jobs to see them here" : 
+//                            "No applications found with \(selectedStatus?.rawValue ?? "") status",
+//                        iconName: "doc.text",
+//                        actionTitle: selectedStatus == nil ? nil : "Clear Filter",
+//                        action: selectedStatus == nil ? nil : { selectedStatus = nil }
+//                    )
                 } else {
                     List(filteredApplications) { application in
                         ApplicationRowView(application: application)
+                            .listRowInsets(EdgeInsets(
+                                top: AUTDesignSystem.Spacing.sm,
+                                leading: AUTDesignSystem.Spacing.lg,
+                                bottom: AUTDesignSystem.Spacing.sm,
+                                trailing: AUTDesignSystem.Spacing.lg
+                            ))
+                            .listRowSeparator(.hidden)
                     }
                     .listStyle(PlainListStyle())
+                    .background(AUTDesignSystem.Colors.Neutral.background)
                 }
             }
             .navigationTitle("Applications")
+            .navigationBarTitleDisplayMode(.large)
             .onAppear {
                 if jobManager.applications.isEmpty {
                     jobManager.loadApplications()
@@ -87,20 +93,36 @@ struct StatusFilterChip: View {
     
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 4) {
+            HStack(spacing: AUTDesignSystem.Spacing.xs) {
                 Text(title)
-                    .font(.caption)
-                    .fontWeight(.medium)
+                    .font(AUTDesignSystem.Typography.badgeText)
+                    .fontWeight(.semibold)
                 
                 Text("(\(count))")
-                    .font(.caption)
+                    .font(AUTDesignSystem.Typography.caption)
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
-            .background(isSelected ? Color.blue : Color(.systemGray6))
-            .foregroundColor(isSelected ? .white : .primary)
-            .cornerRadius(16)
+            .padding(.horizontal, AUTDesignSystem.Spacing.md)
+            .padding(.vertical, AUTDesignSystem.Spacing.sm)
+            .background(
+                isSelected ? 
+                AUTDesignSystem.Colors.Primary.primary : 
+                AUTDesignSystem.Colors.Neutral.mutedBackground
+            )
+            .foregroundColor(
+                isSelected ? 
+                AUTDesignSystem.Colors.Primary.primaryForeground : 
+                AUTDesignSystem.Colors.Neutral.foreground
+            )
+            .cornerRadius(AUTDesignSystem.CornerRadius.round)
+            .shadow(
+                color: isSelected ? AUTDesignSystem.Shadow.light : Color.clear,
+                radius: 2,
+                x: 0,
+                y: 1
+            )
         }
+        .scaleEffect(isSelected ? 1.02 : 1.0)
+        .animation(AUTDesignSystem.Animation.quick, value: isSelected)
     }
 }
 
@@ -108,71 +130,54 @@ struct ApplicationRowView: View {
     let application: Application
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Job Application")
-                        .font(.headline)
+        AUTCard {
+            VStack(alignment: .leading, spacing: AUTDesignSystem.Spacing.md) {
+                HStack {
+                    VStack(alignment: .leading, spacing: AUTDesignSystem.Spacing.xs) {
+                        Text("Job Application")
+                            .font(AUTDesignSystem.Typography.cardTitle)
+                            .foregroundColor(AUTDesignSystem.Colors.Neutral.foreground)
+                        
+                        Text("Applied \(application.appliedDate, style: .date)")
+                            .font(AUTDesignSystem.Typography.caption)
+                            .foregroundColor(AUTDesignSystem.Colors.Neutral.muted)
+                    }
                     
-                    Text("Applied \(application.appliedDate, style: .date)")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    Spacer()
+                    
+                    AUTStatusBadge(status: application.status)
                 }
                 
-                Spacer()
-                
-                StatusBadge(status: application.status)
-            }
-            
-            if let coverLetter = application.coverLetter, !coverLetter.isEmpty {
-                Text("Cover letter submitted")
-                    .font(.caption)
-                    .foregroundColor(.blue)
-            }
-            
-            if let feedback = application.feedback {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Feedback:")
-                        .font(.caption)
-                        .fontWeight(.medium)
-                    Text(feedback)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                if let coverLetter = application.coverLetter, !coverLetter.isEmpty {
+                    HStack(spacing: AUTDesignSystem.Spacing.xs) {
+                        Image(systemName: "doc.text.fill")
+                            .font(.caption)
+                            .foregroundColor(AUTDesignSystem.Colors.Secondary.secondary)
+                        
+                        Text("Cover letter submitted")
+                            .font(AUTDesignSystem.Typography.caption)
+                            .foregroundColor(AUTDesignSystem.Colors.Secondary.secondary)
+                    }
                 }
-                .padding(.top, 4)
+                
+                if let feedback = application.feedback {
+                    VStack(alignment: .leading, spacing: AUTDesignSystem.Spacing.xs) {
+                        Text("Feedback:")
+                            .font(AUTDesignSystem.Typography.caption)
+                            .fontWeight(.semibold)
+                            .foregroundColor(AUTDesignSystem.Colors.Neutral.foreground)
+                        
+                        Text(feedback)
+                            .font(AUTDesignSystem.Typography.caption)
+                            .foregroundColor(AUTDesignSystem.Colors.Neutral.muted)
+                            .lineLimit(3)
+                    }
+                    .padding(.top, AUTDesignSystem.Spacing.xs)
+                }
             }
+            .padding(AUTDesignSystem.Spacing.lg)
         }
-        .padding(.vertical, 8)
     }
 }
 
-struct StatusBadge: View {
-    let status: ApplicationStatus
-    
-    var statusColor: Color {
-        switch status {
-        case .submitted:
-            return .blue
-        case .reviewed:
-            return .orange
-        case .interview:
-            return .purple
-        case .accepted:
-            return .green
-        case .rejected:
-            return .red
-        case .withdrawn:
-            return .gray
-        }
-    }
-    
-    var body: some View {
-        Text(status.rawValue)
-            .font(.caption)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(statusColor.opacity(0.1))
-            .foregroundColor(statusColor)
-            .cornerRadius(12)
-    }
-}
+// Remove the old StatusBadge since we're now using AUTStatusBadge from DesignSystem

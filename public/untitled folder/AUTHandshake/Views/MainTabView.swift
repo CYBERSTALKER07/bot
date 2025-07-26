@@ -9,6 +9,7 @@ struct MainTabView: View {
                 .tabItem {
                     Image(systemName: "house.fill")
                     Text("Dashboard")
+                    
                 }
             
             JobsView()
@@ -53,6 +54,7 @@ struct MainTabView: View {
                     Text("Profile")
                 }
         }
-        .accentColor(.blue)
-    }
+        .accentColor(AUTDesignSystem.Colors.Primary.primary500) // Custom accent color
+     
+}
 }

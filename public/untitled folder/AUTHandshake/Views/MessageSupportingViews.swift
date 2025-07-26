@@ -226,7 +226,7 @@ struct NewConversationView: View {
                     
                     Section("Contacts") {
                         ForEach(filteredUsers) { user in
-                            UserRowView(
+                            MessageUserRowView(
                                 user: user,
                                 isSelected: selectedUsers.contains(user.id)
                             ) {
@@ -325,54 +325,6 @@ struct NewConversationView: View {
     }
 }
 
-// MARK: - User Row View
-struct UserRowView: View {
-    let user: User
-    let isSelected: Bool
-    let onTap: () -> Void
-    
-    var body: some View {
-        HStack {
-            AsyncImage(url: URL(string: user.profileImageURL ?? "")) { image in
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-            } placeholder: {
-                Circle()
-                    .fill(Color.gray.opacity(0.3))
-                    .overlay(
-                        Text(user.firstName.prefix(1))
-                            .font(.title3)
-                            .fontWeight(.medium)
-                            .foregroundColor(.white)
-                    )
-            }
-            .frame(width: 40, height: 40)
-            .clipShape(Circle())
-            
-            VStack(alignment: .leading, spacing: 2) {
-                Text(user.fullName)
-                    .font(.headline)
-                
-                Text(user.isEmployer ? (user.position ?? "Employer") : "Student")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
-            
-            Spacer()
-            
-            if isSelected {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.accentColor)
-            }
-        }
-        .contentShape(Rectangle())
-        .onTapGesture {
-            onTap()
-        }
-    }
-}
-
 // MARK: - Conversation Info View
 struct ConversationInfoView: View {
     let conversation: Conversation
@@ -417,7 +369,7 @@ struct ConversationInfoView: View {
                 if conversation.isGroup {
                     Section("Participants") {
                         ForEach(conversation.participants) { participant in
-                            UserRowView(user: participant, isSelected: false) {}
+                            MessageUserRowView(user: participant, isSelected: false) {}
                         }
                     }
                 }
@@ -509,13 +461,13 @@ struct AttachmentPickerView: View {
         ) { result in
             handleDocumentSelection(result)
         }
-        .onChange(of: selectedItem) { _ in
-            handlePhotoSelection()
+        .onChange(of: selectedItem) { _, newItem in
+            handlePhotoSelection(for: newItem)
         }
     }
     
-    private func handlePhotoSelection() {
-        guard let selectedItem = selectedItem else { return }
+    private func handlePhotoSelection(for selectedItem: PhotosPickerItem?) {
+        guard selectedItem != nil else { return }
         
         // Create mock attachment for photo
         let attachment = MessageAttachment(
@@ -551,6 +503,57 @@ struct AttachmentPickerView: View {
         case .failure(let error):
             print("Document selection failed: \(error)")
         }
+    }
+}
+
+// MARK: - Message User Row View
+struct MessageUserRowView: View {
+    let user: User
+    let isSelected: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            HStack {
+                AsyncImage(url: URL(string: user.profileImageURL ?? "")) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                } placeholder: {
+                    Circle()
+                        .fill(Color.gray.opacity(0.3))
+                        .overlay(
+                            Text(user.firstName.prefix(1))
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(.white)
+                        )
+                }
+                .frame(width: 40, height: 40)
+                .clipShape(Circle())
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(user.fullName)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .foregroundColor(.primary)
+                    
+                    Text(user.email)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+                
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.accentColor)
+                        .font(.title3)
+                }
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(PlainButtonStyle())
     }
 }
 

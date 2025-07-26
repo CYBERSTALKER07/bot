@@ -467,45 +467,6 @@ struct JobRecommendationCard: View {
     }
 }
 
-struct EventRowView: View {
-    let event: Event
-    
-    var body: some View {
-        HStack(spacing: 12) {
-            VStack {
-                Text("\(Calendar.current.component(.day, from: event.date))")
-                    .font(.headline)
-                    .fontWeight(.bold)
-                
-                Text(DateFormatter.monthFormatter.string(from: event.date))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            .frame(width: 40)
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text(event.title)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .lineLimit(1)
-                
-                Text(event.organizer)
-                    .font(.caption)
-                    .foregroundColor(.blue)
-                
-                Text(event.location)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            
-            Spacer()
-        }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(8)
-    }
-}
-
 // MARK: - Data Models
 struct ActivityItem: Identifiable {
     let id = UUID()
