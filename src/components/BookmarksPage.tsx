@@ -131,7 +131,7 @@ export default function BookmarksPage() {
 
   // Filter items
   useEffect(() => {
-    let filtered = savedItems.filter(item => {
+    const filtered = savedItems.filter(item => {
       const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            (item.company && item.company.toLowerCase().includes(searchTerm.toLowerCase()));
