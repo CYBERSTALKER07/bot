@@ -74,7 +74,7 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
   const { isDark } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
-  const { isVisible: isBottomNavVisible } = useScrollDirection({ threshold: 15 });
+  const { isVisible: isBottomNavVisible } = useScrollDirection({ threshold: 3 });
   
   // Always call all hooks first, before any conditional logic
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

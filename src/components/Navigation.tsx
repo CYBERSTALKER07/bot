@@ -37,7 +37,7 @@ export default function Navigation() {
   const { isDark } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
-  const { isVisible: isBottomNavVisible } = useScrollDirection({ threshold: 15 });
+  const { isVisible: isBottomNavVisible } = useScrollDirection({ threshold: 3 });
   
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);

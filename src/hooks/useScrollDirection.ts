@@ -6,7 +6,7 @@ interface UseScrollDirectionOptions {
 }
 
 export function useScrollDirection({ 
-  threshold = 10, 
+  threshold = 5, // Reduced from 10 to 5 for faster response
   initialDirection = 'up' 
 }: UseScrollDirectionOptions = {}) {
   const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>(initialDirection);
@@ -18,6 +18,7 @@ export function useScrollDirection({
     const updateScrollDirection = () => {
       const scrollY = window.pageYOffset || document.documentElement.scrollTop;
       
+      // Reduced threshold check for faster response
       if (Math.abs(scrollY - lastScrollY.current) < threshold) {
         ticking.current = false;
         return;
@@ -25,13 +26,13 @@ export function useScrollDirection({
       
       const direction = scrollY > lastScrollY.current ? 'down' : 'up';
       
-      // Only update if direction actually changed
+      // Update direction and visibility immediately on any direction change
       if (direction !== scrollDirection) {
         setScrollDirection(direction);
         
         // Show only when scrolling up, hide when scrolling down
         // Always show when at the very top of the page
-        if (scrollY <= 50) {
+        if (scrollY <= 30) { // Reduced from 50 to 30
           setIsVisible(true);
         } else {
           setIsVisible(direction === 'up');
@@ -49,6 +50,7 @@ export function useScrollDirection({
       }
     };
 
+    // Use more frequent scroll detection
     window.addEventListener('scroll', onScroll, { passive: true });
     
     return () => {
