@@ -27,6 +27,7 @@ import {
 import { School } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useScrollDirection } from '../hooks/useScrollDirection';
 import ThemeToggle from './ui/ThemeToggle';
 import Button from './ui/Button';
 import { cn } from '../lib/cva';
@@ -73,6 +74,7 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
   const { isDark } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
+  const { isVisible: isBottomNavVisible } = useScrollDirection({ threshold: 15 });
   
   // Always call all hooks first, before any conditional logic
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -720,6 +722,54 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
             </nav>
           </div>
         </div>
+
+        {/* Bottom Navigation with Scroll-based Visibility */}
+        <nav className={cn(
+          'fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl border-t transition-all duration-300 ios-bottom-nav',
+          isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200',
+          // Apply scroll-based visibility with smooth animation
+          isBottomNavVisible 
+            ? 'translate-y-0 opacity-100' 
+            : 'translate-y-full opacity-0'
+        )}>
+          <div className="grid grid-cols-5 h-16 ios-home-indicator-safe">
+            {mobileNavItems.slice(0, 5).map((item, index) => {
+              const Icon = item.icon;
+              const isActive = isCurrentPath(item.path);
+              
+              return (
+                <Link
+                  key={index}
+                  to={item.path}
+                  className={cn(
+                    'flex flex-col items-center justify-center py-2 transition-all duration-200 relative ios-touch-target',
+                    isActive 
+                      ? isDark ? 'text-white' : 'text-black'
+                      : isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-800'
+                  )}
+                >
+                  <div className="relative">
+                    <Icon className="h-6 w-6" />
+                    {item.badge && item.badge > 0 && (
+                      <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                        {item.badge > 9 ? '9+' : item.badge}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-xs mt-1 truncate">{item.label}</span>
+                  
+                  {/* Active indicator */}
+                  {isActive && (
+                    <div className={cn(
+                      "absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 rounded-full",
+                      isDark ? 'bg-white' : 'bg-black'
+                    )} />
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
       </>
     );
   }

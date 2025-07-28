@@ -461,9 +461,9 @@ function AppContent() {
         </main>
         
         {/* Performance Monitor - only shows in development */}
-        {process.env.NODE_ENV === 'development' && (
+        {/* {process.env.NODE_ENV === 'development' && (
           <PerformanceMonitor onPerformanceIssue={handlePerformanceIssue} />
-        )}
+        )} */}
         
         {/* PWA Update Notification */}
         <PWAUpdateNotification />

@@ -4,27 +4,23 @@ import {
   Home,
   Search,
   Bell,
-  Mail,
-  Bookmark,
   User,
-  Settings,
-  MoreHorizontal,
-  Building2,
   Briefcase,
-  Calendar,
-  BookOpen,
-  Users,
+  Building2,
   FileText,
+  Calendar,
   BarChart3,
-  MessageSquare,
+  Settings,
+  Users,
   LogOut,
-  Menu,
+  Feather,
+  MoreHorizontal,
   X as XIcon,
-  Plus,
-  Feather
+  Menu
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useScrollDirection } from '../hooks/useScrollDirection';
 import Button from './ui/Button';
 import { cn } from '../lib/cva';
 
@@ -33,7 +29,6 @@ interface NavigationItem {
   label: string;
   path: string;
   badge?: number;
-  isActive?: boolean;
 }
 
 // X-Style Navigation
@@ -42,6 +37,7 @@ export default function Navigation() {
   const { isDark } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
+  const { isVisible: isBottomNavVisible } = useScrollDirection({ threshold: 15 });
   
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
@@ -297,11 +293,16 @@ export default function Navigation() {
           </div>
         </div>
 
-        {/* Bottom Navigation */}
-        <nav className={`fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl border-t ${
-          isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
-        }`}>
-          <div className="grid grid-cols-5 h-14">
+        {/* Bottom Navigation with Scroll-based Visibility */}
+        <nav className={cn(
+          'fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl border-t transition-all duration-300 ios-bottom-nav',
+          isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200',
+          // Apply scroll-based visibility with smooth animation
+          isBottomNavVisible 
+            ? 'translate-y-0 opacity-100' 
+            : 'translate-y-full opacity-0'
+        )}>
+          <div className="grid grid-cols-5 h-16 ios-home-indicator-safe">
             {navigationItems.slice(0, 5).map((item, index) => {
               const Icon = item.icon;
               const isActive = isCurrentPath(item.path);
@@ -310,11 +311,12 @@ export default function Navigation() {
                 <Link
                   key={index}
                   to={item.path}
-                  className={`flex flex-col items-center justify-center py-2 transition-all duration-200 relative ${
+                  className={cn(
+                    'flex flex-col items-center justify-center py-2 transition-all duration-200 relative ios-touch-target',
                     isActive 
                       ? isDark ? 'text-white' : 'text-black'
                       : isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-800'
-                  }`}
+                  )}
                 >
                   <div className="relative">
                     <Icon className="h-6 w-6" />
@@ -324,6 +326,15 @@ export default function Navigation() {
                       </span>
                     )}
                   </div>
+                  <span className="text-xs mt-1 truncate">{item.label}</span>
+                  
+                  {/* Active indicator */}
+                  {isActive && (
+                    <div className={cn(
+                      "absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 rounded-full",
+                      isDark ? 'bg-white' : 'bg-black'
+                    )} />
+                  )}
                 </Link>
               );
             })}
@@ -443,52 +454,39 @@ export default function Navigation() {
             className={cn(
               "w-full rounded-full font-bold transition-all duration-200",
               isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800',
-              isExpanded ? 'py-3' : 'aspect-square p-3'
+              isExpanded ? 'justify-center' : 'justify-center px-0'
             )}
-            onClick={() => navigate('/post-job')}
           >
-            {isExpanded ? (
-              'Post'
-            ) : (
-              <Plus className="h-6 w-6" />
-            )}
+            {isExpanded ? 'Post' : <Briefcase className="h-5 w-5" />}
           </Button>
         </div>
 
         {/* User Profile */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-800">
-          <div className="relative">
+        <div className="p-4 border-t border-gray-200 dark:border-gray-800 relative">
+          <div className={cn(
+            "flex items-center space-x-3 w-full",
+            !isExpanded && 'justify-center'
+          )}>
             <button
               onClick={() => setIsUserCardOpen(!isUserCardOpen)}
               className={cn(
-                "w-full flex items-center rounded-xl transition-all duration-200 cursor-pointer",
-                isExpanded ? 'space-x-3 p-3' : 'justify-center p-3',
-                isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-100'
+                "flex items-center rounded-full transition-all duration-200",
+                isExpanded ? 'space-x-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800' : 'p-2'
               )}
             >
-              <div className="relative">
-                {user?.avatar_url ? (
-                  <img 
-                    src={user.avatar_url}
-                    alt={user?.full_name || 'User'}
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className={cn(
-                    "w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold",
-                    isDark ? 'bg-gray-700 text-white' : 'bg-gray-300 text-gray-800'
-                  )}>
-                    {user?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
-                  </div>
-                )}
+              <div className={cn(
+                "rounded-full flex items-center justify-center text-lg font-semibold relative",
+                isDark ? 'bg-gray-700 text-white' : 'bg-gray-300 text-gray-800',
+                isExpanded ? 'w-10 h-10' : 'w-8 h-8'
+              )}>
+                {user?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
                 <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-900"></div>
               </div>
-              
               {isExpanded && (
                 <>
-                  <div className="flex-1 text-left overflow-hidden">
+                  <div>
                     <p className={cn(
-                      "font-medium text-base truncate",
+                      "font-medium text-sm truncate",
                       isDark ? 'text-white' : 'text-gray-900'
                     )}>
                       {user?.full_name || 'User'}
@@ -575,9 +573,11 @@ export default function Navigation() {
 
       {/* Main Content Spacer */}
       <div className={cn(
-        'transition-all duration-300 ease-out',
-        isExpanded ? 'ml-64' : 'ml-20'
-      )} />
+        "transition-all duration-300",
+        isExpanded ? "ml-64" : "ml-20"
+      )}>
+        {/* Content goes here */}
+      </div>
     </>
   );
 }
