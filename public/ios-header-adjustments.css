@@ -1,9 +1,9 @@
 /* iOS Header Position Adjustments */
 
-/* Base iOS header safe area - increased from 44px to 64px */
+/* Base iOS header safe area - increased to push header lower */
 .ios-header-safe {
-  padding-top: max(env(safe-area-inset-top), 44px) !important;
-  min-height: max(env(safe-area-inset-top), 44px) !important;
+  padding-top: max(env(safe-area-inset-top), 64px) !important;
+  min-height: max(env(safe-area-inset-top), 64px) !important;
 }
 
 /* iOS header styling with lower position */
@@ -12,7 +12,7 @@
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
-  padding-top: max(env(safe-area-inset-top), 44px) !important;
+  padding-top: max(env(safe-area-inset-top), 64px) !important;
 }
 
 /* Dark mode header */
@@ -21,40 +21,40 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-/* Device-specific adjustments - increased by 20px from original values */
+/* Device-specific adjustments - increased to push header lower */
 
 /* iPhone 14 Pro Max (430x932) */
 @media screen and (max-width: 430px) and (max-height: 932px) {
   .ios-pro-max-adjust, .ios-header-safe, .ios-header {
-    padding-top: max(env(safe-area-inset-top), 79px) !important;
+    padding-top: max(env(safe-area-inset-top), 100px) !important;
   }
 }
 
 /* iPhone 14 Pro (393x852) */
 @media screen and (max-width: 393px) and (max-height: 852px) {
   .ios-pro-adjust, .ios-header-safe, .ios-header {
-    padding-top: max(env(safe-area-inset-top), 79px) !important;
+    padding-top: max(env(safe-area-inset-top), 100px) !important;
   }
 }
 
 /* iPhone 14/13/12 (390x844) */
 @media screen and (max-width: 390px) and (max-height: 844px) {
   .ios-standard-adjust, .ios-header-safe, .ios-header {
-    padding-top: max(env(safe-area-inset-top), 67px) !important;
+    padding-top: max(env(safe-area-inset-top), 85px) !important;
   }
 }
 
 /* iPhone X/XS/11 Pro (375x812) */
 @media screen and (max-width: 375px) and (max-height: 812px) {
   .ios-x-adjust, .ios-header-safe, .ios-header {
-    padding-top: max(env(safe-area-inset-top), 64px) !important;
+    padding-top: max(env(safe-area-inset-top), 80px) !important;
   }
 }
 
 /* iPhone SE/8/7 (375x667) */
 @media screen and (max-width: 375px) and (max-height: 667px) {
   .ios-se-adjust, .ios-header-safe, .ios-header {
-    padding-top: max(env(safe-area-inset-top), 40px) !important;
+    padding-top: max(env(safe-area-inset-top), 60px) !important;
   }
 }
 
@@ -194,7 +194,7 @@
 .ios-icon {
   border-radius: 22.5%;
   mask: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxtYXNrIGlkPSJtYXNrIj4KICAgICAgPHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIHJ4PSI0NSIgZmlsbD0id2hpdGUiLz4KICAgIDwvbWFzaz4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiM4QzFENDAiIG1hc2s9InVybCgjbWFzaykiLz4KPC9zdmc+) center/cover;
-  -webkit-mask: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxtYXNrIGlkPSJtYXNrIj4KICAgICAgPHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIHJ4PSI0NSIgZmlsbD0id2hpdGUiLz4KICAgIDwvbWFzaz4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiM4QzFENDAiIG1hc2s9InVybCgjbWFzaykiLz4KPC9zdmc+) center/cover;
+  -webkit-mask: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1zbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxtYXNrIGlkPSJtYXNrIj4KICAgICAgPHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIHJ4PSI0NSIgZmlsbD0id2hpdGUiLz4KICAgIDwvbWFzaz4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiM4QzFENDAiIG1hc2s9InVybCgjbWFzaykiLz4KPC9zdmc+) center/cover;
 }
 
 /* Fullscreen Modal for iOS */

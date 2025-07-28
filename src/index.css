@@ -492,6 +492,35 @@
     background: rgba(0, 0, 0, 0.95);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
+
+  /* Fix for mobile sidebar - ensure solid backgrounds on iOS */
+  .ios-sidebar-fix {
+    background: rgb(255, 255, 255) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding-top: max(env(safe-area-inset-top), 44px) !important;
+    min-height: max(env(safe-area-inset-top), 44px) !important;
+  }
+  
+  .dark .ios-sidebar-fix {
+    background: rgb(0, 0, 0) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding-top: max(env(safe-area-inset-top), 44px) !important;
+    min-height: max(env(safe-area-inset-top), 44px) !important;
+  }
+
+  /* iOS-specific elements - only show on iOS */
+  .ios-only {
+    display: none;
+  }
+  
+  /* Show iOS-specific elements only on iOS devices */
+  @supports (-webkit-touch-callout: none) {
+    .ios-only {
+      display: block;
+    }
+  }
 }
 
 /* Print styles */

@@ -516,7 +516,17 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
     return (
       <>
         {/* Top App Bar with Enhanced iOS Safe Area - Positioned Lower */}
-        <header className="fixed top-0 left-0 right-0 z-50 ios-header ios-safe-top ios-pro-max-adjust ios-pro-adjust ios-standard-adjust ios-x-adjust ios-se-adjust" style={{ paddingTop: 'max(env(safe-area-inset-top), 80px)' }}>
+        <header 
+          className="fixed left-0 right-0 z-50 ios-header ios-safe-top ios-pro-max-adjust ios-pro-adjust ios-standard-adjust ios-x-adjust ios-se-adjust" 
+          style={{ 
+            top: '0',
+            paddingTop: 'calc(max(env(safe-area-inset-top), 44px) + 80px)' 
+          }}
+        >
+          {/* iOS Status Bar Safe Area */}
+          <div className="h-5 bg-black ios-only" />
+          <div className="h-5 bg-black ios-only" />
+          
           <div className="flex justify-between items-center h-16 px-4 ios-landscape-header">
             <Link to="/dashboard" className="flex items-center space-x-2">
               <GraduationCap className="h-6 w-6 text-brand-primary" />
@@ -569,7 +579,12 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
 
         {/* Left Sidebar with Enhanced iOS Safe Areas */}
         <div
-          className="fixed top-0 left-0 h-full w-80 bg-background border-r border-neutral-200 z-50 shadow-xl ios-safe-area ios-momentum-scroll"
+          className={cn(
+            "fixed top-0 left-0 h-full w-80 border-r z-50 shadow-xl ios-safe-area ios-momentum-scroll ios-sidebar-fix",
+            isDark 
+              ? 'bg-black border-gray-800' 
+              : 'bg-white border-neutral-200'
+          )}
           style={{
             transform: isMobileMenuOpen ? 'translateX(0px)' : 'translateX(-100%)',
             transition: 'transform 300ms ease-out',
@@ -577,16 +592,29 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
           }}
         >
           {/* Sidebar Header with Enhanced iOS spacing */}
-          <div className="flex items-center justify-between h-14 px-4 border-b border-neutral-200 bg-background ios-header-safe ios-pro-max-adjust ios-pro-adjust ios-standard-adjust ios-x-adjust ios-se-adjust">
+          <div className={cn(
+            "flex items-center justify-between h-14 px-4 border-b ios-header-safe ios-pro-max-adjust ios-pro-adjust ios-standard-adjust ios-x-adjust ios-se-adjust ios-sidebar-fix",
+            isDark 
+              ? 'bg-black border-gray-800' 
+              : 'bg-white border-neutral-200'
+          )}>
             <div className="flex items-center space-x-3">
               <GraduationCap className="h-6 w-6 text-brand-primary" />
-              <span className="font-semibold text-foreground">AUT Menu</span>
+              <span className={cn(
+                "font-semibold",
+                isDark ? 'text-white' : 'text-foreground'
+              )}>AUT Menu</span>
             </div>
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setIsMobileMenuOpen(false)}
-              className="text-neutral-500 hover:text-neutral-700 ios-touch-target"
+              className={cn(
+                "ios-touch-target",
+                isDark 
+                  ? 'text-gray-400 hover:text-white' 
+                  : 'text-neutral-500 hover:text-neutral-700'
+              )}
             >
               <X className="h-5 w-5" />
             </Button>
@@ -692,3 +720,84 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
             </nav>
           </div>
         </div>
+      </>
+    );
+  }
+
+  // DESKTOP NAVIGATION
+  return (
+    <div 
+      className={cn(
+        "hidden lg:flex flex-col h-screen sticky top-0",
+        isDark ? 'bg-black' : 'bg-white'
+      )}
+    >
+      {/* Sidebar - Always visible on desktop */}
+      <div className="flex-1 overflow-y-auto border-r border-neutral-200">
+        {/* Profile Section - Always visible */}
+        <div className="px-6 py-4 border-b border-neutral-200">
+          <div className="flex items-center space-x-4">
+            <div className="w-14 h-14 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xl font-medium">
+              {user?.name?.charAt(0) || <User className="h-6 w-6" />}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-foreground truncate">
+                {user?.name || 'User'}
+              </p>
+              <p className="text-xs text-neutral-500 truncate">
+                {user?.email || 'user@example.com'}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation - Always visible on desktop */}
+        <nav className="py-4" role="navigation" aria-label="Main navigation">
+          {/* Render grouped navigation items */}
+          {Object.entries(groupedItems).map(([group, items]) => (
+            <div key={group} className="mb-4">
+              {group !== 'main' && (
+                <div className="px-4 py-2">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+                    {group}
+                  </h3>
+                </div>
+              )}
+              <div className="space-y-1">
+                {items.map((item, index) => {
+                  const Icon = item.icon;
+                  const active = isCurrentPath(item.path);
+                  
+                  return (
+                    <Link
+                      key={`${group}-${index}`}
+                      to={item.path}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={cn(
+                        'flex items-center justify-between px-4 py-3 mx-2 rounded-lg transition-colors',
+                        active
+                          ? 'bg-brand-primary/10 text-brand-primary'
+                          : 'text-neutral-700 hover:bg-neutral-50'
+                      )}
+                      aria-current={active ? 'page' : undefined}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <Icon className="h-5 w-5" />
+                        <span className="font-medium">{item.label}</span>
+                      </div>
+                      {item.badge && item.badge > 0 && (
+                        <span className="bg-error text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center">
+                          {item.badge > 99 ? '99+' : item.badge}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </nav>
+      </div>
+    </div>
+  );
+}
