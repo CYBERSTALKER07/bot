@@ -14,7 +14,8 @@ import {
   Trash2,
   Settings,
   Eye,
-  EyeOff
+  EyeOff,
+  ChevronRight
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -121,7 +122,10 @@ export default function NotificationsPage() {
 
   if (loading) {
     return (
-      <PageLayout className={isDark ? 'bg-black text-white' : 'bg-white text-black'}>
+      <PageLayout className={cn(
+        "min-h-screen transition-colors duration-300",
+        isDark ? 'bg-black text-white' : 'bg-gray-50 text-black'
+      )}>
         <div className="flex justify-center items-center h-64">
           <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${
             isDark ? 'border-white' : 'border-black'
@@ -132,58 +136,86 @@ export default function NotificationsPage() {
   }
 
   return (
-    <PageLayout className={isDark ? 'bg-black text-white' : 'bg-white text-black'} maxWidth="4xl">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <Typography variant="h4" className="font-bold mb-2">
+    <PageLayout 
+      className={cn(
+        "min-h-screen transition-colors duration-300 pb-20", // Added bottom padding for mobile nav
+        isDark ? 'bg-black text-white' : 'bg-gray-50 text-black'
+      )} 
+      maxWidth="4xl"
+    >
+      {/* Mobile-optimized Header */}
+      <div className="mb-4 sm:mb-8">
+        <div className="flex items-start justify-between mb-4 sm:items-center">
+          <div className="flex-1 min-w-0">
+            <Typography 
+              variant="h4" 
+              className="font-bold mb-1 sm:mb-2 text-xl sm:text-2xl lg:text-3xl"
+            >
               Notifications
             </Typography>
             {unreadCount > 0 && (
-              <Typography variant="body2" color="textSecondary">
+              <Typography 
+                variant="body2" 
+                color="textSecondary"
+                className="text-sm sm:text-base"
+              >
                 {unreadCount} unread notification{unreadCount !== 1 ? 's' : ''}
               </Typography>
             )}
           </div>
           
-          <div className="flex space-x-2">
+          {/* Mobile-optimized action buttons */}
+          <div className="flex items-center space-x-2 flex-shrink-0">
             {unreadCount > 0 && (
-              <Button variant="outlined" size="sm" onClick={markAllAsRead}>
-                <Check className="h-4 w-4 mr-2" />
-                Mark all read
+              <Button 
+                variant="outlined" 
+                size="sm" 
+                onClick={markAllAsRead}
+                className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2"
+              >
+                <Check className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Mark all read</span>
               </Button>
             )}
             <Link to="/settings">
-              <Button variant="ghost" size="sm">
-                <Settings className="h-4 w-4" />
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="p-1.5 sm:p-2"
+              >
+                <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             </Link>
           </div>
         </div>
 
-        {/* Filter Tabs */}
-        <div className="flex space-x-1 overflow-x-auto">
+        {/* Mobile-optimized Filter Tabs */}
+        <div className="flex space-x-1 overflow-x-auto scrollbar-hide pb-2">
           {[
             { key: 'all', label: 'All', count: notifications.length },
             { key: 'unread', label: 'Unread', count: unreadCount },
-            { key: 'job_match', label: 'Job Matches', count: notifications.filter(n => n.type === 'job_match').length },
-            { key: 'application_update', label: 'Applications', count: notifications.filter(n => n.type === 'application_update').length }
+            { key: 'job_match', label: 'Jobs', count: notifications.filter(n => n.type === 'job_match').length },
+            { key: 'application_update', label: 'Apps', count: notifications.filter(n => n.type === 'application_update').length }
           ].map((tab) => (
             <Button
               key={tab.key}
               variant={filter === tab.key ? 'contained' : 'ghost'}
               size="sm"
               onClick={() => setFilter(tab.key as any)}
-              className="whitespace-nowrap"
+              className={cn(
+                "whitespace-nowrap flex-shrink-0 text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-full transition-all duration-200",
+                "ios-touch-target", // iOS-friendly touch target
+                filter === tab.key && "shadow-sm"
+              )}
             >
               {tab.label}
               {tab.count > 0 && (
-                <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
+                <span className={cn(
+                  "ml-1 sm:ml-2 px-1.5 sm:px-2 py-0.5 rounded-full text-xs font-medium",
                   filter === tab.key 
                     ? 'bg-white/20 text-white' 
-                    : 'bg-gray-100 text-gray-600'
-                }`}>
+                    : isDark ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600'
+                )}>
                   {tab.count}
                 </span>
               )}
@@ -192,17 +224,25 @@ export default function NotificationsPage() {
         </div>
       </div>
 
-      {/* Notifications List */}
-      <div className="space-y-4">
+      {/* Mobile-optimized Notifications List */}
+      <div className="space-y-2 sm:space-y-4">
         {filteredNotifications.length === 0 ? (
-          <Card className="p-8 text-center">
-            <BellOff className={`h-12 w-12 mx-auto mb-4 ${
+          <Card className={cn(
+            "p-6 sm:p-8 text-center mx-2 sm:mx-0 rounded-xl sm:rounded-2xl",
+            isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
+          )}>
+            <BellOff className={cn(
+              "h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4",
               isDark ? 'text-gray-600' : 'text-gray-400'
-            }`} />
-            <Typography variant="h6" className="mb-2">
+            )} />
+            <Typography variant="h6" className="mb-2 text-base sm:text-lg">
               No notifications
             </Typography>
-            <Typography variant="body2" color="textSecondary">
+            <Typography 
+              variant="body2" 
+              color="textSecondary"
+              className="text-sm sm:text-base px-4"
+            >
               {filter === 'unread' 
                 ? "You're all caught up!" 
                 : "We'll notify you when something important happens."
@@ -214,11 +254,14 @@ export default function NotificationsPage() {
             <Card
               key={notification.id}
               className={cn(
-                'p-4 transition-all duration-200 hover:shadow-md cursor-pointer',
+                "transition-all duration-200 hover:shadow-md cursor-pointer mx-2 sm:mx-0 rounded-xl sm:rounded-2xl",
+                "active:scale-[0.98] active:shadow-sm", // Mobile press feedback
+                "ios-touch-target ios-nav-item", // iOS-friendly interactions
                 !notification.isRead && (isDark 
-                  ? 'bg-lime/5 border-lime/20' 
-                  : 'bg-blue-50 border-blue-200'
-                )
+                  ? 'bg-lime/5 border-lime/20 shadow-lime/5' 
+                  : 'bg-blue-50 border-blue-200 shadow-blue/5'
+                ),
+                isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
               )}
               onClick={() => {
                 if (!notification.isRead) markAsRead(notification.id);
@@ -227,82 +270,104 @@ export default function NotificationsPage() {
                 }
               }}
             >
-              <div className="flex items-start space-x-4">
-                <div className="flex-shrink-0">
-                  {notification.avatar ? (
-                    <img 
-                      src={notification.avatar} 
-                      alt="" 
-                      className="w-10 h-10 rounded-full"
-                    />
-                  ) : (
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      isDark ? 'bg-gray-800' : 'bg-gray-100'
-                    }`}>
-                      {getNotificationIcon(notification.type)}
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <Typography 
-                        variant="body1" 
-                        className={cn(
-                          'font-medium mb-1',
-                          !notification.isRead && 'font-semibold'
-                        )}
-                      >
-                        {notification.title}
-                        {!notification.isRead && (
-                          <span className="ml-2 w-2 h-2 bg-blue-500 rounded-full inline-block"></span>
-                        )}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary" className="mb-2">
-                        {notification.message}
-                      </Typography>
-                      <div className="flex items-center space-x-2 text-sm text-gray-500">
-                        <Clock className="h-3 w-3" />
-                        <span>{formatTimestamp(notification.timestamp)}</span>
-                        {notification.company && (
-                          <>
-                            <span>•</span>
-                            <span>{notification.company}</span>
-                          </>
-                        )}
+              <div className="p-3 sm:p-4">
+                <div className="flex items-start space-x-3 sm:space-x-4">
+                  {/* Mobile-optimized avatar/icon */}
+                  <div className="flex-shrink-0">
+                    {notification.avatar ? (
+                      <img 
+                        src={notification.avatar} 
+                        alt="" 
+                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className={cn(
+                        "w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center",
+                        isDark ? 'bg-gray-800' : 'bg-gray-100'
+                      )}>
+                        {getNotificationIcon(notification.type)}
                       </div>
-                    </div>
+                    )}
+                    {/* Unread indicator */}
+                    {!notification.isRead && (
+                      <div className="absolute w-2 h-2 bg-blue-500 rounded-full -mt-1 -ml-1 ring-2 ring-white dark:ring-gray-900"></div>
+                    )}
+                  </div>
 
-                    <div className="flex items-center space-x-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (notification.isRead) {
-                            setNotifications(prev => 
-                              prev.map(n => 
-                                n.id === notification.id ? { ...n, isRead: false } : n
-                              )
-                            );
-                          } else {
-                            markAsRead(notification.id);
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 min-w-0 pr-2">
+                        <Typography 
+                          variant="body1" 
+                          className={cn(
+                            'mb-1 text-sm sm:text-base leading-tight',
+                            !notification.isRead ? 'font-semibold' : 'font-medium'
+                          )}
+                        >
+                          {notification.title}
+                        </Typography>
+                        <Typography 
+                          variant="body2" 
+                          color="textSecondary" 
+                          className="mb-2 text-xs sm:text-sm leading-relaxed line-clamp-2"
+                        >
+                          {notification.message}
+                        </Typography>
+                        
+                        {/* Mobile-optimized metadata */}
+                        <div className="flex items-center space-x-2 text-xs text-gray-500">
+                          <Clock className="h-3 w-3 flex-shrink-0" />
+                          <span className="truncate">{formatTimestamp(notification.timestamp)}</span>
+                          {notification.company && (
+                            <>
+                              <span className="text-gray-400">•</span>
+                              <span className="truncate">{notification.company}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Mobile-optimized action buttons */}
+                      <div className="flex items-center space-x-1 flex-shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (notification.isRead) {
+                              setNotifications(prev => 
+                                prev.map(n => 
+                                  n.id === notification.id ? { ...n, isRead: false } : n
+                                )
+                              );
+                            } else {
+                              markAsRead(notification.id);
+                            }
+                          }}
+                          className="p-1 sm:p-1.5 ios-touch-target"
+                        >
+                          {notification.isRead ? 
+                            <EyeOff className="h-3 w-3 sm:h-4 sm:w-4" /> : 
+                            <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
                           }
-                        }}
-                      >
-                        {notification.isRead ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteNotification(notification.id);
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteNotification(notification.id);
+                          }}
+                          className="p-1 sm:p-1.5 ios-touch-target text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                        >
+                          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                        </Button>
+                        
+                        {/* Chevron for mobile */}
+                        <div className="sm:hidden">
+                          <ChevronRight className="h-4 w-4 text-gray-400" />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -311,6 +376,9 @@ export default function NotificationsPage() {
           ))
         )}
       </div>
+
+      {/* Mobile spacing for bottom navigation */}
+      <div className="h-16 sm:hidden"></div>
     </PageLayout>
   );
 }
