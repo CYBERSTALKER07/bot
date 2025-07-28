@@ -25,9 +25,17 @@ export function useScrollDirection({
       
       const direction = scrollY > lastScrollY.current ? 'down' : 'up';
       
+      // Only update if direction actually changed
       if (direction !== scrollDirection) {
         setScrollDirection(direction);
-        setIsVisible(direction === 'up' || scrollY < 100); // Always show when near top
+        
+        // Show only when scrolling up, hide when scrolling down
+        // Always show when at the very top of the page
+        if (scrollY <= 50) {
+          setIsVisible(true);
+        } else {
+          setIsVisible(direction === 'up');
+        }
       }
       
       lastScrollY.current = scrollY > 0 ? scrollY : 0;
