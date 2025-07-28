@@ -10,7 +10,14 @@ import {
   Calendar,
   Clock,
   Star,
-  ExternalLink
+  ExternalLink,
+  Menu,
+  X,
+  ChevronDown,
+  ChevronUp,
+  Grid3X3,
+  List,
+  SlidersHorizontal
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import Button from './ui/Button';
@@ -59,6 +66,7 @@ export default function CompaniesPage() {
   const [sortBy, setSortBy] = useState<'name' | 'rating' | 'positions' | 'employees'>('name');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [followingCompanies, setFollowingCompanies] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -147,6 +155,16 @@ export default function CompaniesPage() {
   const locations = [...new Set(companies.map(c => c.location.split(',')[1]?.trim() || c.location))];
   const sizes = [...new Set(companies.map(c => c.company_size))];
 
+  // Clear filters function
+  const clearFilters = () => {
+    setSelectedIndustry('');
+    setSelectedLocation('');
+    setSelectedSize('');
+    setSearchTerm('');
+  };
+
+  const hasActiveFilters = selectedIndustry || selectedLocation || selectedSize || searchTerm;
+
   if (loading) {
     return (
       <div className={`min-h-screen ${isDark ? 'bg-gradient-to-br from-black via-black to-purple-900' : 'bg-gray-50'}`}>
@@ -166,150 +184,451 @@ export default function CompaniesPage() {
 
   return (
     <PageLayout 
-      className={isDark ? 'bg-black text-white' : 'bg-white text-black'}
-      maxWidth="6xl"
+      className={`min-h-screen ${isDark ? 'bg-black text-white' : 'bg-white text-black'}`}
+      maxWidth="full"
+      padding="none"
     >
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Companies</h1>
-        <p className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-          Discover companies that are actively hiring students
-        </p>
-      </div>
-
-      {/* Search and Filters */}
-      <div className="flex flex-col lg:flex-row gap-4 mb-8">
-        <div className="flex-1">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search companies..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className={`w-full pl-10 pr-4 py-3 rounded-lg border ${
-                isDark 
-                  ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-400' 
-                  : 'bg-white border-gray-300 text-black placeholder-gray-500'
-              }`}
-            />
+      {/* Mobile Header */}
+      <div className={cn(
+        'sticky top-0 z-50 backdrop-blur-xl border-b lg:hidden ios-header-safe',
+        isDark ? 'bg-black/95 border-gray-800' : 'bg-white/95 border-gray-200'
+      )}>
+        <div className="flex items-center justify-between px-4 py-3 ios-nav-spacing">
+          <div>
+            <h1 className="text-lg sm:text-xl font-bold">Companies</h1>
+            <p className={cn(
+              'text-xs sm:text-sm',
+              isDark ? 'text-gray-400' : 'text-gray-600'
+            )}>
+              {filteredAndSortedCompanies.length} companies
+            </p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="p-2 ios-touch-target relative"
+              onClick={() => setShowMobileFilters(true)}
+            >
+              <SlidersHorizontal className="h-5 w-5" />
+              {hasActiveFilters && (
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full" />
+              )}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="p-2 ios-touch-target"
+              onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+            >
+              {viewMode === 'grid' ? <List className="h-5 w-5" /> : <Grid3X3 className="h-5 w-5" />}
+            </Button>
           </div>
         </div>
-        
-        <div className="flex gap-2">
-          <select
-            value={selectedIndustry}
-            onChange={(e) => setSelectedIndustry(e.target.value)}
-            className={`px-4 py-3 rounded-lg border ${
-              isDark 
-                ? 'bg-gray-900 border-gray-700 text-white' 
-                : 'bg-white border-gray-300 text-black'
-            }`}
-          >
-            <option value="">All Industries</option>
-            {industries.map(industry => (
-              <option key={industry} value={industry}>{industry}</option>
-            ))}
-          </select>
-          
-          <select
-            value={selectedSize}
-            onChange={(e) => setSelectedSize(e.target.value)}
-            className={`px-4 py-3 rounded-lg border ${
-              isDark 
-                ? 'bg-gray-900 border-gray-700 text-white' 
-                : 'bg-white border-gray-300 text-black'
-            }`}
-          >
-            <option value="">All Sizes</option>
-            {sizes.map(size => (
-              <option key={size} value={size}>{size}</option>
-            ))}
-          </select>
-        </div>
       </div>
 
-      {/* Companies Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredAndSortedCompanies.map((company) => (
-          <Card 
-            key={company.id}
-            className={`p-6 hover:shadow-lg transition-all duration-200 ${
-              isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
-            }`}
+      {/* Mobile Filters Overlay */}
+      {showMobileFilters && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div className="fixed inset-0 bg-black/50" onClick={() => setShowMobileFilters(false)} />
+          <div 
+            className={cn(
+              'fixed left-0 top-0 h-full w-80 max-w-[85vw] overflow-y-auto ios-sidebar-fix ios-safe-area',
+              isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200',
+              'border-r shadow-xl'
+            )}
           >
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center space-x-3">
-                <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                  isDark ? 'bg-gray-800' : 'bg-gray-100'
-                }`}>
-                  <Building2 className="h-6 w-6 text-blue-500" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold">{company.name}</h3>
-                  <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    {company.industry}
-                  </p>
-                </div>
-              </div>
-              <Button variant="ghost" size="sm">
-                <ExternalLink className="h-4 w-4" />
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
+              <h2 className="text-lg font-bold">Filters & Search</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="p-2 ios-touch-target"
+                onClick={() => setShowMobileFilters(false)}
+              >
+                <X className="h-5 w-5" />
               </Button>
             </div>
             
-            <p className={`text-sm mb-4 line-clamp-2 ${
-              isDark ? 'text-gray-300' : 'text-gray-600'
-            }`}>
-              {company.description}
-            </p>
-            
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-4 text-sm text-gray-500">
-                <div className="flex items-center space-x-1">
-                  <Users className="h-4 w-4" />
-                  <span>{company.employee_count}</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <MapPin className="h-4 w-4" />
-                  <span>{company.location}</span>
+            <div className="p-4 space-y-6">
+              {/* Mobile Search */}
+              <div>
+                <label className="block text-sm font-medium mb-2">Search Companies</label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search companies..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className={cn(
+                      'w-full pl-10 pr-4 py-3 rounded-lg border',
+                      isDark 
+                        ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-400' 
+                        : 'bg-white border-gray-300 text-black placeholder-gray-500'
+                    )}
+                  />
                 </div>
               </div>
+
+              {/* Mobile Industry Filter */}
+              <div>
+                <label className="block text-sm font-medium mb-2">Industry</label>
+                <select
+                  value={selectedIndustry}
+                  onChange={(e) => setSelectedIndustry(e.target.value)}
+                  className={cn(
+                    'w-full px-4 py-3 rounded-lg border ios-touch-target',
+                    isDark 
+                      ? 'bg-gray-900 border-gray-700 text-white' 
+                      : 'bg-white border-gray-300 text-black'
+                  )}
+                >
+                  <option value="">All Industries</option>
+                  {industries.map(industry => (
+                    <option key={industry} value={industry}>{industry}</option>
+                  ))}
+                </select>
+              </div>
               
-              <div className="flex items-center space-x-1">
-                <Star className="h-4 w-4 fill-current text-yellow-500" />
-                <span className="text-sm font-medium">{company.rating}</span>
+              {/* Mobile Size Filter */}
+              <div>
+                <label className="block text-sm font-medium mb-2">Company Size</label>
+                <select
+                  value={selectedSize}
+                  onChange={(e) => setSelectedSize(e.target.value)}
+                  className={cn(
+                    'w-full px-4 py-3 rounded-lg border ios-touch-target',
+                    isDark 
+                      ? 'bg-gray-900 border-gray-700 text-white' 
+                      : 'bg-white border-gray-300 text-black'
+                  )}
+                >
+                  <option value="">All Sizes</option>
+                  {sizes.map(size => (
+                    <option key={size} value={size}>{size}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Mobile Sort */}
+              <div>
+                <label className="block text-sm font-medium mb-2">Sort By</label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  className={cn(
+                    'w-full px-4 py-3 rounded-lg border ios-touch-target',
+                    isDark 
+                      ? 'bg-gray-900 border-gray-700 text-white' 
+                      : 'bg-white border-gray-300 text-black'
+                  )}
+                >
+                  <option value="name">Company Name</option>
+                  <option value="rating">Rating</option>
+                  <option value="positions">Open Positions</option>
+                  <option value="employees">Company Size</option>
+                </select>
+              </div>
+
+              {/* Clear Filters */}
+              {hasActiveFilters && (
+                <Button
+                  variant="outlined"
+                  className="w-full ios-touch-target"
+                  onClick={clearFilters}
+                >
+                  Clear All Filters
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="max-w-7xl mx-auto">
+        {/* Desktop Header */}
+        <div className="hidden lg:block px-6 py-8">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold mb-2">Companies</h1>
+            <p className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+              Discover companies that are actively hiring students
+            </p>
+          </div>
+
+          {/* Desktop Search and Filters */}
+          <div className="flex flex-col lg:flex-row gap-4 mb-8">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search companies..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className={`w-full pl-10 pr-4 py-3 rounded-lg border ${
+                    isDark 
+                      ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-400' 
+                      : 'bg-white border-gray-300 text-black placeholder-gray-500'
+                  }`}
+                />
               </div>
             </div>
             
-            <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-              <div>
-                <p className="text-lg font-semibold text-green-600">
-                  {company.recent_jobs.length} open positions
-                </p>
+            <div className="flex gap-2">
+              <select
+                value={selectedIndustry}
+                onChange={(e) => setSelectedIndustry(e.target.value)}
+                className={`px-4 py-3 rounded-lg border ${
+                  isDark 
+                    ? 'bg-gray-900 border-gray-700 text-white' 
+                    : 'bg-white border-gray-300 text-black'
+                }`}
+              >
+                <option value="">All Industries</option>
+                {industries.map(industry => (
+                  <option key={industry} value={industry}>{industry}</option>
+                ))}
+              </select>
+              
+              <select
+                value={selectedSize}
+                onChange={(e) => setSelectedSize(e.target.value)}
+                className={`px-4 py-3 rounded-lg border ${
+                  isDark 
+                    ? 'bg-gray-900 border-gray-700 text-white' 
+                    : 'bg-white border-gray-300 text-black'
+                }`}
+              >
+                <option value="">All Sizes</option>
+                {sizes.map(size => (
+                  <option key={size} value={size}>{size}</option>
+                ))}
+              </select>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                className="p-3"
+                onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+              >
+                {viewMode === 'grid' ? <List className="h-5 w-5" /> : <Grid3X3 className="h-5 w-5" />}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Companies Grid/List */}
+        <div className="px-4 sm:px-6 pb-8 ios-bottom-safe">
+          <div className={cn(
+            viewMode === 'grid' 
+              ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6'
+              : 'space-y-4'
+          )}>
+            {filteredAndSortedCompanies.map((company) => (
+              <CompanyCard
+                key={company.id}
+                company={company}
+                viewMode={viewMode}
+                isDark={isDark}
+                isFollowing={followingCompanies.has(company.id)}
+                onFollow={() => handleFollowCompany(company.id)}
+              />
+            ))}
+          </div>
+
+          {filteredAndSortedCompanies.length === 0 && (
+            <div className="text-center py-12">
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
+                isDark ? 'bg-gray-800' : 'bg-gray-100'
+              }`}>
+                <Building2 className="h-8 w-8 text-gray-400" />
               </div>
+              <h3 className="text-xl font-semibold mb-2">No companies found</h3>
+              <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                Try adjusting your search or filters
+              </p>
+              {hasActiveFilters && (
+                <Button variant="outlined" onClick={clearFilters}>
+                  Clear All Filters
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </PageLayout>
+  );
+}
+
+// Extracted Company Card Component
+const CompanyCard = ({ company, viewMode, isDark, isFollowing, onFollow }: {
+  company: CompanyListing;
+  viewMode: 'grid' | 'list';
+  isDark: boolean;
+  isFollowing: boolean;
+  onFollow: () => void;
+}) => {
+  if (viewMode === 'list') {
+    return (
+      <Card 
+        className={cn(
+          'p-4 sm:p-6 hover:shadow-lg transition-all duration-200',
+          isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
+        )}
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-4 sm:space-y-0">
+          <div className="flex items-start space-x-4 flex-1 min-w-0">
+            <div className={cn(
+              'w-12 h-12 sm:w-16 sm:h-16 rounded-lg flex items-center justify-center flex-shrink-0',
+              isDark ? 'bg-gray-800' : 'bg-gray-100'
+            )}>
+              <Building2 className="h-6 w-6 sm:h-8 sm:w-8 text-blue-500" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center space-x-2 mb-1">
+                <h3 className="text-lg sm:text-xl font-semibold truncate">{company.name}</h3>
+                {company.is_verified && (
+                  <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-white text-xs">✓</span>
+                  </div>
+                )}
+              </div>
+              <p className={cn(
+                'text-sm mb-2',
+                isDark ? 'text-gray-400' : 'text-gray-600'
+              )}>
+                {company.industry}
+              </p>
+              <p className={cn(
+                'text-sm line-clamp-2 mb-3',
+                isDark ? 'text-gray-300' : 'text-gray-600'
+              )}>
+                {company.description}
+              </p>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm text-gray-500">
+                <div className="flex items-center space-x-1">
+                  <Users className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span>{company.employee_count.toLocaleString()} employees</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <MapPin className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="truncate">{company.location}</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-current text-yellow-500" />
+                  <span>{company.rating}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex flex-col sm:items-end space-y-3 flex-shrink-0">
+            <div className="text-center sm:text-right">
+              <p className="text-lg sm:text-xl font-semibold text-green-600">
+                {company.recent_jobs.length}
+              </p>
+              <p className="text-xs sm:text-sm text-gray-500">
+                open positions
+              </p>
+            </div>
+            <div className="flex space-x-2">
+              <Button 
+                variant="outlined" 
+                size="sm"
+                className="ios-touch-target"
+                onClick={onFollow}
+              >
+                {isFollowing ? 'Following' : 'Follow'}
+              </Button>
               <Link to={`/companies/${company.id}`}>
-                <Button size="sm">
+                <Button size="sm" className="ios-touch-target">
                   View Profile
                 </Button>
               </Link>
             </div>
-          </Card>
-        ))}
-      </div>
-
-      {filteredAndSortedCompanies.length === 0 && (
-        <div className="text-center py-12">
-          <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
-            isDark ? 'bg-gray-800' : 'bg-gray-100'
-          }`}>
-            <Building2 className="h-8 w-8 text-gray-400" />
           </div>
-          <h3 className="text-xl font-semibold mb-2">No companies found</h3>
-          <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-            Try adjusting your search or filters
+        </div>
+      </Card>
+    );
+  }
+
+  return (
+    <Card 
+      className={cn(
+        'p-4 sm:p-6 hover:shadow-lg transition-all duration-200',
+        isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
+      )}
+    >
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center space-x-3 flex-1 min-w-0">
+          <div className={cn(
+            'w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0',
+            isDark ? 'bg-gray-800' : 'bg-gray-100'
+          )}>
+            <Building2 className="h-6 w-6 text-blue-500" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center space-x-2 mb-1">
+              <h3 className="text-base sm:text-lg font-semibold truncate">{company.name}</h3>
+              {company.is_verified && (
+                <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-white text-xs">✓</span>
+                </div>
+              )}
+            </div>
+            <p className={cn(
+              'text-xs sm:text-sm',
+              isDark ? 'text-gray-400' : 'text-gray-600'
+            )}>
+              {company.industry}
+            </p>
+          </div>
+        </div>
+        <Button 
+          variant="ghost" 
+          size="sm"
+          className="ios-touch-target"
+          onClick={onFollow}
+        >
+          {isFollowing ? 'Following' : 'Follow'}
+        </Button>
+      </div>
+      
+      <p className={cn(
+        'text-xs sm:text-sm mb-4 line-clamp-3',
+        isDark ? 'text-gray-300' : 'text-gray-600'
+      )}>
+        {company.description}
+      </p>
+      
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4 text-xs sm:text-sm text-gray-500">
+        <div className="flex items-center space-x-1">
+          <Users className="h-3 w-3 sm:h-4 sm:w-4" />
+          <span>{company.employee_count.toLocaleString()}</span>
+        </div>
+        <div className="flex items-center space-x-1">
+          <MapPin className="h-3 w-3 sm:h-4 sm:w-4" />
+          <span className="truncate">{company.location}</span>
+        </div>
+        <div className="flex items-center space-x-1">
+          <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-current text-yellow-500" />
+          <span>{company.rating}</span>
+        </div>
+      </div>
+      
+      <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div>
+          <p className="text-sm sm:text-base font-semibold text-green-600">
+            {company.recent_jobs.length} open positions
           </p>
         </div>
-      )}
-    </PageLayout>
+        <Link to={`/companies/${company.id}`}>
+          <Button size="sm" className="ios-touch-target">
+            View Profile
+          </Button>
+        </Link>
+      </div>
+    </Card>
   );
-}
+};
