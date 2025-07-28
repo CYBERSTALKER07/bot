@@ -82,6 +82,9 @@ const Feed = lazy(() => import('./components/Feed'));
 const PostDetails = lazy(() => import('./components/PostDetails'));
 const CompaniesPage = lazy(() => import('./components/CompaniesPage'));
 const CompanyProfile = lazy(() => import('./components/CompanyProfile'));
+const ResumeBuilder = lazy(() => import('./components/ResumeBuilder/index'));
+const AIResumeBuilderPage = lazy(() => import('./components/AIResumeBuilderPage'));
+const VisualResumeEditor = lazy(() => import('./components/VisualResumeEditor'));
 
 // New pages
 const NotificationsPage = lazy(() => import('./components/NotificationsPage'));
@@ -446,6 +449,27 @@ function AppContent() {
               <ProtectedRoute>
                 <Suspense fallback={<LoadingFallback message="Loading bookmarks..." />}>
                   <BookmarksPage />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/resume-builder" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading resume builder..." />}>
+                  <ResumeBuilder />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/ai-resume-builder" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading AI resume builder..." />}>
+                  <AIResumeBuilderPage />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/visual-resume-editor" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading Visual Resume Editor..." />}>
+                  <VisualResumeEditor />
                 </Suspense>
               </ProtectedRoute>
             } />

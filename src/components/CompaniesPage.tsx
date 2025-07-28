@@ -17,12 +17,16 @@ import {
   ChevronUp,
   Grid3X3,
   List,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Heart,
+  Share2
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import Button from './ui/Button';
 import { Card } from './ui/Card';
 import PageLayout from './ui/PageLayout';
+import Input from './ui/Input';
+import Select from './ui/Select';
 import { cn } from '../lib/cva';
 import { mockCompanies } from '../data/mockData';
 
@@ -183,21 +187,20 @@ export default function CompaniesPage() {
   }
 
   return (
-    <PageLayout 
-      className={`min-h-screen ${isDark ? 'bg-black text-white' : 'bg-white text-black'}`}
-      maxWidth="full"
-      padding="none"
-    >
-      {/* Mobile Header */}
+    <div className={cn(
+      'min-h-screen w-full',
+      isDark ? 'bg-black text-white' : 'bg-white text-black'
+    )}>
+      {/* Mobile Header - Sticky */}
       <div className={cn(
-        'sticky top-0 z-50 backdrop-blur-xl border-b lg:hidden ios-header-safe',
+        'sticky top-0 z-50 backdrop-blur-xl border-b lg:hidden',
         isDark ? 'bg-black/95 border-gray-800' : 'bg-white/95 border-gray-200'
       )}>
-        <div className="flex items-center justify-between px-4 py-3 ios-nav-spacing">
+        <div className="flex items-center justify-between px-4 py-3 safe-area-inset-top">
           <div>
-            <h1 className="text-lg sm:text-xl font-bold">Companies</h1>
+            <h1 className="text-lg font-bold">Companies</h1>
             <p className={cn(
-              'text-xs sm:text-sm',
+              'text-sm',
               isDark ? 'text-gray-400' : 'text-gray-600'
             )}>
               {filteredAndSortedCompanies.length} companies
@@ -207,7 +210,7 @@ export default function CompaniesPage() {
             <Button
               variant="ghost"
               size="sm"
-              className="p-2 ios-touch-target relative"
+              className="p-3 min-h-[44px] min-w-[44px] relative"
               onClick={() => setShowMobileFilters(true)}
             >
               <SlidersHorizontal className="h-5 w-5" />
@@ -218,7 +221,7 @@ export default function CompaniesPage() {
             <Button
               variant="ghost"
               size="sm"
-              className="p-2 ios-touch-target"
+              className="p-3 min-h-[44px] min-w-[44px]"
               onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
             >
               {viewMode === 'grid' ? <List className="h-5 w-5" /> : <Grid3X3 className="h-5 w-5" />}
@@ -231,19 +234,18 @@ export default function CompaniesPage() {
       {showMobileFilters && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="fixed inset-0 bg-black/50" onClick={() => setShowMobileFilters(false)} />
-          <div 
-            className={cn(
-              'fixed left-0 top-0 h-full w-80 max-w-[85vw] overflow-y-auto ios-sidebar-fix ios-safe-area',
-              isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200',
-              'border-r shadow-xl'
-            )}
-          >
+          <div className={cn(
+            'fixed bottom-0 left-0 right-0 max-h-[85vh] overflow-y-auto rounded-t-xl',
+            isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200',
+            'border-t safe-area-inset-bottom'
+          )}>
+            {/* Mobile Filter Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
               <h2 className="text-lg font-bold">Filters & Search</h2>
               <Button
                 variant="ghost"
                 size="sm"
-                className="p-2 ios-touch-target"
+                className="p-2 min-h-[44px] min-w-[44px]"
                 onClick={() => setShowMobileFilters(false)}
               >
                 <X className="h-5 w-5" />
@@ -256,378 +258,492 @@ export default function CompaniesPage() {
                 <label className="block text-sm font-medium mb-2">Search Companies</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input
+                  <Input
                     type="text"
-                    placeholder="Search companies..."
+                    placeholder="Company name or description..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className={cn(
-                      'w-full pl-10 pr-4 py-3 rounded-lg border',
-                      isDark 
-                        ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-400' 
-                        : 'bg-white border-gray-300 text-black placeholder-gray-500'
-                    )}
+                    className="w-full pl-10 min-h-[48px]"
                   />
                 </div>
               </div>
 
-              {/* Mobile Industry Filter */}
+              {/* Mobile Location */}
               <div>
-                <label className="block text-sm font-medium mb-2">Industry</label>
-                <select
-                  value={selectedIndustry}
-                  onChange={(e) => setSelectedIndustry(e.target.value)}
-                  className={cn(
-                    'w-full px-4 py-3 rounded-lg border ios-touch-target',
-                    isDark 
-                      ? 'bg-gray-900 border-gray-700 text-white' 
-                      : 'bg-white border-gray-300 text-black'
-                  )}
-                >
-                  <option value="">All Industries</option>
-                  {industries.map(industry => (
-                    <option key={industry} value={industry}>{industry}</option>
-                  ))}
-                </select>
-              </div>
-              
-              {/* Mobile Size Filter */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Company Size</label>
-                <select
-                  value={selectedSize}
-                  onChange={(e) => setSelectedSize(e.target.value)}
-                  className={cn(
-                    'w-full px-4 py-3 rounded-lg border ios-touch-target',
-                    isDark 
-                      ? 'bg-gray-900 border-gray-700 text-white' 
-                      : 'bg-white border-gray-300 text-black'
-                  )}
-                >
-                  <option value="">All Sizes</option>
-                  {sizes.map(size => (
-                    <option key={size} value={size}>{size}</option>
-                  ))}
-                </select>
+                <label className="block text-sm font-medium mb-2">Location</label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <Select
+                    value={selectedLocation}
+                    onChange={(e) => setSelectedLocation(e.target.value)}
+                    className="w-full pl-10 min-h-[48px]"
+                  >
+                    <option value="">All Locations</option>
+                    {locations.map(location => (
+                      <option key={location} value={location}>{location}</option>
+                    ))}
+                  </Select>
+                </div>
               </div>
 
-              {/* Mobile Sort */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Sort By</label>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
-                  className={cn(
-                    'w-full px-4 py-3 rounded-lg border ios-touch-target',
-                    isDark 
-                      ? 'bg-gray-900 border-gray-700 text-white' 
-                      : 'bg-white border-gray-300 text-black'
-                  )}
-                >
-                  <option value="name">Company Name</option>
-                  <option value="rating">Rating</option>
-                  <option value="positions">Open Positions</option>
-                  <option value="employees">Company Size</option>
-                </select>
+              {/* Mobile Filters Grid */}
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Industry</label>
+                  <Select
+                    value={selectedIndustry}
+                    onChange={(e) => setSelectedIndustry(e.target.value)}
+                    className="w-full min-h-[48px]"
+                  >
+                    <option value="">All Industries</option>
+                    {industries.map(industry => (
+                      <option key={industry} value={industry}>{industry}</option>
+                    ))}
+                  </Select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2">Company Size</label>
+                  <Select
+                    value={selectedSize}
+                    onChange={(e) => setSelectedSize(e.target.value)}
+                    className="w-full min-h-[48px]"
+                  >
+                    <option value="">All Sizes</option>
+                    {sizes.map(size => (
+                      <option key={size} value={size}>{size}</option>
+                    ))}
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Sort By</label>
+                  <Select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as 'name' | 'rating' | 'positions' | 'employees')}
+                    className="w-full min-h-[48px]"
+                  >
+                    <option value="name">Company Name</option>
+                    <option value="rating">Highest Rating</option>
+                    <option value="positions">Most Positions</option>
+                    <option value="employees">Company Size</option>
+                  </Select>
+                </div>
               </div>
 
-              {/* Clear Filters */}
-              {hasActiveFilters && (
+              {/* Apply/Clear Buttons */}
+              <div className="flex gap-3 pt-4">
                 <Button
                   variant="outlined"
-                  className="w-full ios-touch-target"
+                  className="flex-1 min-h-[48px]"
                   onClick={clearFilters}
                 >
-                  Clear All Filters
+                  Clear All
                 </Button>
-              )}
+                <Button
+                  variant="filled"
+                  className="flex-1 min-h-[48px]"
+                  onClick={() => setShowMobileFilters(false)}
+                >
+                  Apply Filters
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto">
+      {/* Desktop Layout */}
+      <div className="hidden lg:block max-w-7xl mx-auto px-6 py-8">
         {/* Desktop Header */}
-        <div className="hidden lg:block px-6 py-8">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Companies</h1>
-            <p className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-              Discover companies that are actively hiring students
-            </p>
-          </div>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Explore Companies</h1>
+          <p className="text-lg text-gray-600 dark:text-gray-400">
+            Discover {companies.length} amazing companies to work for
+          </p>
+        </div>
 
-          {/* Desktop Search and Filters */}
-          <div className="flex flex-col lg:flex-row gap-4 mb-8">
-            <div className="flex-1">
+        {/* Desktop Search and Filters */}
+        <Card className="p-6 mb-8">
+          {/* Main search section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
+            <div className="md:col-span-2">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
                   type="text"
                   placeholder="Search companies..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className={`w-full pl-10 pr-4 py-3 rounded-lg border ${
-                    isDark 
-                      ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-400' 
-                      : 'bg-white border-gray-300 text-black placeholder-gray-500'
-                  }`}
+                  className="w-full pl-10"
                 />
               </div>
             </div>
             
-            <div className="flex gap-2">
-              <select
+            <Select
+              value={selectedLocation}
+              onChange={(e) => setSelectedLocation(e.target.value)}
+              className="w-full"
+            >
+              <option value="">All Locations</option>
+              {locations.map(location => (
+                <option key={location} value={location}>{location}</option>
+              ))}
+            </Select>
+            
+            <Select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as 'name' | 'rating' | 'positions' | 'employees')}
+              className="w-full"
+            >
+              <option value="name">Company Name</option>
+              <option value="rating">Highest Rating</option>
+              <option value="positions">Most Positions</option>
+              <option value="employees">Company Size</option>
+            </Select>
+          </div>
+
+          {/* Desktop filters */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <Button
+              variant="text"
+              size="small"
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center space-x-2"
+            >
+              <Filter className="h-4 w-4" />
+              <span>Advanced Filters</span>
+              <ChevronDown className={cn(
+                'h-4 w-4 transition-transform duration-200',
+                showFilters ? 'rotate-180' : ''
+              )} />
+            </Button>
+
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              {filteredAndSortedCompanies.length} of {companies.length} companies
+            </div>
+          </div>
+
+          {/* Advanced filters */}
+          {showFilters && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <Select
                 value={selectedIndustry}
                 onChange={(e) => setSelectedIndustry(e.target.value)}
-                className={`px-4 py-3 rounded-lg border ${
-                  isDark 
-                    ? 'bg-gray-900 border-gray-700 text-white' 
-                    : 'bg-white border-gray-300 text-black'
-                }`}
+                className="w-full"
               >
                 <option value="">All Industries</option>
                 {industries.map(industry => (
                   <option key={industry} value={industry}>{industry}</option>
                 ))}
-              </select>
+              </Select>
               
-              <select
+              <Select
                 value={selectedSize}
                 onChange={(e) => setSelectedSize(e.target.value)}
-                className={`px-4 py-3 rounded-lg border ${
-                  isDark 
-                    ? 'bg-gray-900 border-gray-700 text-white' 
-                    : 'bg-white border-gray-300 text-black'
-                }`}
+                className="w-full"
               >
                 <option value="">All Sizes</option>
                 {sizes.map(size => (
                   <option key={size} value={size}>{size}</option>
                 ))}
-              </select>
-
-              <Button
-                variant="ghost"
-                size="sm"
-                className="p-3"
-                onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
-              >
-                {viewMode === 'grid' ? <List className="h-5 w-5" /> : <Grid3X3 className="h-5 w-5" />}
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Companies Grid/List */}
-        <div className="px-4 sm:px-6 pb-8 ios-bottom-safe">
-          <div className={cn(
-            viewMode === 'grid' 
-              ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6'
-              : 'space-y-4'
-          )}>
-            {filteredAndSortedCompanies.map((company) => (
-              <CompanyCard
-                key={company.id}
-                company={company}
-                viewMode={viewMode}
-                isDark={isDark}
-                isFollowing={followingCompanies.has(company.id)}
-                onFollow={() => handleFollowCompany(company.id)}
-              />
-            ))}
-          </div>
-
-          {filteredAndSortedCompanies.length === 0 && (
-            <div className="text-center py-12">
-              <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
-                isDark ? 'bg-gray-800' : 'bg-gray-100'
-              }`}>
-                <Building2 className="h-8 w-8 text-gray-400" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">No companies found</h3>
-              <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                Try adjusting your search or filters
-              </p>
-              {hasActiveFilters && (
-                <Button variant="outlined" onClick={clearFilters}>
-                  Clear All Filters
+              </Select>
+              
+              <div className="flex gap-2">
+                <Button variant="outlined" size="small" onClick={clearFilters}>
+                  Clear Filters
                 </Button>
-              )}
+              </div>
             </div>
           )}
-        </div>
+        </Card>
       </div>
-    </PageLayout>
+
+      {/* Company Listings */}
+      <div className={cn(
+        'px-4 pb-8 lg:max-w-7xl lg:mx-auto lg:px-6',
+        'safe-area-inset-bottom'
+      )}>
+        {viewMode === 'grid' ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredAndSortedCompanies.map((company) => (
+              <CompanyCardGrid key={company.id} company={company} isDark={isDark} followingCompanies={followingCompanies} handleFollowCompany={handleFollowCompany} />
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {filteredAndSortedCompanies.map((company) => (
+              <CompanyCardList key={company.id} company={company} isDark={isDark} followingCompanies={followingCompanies} handleFollowCompany={handleFollowCompany} />
+            ))}
+          </div>
+        )}
+
+        {filteredAndSortedCompanies.length === 0 && (
+          <Card className="p-8 text-center">
+            <Building2 className={cn(
+              'h-12 w-12 mx-auto mb-4',
+              isDark ? 'text-gray-600' : 'text-gray-400'
+            )} />
+            <h3 className="text-lg font-semibold mb-2">No companies found</h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Try adjusting your search criteria or filters
+            </p>
+          </Card>
+        )}
+
+        {/* Load More */}
+        {filteredAndSortedCompanies.length > 0 && (
+          <div className="text-center mt-8">
+            <Button variant="outlined" size="large" className="w-full sm:w-auto min-h-[48px]">
+              Load More Companies
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
-// Extracted Company Card Component
-const CompanyCard = ({ company, viewMode, isDark, isFollowing, onFollow }: {
+// Company Card Components
+const CompanyCardList = ({ company, isDark, followingCompanies, handleFollowCompany }: {
   company: CompanyListing;
-  viewMode: 'grid' | 'list';
   isDark: boolean;
-  isFollowing: boolean;
-  onFollow: () => void;
+  followingCompanies: Set<string>;
+  handleFollowCompany: (id: string) => void;
 }) => {
-  if (viewMode === 'list') {
-    return (
-      <Card 
-        className={cn(
-          'p-4 sm:p-6 hover:shadow-lg transition-all duration-200',
-          isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
-        )}
-      >
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-4 sm:space-y-0">
-          <div className="flex items-start space-x-4 flex-1 min-w-0">
-            <div className={cn(
-              'w-12 h-12 sm:w-16 sm:h-16 rounded-lg flex items-center justify-center flex-shrink-0',
-              isDark ? 'bg-gray-800' : 'bg-gray-100'
-            )}>
-              <Building2 className="h-6 w-6 sm:h-8 sm:w-8 text-blue-500" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center space-x-2 mb-1">
-                <h3 className="text-lg sm:text-xl font-semibold truncate">{company.name}</h3>
-                {company.is_verified && (
-                  <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-white text-xs">✓</span>
-                  </div>
-                )}
-              </div>
-              <p className={cn(
-                'text-sm mb-2',
-                isDark ? 'text-gray-400' : 'text-gray-600'
-              )}>
-                {company.industry}
-              </p>
-              <p className={cn(
-                'text-sm line-clamp-2 mb-3',
-                isDark ? 'text-gray-300' : 'text-gray-600'
-              )}>
-                {company.description}
-              </p>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm text-gray-500">
-                <div className="flex items-center space-x-1">
-                  <Users className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span>{company.employee_count.toLocaleString()} employees</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <MapPin className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span className="truncate">{company.location}</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-current text-yellow-500" />
-                  <span>{company.rating}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex flex-col sm:items-end space-y-3 flex-shrink-0">
-            <div className="text-center sm:text-right">
-              <p className="text-lg sm:text-xl font-semibold text-green-600">
-                {company.recent_jobs.length}
-              </p>
-              <p className="text-xs sm:text-sm text-gray-500">
-                open positions
-              </p>
-            </div>
-            <div className="flex space-x-2">
-              <Button 
-                variant="outlined" 
-                size="sm"
-                className="ios-touch-target"
-                onClick={onFollow}
-              >
-                {isFollowing ? 'Following' : 'Follow'}
-              </Button>
-              <Link to={`/companies/${company.id}`}>
-                <Button size="sm" className="ios-touch-target">
-                  View Profile
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </Card>
-    );
-  }
-
   return (
-    <Card 
-      className={cn(
-        'p-4 sm:p-6 hover:shadow-lg transition-all duration-200',
-        isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
+    <Card className="p-4 transition-all duration-200 hover:shadow-lg">
+      {/* Cover Image */}
+      {company.cover_image_url && (
+        <div className="relative w-full h-32 sm:h-40 mb-4 -mt-4 -mx-4 overflow-hidden rounded-t-lg">
+          <img 
+            src={company.cover_image_url} 
+            alt={`${company.name} cover`} 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+        </div>
       )}
-    >
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center space-x-3 flex-1 min-w-0">
-          <div className={cn(
-            'w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0',
-            isDark ? 'bg-gray-800' : 'bg-gray-100'
-          )}>
-            <Building2 className="h-6 w-6 text-blue-500" />
-          </div>
+
+      {/* Company Header */}
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex items-start space-x-3 flex-1 min-w-0">
+          {company.logo_url && (
+            <img 
+              src={company.logo_url} 
+              alt={company.name} 
+              className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+            />
+          )}
+          
           <div className="flex-1 min-w-0">
-            <div className="flex items-center space-x-2 mb-1">
-              <h3 className="text-base sm:text-lg font-semibold truncate">{company.name}</h3>
-              {company.is_verified && (
-                <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-white text-xs">✓</span>
-                </div>
-              )}
-            </div>
-            <p className={cn(
-              'text-xs sm:text-sm',
-              isDark ? 'text-gray-400' : 'text-gray-600'
-            )}>
+            <Link to={`/company/${company.id}`} className="hover:underline block">
+              <h3 className="font-bold text-lg mb-1 line-clamp-2 flex items-center">
+                {company.name}
+                {company.is_verified && (
+                  <span className="ml-2 text-blue-500">
+                    <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20">
+                      <path d="M10 0L12.09 6.26L20 4.27L14.64 9.63L18.18 15.64L10 12.73L1.82 15.64L5.36 9.63L0 4.27L7.91 6.26L10 0Z"/>
+                    </svg>
+                  </span>
+                )}
+                {company.is_hiring && (
+                  <span className="ml-2 text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-1 rounded">
+                    Hiring
+                  </span>
+                )}
+              </h3>
+            </Link>
+            <p className="text-blue-600 dark:text-blue-400 font-medium mb-2">
               {company.industry}
             </p>
           </div>
         </div>
-        <Button 
-          variant="ghost" 
-          size="sm"
-          className="ios-touch-target"
-          onClick={onFollow}
-        >
-          {isFollowing ? 'Following' : 'Follow'}
-        </Button>
-      </div>
-      
-      <p className={cn(
-        'text-xs sm:text-sm mb-4 line-clamp-3',
-        isDark ? 'text-gray-300' : 'text-gray-600'
-      )}>
-        {company.description}
-      </p>
-      
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4 text-xs sm:text-sm text-gray-500">
-        <div className="flex items-center space-x-1">
-          <Users className="h-3 w-3 sm:h-4 sm:w-4" />
-          <span>{company.employee_count.toLocaleString()}</span>
+        
+        {/* Action Buttons */}
+        <div className="flex items-center space-x-2 flex-shrink-0">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleFollowCompany(company.id)}
+            className={cn(
+              'p-2 min-h-[44px] min-w-[44px]',
+              followingCompanies.has(company.id) ? 'text-red-500' : 'text-gray-500 hover:text-red-500'
+            )}
+          >
+            <Heart className={cn(
+              'h-5 w-5',
+              followingCompanies.has(company.id) ? 'fill-current' : ''
+            )} />
+          </Button>
+          <Button variant="ghost" size="sm" className="p-2 min-h-[44px] min-w-[44px] text-gray-500 hover:text-blue-500">
+            <Share2 className="h-5 w-5" />
+          </Button>
         </div>
+      </div>
+
+      {/* Company Details */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
         <div className="flex items-center space-x-1">
-          <MapPin className="h-3 w-3 sm:h-4 sm:w-4" />
+          <MapPin className="h-4 w-4 flex-shrink-0" />
           <span className="truncate">{company.location}</span>
         </div>
         <div className="flex items-center space-x-1">
-          <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-current text-yellow-500" />
-          <span>{company.rating}</span>
+          <Users className="h-4 w-4 flex-shrink-0" />
+          <span className="truncate">{company.company_size}</span>
+        </div>
+        <div className="flex items-center space-x-1">
+          <Star className="h-4 w-4 flex-shrink-0 text-yellow-500" />
+          <span>{company.rating.toFixed(1)} ({company.reviews_count} reviews)</span>
+        </div>
+        <div className="flex items-center space-x-1">
+          <Briefcase className="h-4 w-4 flex-shrink-0" />
+          <span>{company.recent_jobs.length} open positions</span>
         </div>
       </div>
-      
-      <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-        <div>
-          <p className="text-sm sm:text-base font-semibold text-green-600">
-            {company.recent_jobs.length} open positions
-          </p>
+
+      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+        {company.description}
+      </p>
+
+      {/* Benefits */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        {company.featured_benefits.slice(0, window.innerWidth < 768 ? 2 : 3).map((benefit, index) => (
+          <span key={index} className="bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-200 text-xs px-2 py-1 rounded">
+            {benefit}
+          </span>
+        ))}
+        {company.featured_benefits.length > (window.innerWidth < 768 ? 2 : 3) && (
+          <span className="bg-gray-50 text-gray-600 dark:bg-gray-800 dark:text-gray-400 text-xs px-2 py-1 rounded">
+            +{company.featured_benefits.length - (window.innerWidth < 768 ? 2 : 3)} more
+          </span>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between pt-4 border-t border-gray-200 dark:border-gray-700 gap-4">
+        <div className="text-sm text-gray-600 dark:text-gray-400">
+          Founded {company.founded_year} • {company.employee_count.toLocaleString()} employees
         </div>
-        <Link to={`/companies/${company.id}`}>
-          <Button size="sm" className="ios-touch-target">
-            View Profile
+
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Link to={`/company/${company.id}`} className="flex-1 sm:flex-none">
+            <Button variant="outlined" size="sm" className="w-full sm:w-auto min-h-[44px]">
+              View Company
+            </Button>
+          </Link>
+          <Button variant="filled" size="sm" className="w-full sm:w-auto min-h-[44px]">
+            View Jobs ({company.recent_jobs.length})
           </Button>
-        </Link>
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+const CompanyCardGrid = ({ company, isDark, followingCompanies, handleFollowCompany }: {
+  company: CompanyListing;
+  isDark: boolean;
+  followingCompanies: Set<string>;
+  handleFollowCompany: (id: string) => void;
+}) => {
+  return (
+    <Card className="transition-all duration-200 hover:shadow-lg h-full flex flex-col overflow-hidden">
+      {/* Cover Image */}
+      {company.cover_image_url && (
+        <div className="relative w-full h-32 overflow-hidden">
+          <img 
+            src={company.cover_image_url} 
+            alt={`${company.name} cover`} 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+        </div>
+      )}
+
+      <div className="p-4 flex-1 flex flex-col">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex items-center space-x-3 flex-1 min-w-0">
+            {company.logo_url && (
+              <img 
+                src={company.logo_url} 
+                alt={company.name} 
+                className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+              />
+            )}
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold text-base mb-1 line-clamp-2 flex items-center">
+                {company.name}
+                {company.is_verified && (
+                  <span className="ml-2 text-blue-500">
+                    <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                      <path d="M10 0L12.09 6.26L20 4.27L14.64 9.63L18.18 15.64L10 12.73L1.82 15.64L5.36 9.63L0 4.27L7.91 6.26L10 0Z"/>
+                    </svg>
+                  </span>
+                )}
+              </h3>
+              <p className="text-blue-600 dark:text-blue-400 text-sm font-medium">
+                {company.industry}
+              </p>
+            </div>
+          </div>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleFollowCompany(company.id)}
+            className={cn(
+              'p-2 min-h-[44px] min-w-[44px] flex-shrink-0',
+              followingCompanies.has(company.id) ? 'text-red-500' : 'text-gray-500 hover:text-red-500'
+            )}
+          >
+            <Heart className={cn(
+              'h-4 w-4',
+              followingCompanies.has(company.id) ? 'fill-current' : ''
+            )} />
+          </Button>
+        </div>
+
+        {/* Details */}
+        <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400 mb-3 flex-1">
+          <div className="flex items-center space-x-1">
+            <MapPin className="h-4 w-4 flex-shrink-0" />
+            <span className="truncate">{company.location}</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <Users className="h-4 w-4 flex-shrink-0" />
+            <span className="truncate">{company.company_size}</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <Star className="h-4 w-4 flex-shrink-0 text-yellow-500" />
+            <span>{company.rating.toFixed(1)} ({company.reviews_count})</span>
+          </div>
+        </div>
+
+        {/* Tags */}
+        <div className="flex flex-wrap gap-1 mb-4">
+          {company.is_hiring && (
+            <span className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-1 rounded text-xs font-medium">
+              Hiring
+            </span>
+          )}
+          <span className="bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 px-2 py-1 rounded text-xs font-medium">
+            {company.recent_jobs.length} jobs
+          </span>
+        </div>
+
+        {/* Footer */}
+        <div className="space-y-2 mt-auto">
+          <Link to={`/company/${company.id}`}>
+            <Button variant="outlined" size="sm" className="w-full min-h-[44px]">
+              View Company
+            </Button>
+          </Link>
+          <Button variant="filled" size="sm" className="w-full min-h-[44px]">
+            View Jobs ({company.recent_jobs.length})
+          </Button>
+        </div>
       </div>
     </Card>
   );

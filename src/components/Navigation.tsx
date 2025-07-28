@@ -72,6 +72,7 @@ export default function Navigation() {
         { icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
         { icon: Building2, label: 'Companies', path: '/companies' },
         { icon: FileText, label: 'Applications', path: '/applications' },
+        // { icon: FileText, label: 'Resume Builder', path: '/resume-builder' },
         { icon: Calendar, label: 'Events', path: '/events' },
         { icon: User, label: 'Profile', path: '/profile' }
       ];
@@ -208,7 +209,7 @@ export default function Navigation() {
           </div>
 
           {/* Profile Section */}
-          <div className={cn(
+          {/* <div className={cn(
             'px-4 py-4 border-b',
             isDark ? 'border-gray-800' : 'border-gray-200'
           )}>
@@ -237,7 +238,7 @@ export default function Navigation() {
                 </p>
               </div>
             </button>
-          </div>
+          </div> */}
 
           {/* Navigation Items */}
           <div className="flex-1 overflow-y-auto p-4">
