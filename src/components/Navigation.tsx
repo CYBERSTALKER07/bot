@@ -125,8 +125,8 @@ export default function Navigation() {
           isDark ? 'bg-black/95 backdrop-blur-xl border-gray-800' : 'bg-white/95 backdrop-blur-xl border-gray-200'
         }`}>
           {/* iOS Status Bar Safe Area */}
-          <div className="h-5 bg-black ios-only" />
-          <div className="h-5 bg-black ios-only" />
+          {/* <div className="h-5 bg-black ios-only" />
+          <div className="h-5 bg-black ios-only" /> */}
           
           <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center space-x-3">
@@ -343,6 +343,10 @@ export default function Navigation() {
         </nav>
 
         {/* Spacers */}
+        {/* <div className={cn( "h-10",isDark ? 'bg-black' : 'bg-white'
+         )} /> Spacer for top bar */}
+         {/* Spacer for top bar */}
+        {/* <div className="h-16 ios-bottom-nav" /> {/* Spacer for bottom nav */}
         
 
         {/* User Card for Mobile */}

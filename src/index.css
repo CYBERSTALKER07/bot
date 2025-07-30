@@ -512,15 +512,15 @@
 
   /* iOS-specific elements - only show on iOS */
   .ios-only {
-    padding-top: 100px;
-    display: none;
+    display: block !important;
+    padding-top: 20px !important;
   }
   
   /* Show iOS-specific elements only on iOS devices */
   @supports (-webkit-touch-callout: none) {
     .ios-only {
-      padding-top: max(env(safe-area-inset-top), 100px);
-      display: block;
+      display: block !important;
+      padding-top: 20px !important;
     }
   }
 }

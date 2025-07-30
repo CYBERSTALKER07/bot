@@ -522,14 +522,15 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
           className="fixed left-0 right-0 z-50 ios-header ios-safe-top ios-pro-max-adjust ios-pro-adjust ios-standard-adjust ios-x-adjust ios-se-adjust" 
           style={{ 
             top: '0',
-            paddingTop: 'calc(max(env(safe-area-inset-top), 44px) + 80px)' 
+            paddingTop: 'calc(max(env(safe-area-inset-top), 44px) + 100px)' 
           }}
         >
           {/* iOS Status Bar Safe Area */}
-          <div className="h-5 bg-black ios-only" />
-          <div className="h-5 bg-black ios-only" />
+          <div className="h-12 bg-black ios-only" />
+          <div className="h-12 bg-black ios-only" />
+          <div className="h-8 bg-black ios-only" />
           
-          <div className="flex justify-between items-center h-16 px-4 ios-landscape-header">
+          <div className="flex justify-between items-center h-16 px-4 ios-landscape-header mt-6">
             <Link to="/dashboard" className="flex items-center space-x-2">
               <GraduationCap className="h-6 w-6 text-brand-primary" />
               <span className="font-semibold text-foreground">AUT</span>
