@@ -290,6 +290,63 @@ export default function Feed() {
           has_liked: true,
           has_retweeted: true,
           has_bookmarked: true
+        },
+        {
+          id: '13',
+          content: "Just launched our new product! Check out this amazing dashboard we've been working on for months 🚀",
+          author: {
+            id: '13',
+            name: 'Emma Wilson',
+            username: 'emmawilson',
+            verified: false,
+            avatar_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face'
+          },
+          created_at: '2024-01-15T12:00:00Z',
+          likes_count: 145,
+          retweets_count: 32,
+          replies_count: 18,
+          has_liked: false,
+          has_retweeted: false,
+          has_bookmarked: false,
+          media: [{ type: 'image', url: 'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=600&h=400&fit=crop', alt: 'Modern dashboard interface' }]
+        },
+        {
+          id: '14',
+          content: "Amazing team lunch today! Nothing beats good food and even better company 🍕👥",
+          author: {
+            id: '14',
+            name: 'James Park',
+            username: 'jamespark',
+            verified: false,
+            avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face'
+          },
+          created_at: '2024-01-15T13:30:00Z',
+          likes_count: 89,
+          retweets_count: 12,
+          replies_count: 25,
+          has_liked: true,
+          has_retweeted: false,
+          has_bookmarked: false,
+          media: [{ type: 'image', url: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=600&h=400&fit=crop', alt: 'Team lunch photo' }]
+        },
+        {
+          id: '15',
+          content: "Excited to share our latest office space! Modern, collaborative, and designed for innovation 💡✨",
+          author: {
+            id: '15',
+            name: 'TechSpace Co',
+            username: 'techspaceco',
+            verified: true,
+            avatar_url: 'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=40&h=40&fit=crop&crop=center'
+          },
+          created_at: '2024-01-15T14:15:00Z',
+          likes_count: 234,
+          retweets_count: 56,
+          replies_count: 43,
+          has_liked: false,
+          has_retweeted: true,
+          has_bookmarked: true,
+          media: [{ type: 'image', url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&h=400&fit=crop', alt: 'Modern office space' }]
         }
       ];
       
@@ -454,6 +511,27 @@ export default function Feed() {
                   )}>
                     {post.content}
                   </p>
+                  
+                  {/* Post Media */}
+                  {post.media && post.media.length > 0 && (
+                    <div className="mb-3">
+                      {post.media.map((mediaItem, index) => (
+                        mediaItem.type === 'image' && (
+                          <div key={index} className="relative">
+                            <img
+                              src={mediaItem.url}
+                              alt={mediaItem.alt || 'Post image'}
+                              className={cn(
+                                'w-full h-auto max-h-96 object-cover rounded-lg cursor-pointer hover:opacity-95 transition-opacity',
+                                isMobile ? 'max-h-64' : 'max-h-96'
+                              )}
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          </div>
+                        )
+                      ))}
+                    </div>
+                  )}
                   
                   {/* Post Actions */}
                   <div className={cn(
