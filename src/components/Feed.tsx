@@ -239,7 +239,7 @@ export default function Feed() {
         },
         {
           id: '10',
-          content: "COMPANY SPOTLIGHT 🌟 \n\nJoin our team at @TechInnovate! We're building the future of sustainable technology.\n\n🔍 Open roles:\n• Senior Full-Stack Dev\n• Product Designer\n• DevOps Engineer\n\nGreat culture, competitive pay, full remote! Apply now 👇",
+          content: "COMPANY SPOTLIGHT  \n\nJoin our team at @TechInnovate! We're building the future of sustainable technology.\n\n🔍 Open roles:\n• Senior Full-Stack Dev\n• Product Designer\n• DevOps Engineer\n\nGreat culture, competitive pay, full remote! Apply now 👇",
           author: {
             id: '10',
             name: 'TechInnovate',

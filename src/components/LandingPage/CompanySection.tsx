@@ -51,7 +51,7 @@ const hiringAnnouncements = [
 		name: 'Meta',
 		logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg',
 		color: '#1877F2',
-		announcement: '🌟 Metaverse Opportunities',
+		announcement: ' Metaverse Opportunities',
 		positions: 'VR/AR, Backend, Research',
 		icon: <Globe className="h-5 w-5" />
 	},

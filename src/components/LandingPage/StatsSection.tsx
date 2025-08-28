@@ -153,7 +153,7 @@ export default function StatsSection({ statsRef }: StatsSectionProps) {
                 ? 'bg-gradient-to-r from-lime to-dark-accent' 
                 : 'bg-gradient-to-r from-asu-maroon to-asu-gold'
             }`}>
-              Successful Students 🌟
+              Successful Students 
             </span>
           </Typography>
           <Typography 
