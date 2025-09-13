@@ -8,9 +8,9 @@
 /* CSS Variables for consistent theming */
 :root {
   /* Light theme */
-  --color-primary: 140 29 64; /* ASU Maroon */
+  --color-primary: 188 233 83; /* #BCE953 instead of Lime */
   --color-secondary: 255 198 39; /* ASU Gold */
-  --color-accent: 227 255 112; /* Lime */
+  --color-accent: 140 29 64; /* ASU Maroon as accent */
   
   --color-background: 255 255 255;
   --color-foreground: 24 24 27;
@@ -19,7 +19,7 @@
   
   --color-border: 228 228 231;
   --color-input: 228 228 231;
-  --color-ring: 140 29 64;
+  --color-ring: 188 233 83; /* #BCE953 ring color */
   
   --color-success: 34 197 94;
   --color-warning: 245 158 11;
@@ -42,7 +42,7 @@
   
   --color-border: 39 39 70;
   --color-input: 39 39 70;
-  --color-ring: 227 255 112;
+  --color-ring: 188 233 83;
   
   --shadow-color: 0 0 0;
 }

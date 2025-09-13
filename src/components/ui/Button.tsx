@@ -58,22 +58,22 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
       primary: {
         filled: isDark 
           ? 'bg-lime text-dark-surface hover:shadow-elevation-2 focus:ring-lime/20 active:shadow-elevation-1'
-          : 'bg-asu-maroon text-white hover:shadow-elevation-2 focus:ring-asu-maroon/20 active:shadow-elevation-1',
+          : 'bg-lime text-dark-surface hover:shadow-elevation-2 focus:ring-lime/20 active:shadow-elevation-1',
         outlined: isDark
           ? 'border border-lime text-lime hover:bg-lime/8 focus:ring-lime/20 active:bg-lime/12'
-          : 'border border-asu-maroon text-asu-maroon hover:bg-asu-maroon/8 focus:ring-asu-maroon/20 active:bg-asu-maroon/12',
+          : 'border border-lime text-lime hover:bg-lime/8 focus:ring-lime/20 active:bg-lime/12',
         text: isDark
           ? 'text-lime hover:bg-lime/8 focus:ring-lime/20 active:bg-lime/12'
-          : 'text-asu-maroon hover:bg-asu-maroon/8 focus:ring-asu-maroon/20 active:bg-asu-maroon/12',
+          : 'text-lime hover:bg-lime/8 focus:ring-lime/20 active:bg-lime/12',
         elevated: isDark
           ? 'bg-dark-surface text-lime shadow-elevation-1 hover:shadow-elevation-2 focus:ring-lime/20 active:shadow-elevation-1'
-          : 'bg-surface-50 text-asu-maroon shadow-elevation-1 hover:shadow-elevation-2 focus:ring-asu-maroon/20 active:shadow-elevation-1',
+          : 'bg-white text-lime shadow-elevation-1 hover:shadow-elevation-2 focus:ring-lime/20 active:shadow-elevation-1',
         tonal: isDark
           ? 'bg-lime/10 text-lime hover:bg-lime/20 focus:ring-lime/20 active:bg-lime/15'
-          : 'bg-asu-maroon/10 text-asu-maroon hover:bg-asu-maroon/20 focus:ring-asu-maroon/20 active:bg-asu-maroon/15',
+          : 'bg-lime/10 text-lime hover:bg-lime/20 focus:ring-lime/20 active:bg-lime/15',
         fab: isDark
           ? 'bg-lime text-dark-surface shadow-elevation-3 hover:shadow-elevation-4 focus:ring-lime/20 active:shadow-elevation-2 rounded-2xl'
-          : 'bg-asu-maroon text-white shadow-elevation-3 hover:shadow-elevation-4 focus:ring-asu-maroon/20 active:shadow-elevation-2 rounded-2xl'
+          : 'bg-lime text-dark-surface shadow-elevation-3 hover:shadow-elevation-4 focus:ring-lime/20 active:shadow-elevation-2 rounded-2xl'
       },
       secondary: {
         filled: isDark 

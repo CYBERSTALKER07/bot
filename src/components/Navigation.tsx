@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Home,
@@ -16,13 +16,15 @@ import {
   Feather,
   MoreHorizontal,
   X as XIcon,
-  Menu
+  Brain,
+  Linkedin
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useScrollDirection } from '../hooks/useScrollDirection';
 import Button from './ui/Button';
 import { cn } from '../lib/cva';
+import { FloatingActionMenu } from './FloatingActionMenu';
 
 interface NavigationItem {
   icon: React.ComponentType<any>;
@@ -69,6 +71,7 @@ export default function Navigation() {
     if (user?.role === 'student') {
       return [
         ...baseItems,
+        { icon: Brain, label: 'AI Jobs', path: '/ai-job-recommendations' },
         { icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
         { icon: Building2, label: 'Companies', path: '/companies' },
         { icon: FileText, label: 'Applications', path: '/applications' },
@@ -81,6 +84,7 @@ export default function Navigation() {
         ...baseItems,
         { icon: BarChart3, label: 'Dashboard', path: '/employer-dashboard' },
         { icon: Briefcase, label: 'Post Jobs', path: '/post-job' },
+        { icon: Linkedin, label: 'LinkedIn Jobs', path: '/linkedin-job-manager' },
         { icon: Users, label: 'Applicants', path: '/applicants' },
         { icon: User, label: 'Profile', path: '/profile' }
       ];
@@ -111,6 +115,20 @@ export default function Navigation() {
     e.preventDefault();
     e.stopPropagation();
     setIsUserCardOpen(true);
+  };
+
+  // OnPress handler for navigation items with haptic feedback
+  const handleNavItemPress = (path: string, item: NavigationItem) => {
+    // Haptic feedback for mobile devices
+    if (navigator.vibrate) {
+      navigator.vibrate(10);
+    }
+    
+    // Visual feedback - could add press state here
+    console.log(`Navigating to: ${item.label} (${path})`);
+    
+    // Navigate to the selected path
+    navigate(path);
   };
 
   if (!user) return null;
@@ -190,7 +208,7 @@ export default function Navigation() {
           )}>
             <div className="flex items-center space-x-3">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                isDark ? 'bg-white' : 'bg-black'
+                isDark ? 'bg-white' : 'bg-[#800002]'
               }`}>
                 <Feather className={`h-4 w-4 ${isDark ? 'text-black' : 'text-white'}`} />
               </div>
@@ -208,52 +226,31 @@ export default function Navigation() {
             </Button>
           </div>
 
-          {/* Profile Section */}
-          {/* <div className={cn(
-            'px-4 py-4 border-b',
-            isDark ? 'border-gray-800' : 'border-gray-200'
-          )}>
-            <button
-              onClick={handleUserClick}
-              className="flex items-center space-x-3 w-full text-left hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg p-2 -m-2 transition-colors duration-200"
-            >
-              <div className={cn(
-                "w-12 h-12 rounded-full flex items-center justify-center text-lg font-semibold relative",
-                isDark ? 'bg-gray-700 text-white' : 'bg-gray-300 text-gray-800'
-              )}>
-                {user?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
-                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-900"></div>
-              </div>
-              <div>
-                <p className={cn(
-                  "font-medium text-base truncate",
-                  isDark ? 'text-white' : 'text-gray-900'
-                )}>
-                  {user?.full_name || 'User'}
-                </p>
-                <p className={cn(
-                  "text-sm text-gray-500 truncate"
-                )}>
-                  {user?.email || 'user@example.com'}
-                </p>
-              </div>
-            </button>
-          </div> */}
-
-          {/* Navigation Items */}
-          <div className="flex-1 overflow-y-auto p-4">
+          {/* Navigation Items - Fixed Height, No Scroll */}
+          <div className="px-4 py-4">
             <nav className="space-y-2">
               {navigationItems.map((item, index) => {
                 const Icon = item.icon;
                 const isActive = isCurrentPath(item.path);
                 
                 return (
-                  <Link
+                  <button
                     key={index}
-                    to={item.path}
-                    onClick={() => setIsMobileMenuOpen(false)}
+                    onTouchStart={(e) => {
+                      e.preventDefault();
+                      // Haptic feedback on touch start
+                      if (navigator.vibrate) {
+                        navigator.vibrate(10);
+                      }
+                    }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsMobileMenuOpen(false);
+                      handleNavItemPress(item.path, item);
+                    }}
                     className={cn(
-                      "flex items-center justify-between px-3 py-3 rounded-xl transition-all duration-200",
+                      "flex items-center justify-between px-3 py-3 rounded-xl transition-all duration-200 w-full text-left",
+                      "active:scale-95 active:bg-gray-100/20 transform-gpu",
                       isActive
                         ? isDark 
                           ? 'bg-white/10 text-white' 
@@ -262,6 +259,7 @@ export default function Navigation() {
                           ? 'text-gray-300 hover:bg-gray-800 hover:text-white'
                           : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                     )}
+                    aria-label={`Navigate to ${item.label}`}
                   >
                     <div className="flex items-center space-x-3">
                       <Icon className="h-5 w-5" />
@@ -272,7 +270,7 @@ export default function Navigation() {
                         {item.badge > 9 ? '9+' : item.badge}
                       </span>
                     )}
-                  </Link>
+                  </button>
                 );
               })}
             </nav>
@@ -309,15 +307,27 @@ export default function Navigation() {
               const isActive = isCurrentPath(item.path);
               
               return (
-                <Link
+                <button
                   key={index}
-                  to={item.path}
+                  onTouchStart={(e) => {
+                    e.preventDefault();
+                    // Haptic feedback on touch start
+                    if (navigator.vibrate) {
+                      navigator.vibrate(10);
+                    }
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleNavItemPress(item.path, item);
+                  }}
                   className={cn(
                     'flex flex-col items-center justify-center py-2 transition-all duration-200 relative ios-touch-target',
+                    'active:scale-95 active:bg-gray-100/20 transform-gpu',
                     isActive 
                       ? isDark ? 'text-white' : 'text-black'
                       : isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-800'
                   )}
+                  aria-label={`Navigate to ${item.label}`}
                 >
                   <div className="relative">
                     <Icon className="h-6 w-6" />
@@ -336,25 +346,14 @@ export default function Navigation() {
                       isDark ? 'bg-white' : 'bg-black'
                     )} />
                   )}
-                </Link>
+                </button>
               );
             })}
           </div>
         </nav>
 
-        {/* Spacers */}
-        {/* <div className={cn( "h-10",isDark ? 'bg-black' : 'bg-white'
-         )} /> Spacer for top bar */}
-         {/* Spacer for top bar */}
-        {/* <div className="h-16 ios-bottom-nav" /> {/* Spacer for bottom nav */}
-        
-
-        {/* User Card for Mobile */}
-        {/* <UserCard 
-          isOpen={isUserCardOpen}
-          onClose={() => setIsUserCardOpen(false)}
-          position="bottom-right"
-        /> */}
+        {/* Mobile Floating Action Menu - Enhanced with advanced interactions */}
+        <FloatingActionMenu />
       </>
     );
   }
@@ -376,7 +375,7 @@ export default function Navigation() {
         <div className="p-4 border-b border-gray-200 dark:border-gray-800">
           <div className="flex items-center justify-center">
             <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-              isDark ? 'bg-white' : 'bg-black'
+              isDark ? 'bg-white' : 'bg-[#800020]'
             }`}>
               <Feather className={`h-5 w-5 ${isDark ? 'text-black' : 'text-white'}`} />
             </div>
@@ -397,20 +396,37 @@ export default function Navigation() {
             const isActive = isCurrentPath(item.path);
             
             return (
-              <Link
+              <button
                 key={index}
-                to={item.path}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavItemPress(item.path, item);
+                }}
+                onMouseDown={(e) => {
+                  // Add subtle click feedback for desktop
+                  e.currentTarget.style.transform = 'scale(0.98)';
+                }}
+                onMouseUp={(e) => {
+                  // Reset scale after click
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}
+                onMouseLeave={(e) => {
+                  // Ensure scale is reset if mouse leaves during press
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}
                 className={cn(
                   "flex items-center px-3 py-3 rounded-xl transition-all duration-200 group relative",
+                  "active:scale-98 transform-gpu cursor-pointer text-left w-full",
                   isExpanded ? 'space-x-3' : 'justify-center',
                   isActive
                     ? isDark 
                       ? 'bg-white text-black' 
-                      : 'bg-black text-white'
+                      : 'bg-lime text-black'
                     : isDark
                       ? 'text-gray-300 hover:bg-gray-800 hover:text-white'
                       : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                 )}
+                aria-label={`Navigate to ${item.label}`}
               >
                 <div className="relative">
                   <Icon className="h-6 w-6" />
@@ -448,7 +464,7 @@ export default function Navigation() {
                     )}
                   </div>
                 )}
-              </Link>
+              </button>
             );
           })}
         </nav>
@@ -458,7 +474,7 @@ export default function Navigation() {
           <Button
             className={cn(
               "w-full rounded-full font-bold transition-all duration-200",
-              isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800',
+              isDark ? 'bg-white text-black hover:bg-black' : 'bg-black text-black hover:bg-black-text-white',
               isExpanded ? 'justify-center' : 'justify-center px-0'
             )}
           >
@@ -515,24 +531,35 @@ export default function Navigation() {
             {isUserCardOpen && (
               <>
                 <div 
-                  className="fixed inset-0 z-40"
+                  className="fixed inset-0 z-40 animate-in fade-in duration-150"
                   onClick={() => setIsUserCardOpen(false)}
                 />
                 <div className={cn(
                   "absolute bottom-full mb-2 w-64 rounded-2xl shadow-2xl border py-2 z-50",
+                  "transform transition-all duration-300 ease-out",
+                  "animate-in slide-in-from-bottom-2 fade-in zoom-in-95",
+                  "will-change-transform origin-bottom",
                   isExpanded ? "left-0" : "left-full ml-4",
                   isDark ? 'bg-black border-gray-600 shadow-gray-900/50' : 'bg-white border-gray-300 shadow-gray-900/20'
-                )}>
+                )}
+                style={{
+                  animationDelay: '0ms',
+                  animationFillMode: 'both',
+                  backfaceVisibility: 'hidden',
+                  transform: 'translateZ(0)',
+                }}
+                >
                   {/* Settings */}
                   <Link
                     to="/settings"
                     onClick={() => setIsUserCardOpen(false)}
                     className={cn(
-                      "flex items-center px-4 py-3 transition-colors duration-200 w-full",
+                      "flex items-center px-4 py-3 transition-all duration-200 w-full",
+                      "hover:translate-x-1 transform will-change-transform",
                       isDark ? 'hover:bg-gray-900 text-white' : 'hover:bg-gray-50 text-gray-900'
                     )}
                   >
-                    <Settings className="h-5 w-5 mr-3" />
+                    <Settings className="h-5 w-5 mr-3 transition-transform duration-200 group-hover:rotate-12" />
                     <span className="font-normal text-sm">
                       Settings and privacy
                     </span>
@@ -545,11 +572,12 @@ export default function Navigation() {
                       handleLogout();
                     }}
                     className={cn(
-                      "w-full flex items-center px-4 py-3 transition-colors duration-200 text-left",
+                      "w-full flex items-center px-4 py-3 transition-all duration-200 text-left",
+                      "hover:translate-x-1 transform will-change-transform group",
                       isDark ? 'hover:bg-gray-900 text-white' : 'hover:bg-gray-50 text-gray-900'
                     )}
                   >
-                    <LogOut className="h-5 w-5 mr-3" />
+                    <LogOut className="h-5 w-5 mr-3 transition-transform duration-200 group-hover:-rotate-12" />
                     <span className="font-normal text-sm">
                       Log out @{user?.email?.split('@')[0]}
                     </span>
@@ -583,6 +611,9 @@ export default function Navigation() {
       )}>
         {/* Content goes here */}
       </div>
+
+      {/* Floating Action Button with Curved Menu - Bottom Right */}
+      <FloatingActionMenu />
     </>
   );
 }

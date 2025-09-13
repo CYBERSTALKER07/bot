@@ -9,6 +9,9 @@ import PerformanceMonitor from './components/ui/PerformanceMonitor';
 import Navigation from './components/Navigation';
 import PWAInstallBanner from './components/ui/PWAInstallBanner';
 
+// Import iPad testing utilities for development
+import './lib/ipad-testing';
+
 // Import Capacitor for platform detection
 declare global {
   interface Window {
@@ -17,6 +20,13 @@ declare global {
       getPlatform(): string;
     };
     gtag?: (command: string, action: string, parameters: any) => void;
+    // Add device utils for testing
+    deviceUtils?: {
+      isIPad(): boolean;
+      isTouchDevice(): boolean;
+      simulateIPad(): void;
+      testNavigation(): void;
+    };
   }
 }
 
@@ -59,6 +69,8 @@ const Login = lazy(() => import('./components/Auth/Login'));
 const Register = lazy(() => import('./components/Auth/Register'));
 const ProfileSetup = lazy(() => import('./components/Profile/ProfileSetup'));
 const Profile = lazy(() => import('./components/Profile/Profile'));
+const EditProfile = lazy(() => import('./components/Profile/EditProfile'));
+const ProfileEditor = lazy(() => import('./components/Profile/ProfileEditor'));
 const Settings = lazy(() => import('./components/Settings'));
 const Dashboard = lazy(() => import('./components/Dashboard/Dashboard'));
 const SplashScreen = lazy(() => import('./components/SplashScreen'));
@@ -85,11 +97,25 @@ const CompanyProfile = lazy(() => import('./components/CompanyProfile'));
 const ResumeBuilder = lazy(() => import('./components/ResumeBuilder/index'));
 const AIResumeBuilderPage = lazy(() => import('./components/AIResumeBuilderPage'));
 const VisualResumeEditor = lazy(() => import('./components/VisualResumeEditor'));
+const GettingStartedPage = lazy(() => import('./components/GettingStartedPage'));
 
 // New pages
 const NotificationsPage = lazy(() => import('./components/NotificationsPage'));
 const JobsPage = lazy(() => import('./components/JobsPage'));
 const BookmarksPage = lazy(() => import('./components/BookmarksPage'));
+const CreatePost = lazy(() => import('./components/CreatePost'));
+const SearchDemoPage = lazy(() => import('./components/SearchDemoPage'));
+
+// LinkedIn Integration
+const LinkedInJobImport = lazy(() => import('./components/LinkedIn/LinkedInJobImport'));
+const LinkedInJobManager = lazy(() => import('./components/LinkedIn/LinkedInJobManager'));
+const LinkedInCallback = lazy(() => import('./components/LinkedIn/LinkedInCallback'));
+
+// AI Job Matching
+const AIJobRecommendations = lazy(() => import('./components/AI/AIJobRecommendations'));
+
+// Job Application
+const JobApplication = lazy(() => import('./components/JobApplication'));
 
 // Optimized loading component with better UX
 function LoadingFallback({ message = 'Loading...' }: { message?: string }) {
@@ -183,78 +209,71 @@ function SmartHomeRoute() {
 function AppContent() {
   const { user, loading } = useAuth();
   const [showSplash, setShowSplash] = useState(() => {
-    // For iOS, disable splash screen initially to debug
-    if (window.Capacitor?.isNativePlatform() && window.Capacitor.getPlatform() === 'ios') {
-      return false;
-    }
-    // Only show splash if user hasn't seen it in this session
-    return !sessionStorage.getItem('aut-handshake-splash-seen');
+    // Temporarily disable splash screen to debug loading issues
+    return false;
   });
+  
+  // Add maximum loading time protection - move hooks to top level
+  const [forceLoadingOff, setForceLoadingOff] = useState(false);
 
   const handleSplashComplete = () => {
     setShowSplash(false);
-    // Store in sessionStorage so it only persists for the current session
     sessionStorage.setItem('aut-handshake-splash-seen', 'true');
   };
 
-  // PWA Service Worker registration
+  // COMPLETE PWA SHUTDOWN - Prevent any service worker activity
   useEffect(() => {
+    // 1. Unregister all service workers
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js')
-        .then((registration) => {
-          console.log('PWA: Service Worker registered successfully:', registration);
-          
-          // Check for updates
-          registration.addEventListener('updatefound', () => {
-            const newWorker = registration.installing;
-            if (newWorker) {
-              newWorker.addEventListener('statechange', () => {
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  // New update available
-                  console.log('PWA: New content available');
-                }
-              });
-            }
-          });
-        })
-        .catch((error) => {
-          console.log('PWA: Service Worker registration failed:', error);
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        registrations.forEach(registration => {
+          registration.unregister();
         });
-
-      // Listen for messages from service worker
-      navigator.serviceWorker.addEventListener('message', (event) => {
-        if (event.data && event.data.type === 'SKIP_WAITING') {
-          window.location.reload();
-        }
       });
     }
 
-    // iOS specific PWA setup
-    if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
-      document.body.classList.add('pwa-installed');
-      
-      // Handle iOS safe area
-      const meta = document.createElement('meta');
-      meta.name = 'viewport';
-      meta.content = 'width=device-width, initial-scale=1.0, viewport-fit=cover';
-      document.head.appendChild(meta);
+    // 2. Clear all caches
+    if ('caches' in window) {
+      caches.keys().then(cacheNames => {
+        cacheNames.forEach(cacheName => {
+          caches.delete(cacheName);
+        });
+      });
     }
+
+    // 3. Disable all visibility/focus change handlers that might trigger reloads
+    const preventVisibilityChange = (e) => {
+      e.stopImmediatePropagation();
+    };
+    
+    document.addEventListener('visibilitychange', preventVisibilityChange, true);
+    window.addEventListener('focus', preventVisibilityChange, true);
+    window.addEventListener('blur', preventVisibilityChange, true);
+
+    return () => {
+      document.removeEventListener('visibilitychange', preventVisibilityChange, true);
+      window.removeEventListener('focus', preventVisibilityChange, true);
+      window.removeEventListener('blur', preventVisibilityChange, true);
+    };
   }, []);
 
-  // Performance issue handler
-  const handlePerformanceIssue = (fps: number) => {
-    console.warn(`Performance issue detected: ${fps} FPS. Reducing animation complexity.`);
-    
-    // You could also send analytics here
-    if (window.gtag) {
-      window.gtag('event', 'performance_issue', {
-        fps: fps,
-        timestamp: Date.now()
-      });
-    }
-  };
+  // Add debug logging
+  useEffect(() => {
+    console.log('AppContent render - user:', !!user, 'loading:', loading);
+  }, [user, loading]);
 
-  // Add error boundary fallback for iOS
+  // Force loading timeout protection
+  useEffect(() => {
+    if (loading) {
+      const timeout = setTimeout(() => {
+        console.warn('Forcing loading state off after 15 seconds');
+        setForceLoadingOff(true);
+      }, 15000);
+      
+      return () => clearTimeout(timeout);
+    }
+  }, [loading]);
+
   if (showSplash) {
     return (
       <Suspense fallback={<LoadingFallback message="Initializing..." />}>
@@ -263,13 +282,18 @@ function AppContent() {
     );
   }
 
-  if (loading) {
+  if (loading && !forceLoadingOff) {
     return <LoadingFallback message="Loading application..." />;
   }
 
   return (
     <div className="App">
-      <Router>
+      <Router
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true
+        }}
+      >
         <ScrollToTop />
         {/* X-Style Navigation - only show when user is authenticated */}
         {user && <Navigation />}
@@ -322,6 +346,11 @@ function AppContent() {
                 <CompanyProfile />
               </Suspense>
             } />
+            <Route path="/getting-started" element={
+              <Suspense fallback={<LoadingFallback message="Loading getting started..." />}>
+                <GettingStartedPage />
+              </Suspense>
+            } />
 
             {/* Protected routes with lazy loading */}
             <Route path="/feed" element={
@@ -350,10 +379,31 @@ function AppContent() {
                 </Suspense>
               </ProtectedRoute>
             } />
+            <Route path="/profile/:userId" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading user profile..." />}>
+                  <Profile />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/profile/edit" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading profile editor..." />}>
+                  <EditProfile />
+                </Suspense>
+              </ProtectedRoute>
+            } />
             <Route path="/job/:jobId" element={
               <Suspense fallback={<LoadingFallback message="Loading job details..." />}>
                 <JobDetails />
               </Suspense>
+            } />
+            <Route path="/job/:jobId/apply" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading job application..." />}>
+                  <JobApplication />
+                </Suspense>
+              </ProtectedRoute>
             } />
             <Route path="/messages" element={
               <ProtectedRoute>
@@ -417,6 +467,20 @@ function AppContent() {
                 </Suspense>
               </ProtectedRoute>
             } />
+            <Route path="/skills/add" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading skills assessment..." />}>
+                  <SkillsAuditSystem />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/badges" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading badges..." />}>
+                  <DigitalLearningPassport />
+                </Suspense>
+              </ProtectedRoute>
+            } />
             <Route path="/settings" element={
               <ProtectedRoute>
                 <Suspense fallback={<LoadingFallback message="Loading settings..." />}>
@@ -428,6 +492,13 @@ function AppContent() {
               <ProtectedRoute>
                 <Suspense fallback={<LoadingFallback message="Loading post details..." />}>
                   <PostDetails />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/create-post" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading post creator..." />}>
+                  <CreatePost />
                 </Suspense>
               </ProtectedRoute>
             } />
@@ -470,6 +541,35 @@ function AppContent() {
               <ProtectedRoute>
                 <Suspense fallback={<LoadingFallback message="Loading Visual Resume Editor..." />}>
                   <VisualResumeEditor />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/search-demo" element={
+              <Suspense fallback={<LoadingFallback message="Loading search demo..." />}>
+                <SearchDemoPage />
+              </Suspense>
+            } />
+            <Route path="/linkedin-job-import" element={
+              <Suspense fallback={<LoadingFallback message="Loading LinkedIn job import..." />}>
+                <LinkedInJobImport />
+              </Suspense>
+            } />
+            <Route path="/linkedin-job-manager" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading LinkedIn job manager..." />}>
+                  <LinkedInJobManager />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/linkedin-callback" element={
+              <Suspense fallback={<LoadingFallback message="Processing LinkedIn connection..." />}>
+                <LinkedInCallback />
+              </Suspense>
+            } />
+            <Route path="/ai-job-recommendations" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading AI job recommendations..." />}>
+                  <AIJobRecommendations />
                 </Suspense>
               </ProtectedRoute>
             } />

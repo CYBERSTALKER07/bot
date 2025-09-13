@@ -260,7 +260,7 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
             {/* Floating Images Container */}
             <div ref={floatingImagesRef} className="absolute inset-0 pointer-events-none">
               {/* Company Logo Cards - Maximum spacing distribution */}
-              <Card className="floating-image absolute top-2 left-1/2 transform -translate-x-1/2 translate-x-64 w-24 h-24 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-2xl flex items-center justify-center" elevation={4}>
+              <Card className="floating-image absolute top-2 left-1/2 transform -translate-x-1/2 translate-x-64 w-24 h-24 bg-white/95 backdrop-blur-sm border border-none shadow-2xl flex items-center justify-center" elevation={4}>
                 <img src="https://logo.clearbit.com/google.com" alt="Google" className="w-16 h-16 object-contain" />
               </Card>
               

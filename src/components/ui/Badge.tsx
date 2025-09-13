@@ -50,13 +50,13 @@ const Badge: React.FC<BadgeProps> = ({
       primary: {
         filled: isDark 
           ? 'bg-lime text-dark-surface' 
-          : 'bg-asu-maroon text-white',
+          : 'bg-lime text-dark-surface',
         outlined: isDark 
           ? 'border-lime text-lime bg-transparent' 
-          : 'border-asu-maroon text-asu-maroon bg-transparent',
+          : 'border-lime text-lime bg-transparent',
         tonal: isDark 
           ? 'bg-lime/20 text-lime' 
-          : 'bg-asu-maroon/20 text-asu-maroon'
+          : 'bg-lime/20 text-lime'
       },
       secondary: {
         filled: isDark 

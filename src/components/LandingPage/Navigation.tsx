@@ -96,14 +96,14 @@ export default function Navigation({ onScrollToSection }: NavigationProps) {
               Sign In
             </Link>
             <Link 
-              to="/register" 
+              to="/getting-started" 
               className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
                 isDark 
                   ? 'bg-lime text-dark-surface hover:bg-lime/90' 
-                  : 'bg-asu-maroon text-white hover:bg-asu-maroon-dark'
+                  : 'bg-asu-maroon text-white hover:bg-black'
               }`}
             >
-              Sign Up
+              Getting Started
             </Link>
           </div>
         </div>

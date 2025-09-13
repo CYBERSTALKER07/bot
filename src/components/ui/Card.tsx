@@ -186,7 +186,7 @@ export const StatsCard: React.FC<StatsCardProps> = ({
   const { isDark } = useTheme();
   
   const colorClasses = {
-    primary: isDark ? 'text-lime' : 'text-asu-maroon',
+    primary: isDark ? 'text-lime' : 'text-lime',
     secondary: isDark ? 'text-secondary-300' : 'text-secondary-600',
     success: 'text-success-600',
     error: 'text-error-600',
@@ -195,7 +195,7 @@ export const StatsCard: React.FC<StatsCardProps> = ({
   };
 
   const iconBackgroundClasses = {
-    primary: isDark ? 'bg-lime/10' : 'bg-asu-maroon/10',
+    primary: isDark ? 'bg-lime/10' : 'bg-lime/10',
     secondary: isDark ? 'bg-secondary-300/10' : 'bg-secondary-600/10',
     success: 'bg-success-600/10',
     error: 'bg-error-600/10',
@@ -322,7 +322,7 @@ export const JobCard: React.FC<JobCardProps> = ({
               )}
             </div>
             <h3 className={`text-title-large font-medium mb-1 group-hover:${
-              isDark ? 'text-lime' : 'text-asu-maroon'
+              isDark ? 'text-lime' : 'text-lime'
             } transition-colors ${
               isDark ? 'text-dark-text' : 'text-gray-900'
             }`}>
@@ -333,17 +333,17 @@ export const JobCard: React.FC<JobCardProps> = ({
                 isDark ? 'text-dark-muted' : 'text-gray-500'
               }`} />
               <p className={`text-body-medium font-medium ${
-                isDark ? 'text-lime' : 'text-asu-maroon'
+                isDark ? 'text-lime' : 'text-lime'
               }`}>
                 {job.company}
               </p>
             </div>
           </div>
           <div className={`p-3 rounded-xl ${
-            isDark ? 'bg-lime/10' : 'bg-asu-maroon/10'
+            isDark ? 'bg-lime/10' : 'bg-lime/10'
           } group-hover:scale-110 transition-transform duration-200`}>
             <Work className={`h-6 w-6 ${
-              isDark ? 'text-lime' : 'text-asu-maroon'
+              isDark ? 'text-lime' : 'text-lime'
             }`} />
           </div>
         </div>

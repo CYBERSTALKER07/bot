@@ -1,0 +1,1498 @@
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation, useParams } from 'react-router-dom';
+import { 
+  ArrowLeft,
+  Calendar,
+  MapPin,
+  LinkIcon,
+  Mail,
+  Building2,
+  GraduationCap,
+  MoreHorizontal,
+  MessageCircle,
+  Bell,
+  Settings,
+  User,
+  Award,
+  Briefcase,
+  Code,
+  Zap,
+  Plus,
+  X as XIcon,
+  Edit3,
+  Save,
+  Phone,
+  Globe,
+  FileText,
+  ExternalLink,
+  Github,
+  Linkedin,
+  Eye,
+  TrendingUp,
+  Users,
+  Heart,
+  Share,
+  Camera,
+  Upload,
+  UserCheck,
+  UserPlus,
+  UserX,
+  Home,
+  Search,
+  BookOpen,
+  BarChart3,
+  LogOut,
+  Menu,
+  Target,
+  Trophy,
+  Star,
+  CheckCircle,
+  Edit
+} from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
+import Avatar from '../ui/Avatar';
+import Button from '../ui/Button';
+import Modal from '../ui/Modal';
+import { Card } from '../ui/Card';
+import Badge from '../ui/Badge';
+import { cn } from '../../lib/cva';
+import { ProfileService, ProfileData } from '../../lib/profileService';
+import ImageUpload from '../ui/ImageUpload';
+import EditProfile from './EditProfile';
+
+interface ActivityPost {
+  id: string;
+  type: 'skill_added' | 'skill_progress' | 'badge_earned' | 'portfolio_added' | 'assessment_completed' | 'post_created';
+  title: string;
+  description: string;
+  timestamp: string;
+  metadata?: {
+    skill?: {
+      id: string;
+      name: string;
+      category: string;
+      description?: string;
+      icon_url?: string;
+      current_level?: number;
+    };
+    category?: string;
+    currentLevel?: number;
+    score?: number;
+    rank?: number;
+  };
+  likes?: number;
+  comments?: number;
+  isLiked?: boolean;
+}
+
+interface ProfileStats {
+  totalSkills: number;
+  totalBadges: number;
+  averageProgress: number;
+  portfolioEntries: number;
+  recentAchievements: number;
+  profileViews: number;
+}
+
+export default function Profile() {
+  const { user, logout } = useAuth();
+  const { isDark } = useTheme();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { userId } = useParams<{ userId: string }>();
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<'posts' | 'skills' | 'achievements' | 'replies' | 'highlights' | 'articles' | 'media' | 'likes'>('posts');
+  
+  // Determine if viewing own profile or another user's profile
+  const isOwnProfile = !userId || userId === user?.id;
+  const [viewingUser, setViewingUser] = useState<any>(null);
+  
+  // Enhanced responsive breakpoints
+  const [screenSize, setScreenSize] = useState(() => {
+    const width = window.innerWidth;
+    if (width < 480) return 'xs'; // Extra small phones
+    if (width < 640) return 'sm'; // Small phones
+    if (width < 768) return 'md'; // Large phones/small tablets
+    if (width < 1024) return 'lg'; // Tablets
+    return 'xl'; // Desktop
+  });
+
+  const isMobile = screenSize === 'xs' || screenSize === 'sm';
+  const isTablet = screenSize === 'md' || screenSize === 'lg';
+  const isDesktop = screenSize === 'xl';
+
+  // Profile stats with enhanced data
+  const [profileStats, setProfileStats] = useState<ProfileStats>({
+    following: 247,
+    followers: 342,
+    posts: 42,
+    totalSkills: 0,
+    totalBadges: 0,
+    averageProgress: 0,
+    portfolioEntries: 0,
+    recentAchievements: 0,
+    profileViews: 1250
+  });
+
+  // Activity posts for feed
+  const [activityPosts, setActivityPosts] = useState<ActivityPost[]>([]);
+
+  // Use real profile data from backend
+  const [profileData, setProfileData] = useState<ProfileData>({
+    full_name: user?.name || 'User',
+    bio: '',
+    location: '',
+    phone: '',
+    avatar_url: '',
+    cover_image_url: '',
+    skills: [],
+    portfolio_url: '',
+    linkedin_url: '',
+    github_url: '',
+    company_name: '',
+    company_description: '',
+    industry: '',
+    website: '',
+    major: '',
+    graduation_year: new Date().getFullYear()
+  });
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  // Utility functions for formatting and activity
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffHours < 1) return 'Just now';
+    if (diffHours < 24 && diffHours > 1) return `${diffHours}h`;
+    if (diffDays < 7) return `${diffDays}d`;
+    return date.toLocaleDateString();
+  };
+
+  const getPostIcon = (type: string) => {
+    switch (type) {
+      case 'skill_added': return <BookOpen className="w-5 h-5 text-blue-500" />;
+      case 'skill_progress': return <TrendingUp className="w-5 h-5 text-green-500" />;
+      case 'badge_earned': return <Trophy className="w-5 h-5 text-yellow-500" />;
+      case 'assessment_completed': return <CheckCircle className="w-5 h-5 text-purple-500" />;
+      case 'portfolio_added': return <Star className="w-5 h-5 text-orange-500" />;
+      case 'post_created': return <MessageCircle className="w-5 h-5 text-blue-500" />;
+      default: return <Target className="w-5 h-5 text-gray-500" />;
+    }
+  };
+
+  const handleEditProfile = () => {
+    navigate('/profile/edit');
+  };
+
+  const handleShareProfile = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: `${profileData.full_name || 'User'}'s Profile`,
+        text: `Check out ${profileData.full_name || 'this user'}'s profile!`,
+        url: window.location.href,
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      // You could add a toast notification here
+    }
+  };
+
+  // Load profile data from backend
+  useEffect(() => {
+    if (isOwnProfile && user) {
+      loadProfileData();
+    } else if (userId) {
+      loadOtherUserProfile(userId);
+    }
+  }, [user, userId, isOwnProfile]);
+
+  // Handle responsive resize
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width < 480) setScreenSize('xs');
+      else if (width < 640) setScreenSize('sm');
+      else if (width < 768) setScreenSize('md');
+      else if (width < 1024) setScreenSize('lg');
+      else setScreenSize('xl');
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Generate activity posts based on profile data
+  useEffect(() => {
+    if (!profileData || loading) return;
+
+    const generateActivityPosts = () => {
+      const posts: ActivityPost[] = [];
+
+      // Generate skill-related posts
+      if (profileData.skills && profileData.skills.length > 0) {
+        profileData.skills.forEach((skill, index) => {
+          posts.push({
+            id: `skill-${index}`,
+            type: 'skill_added',
+            title: `Added new skill: ${skill}`,
+            description: `Started learning ${skill}. Excited to develop expertise in this area!`,
+            timestamp: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+            metadata: { 
+              skill: { 
+                id: `skill-${index}`, 
+                name: skill, 
+                category: 'Technology',
+                current_level: Math.floor(Math.random() * 4) + 1
+              }
+            },
+            likes: Math.floor(Math.random() * 25) + 5,
+            comments: Math.floor(Math.random() * 10),
+            isLiked: Math.random() > 0.6
+          });
+
+          if (Math.random() > 0.7) {
+            posts.push({
+              id: `progress-${index}`,
+              type: 'skill_progress',
+              title: `Progress update on ${skill}`,
+              description: `Made significant progress in ${skill! Completed several practice projects and feeling more confident.`,
+              timestamp: new Date(Date.now() - Math.random() * 20 * 24 * 60 * 60 * 1000).toISOString(),
+              metadata: { 
+                skill: { 
+                  id: `skill-${index}`, 
+                  name: skill, 
+                  category: 'Technology',
+                  current_level: Math.floor(Math.random() * 3) + 2
+                },
+                currentLevel: Math.floor(Math.random() * 3) + 2
+              },
+              likes: Math.floor(Math.random() * 30) + 10,
+              comments: Math.floor(Math.random() * 15),
+              isLiked: Math.random() > 0.5
+            });
+          }
+        });
+      }
+
+      // Generate achievement posts
+      if (profileData.skills && profileData.skills.length > 2) {
+        const topSkills = profileData.skills.slice(0, 3);
+        topSkills.forEach((skill, index) => {
+          posts.push({
+            id: `badge-${index}`,
+            type: 'badge_earned',
+            title: `🏆 Earned ${skill} Expert Badge!`,
+            description: `Achieved expert level in ${skill! This puts me in the top performers in this skill area.`,
+            timestamp: new Date(Date.now() - Math.random() * 15 * 24 * 60 * 60 * 1000).toISOString(),
+            metadata: { 
+              skill: { 
+                id: `skill-${index}`, 
+                name: skill, 
+                category: 'Technology',
+                current_level: 4
+              },
+              rank: index + 1 
+            },
+            likes: Math.floor(Math.random() * 40) + 15,
+            comments: Math.floor(Math.random() * 20) + 5,
+            isLiked: Math.random() > 0.4
+          });
+        });
+      }
+
+      // Add some general posts
+      posts.push({
+        id: 'post-1',
+        type: 'post_created',
+        title: 'Excited about my learning journey!',
+        description: `Just completed my profile setup and I'm excited to track my progress. Looking forward to connecting with others and sharing knowledge!`,
+        timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+        likes: Math.floor(Math.random() * 20) + 8,
+        comments: Math.floor(Math.random() * 8) + 2,
+        isLiked: Math.random() > 0.7
+      });
+
+      return posts.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 15);
+    };
+
+    const posts = generateActivityPosts();
+    setActivityPosts(posts);
+
+    // Update profile stats
+    const totalSkills = profileData.skills?.length || 0;
+    const totalBadges = Math.min(totalSkills, 3); // Top 3 skills get badges
+    const averageProgress = totalSkills > 0 ? Math.floor(65 + Math.random() * 25) : 0; // Random progress 65-90%
+    const recentAchievements = Math.floor(totalBadges * 0.6) + 1;
+
+    setProfileStats(prev => ({
+      ...prev,
+      totalSkills,
+      totalBadges,
+      averageProgress,
+      portfolioEntries: profileData.portfolio_url ? 1 : 0,
+      recentAchievements
+    }));
+  }, [profileData, loading]);
+
+  const loadProfileData = async () => {
+    if (!user) return;
+    
+    try {
+      setLoading(true);
+      const profile = await ProfileService.getCurrentProfile();
+      if (profile) {
+        setProfileData(profile);
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error);
+      setError('Failed to load profile data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load other user's profile data (read-only)
+  const loadOtherUserProfile = async (targetUserId: string) => {
+    try {
+      setLoading(true);
+      // For now, use mock data since we don't have a service for loading other users' profiles
+      // In a real app, you would call something like ProfileService.getUserProfile(targetUserId)
+      const mockProfile: ProfileData = {
+        full_name: 'Other User',
+        bio: 'This is another user\'s profile. You can view their information but cannot edit it.',
+        location: 'Remote',
+        phone: '',
+        avatar_url: 'https://ui-avatars.com/api/?name=Other+User&background=random',
+        cover_image_url: '',
+        skills: ['React', 'TypeScript', 'Node.js'],
+        portfolio_url: '',
+        linkedin_url: '',
+        github_url: '',
+        company_name: '',
+        company_description: '',
+        industry: '',
+        website: '',
+        major: '',
+        graduation_year: new Date().getFullYear()
+      };
+      setProfileData(mockProfile);
+      setViewingUser({ id: targetUserId, ...mockProfile });
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+      setError('Failed to load user profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Mock posts data for X-style layout
+  const mockPosts = [
+    {
+      id: '1',
+      content: "Just shipped a new feature that I'm really excited about! The team worked incredibly hard on this one. 🚀",
+      timestamp: '2h',
+      likes: 24,
+      retweets: 8,
+      replies: 3,
+      images: []
+    },
+    {
+      id: '2', 
+      content: "Working on some exciting AI projects lately. The future of technology is here and it's incredible what we can build now. What are your thoughts on AI in software development?",
+      timestamp: '5h',
+      likes: 42,
+      retweets: 12,
+      replies: 7,
+      images: []
+    },
+    {
+      id: '3',
+      content: "Beautiful sunset today! Sometimes you need to step away from the code and appreciate the world around you. 🌅",
+      timestamp: '1d',
+      likes: 156,
+      retweets: 23,
+      replies: 18,
+      images: ['https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=300&fit=crop']
+    }
+  ];
+
+  const handleAvatarUpload = async (imageUrl: string) => {
+    try {
+      if (user) {
+        await ProfileService.updateProfile(user.id, { avatar_url: imageUrl });
+        setProfileData(prev => ({ ...prev, avatar_url: imageUrl }));
+      }
+    } catch (error) {
+      console.error('Error updating avatar:', error);
+    }
+  };
+
+  const handleCoverUpload = async (file: File) => {
+    try {
+      if (user) {
+        console.log('🔄 Starting cover upload with file:', file.name, file.type, file.size);
+        
+        // Use ProfileService.updateCoverImage which handles both storage AND database
+        const updatedProfile = await ProfileService.updateCoverImage(file, user.id);
+        console.log('✅ Cover image uploaded and profile updated:', updatedProfile);
+        
+        // Update local state with the complete updated profile
+        setProfileData(updatedProfile);
+        console.log('✅ Local state updated with new profile data');
+        
+        // Optional: Refresh profile data to ensure sync
+        const refreshedProfile = await ProfileService.getCurrentProfile();
+        if (refreshedProfile) {
+          setProfileData(refreshedProfile);
+          console.log('✅ Profile data refreshed, cover_image_url:', refreshedProfile.cover_image_url);
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error updating cover:', error);
+      setError('Failed to update cover photo');
+    }
+  };
+
+  const handleImageUploadError = (error: string) => {
+    setError(error);
+    setTimeout(() => setError(''), 5000);
+  };
+
+  const formatJoinDate = (dateString?: string) => {
+    if (!dateString) return 'Joined recently';
+    const date = new Date(dateString);
+    return `Joined ${date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
+  };
+
+  const handleSave = async () => {
+    if (!user) return;
+    
+    try {
+      await ProfileService.updateProfile(user.id, profileData);
+      setShowEditModal(false);
+    } catch (error) {
+      console.error('Error saving profile:', error);
+    }
+  };
+
+  const navigateToEditor = () => {
+    navigate('/profile/edit');
+  };
+
+  // Tab Button Component
+  const TabButton = ({ id, label, isActive, onClick }: {
+    id: string;
+    label: string;
+    isActive: boolean;
+    onClick: () => void;
+  }) => (
+    <button
+      onClick={onClick}
+      className={cn(
+        'relative px-4 py-4 text-center font-medium transition-colors whitespace-nowrap',
+        isMobile ? 'px-3 py-3 text-sm min-w-0 flex-shrink-0 snap-center' : 'px-6',
+        isActive
+          ? 'text-gray-900 dark:text-white'
+          : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+      )}
+    >
+      <span className={cn(isMobile ? 'text-xs' : 'text-sm')}>{label}</span>
+      {isActive && (
+        <div className={cn(
+          'absolute bottom-0 left-0 right-0 h-1 bg-blue-500 rounded-full',
+          isMobile ? 'h-0.5' : 'h-1'
+        )} />
+      )}
+    </button>
+  );
+
+  // Post Card Component
+  const PostCard = ({ post }: { post: any }) => (
+    <div className={cn(
+      'border-b border-gray-200 dark:border-gray-800 px-4 py-3 hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition-colors cursor-pointer',
+      isMobile ? 'px-4 py-3' : 'px-6 py-4'
+    )}>
+      <div className="flex space-x-3">
+        <div className="flex-shrink-0">
+          <div className={cn(
+            'w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold',
+            isDark ? 'border-black' : 'border-white',
+            isMobile ? 'w-8 h-8 text-sm' : 'w-10 h-10'
+          )}>
+            {profileData.avatar_url ? (
+              <img 
+                src={profileData.avatar_url}
+                alt={profileData.full_name || 'User'}
+                className="w-full h-full rounded-full object-cover"
+              />
+            ) : (
+              (profileData.full_name || 'U').charAt(0)
+            )}
+          </div>
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center space-x-2">
+            <span className={cn('font-bold text-gray-900 dark:text-white', isMobile ? 'text-sm' : 'text-base')}>
+              {profileData.full_name || 'User'}
+            </span>
+            <span className={cn('text-gray-500', isMobile ? 'text-xs' : 'text-sm')}>
+              @{(profileData.full_name || 'user').toLowerCase().replace(/\s/g, '')}
+            </span>
+            <span className="text-gray-500">·</span>
+            <span className={cn('text-gray-500', isMobile ? 'text-xs' : 'text-sm')}>{post.timestamp}</span>
+          </div>
+          <div className={cn('mt-1', isMobile ? 'text-sm' : 'text-base')}>
+            <p className="text-gray-900 dark:text-white whitespace-pre-line">{post.content}</p>
+            {post.images?.length > 0 && (
+              <div className="mt-3">
+                <img 
+                  src={post.images[0]} 
+                  alt="Post image"
+                  className="rounded-2xl max-w-full h-auto border border-gray-200 dark:border-gray-700"
+                />
+              </div>
+            )}
+          </div>
+          <div className={cn('flex items-center justify-between mt-3 max-w-md', isMobile ? 'text-xs' : 'text-sm')}>
+            <button className="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors group">
+              <div className="p-2 rounded-full group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20">
+                <MessageCircle className={cn(isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4')} />
+              </div>
+              <span>{post.replies}</span>
+            </button>
+            <button className="flex items-center space-x-2 text-gray-500 hover:text-green-500 transition-colors group">
+              <div className="p-2 rounded-full group-hover:bg-green-50 dark:group-hover:bg-green-900/20">
+                <TrendingUp className={cn(isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4')} />
+              </div>
+              <span>{post.retweets}</span>
+            </button>
+            <button className="flex items-center space-x-2 text-gray-500 hover:text-red-500 transition-colors group">
+              <div className="p-2 rounded-full group-hover:bg-red-50 dark:group-hover:bg-red-900/20">
+                <Heart className={cn(isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4')} />
+              </div>
+              <span>{post.likes}</span>
+            </button>
+            <button className="text-gray-500 hover:text-blue-500 transition-colors group">
+              <div className="p-2 rounded-full group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20">
+                <Share className={cn(isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4')} />
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Tab Content Renderer
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'posts':
+        return (
+          <div>
+            {mockPosts.map((post) => (
+              <PostCard key={post.id} post={post} />
+            ))}
+          </div>
+        );
+
+      case 'replies':
+        return (
+          <div className="text-center py-16">
+            <MessageCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No replies yet</h3>
+            <p className="text-gray-500">When @{(profileData.full_name || 'user').toLowerCase().replace(/\s/g, '')} replies to a post, it'll show up here.</p>
+          </div>
+        );
+
+      case 'highlights':
+        return (
+          <div className="text-center py-16">
+            <Zap className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Nothing to see here — yet</h3>
+            <p className="text-gray-500">Highlights from this account will show up here.</p>
+          </div>
+        );
+
+      case 'articles':
+        return (
+          <div className="text-center py-16">
+            <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No articles yet</h3>
+            <p className="text-gray-500">Articles written by @{(profileData.full_name || 'user').toLowerCase().replace(/\s/g, '')} will appear here.</p>
+          </div>
+        );
+
+      case 'media':
+        return (
+          <div className="text-center py-16">
+            <Camera className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No photos or videos yet</h3>
+            <p className="text-gray-500">When @{(profileData.full_name || 'user').toLowerCase().replace(/\s/g, '')} posts photos or videos, they'll show up here.</p>
+          </div>
+        );
+
+      case 'likes':
+        return (
+          <div className="text-center py-16">
+            <Heart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No likes yet</h3>
+            <p className="text-gray-500">When @{(profileData.full_name || 'user').toLowerCase().replace(/\s/g, '')} likes a post, it'll show up here.</p>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (!user || !profileData) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            Profile not found
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400">
+            Please complete your profile setup.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={cn(
+      'min-h-screen',
+      isDark ? 'bg-gray-900 text-white' : 'bg-gray-50 text-black'
+    )}>
+      {/* Error message */}
+      {error && (
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 mx-4 mt-4 rounded-lg">
+          {error}
+        </div>
+      )}
+
+      {/* Desktop Layout */}
+      {isDesktop && (
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="grid grid-cols-12 gap-6">
+            {/* Left Sidebar - Profile Info */}
+            <div className="col-span-3">
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden sticky top-6">
+                {/* Cover Photo */}
+                <div className="relative h-32 bg-gradient-to-r from-blue-500 to-purple-600">
+                  {profileData.cover_image_url && (
+                    <img
+                      src={profileData.cover_image_url}
+                      alt="Cover"
+                      className="w-full h-full object-cover"
+                      onLoad={() => console.log('🖼️ Desktop cover image loaded successfully:', profileData.cover_image_url)}
+                      onError={(e) => console.error('❌ Desktop cover image failed to load:', profileData.cover_image_url, e)}
+                    />
+                  )}
+                  
+                  {/* Debug info for desktop */}
+                  {/* {process.env.NODE_ENV === 'development' && (
+                    <div className="absolute bottom-2 left-2 bg-black/75 text-white text-xs p-1 rounded">
+                      Desktop Cover URL: {profileData.cover_image_url || 'None'}
+                    </div>
+                  )} */}
+                  
+                  <button
+                    onClick={handleEditProfile}
+                    className="absolute top-3 right-3 p-2 bg-black bg-opacity-50 hover:bg-opacity-70 rounded-full text-white transition-all"
+                  >
+                    <Camera className="w-4 h-4" />
+                  </button>
+                </div>
+                
+                <div className="px-6 pb-6">
+                  {/* Avatar */}
+                  <div className="relative -mt-16 mb-4">
+                    <div className="w-20 h-20 rounded-full border-4 border-white dark:border-gray-800 bg-blue-500 flex items-center justify-center overflow-hidden">
+                      {profileData.avatar_url ? (
+                        <img 
+                          src={profileData.avatar_url} 
+                          alt={profileData.full_name || 'User avatar'} 
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <User className="w-8 h-8 text-white" />
+                      )}
+                    </div>
+                    <button
+                      onClick={handleEditProfile}
+                      className="absolute bottom-0 right-0 p-1.5 bg-blue-500 hover:bg-blue-600 rounded-full text-white transition-colors"
+                    >
+                      <Edit className="w-3 h-3" />
+                    </button>
+                  </div>
+                  
+                  {/* Profile Info */}
+                  <div className="flex items-center justify-between mb-3">
+                    <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+                      {profileData.full_name || 'Anonymous User'}
+                    </h1>
+                    <button
+                      onClick={handleShareProfile}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    >
+                      <Share className="w-4 h-4 text-gray-500" />
+                    </button>
+                  </div>
+                  
+                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">
+                    @{(profileData.full_name || 'user').toLowerCase().replace(/\s/g, '')}
+                  </p>
+                  
+                  {profileData.bio && (
+                    <p className="text-gray-700 dark:text-gray-300 text-sm mb-4 leading-relaxed">
+                      {profileData.bio}
+                    </p>
+                  )}
+                  
+                  {/* Metadata */}
+                  <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                    {profileData.location && (
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4" />
+                        <span>{profileData.location}</span>
+                      </div>
+                    )}
+                    {(profileData.website || profileData.portfolio_url) && (
+                      <div className="flex items-center gap-2">
+                        <LinkIcon className="w-4 h-4" />
+                        <a 
+                          href={profileData.website || profileData.portfolio_url} 
+                          className="text-blue-600 hover:underline" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                        >
+                          {(profileData.website || profileData.portfolio_url || '').replace('https://', '')}
+                        </a>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2"></div>
+                      <Calendar className="w-4 h-4" />
+                      <span>Joined {formatJoinDate(profileData.created_at)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Stats */}
+                <div className="border-t border-gray-200 dark:border-gray-700 px-6 py-4">
+                  <div className="grid grid-cols-2 gap-4 text-center">
+                    <div>
+                      <div className="text-lg font-bold text-gray-900 dark:text-white">
+                        {profileStats.totalSkills}
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Skills</div>
+                    </div>
+                    <div>
+                      <div className="text-lg font-bold text-gray-900 dark:text-white">
+                        {profileStats.totalBadges}
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Badges</div>
+                    </div>
+                    <div>
+                      <div className="text-lg font-bold text-gray-900 dark:text-white">
+                        {profileStats.averageProgress}%
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Progress</div>
+                    </div>
+                    <div>
+                      <div className="text-lg font-bold text-gray-900 dark:text-white">
+                        {profileStats.recentAchievements}
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Recent</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Edit Button */}
+                <div className="px-6 pb-4">
+                  <button
+                    onClick={handleEditProfile}
+                    className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Edit className="w-4 h-4" />
+                    Edit Profile
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Main Content - Activity Feed */}
+            <div className="col-span-6">
+              {/* Tab Navigation */}
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
+                <div className="flex border-b border-gray-200 dark:border-gray-700">
+                  {[
+                    { key: 'posts', label: 'Activity', icon: MessageCircle },
+                    { key: 'skills', label: 'Skills', icon: Target },
+                    { key: 'achievements', label: 'Achievements', icon: Trophy }
+                  ].map(tab => (
+                    <button
+                      key={tab.key}
+                      onClick={() => setActiveTab(tab.key as any)}
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                        activeTab === tab.key
+                          ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                          : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                      }`}
+                    >
+                      <tab.icon className="w-4 h-4" />
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tab Content */}
+              {activeTab === 'posts' && (
+                <div className="space-y-4">
+                  {activityPosts.map((post) => (
+                    <div key={post.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                      <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
+                          {profileData.avatar_url ? (
+                            <img 
+                              src={profileData.avatar_url} 
+                              alt={profileData.full_name || 'User avatar'} 
+                              className="w-full h-full rounded-full object-cover"
+                            />
+                          ) : (
+                            <User className="w-5 h-5 text-white" />
+                          )}
+                        </div>
+                        
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="font-semibold text-gray-900 dark:text-white">
+                              {profileData.full_name || 'Anonymous User'}
+                            </span>
+                            <span className="text-gray-500 text-sm">
+                              @{(profileData.full_name || 'user').toLowerCase().replace(/\s/g, '')}
+                            </span>
+                            <span className="text-gray-500 text-sm">·</span>
+                            <span className="text-gray-500 text-sm">
+                              {formatTimestamp(post.timestamp)}
+                            </span>
+                          </div>
+                          
+                          <div className="flex items-center gap-2 mb-3">
+                            {getPostIcon(post.type)}
+                            <h3 className="font-semibold text-gray-900 dark:text-white">
+                              {post.title}
+                            </h3>
+                          </div>
+                          
+                          <p className="text-gray-700 dark:text-gray-300 mb-4">
+                            {post.description}
+                          </p>
+                          
+                          {/* Post metadata display */}
+                          {post.metadata?.skill && (
+                            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 mb-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 bg-blue-500 rounded flex items-center justify-center">
+                                  <Target className="w-4 h-4 text-white" />
+                                </div>
+                                <div>
+                                  <div className="font-medium text-gray-900 dark:text-white">
+                                    {post.metadata.skill.name}
+                                  </div>
+                                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                                    {post.metadata.skill.category}
+                                    {post.metadata.currentLevel && (
+                                      <span> • Level {post.metadata.currentLevel}/4</span>
+                                    )}
+                                    {post.metadata.score && (
+                                      <span> • Score: {post.metadata.score}/5</span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Engagement buttons */}
+                          <div className="flex items-center gap-6 mt-4">
+                            <button className="flex items-center gap-2 text-gray-500 hover:text-blue-500 transition-colors">
+                              <MessageCircle className="w-4 h-4" />
+                              <span className="text-sm">{post.comments || 0}</span>
+                            </button>
+                            <button className="flex items-center gap-2 text-gray-500 hover:text-green-500 transition-colors">
+                              <TrendingUp className="w-4 h-4" />
+                              <span className="text-sm">Share</span>
+                            </button>
+                            <button className={`flex items-center gap-2 transition-colors ${post.isLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}`}>
+                              <Heart className={`w-4 h-4 ${post.isLiked ? 'fill-current' : ''}`} />
+                              <span className="text-sm">{post.likes || 0}</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {activeTab === 'skills' && (
+                <div className="space-y-4">
+                  {profileData.skills && profileData.skills.length > 0 ? (
+                    profileData.skills.map((skill, index) => (
+                      <div key={index} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+                            <Target className="w-6 h-6 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
+                              {skill}
+                            </h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                              Technology • Level {Math.floor(Math.random() * 4) + 1}/4
+                            </p>
+                            <div className="flex items-center gap-4">
+                              <div className="flex-1">
+                                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                  <div 
+                                    className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                                    style={{ width: `${Math.floor(Math.random() * 80) + 20}%` }}
+                                  ></div>
+                                </div>
+                              </div>
+                              <span className="text-sm font-medium text-gray-900 dark:text-white">
+                                {Math.floor(Math.random() * 80) + 20}%
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-16">
+                      <Target className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No skills added yet</h3>
+                      <p className="text-gray-500">Add skills to your profile to track your progress.</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'achievements' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {profileData.skills && profileData.skills.length > 0 ? (
+                    profileData.skills.slice(0, 6).map((skill, index) => (
+                      <div key={index} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center">
+                            <Trophy className="w-5 h-5 text-white" />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-gray-900 dark:text-white">
+                              {skill} Expert
+                            </h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              #{index + 1} Top Skill
+                            </p>
+                          </div>
+                        </div>
+                        <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
+                          Achieved expert level in {skill}
+                        </p>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          Earned recently
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="col-span-2 text-center py-16">
+                      <Trophy className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No achievements yet</h3>
+                      <p className="text-gray-500">Complete skills and assessments to earn achievements.</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Right Sidebar - Statistics and Quick Info */}
+            <div className="col-span-3">
+              <div className="space-y-6">
+                {/* Progress Overview */}
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Average Progress</h3>
+                  <div className="flex items-center justify-center">
+                    <div className="relative w-32 h-32">
+                      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
+                        <circle
+                          cx="60"
+                          cy="60"
+                          r="50"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="8"
+                          className="text-gray-200 dark:text-gray-700"
+                        />
+                        <circle
+                          cx="60"
+                          cy="60"
+                          r="50"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="8"
+                          strokeLinecap="round"
+                          strokeDasharray={`${2 * Math.PI * 50}`}
+                          strokeDashoffset={`${2 * Math.PI * 50 * (1 - profileStats.averageProgress / 100)}`}
+                          className="text-blue-500 transition-all duration-500"
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-gray-900 dark:text-white">{profileStats.averageProgress}%</div>
+                          <div className="text-xs text-gray-600 dark:text-gray-400">Complete</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Top Skills */}
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Top Skills</h3>
+                  <div className="space-y-3">
+                    {profileData.skills && profileData.skills.length > 0 ? (
+                      profileData.skills.slice(0, 5).map((skill, index) => (
+                        <div key={index} className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white text-sm font-medium">
+                            {index + 1}
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-900 dark:text-white text-sm">
+                              {skill}
+                            </div>
+                            <div className="text-xs text-gray-600 dark:text-gray-400">
+                              Level {Math.floor(Math.random() * 4) + 1}/4
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm text-gray-500">No skills added yet</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Recent Activity */}
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Recent Activity</h3>
+                  <div className="space-y-3">
+                    {activityPosts.slice(0, 5).map((post) => (
+                      <div key={post.id} className="flex items-start gap-3">
+                        <div className="mt-1">
+                          {getPostIcon(post.type)}
+                        </div>
+                        <div className="flex-1">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white line-clamp-2">
+                            {post.title}
+                          </div>
+                          <div className="text-xs text-gray-600 dark:text-gray-400">
+                            {formatTimestamp(post.timestamp)}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Layout - Keep existing mobile layout */}
+      {!isDesktop && (
+        <div className={cn(
+          'mx-auto',
+          screenSize === 'xs' ? 'max-w-full' : 
+          screenSize === 'sm' ? 'max-w-full' : 
+          screenSize === 'md' ? 'max-w-full' : 
+          'max-w-2xl'
+        )}>
+          {/* X-Style Header - Enhanced Mobile Responsiveness */}
+          <div className={cn(
+            'sticky backdrop-blur-md border-b z-20',
+            isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200',
+            isMobile ? 'top-0' : 'top-0'
+          )}>
+            <div className={cn(
+              'flex items-center py-3',
+              screenSize === 'xs' ? 'px-3' : 'px-4'
+            )}>
+              <button 
+                onClick={() => navigate(-1)}
+                className={cn(
+                  'p-2 hover:bg-gray-100 dark:hover:bg-gray-900 rounded-full transition-colors',
+                  isMobile && 'p-3 -ml-1 mr-4'
+                )}
+              >
+                <ArrowLeft className={cn(isMobile ? 'w-5 h-5' : 'w-5 h-5')} />
+              </button>
+              <div className="flex-1">
+                <h1 className={cn(
+                  'font-bold truncate',
+                  screenSize === 'xs' ? 'text-lg' : 'text-xl'
+                )}>
+                  {profileData.full_name || user?.name || 'User'}
+                </h1>
+                <p className={cn(
+                  'text-gray-500 truncate',
+                  screenSize === 'xs' ? 'text-xs' : 'text-sm'
+                )}>
+                  {profileStats.posts} posts
+                </p>
+              </div>
+              <button className={cn(
+                'p-2 hover:bg-gray-100 dark:hover:bg-gray-900 rounded-full transition-colors',
+                isMobile && 'p-3'
+              )}></button>
+                <MoreHorizontal className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Cover Photo with Upload - Enhanced Mobile Sizes */}
+          <div className={cn(
+            'relative',
+            screenSize === 'xs' ? 'h-40' :
+            screenSize === 'sm' ? 'h-44' :
+            screenSize === 'md' ? 'h-48' :
+            'h-52'
+          )}>
+            {profileData.cover_image_url ? (
+              <img
+                src={profileData.cover_image_url}
+                alt="Cover"
+                className="absolute inset-0 w-full h-full object-cover"
+                onLoad={() => console.log('🖼️ Cover image loaded successfully:', profileData.cover_image_url)}
+                onError={(e) => console.error('❌ Cover image failed to load:', profileData.cover_image_url, e)}
+              />
+            ) : (
+              <div className={cn(
+                'absolute inset-0',
+                isDark 
+                  ? 'bg-gradient-to-br from-gray-800 via-gray-700 to-gray-600' 
+                  : 'bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500'
+              )}></div>
+            )}
+            
+            {/* Debug info */}
+            {/* {process.env.NODE_ENV === 'development' && (
+              <div className="absolute bottom-2 left-2 bg-black/75 text-white text-xs p-1 rounded">
+                Cover URL: {profileData.cover_image_url || 'None'}
+              </div>
+            )} */}
+            
+            {/* Cover Upload Button */}
+            <div className="absolute top-4 right-4 z-10">
+              <ImageUpload
+                type="cover"
+                onFileSelected={handleCoverUpload}
+                onUploadError={handleImageUploadError}
+                className="opacity-75 hover:opacity-100 transition-opacity"
+              />
+            </div>
+          </div>
+
+          {/* Profile Section - Enhanced Mobile Layout */}
+          <div className={cn(
+            screenSize === 'xs' ? 'px-3' :
+            screenSize === 'sm' ? 'px-3' : 
+            'px-4'
+          )}>
+            <div className={cn(
+              'flex justify-between items-start mb-4',
+              screenSize === 'xs' ? '-mt-12' :
+              screenSize === 'sm' ? '-mt-14' :
+              '-mt-16'
+            )}>
+              {/* Avatar with Upload - Responsive Sizing */}
+              <div className="relative">
+                {profileData.avatar_url ? (
+                  <img
+                    src={profileData.avatar_url}
+                    alt="Profile"
+                    className={cn(
+                      'rounded-full border-4 object-cover',
+                      isDark ? 'border-black' : 'border-white',
+                      screenSize === 'xs' ? 'w-24 h-24' :
+                      screenSize === 'sm' ? 'w-28 h-28' :
+                      screenSize === 'md' ? 'w-32 h-32' :
+                      'w-32 h-32'
+                    )}
+                  />
+                ) : (
+                  <div className={cn(
+                    'rounded-full border-4 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold',
+                    isDark ? 'border-black' : 'border-white',
+                    screenSize === 'xs' ? 'w-24 h-24 text-2xl' :
+                    screenSize === 'sm' ? 'w-28 h-28 text-3xl' :
+                    screenSize === 'md' ? 'w-32 h-32 text-4xl' :
+                    'w-32 h-32 text-4xl'
+                  )}>
+                    {(profileData.full_name || user?.name || 'U').charAt(0)}
+                  </div>
+                )}
+                
+                {/* Avatar Upload Overlay */}
+                <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer">
+                  <ImageUpload
+                    type="avatar"
+                    currentImageUrl={profileData.avatar_url}
+                    onUploadSuccess={handleAvatarUpload}
+                    onUploadError={handleImageUploadError}
+                    size="lg"
+                    className="w-full h-full"
+                  />
+                </div>
+              </div>
+
+              {/* Action Buttons - Mobile Optimized */}
+              <div className={cn(
+                'flex mt-4',
+                screenSize === 'xs' ? 'flex-col space-y-2 w-full ml-4' :
+                screenSize === 'sm' ? 'flex-wrap gap-2 ml-4' :
+                'space-x-2'
+              )}>
+                {screenSize === 'xs' ? (
+                  <>
+                    <Button
+                      variant="outlined"
+                      onClick={navigateToEditor}
+                      className="w-full rounded-full font-bold border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900 text-sm"
+                      size="sm"
+                    >
+                      Edit profile
+                    </Button>
+                    <div className="flex space-x-2">
+                      <button className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
+                        <Mail className="w-4 h-4 mx-auto" />
+                      </button>
+                      <button className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
+                        <Bell className="w-4 h-4 mx-auto" />
+                      </button>
+                      <button className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
+                        <MoreHorizontal className="w-4 h-4 mx-auto" />
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <button className="p-2 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
+                      <Mail className="w-5 h-5" />
+                    </button>
+                    <button className="p-2 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
+                      <Bell className="w-5 h-5" />
+                    </button>
+                    <button className="p-2 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
+                      <MoreHorizontal className="w-5 h-5" />
+                    </button>
+                    <Button
+                      variant="outlined"
+                      onClick={navigateToEditor}
+                      className="rounded-full px-6 font-bold border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900"
+                    >
+                      Edit profile
+                    </Button>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Profile Info - Enhanced Mobile Typography */}
+            <div className="mb-4">
+              <h1 className={cn(
+                'font-bold mb-1',
+                screenSize === 'xs' ? 'text-xl' :
+                screenSize === 'sm' ? 'text-2xl' :
+                'text-2xl'
+              )}>
+                {profileData.full_name || user?.name || 'User'}
+              </h1>
+              <p className={cn(
+                'text-gray-500 mb-3',
+                screenSize === 'xs' ? 'text-sm' : 'text-base'
+              )}>
+                @{(profileData.full_name || user?.name || 'user').toLowerCase().replace(/\s/g, '')}
+              </p>
+              
+              <div className="mb-3">
+                <p className={cn(
+                  'whitespace-pre-line leading-relaxed',
+                  screenSize === 'xs' ? 'text-sm' : 'text-base'
+                )}>
+                  {profileData.bio || 'No bio available yet'}
+                </p>
+              </div>
+
+              {/* Enhanced Skills Display */}
+              {profileData.skills && profileData.skills.length > 0 && (
+                <div className="mb-3">
+                  <div className={cn('flex flex-wrap gap-2', screenSize === 'xs' ? 'gap-1' : 'gap-2')}>
+                    {profileData.skills.slice(0, isMobile ? 3 : 5).map((skill, index) => (
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className={cn(screenSize === 'xs' ? 'text-xs px-2 py-1' : 'text-sm')}
+                      >
+                        {skill}
+                      </Badge>
+                    ))}
+                    {profileData.skills.length > (isMobile ? 3 : 5) && (
+                      <Badge variant="outline" className={cn(screenSize === 'xs' ? 'text-xs px-2 py-1' : 'text-sm')}>
+                        +{profileData.skills.length - (isMobile ? 3 : 5)} more
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Metadata - Responsive Layout */}
+              <div className={cn(
+                'flex flex-wrap items-center mb-4 text-gray-500',
+                screenSize === 'xs' ? 'gap-3 text-xs' :
+                screenSize === 'sm' ? 'gap-3 text-sm' :
+                'gap-4 text-sm'
+              )}>
+                {profileData.location && (
+                  <div className="flex items-center space-x-1">
+                    <MapPin className={cn(screenSize === 'xs' ? 'w-3 h-3' : 'w-4 h-4')} />
+                    <span className="truncate max-w-32">{profileData.location}</span>
+                  </div>
+                )}
+                {(profileData.portfolio_url || profileData.website) && (
+                  <div className="flex items-center space-x-1 min-w-0">
+                    <LinkIcon className={cn(screenSize === 'xs' ? 'w-3 h-3' : 'w-4 h-4')} />
+                    <a 
+                      href={profileData.portfolio_url || profileData.website} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="text-blue-500 hover:underline truncate max-w-32"
+                    >
+                      {(profileData.portfolio_url || profileData.website || '').replace('https://', '')}
+                    </a>
+                  </div>
+                )}
+                <div className="flex items-center space-x-1">
+                  <Calendar className={cn(screenSize === 'xs' ? 'w-3 h-3' : 'w-4 h-4')} />
+                  <span className="truncate max-w-32">{formatJoinDate(profileData.created_at)}</span>
+                </div>
+              </div>
+
+              {/* Following/Followers - Enhanced Mobile Layout */}
+              <div className={cn(
+                'flex',
+                screenSize === 'xs' ? 'space-x-4' : 'space-x-6'
+              )}>
+                <button className="hover:underline">
+                  <span className={cn(
+                    'font-bold',
+                    screenSize === 'xs' ? 'text-sm' : 'text-base'
+                  )}>
+                    {profileStats.following.toLocaleString()}
+                  </span>
+                  <span className={cn(
+                    'text-gray-500 ml-1',
+                    screenSize === 'xs' ? 'text-xs' : 'text-sm'
+                  )}>
+                    Following
+                  </span>
+                </button>
+                <button className="hover:underline">
+                  <span className={cn(
+                    'font-bold',
+                    screenSize === 'xs' ? 'text-sm' : 'text-base'
+                  )}>
+                    {profileStats.followers.toLocaleString()}
+                  </span>
+                  <span className={cn(
+                    'text-gray-500 ml-1',
+                    screenSize === 'xs' ? 'text-xs' : 'text-sm'
+                  )}>
+                    Followers
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Navigation Tabs - Enhanced Mobile Scrolling */}
+          <div className="border-b border-gray-200 dark:border-gray-800">
+            <div className={cn(
+              'flex overflow-x-auto scrollbar-hide',
+              isMobile && 'snap-x snap-mandatory'
+            )}>
+              <TabButton
+                id="posts"
+                label="Posts"
+                isActive={activeTab === 'posts'}
+                onClick={() => setActiveTab('posts')}
+              />
+              <TabButton
+                id="replies"
+                label="Replies"
+                isActive={activeTab === 'replies'}
+                onClick={() => setActiveTab('replies')}
+              />
+              <TabButton
+                id="highlights"
+                label="Highlights"
+                isActive={activeTab === 'highlights'}
+                onClick={() => setActiveTab('highlights')}
+              />
+              <TabButton
+                id="articles"
+                label="Articles"
+                isActive={activeTab === 'articles'}
+                onClick={() => setActiveTab('articles')}
+              />
+              <TabButton
+                id="media"
+                label="Media"
+                isActive={activeTab === 'media'}
+                onClick={() => setActiveTab('media')}
+              />
+              <TabButton
+                id="likes"
+                label="Likes"
+                isActive={activeTab === 'likes'}
+                onClick={() => setActiveTab('likes')}
+              />
+            </div>
+          </div>
+
+          {/* Tab Content */}
+          {renderTabContent()}
+        </div>
+      )}
+    </div>
+  );
+}

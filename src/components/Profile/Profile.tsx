@@ -1,204 +1,222 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { 
   ArrowLeft,
   Calendar,
   MapPin,
   LinkIcon,
   Mail,
-  Building2,
-  GraduationCap,
   MoreHorizontal,
   MessageCircle,
   Bell,
-  Settings,
   User,
-  Award,
-  Briefcase,
-  Code,
-  Zap,
-  Plus,
-  X as XIcon,
-  Edit3,
-  Save,
-  Phone,
-  Globe,
-  FileText,
-  ExternalLink,
-  Github,
-  Linkedin,
-  Eye,
   TrendingUp,
-  Users,
   Heart,
   Share,
-  Camera,
-  Upload,
-  UserCheck,
-  UserPlus,
-  UserX,
-  Home,
+  Edit,
   Search,
-  BookOpen,
+  X,
+  Verified,
+  Smartphone,
   BarChart3,
+  Home,
+  Hash,
+  Bookmark,
+  Users,
+  Settings,
   LogOut,
-  Menu
+  Plus,
+  Briefcase,
+  GraduationCap,
+  Award,
+  Target,
+  Repeat2
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import Avatar from '../ui/Avatar';
+import { supabase } from '../../lib/supabase';
 import Button from '../ui/Button';
-import Modal from '../ui/Modal';
-import { Card } from '../ui/Card';
 import Badge from '../ui/Badge';
 import { cn } from '../../lib/cva';
+import AnimatedSearchButton from '../AnimatedSearchButton';
 
 interface ProfileData {
-  name: string;
-  email: string;
-  phone: string;
-  location: string;
-  bio: string;
-  skills: string[];
-  experience: Experience[];
-  education: Education[]; 
-  projects: Project[];
-  certifications: Certification[];
-  portfolio_url?: string;
-  linkedin_url?: string;
-  github_url?: string;
-  company_name?: string;
-  company_description?: string;
-  company_size?: string;
-  industry?: string;
+  id?: string;
+  username?: string;
+  full_name?: string;
+  bio?: string;
+  avatar_url?: string;
+  cover_image_url?: string;
   website?: string;
-  joined_date?: string;
+  role?: 'student' | 'employer' | 'admin';
+  company_name?: string;
+  location?: string;
+  created_at?: string;
+  skills?: string[];
+  portfolio_url?: string;
 }
 
-interface Experience {
-  id: string;
-  company: string;
-  position: string;
-  location: string;
-  start_date: string;
-  end_date?: string;
-  current: boolean;
-  description: string;
+interface ProfileStats {
+  following: number;
+  followers: number;
+  posts: number;
 }
 
-interface Education {
-  id: string;
-  institution: string;
-  degree: string;
-  field: string;
-  start_date: string;
-  end_date?: string;
-  gpa?: string;
-  current: boolean;
-}
-
-interface Project {
-  id: string;
-  title: string;
-  description: string;
-  technologies: string[];
-  url?: string;
-  github_url?: string;
-  image_url?: string;
-}
-
-interface Certification {
+interface SuggestedUser {
   id: string;
   name: string;
-  issuer: string;
-  date: string;
-  expiry_date?: string;
-  credential_id?: string;
-  url?: string;
+  username: string;
+  avatar?: string;
+  verified?: boolean;
+}
+
+interface TrendingTopic {
+  category: string;
+  topic: string;
+  posts: string;
+  trending?: boolean;
+}
+
+interface Post {
+  id: string;
+  content: string;
+  user_id: string;
+  created_at: string;
+  likes_count: number;
+  shares_count: number;
+  comments_count: number;
+  media_type?: 'text' | 'image' | 'video';
+  image_url?: string;
+  video_url?: string;
+  visibility: 'public' | 'connections' | 'private';
+  author?: {
+    id: string;
+    name: string;
+    username: string;
+    avatar_url?: string;
+    verified?: boolean;
+  };
 }
 
 export default function Profile() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const { isDark } = useTheme();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [activeTab, setActiveTab] = useState<'posts' | 'replies' | 'highlights' | 'articles' | 'media' | 'likes'>('posts');
+  const { userId } = useParams<{ userId: string }>();
+  const [activeTab, setActiveTab] = useState<'posts' | 'replies' | 'highlights' | 'media' | 'likes'>('posts');
+  
+  // Determine if viewing own profile or another user's profile
+  const isOwnProfile = !userId || userId === user?.id;
   
   // Enhanced responsive breakpoints
   const [screenSize, setScreenSize] = useState(() => {
     const width = window.innerWidth;
-    if (width < 480) return 'xs'; // Extra small phones
-    if (width < 640) return 'sm'; // Small phones
-    if (width < 768) return 'md'; // Large phones/small tablets
-    if (width < 1024) return 'lg'; // Tablets
-    return 'xl'; // Desktop
+    if (width < 480) return 'xs';
+    if (width < 640) return 'sm';
+    if (width < 768) return 'md';
+    if (width < 1024) return 'lg';
+    return 'xl';
   });
-  
+
   const isMobile = screenSize === 'xs' || screenSize === 'sm';
-  const isTablet = screenSize === 'md' || screenSize === 'lg';
-  const isDesktop = screenSize === 'xl';
 
-  const [profileStats, setProfileStats] = useState({
-    following: 1247,
+  // Profile stats
+  const [profileStats, setProfileStats] = useState<ProfileStats>({
+    following: 247,
     followers: 342,
-    posts: 42
-  });
-  
-  const [profileData, setProfileData] = useState<ProfileData>({
-    name: user?.name || 'User',
-    email: user?.email || '',
-    phone: '',
-    location: 'Phoenix, AZ',
-    bio: 'Software Engineer @TechCorp 🚀\nBuilding the future one line of code at a time 💻\n#React #TypeScript #AI',
-    skills: ['React', 'TypeScript', 'Node.js', 'Python'],
-    experience: [],
-    education: [],
-    projects: [],
-    certifications: [],
-    portfolio_url: 'https://johndoe.dev',
-    linkedin_url: 'https://linkedin.com/in/johndoe',
-    github_url: 'https://github.com/johndoe',
-    company_name: '',
-    company_description: '',
-    company_size: '',
-    industry: '',
-    website: '',
-    joined_date: 'January 2020'
+    posts: 0
   });
 
-  // Mock posts data for X-style layout
-  const mockPosts = [
+  // Profile data
+  const [profileData, setProfileData] = useState<ProfileData>({
+    full_name: user?.name || 'User',
+    bio: '',
+    location: '',
+    avatar_url: '',
+    cover_image_url: '',
+    skills: [],
+    portfolio_url: '',
+    website: ''
+  });
+
+  // Posts state
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [postsLoading, setPostsLoading] = useState(true);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  // Suggested users data
+  const [suggestedUsers] = useState<SuggestedUser[]>([
     {
       id: '1',
-      content: "Just shipped a new feature that I'm really excited about! The team worked incredibly hard on this one. 🚀",
-      timestamp: '2h',
-      likes: 24,
-      retweets: 8,
-      replies: 3,
-      images: []
+      name: 'kurbonov',
+      username: '@thekurbonov',
+      avatar: '',
+      verified: false
     },
     {
-      id: '2', 
-      content: "Working on some exciting AI projects lately. The future of technology is here and it's incredible what we can build now. What are your thoughts on AI in software development?",
-      timestamp: '5h',
-      likes: 42,
-      retweets: 12,
-      replies: 7,
-      images: []
+      id: '2',
+      name: 'Sadriddin',
+      username: '@abdoorakhimov',
+      avatar: '',
+      verified: false
     },
     {
       id: '3',
-      content: "Beautiful sunset today! Sometimes you need to step away from the code and appreciate the world around you. 🌅",
-      timestamp: '1d',
-      likes: 156,
-      retweets: 23,
-      replies: 18,
-      images: ['https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=300&fit=crop']
+      name: 'The Economist',
+      username: '@TheEconomist',
+      avatar: '',
+      verified: true
     }
+  ]);
+
+  // Trending topics data
+  const [trendingTopics] = useState<TrendingTopic[]>([
+    {
+      category: 'Only on X · Trending',
+      topic: '#KengNamping',
+      posts: '96.6K posts'
+    },
+    {
+      category: 'Entertainment · Trending',
+      topic: 'Brand New Day',
+      posts: '4,533 posts'
+    },
+    {
+      category: 'Politics · Trending',
+      topic: 'North Korea',
+      posts: '37.7K posts'
+    },
+    {
+      category: 'Politics · Trending',
+      topic: 'Hegseth',
+      posts: '43.3K posts'
+    }
+  ]);
+
+  // Navigation items for left sidebar
+  const navigationItems = [
+    { id: 'home', label: 'Home', icon: Home, path: '/dashboard' },
+    { id: 'explore', label: 'Explore', icon: Hash, path: '/explore' },
+    { id: 'notifications', label: 'Notifications', icon: Bell, path: '/notifications' },
+    { id: 'messages', label: 'Messages', icon: Mail, path: '/messages' },
+    { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark, path: '/bookmarks' },
+    { id: 'jobs', label: 'Jobs', icon: Briefcase, path: '/jobs' },
+    { id: 'communities', label: 'Communities', icon: Users, path: '/communities' },
+    { id: 'profile', label: 'Profile', icon: User, path: '/profile' },
+    { id: 'more', label: 'More', icon: MoreHorizontal, path: '#' }
   ];
 
+  // Quick stats for left sidebar
+  const quickStats = [
+    { label: 'Profile Views', value: '1,247', icon: Target },
+    { label: 'Applications', value: '23', icon: Briefcase },
+    { label: 'Connections', value: '589', icon: Users },
+    { label: 'Achievements', value: '12', icon: Award }
+  ];
+
+  // Handle responsive resize
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
@@ -213,735 +231,1096 @@ export default function Profile() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const formatJoinDate = (dateString: string) => {
-    if (!dateString) return 'Joined January 2024';
+  // Load profile data
+  useEffect(() => {
+    if (isOwnProfile && user) {
+      loadProfileData();
+      fetchUserPosts();
+    } else if (userId) {
+      loadOtherUserProfile(userId);
+      fetchUserPosts(userId);
+    }
+  }, [user, userId, isOwnProfile]);
+
+  const loadProfileData = async () => {
+    if (!user) return;
+    
+    try {
+      setLoading(true);
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
+
+      if (profile) {
+        setProfileData({
+          ...profile,
+          skills: profile.skills || []
+        });
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error);
+      setError('Failed to load profile data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadOtherUserProfile = async (targetUserId: string) => {
+    try {
+      setLoading(true);
+      // Mock data for other user's profile
+      const mockProfile: ProfileData = {
+        full_name: 'Other User',
+        bio: 'This is another user\'s profile.',
+        location: 'Remote',
+        avatar_url: '',
+        cover_image_url: '',
+        skills: ['React', 'TypeScript', 'Node.js'],
+        portfolio_url: '',
+        website: ''
+      };
+      setProfileData(mockProfile);
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+      setError('Failed to load user profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchUserPosts = async (targetUserId?: string) => {
+    const userIdToFetch = targetUserId || user?.id;
+    if (!userIdToFetch) return;
+
+    try {
+      setPostsLoading(true);
+      
+      // Fetch posts for the user
+      const { data: postsData, error: postsError } = await supabase
+        .from('posts')
+        .select(`
+          id,
+          content,
+          user_id,
+          created_at,
+          likes_count,
+          shares_count,
+          comments_count,
+          media_type,
+          image_url,
+          video_url,
+          visibility
+        `)
+        .eq('user_id', userIdToFetch)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (postsError) {
+        console.error('Error fetching posts:', postsError);
+        return;
+      }
+
+      // Fetch profile data for the user
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, full_name, username, avatar_url')
+        .eq('id', userIdToFetch)
+        .single();
+
+      if (profileError) {
+        console.warn('Error fetching profile for posts:', profileError);
+      }
+
+      // Transform posts with author information
+      const transformedPosts: Post[] = (postsData || []).map(post => ({
+        ...post,
+        author: {
+          id: userIdToFetch,
+          name: profileData?.full_name || 'User',
+          username: profileData?.username || 'user',
+          avatar_url: profileData?.avatar_url,
+          verified: false
+        }
+      }));
+
+      setPosts(transformedPosts);
+      
+      // Update profile stats with actual post count
+      setProfileStats(prev => ({
+        ...prev,
+        posts: transformedPosts.length
+      }));
+
+    } catch (error) {
+      console.error('Error fetching user posts:', error);
+    } finally {
+      setPostsLoading(false);
+    }
+  };
+
+  const handleEditProfile = () => {
+    navigate('/profile/edit');
+  };
+
+  const formatJoinDate = (dateString?: string) => {
+    if (!dateString) return 'Joined recently';
     const date = new Date(dateString);
     return `Joined ${date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
   };
 
-  const handleSave = () => {
-    // Save logic here
-    setShowEditModal(false);
+  // Sample post data
+  const samplePost = {
+    id: '1',
+    content: 'Just shipped a new feature for our automation platform! Excited to see how it helps businesses streamline their workflows. 🚀 #automation #business',
+    timestamp: 'Aug 28',
+    likes: 12,
+    retweets: 3,
+    replies: 5,
+    image: '/api/placeholder/400/300'
   };
 
-  const addSkill = (skill: string) => {
-    if (skill && !profileData.skills.includes(skill)) {
-      setProfileData(prev => ({
-        ...prev,
-        skills: [...prev.skills, skill]
-      }));
-    }
-  };
+  if (loading) {
+    return (
+      <div className={cn(
+        "flex items-center justify-center min-h-screen",
+        isDark ? "bg-black" : "bg-white"
+      )}>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#BCE953]"></div>
+      </div>
+    );
+  }
 
-  const removeSkill = (skillToRemove: string) => {
-    setProfileData(prev => ({
-      ...prev,
-      skills: prev.skills.filter(skill => skill !== skillToRemove)
-    }));
-  };
-
-  const PostCard = ({ post }: { post: any }) => (
-    <div className={cn(
-      'border-b border-gray-200 dark:border-gray-800 px-4 py-3 hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition-colors cursor-pointer',
-      isMobile ? 'px-4 py-3' : 'px-6 py-4'
-    )}>
-      <div className="flex space-x-3">
-        <div className="flex-shrink-0">
-          <div className={cn(
-            'w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold',
-            isDark ? 'border-black' : 'border-white',
-            isMobile ? 'w-8 h-8 text-sm' : 'w-10 h-10'
+  if (!user) {
+    return (
+      <div className={cn(
+        "flex items-center justify-center min-h-screen",
+        isDark ? "bg-black" : "bg-white"
+      )}>
+        <div className="text-center">
+          <h2 className={cn(
+            "text-xl font-semibold mb-2",
+            isDark ? "text-white" : "text-gray-900"
           )}>
-            {user?.avatar_url ? (
-              <img 
-                src={user.avatar_url}
-                alt={profileData.name}
-                className="w-full h-full rounded-full object-cover"
-              />
-            ) : (
-              profileData.name.charAt(0)
-            )}
-          </div>
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center space-x-2">
-            <span className={cn('font-bold text-gray-900 dark:text-white', isMobile ? 'text-sm' : 'text-base')}>
-              {profileData.name}
-            </span>
-            <span className={cn('text-gray-500', isMobile ? 'text-xs' : 'text-sm')}>
-              @{profileData.name.toLowerCase().replace(/\s/g, '')}
-            </span>
-            <span className="text-gray-500">·</span>
-            <span className={cn('text-gray-500', isMobile ? 'text-xs' : 'text-sm')}>{post.timestamp}</span>
-          </div>
-          <div className={cn('mt-1', isMobile ? 'text-sm' : 'text-base')}>
-            <p className="text-gray-900 dark:text-white whitespace-pre-line">{post.content}</p>
-            {post.images?.length > 0 && (
-              <div className="mt-3">
-                <img 
-                  src={post.images[0]} 
-                  alt="Post image"
-                  className="rounded-2xl max-w-full h-auto border border-gray-200 dark:border-gray-700"
-                />
-              </div>
-            )}
-          </div>
-          <div className={cn('flex items-center justify-between mt-3 max-w-md', isMobile ? 'text-xs' : 'text-sm')}>
-            <button className="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors group">
-              <div className="p-2 rounded-full group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20">
-                <MessageCircle className={cn(isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4')} />
-              </div>
-              <span>{post.replies}</span>
-            </button>
-            <button className="flex items-center space-x-2 text-gray-500 hover:text-green-500 transition-colors group">
-              <div className="p-2 rounded-full group-hover:bg-green-50 dark:group-hover:bg-green-900/20">
-                <TrendingUp className={cn(isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4')} />
-              </div>
-              <span>{post.retweets}</span>
-            </button>
-            <button className="flex items-center space-x-2 text-gray-500 hover:text-red-500 transition-colors group">
-              <div className="p-2 rounded-full group-hover:bg-red-50 dark:group-hover:bg-red-900/20">
-                <Heart className={cn(isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4')} />
-              </div>
-              <span>{post.likes}</span>
-            </button>
-            <button className="text-gray-500 hover:text-blue-500 transition-colors group">
-              <div className="p-2 rounded-full group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20">
-                <Share className={cn(isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4')} />
-              </div>
-            </button>
-          </div>
+            Profile not found
+          </h2>
+          <p className={cn(
+            isDark ? "text-gray-400" : "text-gray-600"
+          )}>
+            Please complete your profile setup.
+          </p>
         </div>
       </div>
-    </div>
-  );
-
-  const TabButton = ({ id, label, isActive, onClick }: { id: string; label: string; isActive: boolean; onClick: () => void }) => (
-    <button
-      onClick={onClick}
-      className={cn(
-        'relative px-4 py-4 font-medium text-center transition-colors hover:bg-gray-50/50 dark:hover:bg-white/[0.02] flex-1',
-        isMobile ? 'text-sm px-2 py-3' : 'text-base',
-        isActive
-          ? 'text-gray-900 dark:text-white'
-          : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
-      )}
-    >
-      {label}
-      {isActive && (
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-500 rounded-full"></div>
-      )}
-    </button>
-  );
-
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'posts':
-        return (
-          <div>
-            {mockPosts.map((post) => (
-              <PostCard key={post.id} post={post} />
-            ))}
-          </div>
-        );
-
-      case 'replies':
-        return (
-          <div className="text-center py-16">
-            <MessageCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No replies yet</h3>
-            <p className="text-gray-500">When @{profileData.name.toLowerCase().replace(/\s/g, '')} replies to posts, they'll show up here.</p>
-          </div>
-        );
-
-      case 'highlights':
-        return (
-          <div className="text-center py-16">
-            <Zap className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Nothing to see here — yet</h3>
-            <p className="text-gray-500">Highlights from this account will show up here.</p>
-          </div>
-        );
-
-      case 'articles':
-        return (
-          <div className="text-center py-16">
-            <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No articles yet</h3>
-            <p className="text-gray-500">Articles written by @{profileData.name.toLowerCase().replace(/\s/g, '')} will appear here.</p>
-          </div>
-        );
-
-      case 'media':
-        return (
-          <div className="text-center py-16">
-            <Camera className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No photos or videos yet</h3>
-            <p className="text-gray-500">When @{profileData.name.toLowerCase().replace(/\s/g, '')} posts photos or videos, they'll show up here.</p>
-          </div>
-        );
-
-      case 'likes':
-        return (
-          <div className="text-center py-16">
-            <Heart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No likes yet</h3>
-            <p className="text-gray-500">When @{profileData.name.toLowerCase().replace(/\s/g, '')} likes a post, it'll show up here.</p>
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
+    );
+  }
 
   return (
     <div className={cn(
-      'min-h-screen',
-      isDark ? 'bg-black text-white' : 'bg-white text-black',
-      // Add safe area padding for mobile devices
-      isMobile && 'pb-safe-area-inset-bottom pt-safe-area-inset-top'
+      "min-h-screen",
+      isDark ? "bg-black text-white" : "bg-gray-50 text-gray-900"
     )}>
-      {/* X-Style Header - Enhanced Mobile Responsiveness */}
-      <div className={cn(
-        'sticky backdrop-blur-md border-b z-20',
-        isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200',
-        // Responsive positioning
-        isMobile ? 'top-0' : 'top-0'
-      )}>
+      <div className="max-w-7xl mx-auto flex">
+        {/* Left Sidebar - Hidden on mobile */}
         <div className={cn(
-          'flex items-center py-3',
-          // Responsive padding
-          screenSize === 'xs' ? 'px-3' : 'px-4'
+          "hidden lg:block w-80 p-4 space-y-6 border-r sticky top-0 h-screen overflow-y-auto",
+          isDark ? "bg-black border-gray-800" : "bg-white border-gray-200"
         )}>
-          <button 
-            onClick={() => navigate(-1)}
-            className={cn(
-              'p-2 hover:bg-gray-100 dark:hover:bg-gray-900 rounded-full transition-colors',
-              // Enhanced touch targets for mobile
-              isMobile ? 'p-3 -ml-1 mr-4' : 'mr-8'
+          {/* User Profile Quick View */}
+          <div className="relative rounded-2xl p-4 text-white overflow-hidden">
+            {/* Cover Photo Background */}
+            {profileData.cover_image_url ? (
+              <img
+                src={profileData.cover_image_url}
+                alt="Cover"
+                className="absolute inset-0 w-full h-full object-cover rounded-2xl"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl" />
             )}
-          >
-            <ArrowLeft className={cn(isMobile ? 'w-5 h-5' : 'w-5 h-5')} />
-          </button>
-          <div className="flex-1">
-            <h1 className={cn(
-              'font-bold truncate',
-              screenSize === 'xs' ? 'text-lg' : 'text-xl'
-            )}>
-              {profileData.name}
-            </h1>
-            <p className={cn(
-              'text-gray-500 truncate',
-              screenSize === 'xs' ? 'text-xs' : 'text-sm'
-            )}>
-              {profileStats.posts} posts
-            </p>
-          </div>
-          <button className={cn(
-            'p-2 hover:bg-gray-100 dark:hover:bg-gray-900 rounded-full transition-colors',
-            isMobile && 'p-3'
-          )}>
-            <MoreHorizontal className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-
-      <div className={cn(
-        'mx-auto',
-        // Responsive max widths
-        screenSize === 'xs' ? 'max-w-full' : 
-        screenSize === 'sm' ? 'max-w-full' : 
-        screenSize === 'md' ? 'max-w-full' : 
-        'max-w-2xl'
-      )}>
-        {/* Cover Photo - Enhanced Mobile Sizes */}
-        <div className={cn(
-          'relative',
-          // Responsive cover photo heights
-          screenSize === 'xs' ? 'h-40' :
-          screenSize === 'sm' ? 'h-44' :
-          screenSize === 'md' ? 'h-48' :
-          'h-52'
-        )}>
-          <div className={cn(
-            'absolute inset-0',
-            isDark 
-              ? 'bg-gradient-to-br from-gray-800 via-gray-700 to-gray-600' 
-              : 'bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500'
-          )}></div>
-          <button className={cn(
-            'absolute bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors',
-            // Responsive positioning and sizing
-            screenSize === 'xs' ? 'top-2 right-2 p-1.5' : 'top-4 right-4 p-2'
-          )}>
-            <Camera className={cn(screenSize === 'xs' ? 'w-3.5 h-3.5' : 'w-4 h-4')} />
-          </button>
-        </div>
-
-        {/* Profile Section - Enhanced Mobile Layout */}
-        <div className={cn(
-          screenSize === 'xs' ? 'px-3' :
-          screenSize === 'sm' ? 'px-3' : 
-          'px-4'
-        )}>
-          <div className={cn(
-            'flex justify-between items-start mb-4',
-            // Responsive avatar positioning
-            screenSize === 'xs' ? '-mt-12' :
-            screenSize === 'sm' ? '-mt-14' :
-            '-mt-16'
-          )}>
-            {/* Avatar - Responsive Sizing */}
-            <div className="relative">
-              <div className={cn(
-                'rounded-full border-4 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold',
-                isDark ? 'border-black' : 'border-white',
-                // Responsive avatar sizes
-                screenSize === 'xs' ? 'w-24 h-24 text-2xl' :
-                screenSize === 'sm' ? 'w-28 h-28 text-3xl' :
-                screenSize === 'md' ? 'w-32 h-32 text-4xl' :
-                'w-32 h-32 text-4xl'
-              )}>
-                {user?.avatar_url ? (
-                  <img 
-                    src={user.avatar_url}
-                    alt={profileData.name}
-                    className="w-full h-full rounded-full object-cover"
+            
+            {/* Dark overlay for better text readability */}
+            <div className="absolute inset-0 bg-black/40 rounded-2xl" />
+            
+            {/* Content */}
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-4">
+                {profileData.avatar_url ? (
+                  <img
+                    src={profileData.avatar_url}
+                    alt="Profile"
+                    className="w-12 h-12 rounded-full border-2 border-white object-cover"
                   />
                 ) : (
-                  profileData.name.charAt(0)
-                )}
-              </div>
-            </div>
-
-            {/* Action Buttons - Mobile Optimized */}
-            <div className={cn(
-              'flex mt-4',
-              // Responsive button layouts
-              screenSize === 'xs' ? 'flex-col space-y-2 w-full ml-4' :
-              screenSize === 'sm' ? 'flex-wrap gap-2 ml-4' :
-              'space-x-2'
-            )}>
-              {screenSize === 'xs' ? (
-                // Extra small screens - stacked buttons
-                <>
-                  <Button
-                    variant="outlined"
-                    onClick={() => setShowEditModal(true)}
-                    className="w-full rounded-full font-bold border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900 text-sm"
-                    size="sm"
-                  >
-                    Edit profile
-                  </Button>
-                  <div className="flex space-x-2">
-                    <button className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
-                      <Mail className="w-4 h-4 mx-auto" />
-                    </button>
-                    <button className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
-                      <Bell className="w-4 h-4 mx-auto" />
-                    </button>
-                    <button className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
-                      <MoreHorizontal className="w-4 h-4 mx-auto" />
-                    </button>
+                  <div className="w-12 h-12 rounded-full border-2 border-white bg-white/20 flex items-center justify-center text-white font-bold">
+                    {(profileData.full_name || user?.name || 'U').charAt(0)}
                   </div>
-                </>
-              ) : isMobile ? (
-                // Small screens - compact layout
-                <>
-                  <button className="p-2 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
-                    <Mail className="w-4 h-4" />
-                  </button>
-                  <button className="p-2 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
-                    <Bell className="w-4 h-4" />
-                  </button>
-                  <button className="p-2 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
-                    <MoreHorizontal className="w-4 h-4" />
-                  </button>
-                  <Button
-                    variant="outlined"
-                    onClick={() => setShowEditModal(true)}
-                    className="rounded-full px-4 font-bold border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900 text-sm"
-                    size="sm"
-                  >
-                    Edit
-                  </Button>
-                </>
-              ) : (
-                // Desktop layout
-                <>
-                  <button className="p-2 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
-                    <Mail className="w-5 h-5" />
-                  </button>
-                  <button className="p-2 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
-                    <Bell className="w-5 h-5" />
-                  </button>
-                  <button className="p-2 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
-                    <MoreHorizontal className="w-5 h-5" />
-                  </button>
-                  <Button
-                    variant="outlined"
-                    onClick={() => setShowEditModal(true)}
-                    className="rounded-full px-6 font-bold border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900"
-                  >
-                    Edit profile
-                  </Button>
-                </>
-              )}
+                )}
+                <div className="flex-1">
+                  <h3 className="font-bold text-sm">
+                    {profileData.full_name || user?.name || 'User'}
+                  </h3>
+                  <p className="text-white/80 text-xs">
+                    @{profileData.username || 'username'}
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="text-center">
+                  <div className="font-bold">{profileStats.followers}</div>
+                  <div className="text-white/80">Followers</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-bold">{profileStats.following}</div>
+                  <div className="text-white/80">Following</div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Profile Info - Enhanced Mobile Typography */}
-          <div className="mb-4">
-            <h1 className={cn(
-              'font-bold mb-1',
-              screenSize === 'xs' ? 'text-xl' :
-              screenSize === 'sm' ? 'text-2xl' :
-              'text-2xl'
-            )}>
-              {profileData.name}
-            </h1>
-            <p className={cn(
-              'text-gray-500 mb-3',
-              screenSize === 'xs' ? 'text-sm' : 'text-base'
-            )}>
-              @{profileData.name.toLowerCase().replace(/\s/g, '')}
+          {/* AI Career Assistant - Unique Feature */}
+          <div className="bg-primary rounded-2xl p-4 text-white">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 bg-white-/90 rounded-full flex items-center justify-center">
+                <Target className="w-4 h-4" />
+              </div>
+              <h3 className="font-bold text-lg">AI Career Coach</h3>
+            </div>
+            <p className="text-sm text-white/90 mb-3">
+              Get personalized career guidance based on your profile and goals
             </p>
-            
-            <div className="mb-3">
-              <p className={cn(
-                'whitespace-pre-line leading-relaxed',
-                screenSize === 'xs' ? 'text-sm' : 'text-base'
-              )}>
-                {profileData.bio}
-              </p>
+            <div className="space-y-2">
+              <button className="w-full bg-white/20 hover:bg-white/30 rounded-lg p-2 text-xs text-left transition-colors">
+                Daily Career Tip: "Network authentically, not just for opportunities"
+              </button>
+              <button className="w-full bg-white/20 hover:bg-white/30 rounded-lg p-2 text-xs text-left transition-colors">
+                Next Goal: Complete 3 skill assessments this week
+              </button>
             </div>
+          </div>
 
-            {/* Metadata - Responsive Layout */}
-            <div className={cn(
-              'flex flex-wrap items-center mb-4 text-gray-500',
-              screenSize === 'xs' ? 'gap-3 text-xs' :
-              screenSize === 'sm' ? 'gap-3 text-sm' :
-              'gap-4 text-sm'
-            )}>
-              {profileData.location && (
-                <div className="flex items-center space-x-1">
-                  <MapPin className={cn(screenSize === 'xs' ? 'w-3 h-3' : 'w-4 h-4')} />
-                  <span className="truncate max-w-32">{profileData.location}</span>
-                </div>
-              )}
-              {profileData.portfolio_url && (
-                <div className="flex items-center space-x-1 min-w-0">
-                  <LinkIcon className={cn(screenSize === 'xs' ? 'w-3 h-3' : 'w-4 h-4')} />
-                  <a 
-                    href={profileData.portfolio_url} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="text-blue-500 hover:underline truncate max-w-32"
-                  >
-                    {profileData.portfolio_url.replace('https://', '')}
-                  </a>
-                </div>
-              )}
-              <div className="flex items-center space-x-1">
-                <Calendar className={cn(screenSize === 'xs' ? 'w-3 h-3' : 'w-4 h-4')} />
-                <span>Joined {profileData.joined_date}</span>
+          {/* Skills Development Tracker */}
+          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+            <div className="p-4 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-gray-900">Skill Progress</h3>
+                <button className="text-[#7BA805] text-sm hover:underline">View All</button>
               </div>
             </div>
-
-            {/* Following/Followers - Enhanced Mobile Layout */}
-            <div className={cn(
-              'flex',
-              screenSize === 'xs' ? 'space-x-4' : 'space-x-6'
-            )}>
-              <button className="hover:underline">
-                <span className={cn(
-                  'font-bold',
-                  screenSize === 'xs' ? 'text-sm' : 'text-base'
-                )}>
-                  {profileStats.following.toLocaleString()}
-                </span>
-                <span className={cn(
-                  'text-gray-500 ml-1',
-                  screenSize === 'xs' ? 'text-xs' : 'text-sm'
-                )}>
-                  Following
-                </span>
-              </button>
-              <button className="hover:underline">
-                <span className={cn(
-                  'font-bold',
-                  screenSize === 'xs' ? 'text-sm' : 'text-base'
-                )}>
-                  {profileStats.followers.toLocaleString()}
-                </span>
-                <span className={cn(
-                  'text-gray-500 ml-1',
-                  screenSize === 'xs' ? 'text-xs' : 'text-sm'
-                )}>
-                  Followers
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Navigation Tabs - Enhanced Mobile Scrolling */}
-        <div className="border-b border-gray-200 dark:border-gray-800">
-          <div className={cn(
-            'flex overflow-x-auto scrollbar-hide',
-            // Mobile tab optimizations
-            isMobile && 'snap-x snap-mandatory'
-          )}>
-            <TabButton
-              id="posts"
-              label="Posts"
-              isActive={activeTab === 'posts'}
-              onClick={() => setActiveTab('posts')}
-            />
-            <TabButton
-              id="replies"
-              label="Replies"
-              isActive={activeTab === 'replies'}
-              onClick={() => setActiveTab('replies')}
-            />
-            <TabButton
-              id="highlights"
-              label="Highlights"
-              isActive={activeTab === 'highlights'}
-              onClick={() => setActiveTab('highlights')}
-            />
-            <TabButton
-              id="articles"
-              label="Articles"
-              isActive={activeTab === 'articles'}
-              onClick={() => setActiveTab('articles')}
-            />
-            <TabButton
-              id="media"
-              label="Media"
-              isActive={activeTab === 'media'}
-              onClick={() => setActiveTab('media')}
-            />
-            <TabButton
-              id="likes"
-              label="Likes"
-              isActive={activeTab === 'likes'}
-              onClick={() => setActiveTab('likes')}
-            />
-          </div>
-        </div>
-
-        {/* Tab Content */}
-        {renderTabContent()}
-      </div>
-
-      {/* Enhanced Edit Profile Modal */}
-      <Modal
-        open={showEditModal}
-        onClose={() => setShowEditModal(false)}
-        title="Edit Profile"
-        maxWidth="lg"
-      >
-        <div className="space-y-6">
-          {/* Cover Photo Section */}
-          <div className="relative">
-            <div className={cn(
-              'rounded-lg flex items-center justify-center group',
-              isDark ? 'bg-gray-800' : 'bg-gray-200',
-              isMobile ? 'h-32' : 'h-40'
-            )}>
-              <button className="p-3 bg-blue-500 hover:bg-blue-600 rounded-full text-white">
-                <Upload className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
-
-          {/* Avatar Section */}
-          <div className={cn('flex justify-center mb-8', isMobile ? '-mt-16 mb-6' : '-mt-20')}>
-            <div className="relative group">
-              <div className={cn(
-                'rounded-full border-4 flex items-center justify-center text-white font-bold',
-                isDark ? 'border-black bg-gray-700' : 'border-white bg-gray-400',
-                isMobile ? 'w-20 h-20 text-xl' : 'w-24 h-24 text-2xl'
-              )}>
-                {profileData.name.charAt(0)}
-              </div>
-              <button className={cn(
-                'absolute bottom-0 right-0 p-1 bg-blue-500 rounded-full text-white',
-                isMobile ? 'p-1' : 'p-1'
-              )}>
-                <Camera className="h-3 w-3" />
-              </button>
-            </div>
-          </div>
-
-          {/* Enhanced Form Fields */}
-          <div className={cn('grid gap-4', isMobile ? 'grid-cols-1 gap-3' : 'grid-cols-1 md:grid-cols-2 gap-4')}>
-            <div className={cn(isMobile ? '' : 'md:col-span-2')}>
-              <label className={cn('block font-medium mb-2', isMobile ? 'text-sm' : 'text-sm')}>Full Name</label>
-              <input
-                type="text"
-                value={profileData.name}
-                onChange={(e) => setProfileData(prev => ({...prev, name: e.target.value}))}
-                className={cn(
-                  'w-full p-3 border rounded-lg',
-                  isDark 
-                    ? 'border-gray-600 bg-gray-800 text-white' 
-                    : 'border-gray-300 bg-white text-black',
-                  isMobile ? 'p-2 text-sm' : 'p-3'
-                )}
-              />
-            </div>
-
-            <div className={cn(isMobile ? '' : 'md:col-span-2')}>
-              <label className={cn('block font-medium mb-2', isMobile ? 'text-sm' : 'text-sm')}>Bio</label>
-              <textarea
-                value={profileData.bio}
-                onChange={(e) => setProfileData(prev => ({...prev, bio: e.target.value}))}
-                rows={isMobile ? 3 : 4}
-                className={cn(
-                  'w-full border rounded-lg resize-none',
-                  isDark 
-                    ? 'border-gray-600 bg-gray-800 text-white' 
-                    : 'border-gray-300 bg-white text-black',
-                  isMobile ? 'p-2 text-sm' : 'p-3'
-                )}
-                placeholder="Tell us about yourself..."
-              />
-            </div>
-
-            <div>
-              <label className={cn('block font-medium mb-2', isMobile ? 'text-sm' : 'text-sm')}>Location</label>
-              <input
-                type="text"
-                value={profileData.location}
-                onChange={(e) => setProfileData(prev => ({...prev, location: e.target.value}))}
-                className={cn(
-                  'w-full border rounded-lg',
-                  isDark 
-                    ? 'border-gray-600 bg-gray-800 text-white' 
-                    : 'border-gray-300 bg-white text-black',
-                  isMobile ? 'p-2 text-sm' : 'p-3'
-                )}
-                placeholder="City, State"
-              />
-            </div>
-
-            <div>
-              <label className={cn('block font-medium mb-2', isMobile ? 'text-sm' : 'text-sm')}>Phone</label>
-              <input
-                type="tel"
-                value={profileData.phone}
-                onChange={(e) => setProfileData(prev => ({...prev, phone: e.target.value}))}
-                className={cn(
-                  'w-full border rounded-lg',
-                  isDark 
-                    ? 'border-gray-600 bg-gray-800 text-white' 
-                    : 'border-gray-300 bg-white text-black',
-                  isMobile ? 'p-2 text-sm' : 'p-3'
-                )}
-                placeholder="+1 (555) 123-4567"
-              />
-            </div>
-
-            <div className={cn(isMobile ? '' : 'md:col-span-2')}>
-              <label className={cn('block font-medium mb-2', isMobile ? 'text-sm' : 'text-sm')}>Website/Portfolio</label>
-              <input
-                type="url"
-                value={profileData.portfolio_url || profileData.website || ''}
-                onChange={(e) => setProfileData(prev => ({
-                  ...prev, 
-                  [user?.role === 'employer' ? 'website' : 'portfolio_url']: e.target.value
-                }))}
-                className={cn(
-                  'w-full border rounded-lg',
-                  isDark 
-                    ? 'border-gray-600 bg-gray-800 text-white' 
-                    : 'border-gray-300 bg-white text-black',
-                  isMobile ? 'p-2 text-sm' : 'p-3'
-                )}
-                placeholder="https://yourwebsite.com"
-              />
-            </div>
-
-            <div>
-              <label className={cn('block font-medium mb-2', isMobile ? 'text-sm' : 'text-sm')}>LinkedIn</label>
-              <input
-                type="url"
-                value={profileData.linkedin_url || ''}
-                onChange={(e) => setProfileData(prev => ({...prev, linkedin_url: e.target.value}))}
-                className={cn(
-                  'w-full border rounded-lg',
-                  isDark 
-                    ? 'border-gray-600 bg-gray-800 text-white' 
-                    : 'border-gray-300 bg-white text-black',
-                  isMobile ? 'p-2 text-sm' : 'p-3'
-                )}
-                placeholder="https://linkedin.com/in/yourprofile"
-              />
-            </div>
-          </div>
-
-          {/* Enhanced Skills Section */}
-          <div>
-            <label className={cn('block font-medium mb-2', isMobile ? 'text-sm' : 'text-sm')}>Skills</label>
-            <div className={cn('flex flex-wrap gap-2 mb-3', isMobile ? 'gap-1.5 mb-2' : 'gap-2')}>
-              {profileData.skills.map((skill, index) => (
-                <Badge
-                  key={index}
-                  variant="secondary"
-                  className={cn('flex items-center space-x-2', isMobile ? 'px-2 py-1 text-xs' : 'px-3 py-1')}
-                >
-                  <span>{skill}</span>
-                  <button
-                    onClick={() => removeSkill(skill)}
-                    className="hover:text-red-500"
-                  >
-                    <XIcon className="h-3 w-3" />
-                  </button>
-                </Badge>
+            <div className="p-4 space-y-4">
+              {[
+                { skill: 'React', level: 85, trending: true },
+                { skill: 'TypeScript', level: 72, trending: false },
+                { skill: 'Node.js', level: 68, trending: true }
+              ].map((skill, index) => (
+                <div key={index}>
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-gray-900">{skill.skill}</span>
+                    
+                    </div>
+                    <span className="text-xs text-gray-600">{skill.level}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-1.5">
+                    <div 
+                      className="bg-[#BCE953] h-1.5 rounded-full transition-all duration-300"
+                      style={{width: `${skill.level}%`}}
+                    />
+                  </div>
+                </div>
               ))}
             </div>
-            <Button
-              variant="outlined"
-              onClick={() => {
-                const skill = prompt('Enter a skill:');
-                if (skill) addSkill(skill);
-              }}
-              className={cn(isMobile ? 'w-full text-sm' : 'w-full md:w-auto')}
-              size={isMobile ? 'sm' : 'md'}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Skill
-            </Button>
           </div>
 
-          {/* Action Buttons */}
-          <div className={cn(
-            'flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700',
-            isMobile ? 'flex-col space-y-2 space-x-0' : ''
-          )}>
-            <Button
-              variant="outlined"
-              onClick={() => setShowEditModal(false)}
-              className={cn(isMobile ? 'w-full order-2' : '')}
-              size={isMobile ? 'sm' : 'md'}
+          {/* Industry Insights */}
+          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+            <div className="p-4 border-b border-gray-200">
+              <h3 className="font-bold text-gray-900">Industry Pulse</h3>
+              <p className="text-xs text-gray-600">Real-time market insights</p>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {[
+                { 
+                  title: 'AI/ML Engineers', 
+                  change: '+23%', 
+                  trend: 'up',
+                  description: 'Demand surge this month'
+                },
+                { 
+                  title: 'Full-Stack Developers', 
+                  change: '+15%', 
+                  trend: 'up',
+                  description: 'Remote opportunities rising'
+                },
+                { 
+                  title: 'UX Designers', 
+                  change: '+8%', 
+                  trend: 'up',
+                  description: 'Fintech sector leading'
+                }
+              ].map((insight, index) => (
+                <div key={index} className="p-3 hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-medium text-gray-900">{insight.title}</span>
+                    {/* <div className={cn(
+                      'flex items-center gap-1 text-xs px-2 py-1 rounded-full',
+                      insight.trend === 'up' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                    )}>
+                      <TrendingUp className="w-3 h-3" />
+                      {insight.change}
+                    </div> */}
+                  </div>
+                  <p className="text-xs text-gray-600">{insight.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Mentorship Marketplace */}
+          <div className="bg-blue-950 rounded-2xl p-4 text-white">
+            <div className="flex items-center gap-2 mb-3">
+              <Users className="w-5 h-5" />
+              <h3 className="font-bold">Find a Mentor</h3>
+            </div>
+            <p className="text-sm text-white/90 mb-3">
+              Connect with industry professionals for 1-on-1 guidance
+            </p>
+            <div className="flex -space-x-2 mb-3">
+              {[1,2,3,4].map((i) => (
+                <div key={i} className="w-8 h-8 bg-white/20 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold">
+                  {String.fromCharCode(65 + i)}
+                </div>
+              ))}
+              <div className="w-8 h-8 bg-white/30 rounded-full border-2 border-white flex items-center justify-center text-xs">
+                +12
+              </div>
+            </div>
+            <button className="w-full bg-white/20 hover:bg-white/30 rounded-lg py-2 text-sm font-medium transition-colors">
+              Browse Mentors
+            </button>
+          </div>
+
+          {/* Career Opportunities Scanner */}
+          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+            <div className="p-4 border-b border-gray-200">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <h3 className="font-bold text-gray-900">Live Opportunities</h3>
+              </div>
+              <p className="text-xs text-gray-600">Matching your profile in real-time</p>
+            </div>
+            <div className="p-4 space-y-3">
+              {[
+                { 
+                  company: 'Google', 
+                  role: 'Frontend Developer',
+                  match: 94,
+                  timeLeft: '2 days',
+                  applicants: 23
+                },
+                { 
+                  company: 'Meta', 
+                  role: 'Product Manager',
+                  match: 87,
+                  timeLeft: '5 days',
+                  applicants: 45
+                }
+              ].map((opp, index) => (
+                <div key={index} className="border border-gray-200 rounded-lg p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <h4 className="font-medium text-sm text-gray-900">{opp.role}</h4>
+                      <p className="text-xs text-gray-600">{opp.company}</p>
+                    </div>
+                    <div className="text-right">
+                      <div className={cn(
+                        'text-xs px-2 py-1 rounded-full font-medium',
+                        opp.match >= 90 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                      )}>
+                        {opp.match}% match
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>{opp.applicants} applied</span>
+                    <span>Closes in {opp.timeLeft}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Create Post Button */}
+          <Button
+            onClick={() => navigate('/create-post')}
+            className="w-full bg-[#BCE953] hover:bg-[#A8D543] text-black font-bold py-3 rounded-full flex items-center justify-center gap-2"
+          >
+            <Plus className="w-5 h-5" />
+            Create Post
+          </Button>
+
+          {/* Recent Connections */}
+          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+            <div className="p-4 border-b border-gray-200">
+              <h3 className="font-bold text-gray-900">Recent Connections</h3>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {[
+                { name: 'Alex Chen', role: 'Software Engineer', avatar: '' },
+                { name: 'Sarah Johnson', role: 'Product Manager', avatar: '' },
+                { name: 'Mike Rodriguez', role: 'Designer', avatar: '' }
+              ].map((connection, index) => (
+                <div key={index} className="p-3 hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 font-bold text-sm">
+                      {connection.name.charAt(0)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm text-gray-900 truncate">
+                        {connection.name}
+                      </p>
+                      <p className="text-xs text-gray-600 truncate">
+                        {connection.role}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Settings and Logout */}
+          <div className="space-y-2">
+            <button
+              onClick={() => navigate('/settings')}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-100 transition-colors"
             >
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              onClick={handleSave}
-              className={cn('bg-blue-500 hover:bg-blue-600', isMobile ? 'w-full order-1' : '')}
-              size={isMobile ? 'sm' : 'md'}
+              <Settings className="w-5 h-5" />
+              <span>Settings</span>
+            </button>
+            <button
+              onClick={() => {/* handle logout */}}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition-colors"
             >
-              <Save className="h-4 w-4 mr-2" />
-              Save Changes
-            </Button>
+              <LogOut className="w-5 h-5" />
+              <span>Logout</span>
+            </button>
           </div>
         </div>
-      </Modal>
+
+        {/* Main Content */}
+        <div className={cn('flex-1 max-w-2xl border-x border-gray-200 bg-white', isDark ? "bg-black text-white" : "bg-gray-50 text-gray-900")}>
+          {/* Header */}
+          <div className="sticky top-0 backdrop-blur-md bg-white/80 border-b border-gray-200 z-20">
+            <div className="flex items-center py-3 px-4">
+              <button 
+                onClick={() => navigate(-1)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors mr-4"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <div className="flex-1">
+                <h1 className="font-bold text-xl text-gray-900">
+                  {profileData.full_name || user?.name || 'User'}
+                </h1>
+                <p className="text-gray-600 text-sm">
+                  {profileStats.posts} posts
+                </p>
+              </div>
+              <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                <MoreHorizontal className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Cover Photo */}
+          <div className={cn("relative h-48 bg-gradient-to-r from-blue-400 to-purple-500")}>
+            {profileData.cover_image_url ? (
+              <img
+                src={profileData.cover_image_url}
+                alt="Cover"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-blue-400 via-purple-500 to-pink-400" />
+            )}
+          </div>
+
+          {/* Profile Info */}
+          <div className="px-4 pb-4 bg-white">
+            <div className="flex justify-between items-start -mt-16 mb-4">
+              {/* Avatar */}
+              <div className="relative">
+                {profileData.avatar_url ? (
+                  <img
+                    src={profileData.avatar_url}
+                    alt="Profile"
+                    className="w-32 h-32 rounded-full border-4 border-white object-cover shadow-lg"
+                  />
+                ) : (
+                  <div className="w-32 h-32 rounded-full border-4 border-white bg-gray-300 flex items-center justify-center text-gray-700 font-bold text-4xl shadow-lg">
+                    {(profileData.full_name || user?.name || 'U').charAt(0)}
+                  </div>
+                )}
+              </div>
+
+              {/* Edit Profile Button */}
+              <div className="mt-4">
+                <Button
+                  variant="outlined"
+                  onClick={handleEditProfile}
+                  className="rounded-full px-6 py-1.5 border-gray-300 text-black hover:bg-transparent font-bold"
+                >
+                  Edit profile
+                </Button>
+              </div>
+            </div>
+
+            {/* User Info */}
+            <div className={cn("mb-4", isDark ? "bg-black text-white" : "text-gray-900")}>
+              <div className="flex items-center gap-2 mb-1">
+                <h1 className="text-2xl font-bold text-gray-900">
+                  {profileData.full_name || user?.name || 'User'}
+                </h1>
+                {user?.profile?.verified && (
+                  <Verified className="w-5 h-5 text-blue-500" />
+                )}
+              </div>
+              <p className="text-gray-600 text-base mb-3">
+                @{(profileData.username || (profileData.full_name || user?.name || 'user').toLowerCase().replace(/\s/g, ''))}
+              </p>
+
+              {/* Bio */}
+              <div className="mb-3">
+                <p className="text-gray-900 leading-relaxed">
+                  {profileData.bio || 'The Lab Business automation company'}
+                </p>
+              </div>
+
+              {/* Metadata */}
+              <div className="flex flex-wrap items-center gap-4 text-gray-600 text-sm mb-3">
+                {profileData.location && (
+                  <div className="flex items-center gap-1">
+                    <MapPin className="w-4 h-4" />
+                    <span>Mobile Application</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-1">
+                  <Calendar className="w-4 h-4" />
+                  <span>Joined {formatJoinDate(profileData.created_at) || 'January 2025'}</span>
+                </div>
+              </div>
+
+              {/* Following/Followers */}
+              <div className="flex gap-5">
+                <button className="hover:underline">
+                  <span className="font-bold text-gray-900">
+                    {profileStats.following}
+                  </span>
+                  <span className="text-gray-600 ml-1">
+                    Following
+                  </span>
+                </button>
+                <button className="hover:underline">
+                  <span className="font-bold text-gray-900">
+                    {profileStats.followers}
+                  </span>
+                  <span className="text-gray-600 ml-1">
+                    Followers
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* Verification Banner */}
+            <div className="bg-[#BCE953]/10 border border-[#BCE953] rounded-xl p-4 mb-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[#7BA805] font-bold">You aren't verified yet</span>
+                    <Verified className="w-5 h-5 text-[#7BA805]" />
+                  </div>
+                  <p className="text-gray-700 text-sm mb-3">
+                    Get verified for boosted replies, analytics, ad-free browsing, and more. 
+                    Upgrade your profile now.
+                  </p>
+                  <Button
+                    variant="primary"
+                    className="bg-[#BCE953] hover:bg-[#A8D543] text-black font-bold px-4 py-1.5 rounded-full text-sm"
+                  >
+                    Get verified
+                  </Button>
+                </div>
+                <button className="text-gray-600 hover:text-gray-900">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Navigation Tabs */}
+          <div className="border-b border-gray-200 bg-white">
+            <div className="flex">
+              {[
+                { id: 'posts', label: 'Posts' },
+                { id: 'replies', label: 'Replies' },
+                { id: 'highlights', label: 'Highlights' },
+                { id: 'articles', label: 'Articles' },
+                { id: 'media', label: 'Media' },
+                { id: 'likes', label: 'Likes' }
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={cn(
+                    'relative px-4 py-4 text-center font-medium transition-colors flex-1',
+                    activeTab === tab.id
+                      ? 'text-gray-900'
+                      : 'text-gray-600 hover:text-gray-900'
+                  )}
+                >
+                  <span className="text-sm">{tab.label}</span>
+                  {activeTab === tab.id && (
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#BCE953] rounded-full" />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Posts Content */}
+          <div className={cn("min-h-screen", isDark ? "bg-black text-white" : "bg-gray-50 text-gray-900")}>
+            {postsLoading ? (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#BCE953]"></div>
+              </div>
+            ) : posts.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                  <MessageCircle className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No posts yet</h3>
+                <p className="text-gray-600 mb-4">
+                  {isOwnProfile ? "You haven't posted anything yet." : "This user hasn't posted anything yet."}
+                </p>
+                {isOwnProfile && (
+                  <Button
+                    onClick={() => navigate('/create-post')}
+                    className="bg-[#BCE953] hover:bg-[#A8D543] text-black font-bold px-6 py-2 rounded-full"
+                  >
+                    Create your first post
+                  </Button>
+                )}
+              </div>
+            ) : (
+              posts.map((post) => (
+                <div key={post.id} className={cn("border-b border-gray-200 p-4 transition-colors cursor-pointe")} onClick={() => navigate(`/post/${post.id}`)}>
+                  <div className="flex gap-3">
+                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center font-bold flex-shrink-0">
+                      {post.author?.avatar_url ? (
+                        <img
+                          src={post.author.avatar_url}
+                          alt={post.author.name}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                      ) : (
+                        (post.author?.name || 'U').charAt(0)
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-bold text-gray-900">
+                          {post.author?.name || 'User'}
+                        </span>
+                        <span className="text-gray-600 text-sm">
+                          @{post.author?.username || 'user'}
+                        </span>
+                        <span className="text-gray-600">·</span>
+                        <span className="text-gray-600 text-sm">
+                          {new Date(post.created_at).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric'
+                          })}
+                        </span>
+                        <button className="ml-auto text-gray-600 hover:text-gray-900">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <p className="text-gray-900 mb-3 leading-relaxed whitespace-pre-wrap">
+                        {post.content}
+                      </p>
+                      
+                      {/* Media Content */}
+                      {post.image_url && (
+                        <div className="rounded-2xl overflow-hidden mb-3 border border-gray-300">
+                          <img 
+                            src={post.image_url} 
+                            alt="Post image"
+                            className="w-full h-auto max-h-96 object-cover"
+                          />
+                        </div>
+                      )}
+                      
+                      {post.video_url && (
+                        <div className="rounded-2xl overflow-hidden mb-3 border border-gray-300">
+                          <video 
+                            src={post.video_url}
+                            controls
+                            className="w-full h-auto max-h-96"
+                          >
+                            Your browser does not support the video tag.
+                          </video>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center justify-between max-w-md text-gray-600">
+                        <button 
+                          className="flex items-center gap-2 hover:text-blue-500 transition-colors group"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/post/${post.id}`);
+                          }}
+                        >
+                          <div className="p-2 rounded-full group-hover:bg-blue-50">
+                            <MessageCircle className="w-4 h-4" />
+                          </div>
+                          <span className="text-sm">{post.comments_count || 0}</span>
+                        </button>
+                        <button className="flex items-center gap-2 hover:text-green-500 transition-colors group">
+                          <div className="p-2 rounded-full group-hover:bg-green-50">
+                            <Repeat2 className="w-4 h-4" />
+                          </div>
+                          <span className="text-sm">{post.shares_count || 0}</span>
+                        </button>
+                        <button className="flex items-center gap-2 hover:text-red-500 transition-colors group">
+                          <div className="p-2 rounded-full group-hover:bg-red-50">
+                            <Heart className="w-4 h-4" />
+                          </div>
+                          <span className="text-sm">{post.likes_count || 0}</span>
+                        </button>
+                        <button className="flex items-center gap-2 hover:text-blue-500 transition-colors group">
+                          <div className="p-2 rounded-full group-hover:bg-blue-50">
+                            <BarChart3 className="w-4 h-4" />
+                          </div>
+                        </button>
+                        <button className="hover:text-blue-500 transition-colors group">
+                          <div className="p-2 rounded-full group-hover:bg-blue-50">
+                            <Share className="w-4 h-4" />
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Right Sidebar */}
+        <div className="w-80 p-4 space-y-4 bg-gray-50">
+          {/* Search Bar */}
+          <AnimatedSearchButton className="fixed top-4 right-4" />
+
+          {/* You might like */}
+          <div className="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
+            <div className="p-4 border-b border-gray-200">
+              <h2 className="text-xl font-bold text-gray-900">You might like</h2>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {suggestedUsers.map((suggestedUser) => (
+                <div key={suggestedUser.id} className="p-4 hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 font-bold">
+                        {suggestedUser.name.charAt(0)}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1">
+                          <span className="font-bold text-gray-900 text-sm">
+                            {suggestedUser.name}
+                          </span>
+                          {suggestedUser.verified && (
+                            <Verified className="w-4 h-4 text-blue-500" />
+                          )}
+                        </div>
+                        <span className="text-gray-600 text-sm">
+                          {suggestedUser.username}
+                        </span>
+                      </div>
+                    </div>
+                    <Button
+                      variant="primary"
+                      className="bg-gray-900 text-white hover:bg-gray-800 font-bold px-4 py-1.5 rounded-full text-sm"
+                    >
+                      Follow
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="p-4">
+              <button className="text-[#7BA805] hover:underline text-sm">
+                Show more
+              </button>
+            </div>
+          </div>
+
+          {/* What's happening */}
+          <div className="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
+            <div className="p-4 border-b border-gray-200">
+              <h2 className="text-xl font-bold text-gray-900">What's happening</h2>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {trendingTopics.map((topic, index) => (
+                <div key={index} className="p-4 hover:bg-gray-50 transition-colors cursor-pointer">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <p className="text-gray-600 text-xs mb-1">
+                        {topic.category}
+                      </p>
+                      <p className="font-bold text-gray-900 mb-1">
+                        {topic.topic}
+                      </p>
+                      <p className="text-gray-600 text-xs">
+                        {topic.posts}
+                      </p>
+                    </div>
+                    <button className="text-gray-600 hover:text-gray-900">
+                      <MoreHorizontal className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="p-4">
+              <button className="text-[#7BA805] hover:underline text-sm">
+                Show more
+              </button>
+            </div>
+          </div>
+
+          {/* AI Career Assistant - Unique Feature */}
+          <div className="bg-primary rounded-2xl p-4 text-white">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                <Target className="w-4 h-4" />
+              </div>
+              <h3 className="font-bold text-lg">AI Career Coach</h3>
+            </div>
+            <p className="text-sm text-white/90 mb-3">
+              Get personalized career guidance based on your profile and goals
+            </p>
+            <div className="space-y-2">
+              <button className="w-full bg-white/20 hover:bg-white/30 rounded-lg p-2 text-xs text-left transition-colors">
+                💡 Daily Career Tip: "Network authentically, not just for opportunities"
+              </button>
+              <button className="w-full bg-white/20 hover:bg-white/30 rounded-lg p-2 text-xs text-left transition-colors">
+                🎯 Next Goal: Complete 3 skill assessments this week
+              </button>
+            </div>
+          </div>
+
+          {/* Skills Development Tracker */}
+          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+            <div className="p-4 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-gray-900">Skill Progress</h3>
+                <button className="text-[#7BA805] text-sm hover:underline">View All</button>
+              </div>
+            </div>
+            <div className="p-4 space-y-4">
+              {[
+                { skill: 'React', level: 85, trending: true },
+                { skill: 'TypeScript', level: 72, trending: false },
+                { skill: 'Node.js', level: 68, trending: true }
+              ].map((skill, index) => (
+                <div key={index}>
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-gray-900">{skill.skill}</span>
+                      {skill.trending && (
+                        <div className="flex items-center gap-1">
+                          <TrendingUp className="w-3 h-3 text-green-500" />
+                          <span className="text-xs text-green-500">+5%</span>
+                        </div>
+                      )}
+                    </div>
+                    <span className="text-xs text-gray-600">{skill.level}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-1.5">
+                    <div 
+                      className="bg-[#BCE953] h-1.5 rounded-full transition-all duration-300"
+                      style={{width: `${skill.level}%`}}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Industry Insights */}
+          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+            <div className="p-4 border-b border-gray-200">
+              <h3 className="font-bold text-gray-900">Industry Pulse</h3>
+              <p className="text-xs text-gray-600">Real-time market insights</p>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {[
+                { 
+                  title: 'AI/ML Engineers', 
+                  change: '+23%', 
+                  trend: 'up',
+                  description: 'Demand surge this month'
+                },
+                { 
+                  title: 'Full-Stack Developers', 
+                  change: '+15%', 
+                  trend: 'up',
+                  description: 'Remote opportunities rising'
+                },
+                { 
+                  title: 'UX Designers', 
+                  change: '+8%', 
+                  trend: 'up',
+                  description: 'Fintech sector leading'
+                }
+              ].map((insight, index) => (
+                <div key={index} className="p-3 hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-medium text-gray-900">{insight.title}</span>
+                    <div className={cn(
+                      'flex items-center gap-1 text-xs px-2 py-1 rounded-full',
+                      insight.trend === 'up' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                    )}>
+                      <TrendingUp className="w-3 h-3" />
+                      {insight.change}
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-600">{insight.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Mentorship Marketplace */}
+          <div className="bg-lime rounded-2xl p-4 text-black">
+            <div className="flex items-center gap-2 mb-3">
+              <Users className="w-5 h-5" />
+              <h3 className="font-bold">Find a Mentor</h3>
+            </div>
+            <p className="text-sm text-black mb-3">
+              Connect with industry professionals for 1-on-1 guidance
+            </p>
+            {/* <div className="flex -space-x-2 mb-3">
+              {[1,2,3,4].map((i) => (
+                <div key={i} className="w-8 h-8 bg-white/20 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold">
+                  {String.fromCharCode(65 + i)}
+                </div>
+              ))}
+              <div className="w-8 h-8 bg-white/30 rounded-full border-2 border-white flex items-center justify-center text-xs">
+                +12
+              </div> */}
+            <button className="w-full bg-primary hover:text-black hover:bg-white text-white rounded-lg py-2 text-sm font-medium transition-colors">
+              Browse Mentors
+            </button>
+          </div>
+
+          {/* Career Opportunities Scanner */}
+          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+            <div className="p-4 border-b border-gray-200">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <h3 className="font-bold text-gray-900">Live Opportunities</h3>
+              </div>
+              <p className="text-xs text-gray-600">Matching your profile in real-time</p>
+            </div>
+            <div className="p-4 space-y-3">
+              {[
+                { 
+                  company: 'Google', 
+                  role: 'Frontend Developer',
+                  match: 94,
+                  timeLeft: '2 days',
+                  applicants: 23
+                },
+                { 
+                  company: 'Meta', 
+                  role: 'Product Manager',
+                  match: 87,
+                  timeLeft: '5 days',
+                  applicants: 45
+                }
+              ].map((opp, index) => (
+                <div key={index} className="border border-gray-200 rounded-lg p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <h4 className="font-medium text-sm text-gray-900">{opp.role}</h4>
+                      <p className="text-xs text-gray-600">{opp.company}</p>
+                    </div>
+                    <div className="text-right">
+                      <div className={cn(
+                        'text-xs px-2 py-1 rounded-full font-medium',
+                        opp.match >= 90 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                      )}>
+                        {opp.match}% match
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>{opp.applicants} applied</span>
+                    <span>Closes in {opp.timeLeft}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Career Growth Card */}
+          <div className="bg-[#8056E6] rounded-2xl overflow-hidden shadow-sm">
+            <div className="p-4 border-b border-[#8056E6]/30">
+              <h2 className="text-xl font-bold text-white">Career Growth</h2>
+            </div>
+            <div className="p-4 space-y-3">
+              <div className="text-white">
+                <p className="font-semibold mb-2">Complete your profile</p>
+                <div className="w-full bg-white/20 rounded-full h-2 mb-2">
+                  <div className="bg-[#BCE953] h-2 rounded-full" style={{width: '75%'}}></div>
+                </div>
+                <p className="text-sm text-white/90">75% complete</p>
+              </div>
+              <div className="text-white">
+                <p className="font-semibold mb-1">Skills to add</p>
+                <p className="text-sm text-white/90">Add 3 more skills to boost your profile visibility</p>
+              </div>
+            </div>
+            <div className="p-4">
+              <button className="text-[#BCE953] hover:underline text-sm font-medium">
+                View recommendations
+              </button>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="text-xs text-gray-600 space-y-2">
+            <div className="flex flex-wrap gap-3">
+              <button className="hover:underline">Terms of Service</button>
+              <button className="hover:underline">Privacy Policy</button>
+              <button className="hover:underline">Cookie Policy</button>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button className="hover:underline">Accessibility</button>
+              <button className="hover:underline">Ads info</button>
+              <button className="hover:underline">More</button>
+              <span>© 2025 X Corp.</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

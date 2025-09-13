@@ -19,7 +19,8 @@ import {
   Menu,
   X,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Download
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import Button from '../ui/Button';
@@ -212,6 +213,14 @@ export default function EmployerDashboard() {
                     >
                       <Users className="h-5 w-5 text-green-500" />
                       <span>Review Applicants</span>
+                    </Link>
+                    <Link 
+                      to="/linkedin-job-import" 
+                      className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors ios-nav-item"
+                      onClick={() => setShowMobileSidebar(false)}
+                    >
+                      <Download className="h-5 w-5 text-blue-500" />
+                      <span>Import LinkedIn Jobs</span>
                     </Link>
                     <Link 
                       to="/analytics" 
@@ -688,6 +697,10 @@ const DesktopSidebar = ({ isDark, searchTerm, setSearchTerm, trendingSkills }: {
         <Link to="/applicants" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors">
           <Users className="h-5 w-5 text-green-500" />
           <span>Review Applicants</span>
+        </Link>
+        <Link to="/linkedin-job-import" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors">
+          <Download className="h-5 w-5 text-blue-500" />
+          <span>Import LinkedIn Jobs</span>
         </Link>
         <Link to="/analytics" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors">
           <BarChart3 className="h-5 w-5 text-purple-500" />

@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   User, 
   Building2, 
   Mail,
   Eye,
   EyeOff,
+  ArrowRight,
   AlertCircle,
-  GraduationCap
+  GraduationCap,
+  Check
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -15,48 +17,112 @@ import Button from '../ui/Button';
 
 export default function Register() {
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
     role: 'student' as 'student' | 'employer',
-    companyName: ''
+    companyName: '',
+    agreeToTerms: false
   });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   
   const { register } = useAuth();
   const { isDark } = useTheme();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Set role from URL params
+  React.useEffect(() => {
+    const roleParam = searchParams.get('role');
+    if (roleParam === 'employer' || roleParam === 'student') {
+      setFormData(prev => ({ ...prev, role: roleParam as 'student' | 'employer' }));
+    }
+  }, [searchParams]);
 
   const handleChange = (field: keyof typeof formData) => (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setFormData(prev => ({ ...prev, [field]: e.target.value }));
+    const value = field === 'agreeToTerms' ? e.target.checked : e.target.value;
+    setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // Clear validation error for this field
+    if (validationErrors[field]) {
+      setValidationErrors(prev => ({ ...prev, [field]: '' }));
+    }
+    setError('');
+    setSuccess('');
+  };
+
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    if (!formData.firstName.trim()) {
+      errors.firstName = 'First name is required';
+    }
+
+    if (!formData.lastName.trim()) {
+      errors.lastName = 'Last name is required';
+    }
+
+    if (!formData.email.trim()) {
+      errors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+
+    if (!formData.password.trim()) {
+      errors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      errors.password = 'Password must be at least 6 characters long';
+    }
+
+    if (!formData.confirmPassword.trim()) {
+      errors.confirmPassword = 'Please confirm your password';
+    } else if (formData.password !== formData.confirmPassword) {
+      errors.confirmPassword = 'Passwords do not match';
+    }
+
+    if (formData.role === 'employer' && !formData.companyName.trim()) {
+      errors.companyName = 'Company name is required for employers';
+    }
+
+    if (!formData.agreeToTerms) {
+      errors.agreeToTerms = 'You must agree to the terms and conditions';
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
 
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+    if (!validateForm()) {
       return;
     }
 
     setLoading(true);
     try {
-      await register(formData.email, formData.password, formData.role, formData.name);
-      navigate('/profile-setup');
-    } catch (err: any) {
-      setError(err.message || 'Registration failed');
+      const fullName = `${formData.firstName.trim()} ${formData.lastName.trim()}`;
+      await register(formData.email, formData.password, formData.role, fullName);
+      
+      setSuccess('Registration successful! Please check your email to confirm your account before signing in.');
+      
+      // Redirect to login after a delay
+      setTimeout(() => {
+        navigate(`/login?role=${formData.role}`);
+      }, 3000);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -66,103 +132,132 @@ export default function Register() {
     <div className={`min-h-screen ${isDark ? 'bg-black text-white' : 'bg-white text-black'}`}>
       <div className="min-h-screen flex">
         {/* Left Side - Form */}
-        <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24 max-w-md mx-auto lg:max-w-none">
-          <div className="mx-auto w-full max-w-sm lg:w-96">
+        <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24 max-w-2xl mx-auto lg:max-w-none">
+          <div className="mx-auto w-full max-w-md lg:w-full">
             {/* Logo */}
             <div className="text-center mb-8">
               <div className={`w-12 h-12 rounded-full mx-auto mb-6 flex items-center justify-center ${
-                isDark ? 'bg-lime' : 'bg-asu-maroon'
+                isDark ? 'bg-[#BCE953]' : 'bg-[#BCE953]'
               }`}>
-                <GraduationCap className={`h-6 w-6 ${isDark ? 'text-black' : 'text-white'}`} />
+                <GraduationCap className="h-6 w-6 text-black" />
               </div>
               <h1 className="text-3xl font-bold mb-2">Create your account</h1>
+              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                Join the AUT community and start connecting with opportunities
+              </p>
             </div>
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Role Selection */}
               <div className="space-y-3">
-                <button
-                  type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, role: 'student' }))}
-                  className={`w-full p-4 rounded-full border-2 transition-all duration-200 flex items-center justify-center space-x-3 ${
-                    formData.role === 'student'
-                      ? isDark
-                        ? 'border-white bg-white text-black'
-                        : 'border-black bg-black text-white'
-                      : isDark
-                        ? 'border-gray-600 text-gray-300 hover:border-gray-500'
-                        : 'border-gray-300 text-gray-700 hover:border-gray-400'
-                  }`}
-                >
-                  <User className="h-5 w-5" />
-                  <span className="font-medium">Sign up as Student</span>
-                </button>
-                
-                <button
-                  type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, role: 'employer' }))}
-                  className={`w-full p-4 rounded-full border-2 transition-all duration-200 flex items-center justify-center space-x-3 ${
-                    formData.role === 'employer'
-                      ? isDark
-                        ? 'border-white bg-white text-black'
-                        : 'border-black bg-black text-white'
-                      : isDark
-                        ? 'border-gray-600 text-gray-300 hover:border-gray-500'
-                        : 'border-gray-300 text-gray-700 hover:border-gray-400'
-                  }`}
-                >
-                  <Building2 className="h-5 w-5" />
-                  <span className="font-medium">Sign up as Employer</span>
-                </button>
-              </div>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300" />
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className={`px-2 ${isDark ? 'bg-black text-gray-400' : 'bg-white text-gray-500'}`}>
-                    Enter your details
-                  </span>
+                <label className="text-sm font-medium">I am a:</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, role: 'student' }))}
+                    className={`p-4 rounded-lg border-2 transition-all duration-200 flex items-center justify-center space-x-3 ${
+                      formData.role === 'student'
+                        ? 'border-[#BCE953] bg-[#BCE953] text-black'
+                        : isDark
+                          ? 'border-gray-600 text-gray-300 hover:border-gray-500'
+                          : 'border-gray-300 text-gray-700 hover:border-gray-400'
+                    }`}
+                  >
+                    <User className="h-5 w-5" />
+                    <span className="font-medium">Student</span>
+                  </button>
+                  
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, role: 'employer' }))}
+                    className={`p-4 rounded-lg border-2 transition-all duration-200 flex items-center justify-center space-x-3 ${
+                      formData.role === 'employer'
+                        ? 'border-[#BCE953] bg-[#BCE953] text-black'
+                        : isDark
+                          ? 'border-gray-600 text-gray-300 hover:border-gray-500'
+                          : 'border-gray-300 text-gray-700 hover:border-gray-400'
+                    }`}
+                  >
+                    <Building2 className="h-5 w-5" />
+                    <span className="font-medium">Employer</span>
+                  </button>
                 </div>
               </div>
 
-              {/* Name Input */}
-              <div className="space-y-1">
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={handleChange('name')}
-                  placeholder="Full name"
-                  required
-                  className={`w-full px-4 py-4 text-lg rounded-md border-2 bg-transparent transition-colors ${
-                    isDark
-                      ? 'border-gray-600 focus:border-blue-500 text-white placeholder-gray-400'
-                      : 'border-gray-300 focus:border-blue-500 text-black placeholder-gray-500'
-                  } focus:outline-none`}
-                />
+              {/* Name Fields */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <input
+                    type="text"
+                    placeholder="First Name"
+                    value={formData.firstName}
+                    onChange={handleChange('firstName')}
+                    className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                      validationErrors.firstName
+                        ? 'border-red-500 focus:border-red-500'
+                        : isDark
+                          ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-[#BCE953]'
+                          : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#BCE953]'
+                    } focus:outline-none focus:ring-2 focus:ring-[#BCE953]/20`}
+                  />
+                  {validationErrors.firstName && (
+                    <p className="text-red-500 text-sm flex items-center space-x-1">
+                      <AlertCircle className="h-4 w-4" />
+                      <span>{validationErrors.firstName}</span>
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-1">
+                  <input
+                    type="text"
+                    placeholder="Last Name"
+                    value={formData.lastName}
+                    onChange={handleChange('lastName')}
+                    className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                      validationErrors.lastName
+                        ? 'border-red-500 focus:border-red-500'
+                        : isDark
+                          ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-[#BCE953]'
+                          : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#BCE953]'
+                    } focus:outline-none focus:ring-2 focus:ring-[#BCE953]/20`}
+                  />
+                  {validationErrors.lastName && (
+                    <p className="text-red-500 text-sm flex items-center space-x-1">
+                      <AlertCircle className="h-4 w-4" />
+                      <span>{validationErrors.lastName}</span>
+                    </p>
+                  )}
+                </div>
               </div>
 
-              {/* Email Input */}
+              {/* Email */}
               <div className="space-y-1">
                 <div className="relative">
                   <input
                     type="email"
+                    placeholder="Email address"
                     value={formData.email}
                     onChange={handleChange('email')}
-                    placeholder="Email"
-                    required
-                    className={`w-full px-4 py-4 text-lg rounded-md border-2 bg-transparent transition-colors ${
-                      isDark
-                        ? 'border-gray-600 focus:border-blue-500 text-white placeholder-gray-400'
-                        : 'border-gray-300 focus:border-blue-500 text-black placeholder-gray-500'
-                    } focus:outline-none`}
+                    className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                      validationErrors.email
+                        ? 'border-red-500 focus:border-red-500'
+                        : isDark
+                          ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-[#BCE953]'
+                          : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#BCE953]'
+                    } focus:outline-none focus:ring-2 focus:ring-[#BCE953]/20`}
                   />
-                  <Mail className={`absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 ${
+                  <Mail className={`absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 ${
                     isDark ? 'text-gray-400' : 'text-gray-500'
                   }`} />
                 </div>
+                {validationErrors.email && (
+                  <p className="text-red-500 text-sm flex items-center space-x-1">
+                    <AlertCircle className="h-4 w-4" />
+                    <span>{validationErrors.email}</span>
+                  </p>
+                )}
               </div>
 
               {/* Company Name (for employers) */}
@@ -170,77 +265,128 @@ export default function Register() {
                 <div className="space-y-1">
                   <input
                     type="text"
+                    placeholder="Company Name"
                     value={formData.companyName}
                     onChange={handleChange('companyName')}
-                    placeholder="Company name"
-                    required
-                    className={`w-full px-4 py-4 text-lg rounded-md border-2 bg-transparent transition-colors ${
-                      isDark
-                        ? 'border-gray-600 focus:border-blue-500 text-white placeholder-gray-400'
-                        : 'border-gray-300 focus:border-blue-500 text-black placeholder-gray-500'
-                    } focus:outline-none`}
+                    className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                      validationErrors.companyName
+                        ? 'border-red-500 focus:border-red-500'
+                        : isDark
+                          ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-[#BCE953]'
+                          : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#BCE953]'
+                    } focus:outline-none focus:ring-2 focus:ring-[#BCE953]/20`}
                   />
+                  {validationErrors.companyName && (
+                    <p className="text-red-500 text-sm flex items-center space-x-1">
+                      <AlertCircle className="h-4 w-4" />
+                      <span>{validationErrors.companyName}</span>
+                    </p>
+                  )}
                 </div>
               )}
 
-              {/* Password Input */}
-              <div className="space-y-1">
-                <div className="relative">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    value={formData.password}
-                    onChange={handleChange('password')}
-                    placeholder="Password"
-                    required
-                    className={`w-full px-4 py-4 text-lg rounded-md border-2 bg-transparent transition-colors pr-12 ${
-                      isDark
-                        ? 'border-gray-600 focus:border-blue-500 text-white placeholder-gray-400'
-                        : 'border-gray-300 focus:border-blue-500 text-black placeholder-gray-500'
-                    } focus:outline-none`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className={`absolute right-4 top-1/2 transform -translate-y-1/2 ${
-                      isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                  >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </button>
+              {/* Password Fields */}
+              <div className="grid grid-cols-1 gap-4">
+                <div className="space-y-1">
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Password"
+                      value={formData.password}
+                      onChange={handleChange('password')}
+                      className={`w-full px-4 py-3 rounded-lg border transition-colors pr-12 ${
+                        validationErrors.password
+                          ? 'border-red-500 focus:border-red-500'
+                          : isDark
+                            ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-[#BCE953]'
+                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#BCE953]'
+                      } focus:outline-none focus:ring-2 focus:ring-[#BCE953]/20`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
+                        isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'
+                      }`}
+                    >
+                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
+                  </div>
+                  {validationErrors.password && (
+                    <p className="text-red-500 text-sm flex items-center space-x-1">
+                      <AlertCircle className="h-4 w-4" />
+                      <span>{validationErrors.password}</span>
+                    </p>
+                  )}
                 </div>
-                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                  Must be at least 6 characters
-                </p>
+
+                <div className="space-y-1">
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      placeholder="Confirm Password"
+                      value={formData.confirmPassword}
+                      onChange={handleChange('confirmPassword')}
+                      className={`w-full px-4 py-3 rounded-lg border transition-colors pr-12 ${
+                        validationErrors.confirmPassword
+                          ? 'border-red-500 focus:border-red-500'
+                          : isDark
+                            ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-[#BCE953]'
+                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#BCE953]'
+                      } focus:outline-none focus:ring-2 focus:ring-[#BCE953]/20`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
+                        isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'
+                      }`}
+                    >
+                      {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
+                  </div>
+                  {validationErrors.confirmPassword && (
+                    <p className="text-red-500 text-sm flex items-center space-x-1">
+                      <AlertCircle className="h-4 w-4" />
+                      <span>{validationErrors.confirmPassword}</span>
+                    </p>
+                  )}
+                </div>
               </div>
 
-              {/* Confirm Password Input */}
+              {/* Terms and Conditions */}
               <div className="space-y-1">
-                <div className="relative">
+                <label className="flex items-start space-x-3">
                   <input
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    value={formData.confirmPassword}
-                    onChange={handleChange('confirmPassword')}
-                    placeholder="Confirm password"
-                    required
-                    className={`w-full px-4 py-4 text-lg rounded-md border-2 bg-transparent transition-colors pr-12 ${
-                      isDark
-                        ? 'border-gray-600 focus:border-blue-500 text-white placeholder-gray-400'
-                        : 'border-gray-300 focus:border-blue-500 text-black placeholder-gray-500'
-                    } focus:outline-none`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className={`absolute right-4 top-1/2 transform -translate-y-1/2 ${
-                      isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'
+                    type="checkbox"
+                    checked={formData.agreeToTerms}
+                    onChange={handleChange('agreeToTerms')}
+                    className={`mt-1 w-4 h-4 rounded ${
+                      isDark 
+                        ? 'bg-gray-800 border-gray-600 text-[#BCE953]' 
+                        : 'bg-white border-gray-300 text-[#BCE953]'
                     }`}
-                  >
-                    {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </button>
-                </div>
+                  />
+                  <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                    I agree to the{' '}
+                    <Link to="/terms" className="text-[#BCE953] hover:underline">
+                      Terms of Service
+                    </Link>{' '}
+                    and{' '}
+                    <Link to="/privacy" className="text-[#BCE953] hover:underline">
+                      Privacy Policy
+                    </Link>
+                  </span>
+                </label>
+                {validationErrors.agreeToTerms && (
+                  <p className="text-red-500 text-sm flex items-center space-x-1">
+                    <AlertCircle className="h-4 w-4" />
+                    <span>{validationErrors.agreeToTerms}</span>
+                  </p>
+                )}
               </div>
 
-              {/* Error Message */}
+              {/* Error/Success Messages */}
               {error && (
                 <div className={`p-4 rounded-lg border ${
                   isDark 
@@ -254,42 +400,47 @@ export default function Register() {
                 </div>
               )}
 
+              {success && (
+                <div className={`p-4 rounded-lg border ${
+                  isDark 
+                    ? 'bg-green-900/20 border-green-800 text-green-300' 
+                    : 'bg-green-50 border-green-200 text-green-700'
+                }`}>
+                  <div className="flex items-center space-x-2">
+                    <Check className="h-5 w-5" />
+                    <span>{success}</span>
+                  </div>
+                </div>
+              )}
+
               {/* Submit Button */}
               <Button
                 type="submit"
                 disabled={loading}
-                className={`w-full py-4 text-lg font-bold rounded-full transition-colors ${
-                  isDark
-                    ? 'bg-white text-black hover:bg-gray-200 disabled:bg-gray-800 disabled:text-gray-500'
-                    : 'bg-black text-white hover:bg-gray-800 disabled:bg-gray-300 disabled:text-gray-500'
+                className={`w-full py-3 text-lg font-semibold rounded-lg transition-colors flex items-center justify-center space-x-2 ${
+                  loading
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-[#BCE953] hover:bg-[#BCE953]/90 text-black'
                 }`}
               >
-                {loading ? 'Creating account...' : 'Create account'}
+                {loading ? (
+                  <span>Creating account...</span>
+                ) : (
+                  <>
+                    <span>Create account</span>
+                    <ArrowRight className="h-5 w-5" />
+                  </>
+                )}
               </Button>
             </form>
-
-            {/* Terms */}
-            <p className={`mt-6 text-sm text-center ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-              By signing up, you agree to the{' '}
-              <Link to="/terms" className={`hover:underline ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
-                Terms of Service
-              </Link>{' '}
-              and{' '}
-              <Link to="/privacy" className={`hover:underline ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
-                Privacy Policy
-              </Link>
-              .
-            </p>
 
             {/* Sign In Link */}
             <div className="mt-8 text-center">
               <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 Already have an account?{' '}
                 <Link 
-                  to="/login"
-                  className={`font-medium hover:underline ${
-                    isDark ? 'text-blue-400' : 'text-blue-600'
-                  }`}
+                  to={`/login?role=${formData.role}`}
+                  className="text-[#BCE953] hover:underline font-medium"
                 >
                   Sign in
                 </Link>
@@ -298,97 +449,40 @@ export default function Register() {
           </div>
         </div>
 
-        {/* Right Side - Hero with Student Images Grid */}
-        <div className="hidden lg:block relative flex-1">
+        {/* Right Side - Visual Content (Desktop only) */}
+        <div className="hidden lg:flex relative flex-1 overflow-hidden">
           <div className={`absolute inset-0 ${
             isDark 
               ? 'bg-gradient-to-br from-gray-900 via-black to-gray-900' 
-              : 'bg-gradient-to-br from-gray-100 via-white to-gray-100'
+              : 'bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600'
           }`}>
-            <div className="flex flex-col justify-center items-center h-full p-12 text-center relative">
-              {/* Student Images Grid */}
-              <div className="absolute inset-0 p-8 flex items-center justify-center">
-                <div className="grid grid-cols-2 gap-4 max-w-md w-full">
-                  <div className="space-y-4">
-                    <div className="relative overflow-hidden rounded-2xl shadow-lg transform -rotate-1 hover:rotate-0 transition-transform duration-300">
-                      <img 
-                        src="/student2.jpg" 
-                        alt="Students collaborating" 
-                        className="w-full h-32 object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                    </div>
-                    <div className="relative overflow-hidden rounded-2xl shadow-lg transform rotate-2 hover:rotate-0 transition-transform duration-300">
-                      <img 
-                        src="/student3.jpg" 
-                        alt="Student presenting" 
-                        className="w-full h-48 object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                    </div>
-                  </div>
-                  <div className="space-y-4 pt-8">
-                    <div className="relative overflow-hidden rounded-2xl shadow-lg transform rotate-1 hover:rotate-0 transition-transform duration-300">
-                      <img 
-                        src="/student1.jpg" 
-                        alt="Student studying" 
-                        className="w-full h-48 object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                    </div>
-                    <div className="relative overflow-hidden rounded-2xl shadow-lg transform -rotate-2 hover:rotate-0 transition-transform duration-300">
-                      <img 
-                        src="/student2.jpg" 
-                        alt="Students networking" 
-                        className="w-full h-32 object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <div className="absolute inset-0 bg-gradient-to-br from-[#BCE953]/20 to-transparent"></div>
+          </div>
+          
+          <div className="relative z-10 flex flex-col justify-center items-center h-full p-12 text-white">
+            <div className="max-w-md text-center">
+              <GraduationCap className="w-24 h-24 mx-auto mb-8 text-[#BCE953]" />
+              <h2 className="text-4xl font-bold mb-6">
+                {formData.role === 'student' ? 'Launch Your Career' : 'Find Top Talent'}
+              </h2>
+              <p className="text-xl mb-8 text-gray-200">
+                {formData.role === 'student' 
+                  ? 'Connect with leading employers and discover opportunities that match your skills and interests.'
+                  : 'Access a pool of talented students and graduates from AUT University.'
+                }
+              </p>
               
-              {/* Content overlay */}
-              <div className="relative z-10 bg-black/30 backdrop-blur-sm rounded-2xl p-8 text-white max-w-sm">
-                <div className={`w-16 h-16 rounded-full mb-6 flex items-center justify-center mx-auto ${
-                  isDark ? 'bg-lime' : 'bg-asu-maroon'
-                }`}>
-                  <GraduationCap className={`h-8 w-8 ${isDark ? 'text-black' : 'text-white'}`} />
+              <div className="grid grid-cols-2 gap-6 text-center">
+                <div>
+                  <div className="text-3xl font-bold text-[#BCE953] mb-2">15k+</div>
+                  <div className="text-sm text-gray-300">
+                    {formData.role === 'student' ? 'Students' : 'Active Students'}
+                  </div>
                 </div>
-                
-                <h2 className="text-2xl font-bold mb-4 text-white">
-                  Start Your Journey
-                </h2>
-                
-                <p className="text-sm mb-6 text-white/90">
-                  Join thousands of AUT students building their careers.
-                </p>
-
-                {/* Benefits */}
-                <div className="space-y-2 text-left">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-5 h-5 rounded-full flex items-center justify-center bg-lime text-black">
-                      <span className="text-xs">✓</span>
-                    </div>
-                    <span className="text-white/90 text-xs">
-                      Free for students
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-5 h-5 rounded-full flex items-center justify-center bg-lime text-black">
-                      <span className="text-xs">✓</span>
-                    </div>
-                    <span className="text-white/90 text-xs">
-                      Direct employer access
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-5 h-5 rounded-full flex items-center justify-center bg-lime text-black">
-                      <span className="text-xs">✓</span>
-                    </div>
-                    <span className="text-white/90 text-xs">
-                      Exclusive opportunities
-                    </span>
+                <div>
+                  <div className="text-3xl font-bold text-[#BCE953] mb-2">2.5k+</div>
+                  <div className="text-sm text-gray-300">
+                    {formData.role === 'student' ? 'Job Opportunities' : 'Companies'}
                   </div>
                 </div>
               </div>

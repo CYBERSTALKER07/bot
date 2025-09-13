@@ -123,13 +123,13 @@ const SwiftUIButton = forwardRef<HTMLButtonElement, SwiftUIButtonProps>(({
       primary: {
         filled: isDark 
           ? 'bg-lime text-dark-surface hover:bg-lime/90 focus:ring-lime/20 shadow-lg hover:shadow-xl' 
-          : 'bg-asu-maroon text-white hover:bg-asu-maroon/90 focus:ring-asu-maroon/20 shadow-lg hover:shadow-xl',
+          : 'bg-lime text-dark-surface hover:bg-lime/90 focus:ring-lime/20 shadow-lg hover:shadow-xl',
         outlined: isDark
           ? 'border-2 border-lime text-lime hover:bg-lime/10 focus:ring-lime/20'
-          : 'border-2 border-asu-maroon text-asu-maroon hover:bg-asu-maroon/10 focus:ring-asu-maroon/20',
+          : 'border-2 border-lime text-lime hover:bg-lime/10 focus:ring-lime/20',
         text: isDark
           ? 'text-lime hover:bg-lime/10 focus:ring-lime/20'
-          : 'text-asu-maroon hover:bg-asu-maroon/10 focus:ring-asu-maroon/20',
+          : 'text-lime hover:bg-lime/10 focus:ring-lime/20',
       }
     };
 

@@ -34,7 +34,7 @@ export default function ThemeToggle({
         className={`relative inline-flex items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
           isDark
             ? 'bg-lime focus:ring-lime'
-            : 'bg-gray-200 focus:ring-asu-maroon'
+            : 'bg-lime focus:ring-lime'
         } ${
           size === 'sm' ? 'h-6 w-11' : size === 'lg' ? 'h-8 w-14' : 'h-7 w-12'
         } ${className}`}
@@ -52,7 +52,7 @@ export default function ThemeToggle({
           {isDark ? (
             <Moon className={`${iconSizes[size]} text-lime m-auto mt-0.5`} />
           ) : (
-            <Sun className={`${iconSizes[size]} text-asu-maroon m-auto mt-0.5`} />
+            <Sun className={`${iconSizes[size]} text-lime m-auto mt-0.5`} />
           )}
         </span>
       </button>
@@ -65,7 +65,7 @@ export default function ThemeToggle({
       className={`${sizes[size]} rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
         isDark
           ? 'bg-lime/20 text-lime hover:bg-lime/30 focus:ring-lime'
-          : 'bg-gray-100 text-gray-600 hover:bg-gray-200 focus:ring-asu-maroon'
+          : 'bg-lime/20 text-lime hover:bg-lime/30 focus:ring-lime'
       } ${className}`}
       aria-label="Toggle theme"
     >
