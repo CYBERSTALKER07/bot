@@ -188,9 +188,9 @@ const isPWA = () => {
 function SmartHomeRoute() {
   const { user } = useAuth();
   
-  // If user is authenticated, go to feed
+  // If user is authenticated, go to dashboard (home)
   if (user) {
-    return <Navigate to="/feed" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
   
   // If running as PWA, skip landing page and go to login
