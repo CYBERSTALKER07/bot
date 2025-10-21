@@ -399,43 +399,69 @@ CREATE INDEX comment_likes_user_id_idx ON comment_likes(user_id);
 -- Create Row Level Security (RLS) policies
 
 -- Profiles policies (enhanced for privacy)
+-- Fixed to handle unauthenticated users and NULL auth.uid()
+DROP POLICY IF EXISTS "Public profiles are viewable by everyone." ON profiles;
 CREATE POLICY "Public profiles are viewable by everyone." ON profiles FOR SELECT USING (
   NOT is_private OR 
-  auth.uid() = id OR 
-  EXISTS (SELECT 1 FROM follows WHERE following_id = profiles.id AND follower_id = auth.uid())
+  (auth.uid() IS NOT NULL AND auth.uid() = id) OR 
+  (auth.uid() IS NOT NULL AND EXISTS (SELECT 1 FROM follows WHERE following_id = profiles.id AND follower_id = auth.uid()))
 );
 
-CREATE POLICY "Users can insert their own profile." ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
-CREATE POLICY "Users can update own profile." ON profiles FOR UPDATE USING (auth.uid() = id);
-CREATE POLICY "Users can delete own profile." ON profiles FOR DELETE USING (auth.uid() = id);
+DROP POLICY IF EXISTS "Users can insert their own profile." ON profiles;
+CREATE POLICY "Users can insert their own profile." ON profiles FOR INSERT WITH CHECK (auth.uid() IS NOT NULL AND auth.uid() = id);
+
+DROP POLICY IF EXISTS "Users can update own profile." ON profiles;
+CREATE POLICY "Users can update own profile." ON profiles FOR UPDATE USING (auth.uid() IS NOT NULL AND auth.uid() = id);
+
+DROP POLICY IF EXISTS "Users can delete own profile." ON profiles;
+CREATE POLICY "Users can delete own profile." ON profiles FOR DELETE USING (auth.uid() IS NOT NULL AND auth.uid() = id);
 
 -- User preferences policies
-CREATE POLICY "Users can view their own preferences." ON user_preferences FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert their own preferences." ON user_preferences FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can update their own preferences." ON user_preferences FOR UPDATE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can view their own preferences." ON user_preferences;
+CREATE POLICY "Users can view their own preferences." ON user_preferences FOR SELECT USING (auth.uid() IS NOT NULL AND auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can insert their own preferences." ON user_preferences;
+CREATE POLICY "Users can insert their own preferences." ON user_preferences FOR INSERT WITH CHECK (auth.uid() IS NOT NULL AND auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can update their own preferences." ON user_preferences;
+CREATE POLICY "Users can update their own preferences." ON user_preferences FOR UPDATE USING (auth.uid() IS NOT NULL AND auth.uid() = user_id);
 
 -- Follows policies
+DROP POLICY IF EXISTS "Users can view follows." ON follows;
 CREATE POLICY "Users can view follows." ON follows FOR SELECT USING (true);
-CREATE POLICY "Users can follow others." ON follows FOR INSERT WITH CHECK (auth.uid() = follower_id);
-CREATE POLICY "Users can unfollow others." ON follows FOR DELETE USING (auth.uid() = follower_id);
+
+DROP POLICY IF EXISTS "Users can follow others." ON follows;
+CREATE POLICY "Users can follow others." ON follows FOR INSERT WITH CHECK (auth.uid() IS NOT NULL AND auth.uid() = follower_id);
+
+DROP POLICY IF EXISTS "Users can unfollow others." ON follows;
+CREATE POLICY "Users can unfollow others." ON follows FOR DELETE USING (auth.uid() IS NOT NULL AND auth.uid() = follower_id);
 
 -- Profile views policies
-CREATE POLICY "Users can view profile views of their own profile." ON profile_views FOR SELECT USING (profile_id = auth.uid());
+DROP POLICY IF EXISTS "Users can view profile views of their own profile." ON profile_views;
+CREATE POLICY "Users can view profile views of their own profile." ON profile_views FOR SELECT USING (auth.uid() IS NOT NULL AND profile_id = auth.uid());
+
+DROP POLICY IF EXISTS "Anyone can log profile views." ON profile_views;
 CREATE POLICY "Anyone can log profile views." ON profile_views FOR INSERT WITH CHECK (true);
 
 -- Posts policies (enhanced)
+DROP POLICY IF EXISTS "Posts are viewable based on visibility." ON posts;
 CREATE POLICY "Posts are viewable based on visibility." ON posts FOR SELECT USING (
   visibility = 'public' OR 
-  (visibility = 'followers' AND (
+  (visibility = 'followers' AND auth.uid() IS NOT NULL AND (
     auth.uid() = user_id OR 
     EXISTS (SELECT 1 FROM follows WHERE following_id = posts.user_id AND follower_id = auth.uid())
   )) OR
-  (visibility = 'private' AND auth.uid() = user_id)
+  (visibility = 'private' AND auth.uid() IS NOT NULL AND auth.uid() = user_id)
 );
 
-CREATE POLICY "Users can insert their own posts." ON posts FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can update own posts." ON posts FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can delete own posts." ON posts FOR DELETE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can insert their own posts." ON posts;
+CREATE POLICY "Users can insert their own posts." ON posts FOR INSERT WITH CHECK (auth.uid() IS NOT NULL AND auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can update own posts." ON posts;
+CREATE POLICY "Users can update own posts." ON posts FOR UPDATE USING (auth.uid() IS NOT NULL AND auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can delete own posts." ON posts;
+CREATE POLICY "Users can delete own posts." ON posts FOR DELETE USING (auth.uid() IS NOT NULL AND auth.uid() = user_id);
 
 -- Jobs policies (enhanced)
 CREATE POLICY "Open jobs are viewable by everyone." ON jobs FOR SELECT USING (
@@ -468,11 +494,11 @@ CREATE POLICY "Comments are viewable based on post visibility." ON comments FOR 
     WHERE id = comments.post_id 
     AND (
       visibility = 'public' OR 
-      (visibility = 'followers' AND (
+      (visibility = 'followers' AND auth.uid() IS NOT NULL AND (
         user_id = auth.uid() OR 
         EXISTS (SELECT 1 FROM follows WHERE following_id = posts.user_id AND follower_id = auth.uid())
       )) OR
-      (visibility = 'private' AND user_id = auth.uid())
+      (visibility = 'private' AND auth.uid() IS NOT NULL AND user_id = auth.uid())
     )
   )
 );
@@ -484,22 +510,22 @@ CREATE POLICY "Users can insert comments on viewable posts." ON comments FOR INS
     WHERE id = comments.post_id 
     AND (
       visibility = 'public' OR 
-      (visibility = 'followers' AND (
+      (visibility = 'followers' AND auth.uid() IS NOT NULL AND (
         user_id = auth.uid() OR 
         EXISTS (SELECT 1 FROM follows WHERE following_id = posts.user_id AND follower_id = auth.uid())
       )) OR
-      (visibility = 'private' AND user_id = auth.uid())
+      (visibility = 'private' AND auth.uid() IS NOT NULL AND user_id = auth.uid())
     )
   )
 );
 
-CREATE POLICY "Users can update their own comments." ON comments FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can delete their own comments." ON comments FOR DELETE USING (auth.uid() = user_id);
+CREATE POLICY "Users can update their own comments." ON comments FOR UPDATE USING (auth.uid() IS NOT NULL AND auth.uid() = user_id);
+CREATE POLICY "Users can delete their own comments." ON comments FOR DELETE USING (auth.uid() IS NOT NULL AND auth.uid() = user_id);
 
 -- Comment likes policies
 CREATE POLICY "Comment likes are viewable by everyone." ON comment_likes FOR SELECT USING (true);
-CREATE POLICY "Users can like comments." ON comment_likes FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can unlike comments." ON comment_likes FOR DELETE USING (auth.uid() = user_id);
+CREATE POLICY "Users can like comments." ON comment_likes FOR INSERT WITH CHECK (auth.uid() IS NOT NULL AND auth.uid() = user_id);
+CREATE POLICY "Users can unlike comments." ON comment_likes FOR DELETE USING (auth.uid() IS NOT NULL AND auth.uid() = user_id);
 
 -- Enable RLS on all tables
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;

@@ -46,7 +46,6 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
     company_name: '',
     title: '',
     verified: false,
-    // Remove fields that don't exist in the database
     display_name: ''
   });
 
@@ -73,13 +72,14 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
       if (profile) {
         const extendedProfile = {
           ...profile,
-          display_name: profile.display_name || profile.full_name || ''
+          display_name: profile.username || profile.full_name || ''
         };
         setProfileData(extendedProfile);
         setOriginalData(extendedProfile);
       }
     } catch (error) {
       console.error('Error loading profile:', error);
+      setErrors({ general: 'Failed to load profile data' });
     } finally {
       setLoading(false);
     }
@@ -90,6 +90,14 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
 
     if (!profileData.full_name?.trim()) {
       newErrors.full_name = 'Display name is required';
+    }
+
+    if (!profileData.username?.trim()) {
+      newErrors.username = 'Username is required';
+    } else if (!/^[a-z0-9_]+$/.test(profileData.username)) {
+      newErrors.username = 'Username can only contain lowercase letters, numbers, and underscores';
+    } else if (profileData.username.length < 3) {
+      newErrors.username = 'Username must be at least 3 characters long';
     }
 
     if (profileData.bio && profileData.bio.length > 160) {
@@ -110,6 +118,16 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
 
     if (profileData.portfolio_url && !isValidUrl(profileData.portfolio_url)) {
       newErrors.portfolio_url = 'Please enter a valid portfolio URL';
+    }
+
+    // Role-specific validation
+    if (user?.role === 'employer') {
+      if (!profileData.company_name?.trim()) {
+        newErrors.company_name = 'Company name is required for employers';
+      }
+      if (!profileData.title?.trim()) {
+        newErrors.title = 'Job title is required for employers';
+      }
     }
 
     setErrors(newErrors);
@@ -151,19 +169,23 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
     try {
       setSaving(true);
       
-      // Prepare data for saving - only include fields that exist in database
-      const saveData = {
-        full_name: profileData.full_name,
-        username: profileData.display_name || profileData.username, // Use display_name as username
-        bio: profileData.bio,
-        location: profileData.location,
+      // Prepare data for saving - clean and validate
+      const saveData: Partial<ProfileData> = {
+        full_name: profileData.full_name?.trim(),
+        username: profileData.username?.toLowerCase().trim(),
+        bio: profileData.bio?.trim(),
+        location: profileData.location?.trim(),
         avatar_url: profileData.avatar_url,
-        cover_image_url: profileData.cover_image_url, // ✅ Add cover_image_url to save data
-        website: profileData.website,
-        role: profileData.role,
-        company_name: profileData.company_name,
-        title: profileData.title
+        cover_image_url: profileData.cover_image_url,
+        website: profileData.website?.trim(),
+        role: profileData.role
       };
+
+      // Add role-specific fields
+      if (user.role === 'employer') {
+        saveData.company_name = profileData.company_name?.trim();
+        saveData.title = profileData.title?.trim();
+      }
       
       await ProfileService.updateProfile(user.id, saveData);
       setOriginalData(profileData);
@@ -174,9 +196,19 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
       } else {
         navigate('/profile');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving profile:', error);
-      setErrors({ general: 'Failed to save profile. Please try again.' });
+      
+      // Provide specific error messages based on error type
+      if (error.message?.includes('duplicate') || error.message?.includes('409')) {
+        setErrors({ general: 'Username is already taken. Please choose a different username.' });
+      } else if (error.message?.includes('permission') || error.message?.includes('403')) {
+        setErrors({ general: 'You do not have permission to edit this profile.' });
+      } else if (error.message?.includes('400')) {
+        setErrors({ general: 'Invalid data format. Please check your entries and try again.' });
+      } else {
+        setErrors({ general: 'Failed to save profile. Please try again.' });
+      }
     } finally {
       setSaving(false);
     }
@@ -209,11 +241,13 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
     placeholder: string,
     type: 'text' | 'textarea' | 'number' | 'date' | 'email' | 'url' = 'text',
     icon?: React.ReactNode,
-    maxLength?: number
+    maxLength?: number,
+    required?: boolean
   ) => (
     <div className="space-y-2">
       <label className="block text-sm font-medium text-gray-900 dark:text-white">
         {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
       </label>
       <div className="relative">
         {icon && (
@@ -285,13 +319,12 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
 
   const content = (
     <div className={cn(
-      'flex flex-col',
-      isModal ? 'h-full' : 'min-h-screen',
+      'flex flex-col h-screen',
       isDark ? 'bg-black text-white' : 'bg-white text-black'
     )}>
       {/* Header */}
       <div className={cn(
-        'sticky top-0 z-10 backdrop-blur-md border-b',
+        'sticky top-0 z-10 backdrop-blur-md border-b flex-shrink-0',
         isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
       )}>
         <div className="flex items-center justify-between p-4">
@@ -321,8 +354,8 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto">
+      {/* Content - Scrollable Container */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden">
         <div className="max-w-2xl mx-auto p-4 space-y-6">
           {/* Error Messages */}
           {errors.general && (
@@ -394,8 +427,8 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
           <div className="space-y-4">
             <h2 className="text-lg font-semibold">Basic Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {renderField('Display Name', 'full_name', 'Your display name', 'text', <User className="w-4 h-4" />, 50)}
-              {renderField('Username', 'display_name', 'Your username', 'text', <User className="w-4 h-4" />, 30)}
+              {renderField('Display Name', 'full_name', 'Your display name', 'text', <User className="w-4 h-4" />, 50, true)}
+              {renderField('Username', 'username', 'your_username', 'text', <User className="w-4 h-4" />, 30, true)}
             </div>
             {renderField('Bio', 'bio', 'Tell the world about yourself', 'textarea', <Award className="w-4 h-4" />, 160)}
             {renderField('Location', 'location', 'Where are you located?', 'text', <MapPin className="w-4 h-4" />)}
@@ -406,30 +439,34 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
           <div className="space-y-4">
             <h2 className="text-lg font-semibold">Professional Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {renderField('Company', 'company_name', 'Your company name', 'text', <Building2 className="w-4 h-4" />)}
-              {renderField('Job Title', 'title', 'Your job title', 'text', <Briefcase className="w-4 h-4" />)}
+              {user?.role === 'employer' 
+                ? renderField('Company', 'company_name', 'Your company name', 'text', <Building2 className="w-4 h-4" />, undefined, true)
+                : renderField('Company', 'company_name', 'Your company name', 'text', <Building2 className="w-4 h-4" />)
+              }
+              {user?.role === 'employer' 
+                ? renderField('Job Title', 'title', 'Your job title', 'text', <Briefcase className="w-4 h-4" />, undefined, true)
+                : renderField('Job Title', 'title', 'Your job title', 'text', <Briefcase className="w-4 h-4" />)
+              }
             </div>
             
-            {/* Role Selection */}
+            {/* Role Selection - Read Only */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-900 dark:text-white">
                 Role
               </label>
-              <select
-                value={profileData.role || 'student'}
-                onChange={(e) => handleInputChange('role', e.target.value)}
-                className={cn(
-                  'w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg',
-                  'bg-white dark:bg-gray-900 text-gray-900 dark:text-white',
-                  'focus:outline-none focus:ring-2 focus:border-blue-500 focus:ring-blue-500'
-                )}
-              >
-                <option value="student">Student</option>
-                <option value="employer">Employer</option>
-                <option value="admin">Admin</option>
-              </select>
+              <div className={cn(
+                'w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg',
+                'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white',
+                'text-sm'
+              )}>
+                {profileData.role === 'employer' ? 'Employer' : profileData.role === 'admin' ? 'Admin' : 'Student'}
+              </div>
+              <p className="text-xs text-gray-500">Role cannot be changed after account creation</p>
             </div>
           </div>
+
+          {/* Bottom padding for scrolling space */}
+          <div className="pb-8" />
         </div>
       </div>
     </div>

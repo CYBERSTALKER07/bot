@@ -25,7 +25,7 @@ const hiringAnnouncements = [
 	},
 	{
 		name: 'Microsoft',
-		logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/microsoft/microsoft-original.svg',
+		logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTEiIGhlaWdodD0iMTEiIGZpbGw9IiNmMjUwMjIiLz4KICA8cmVjdCB4PSIxMyIgd2lkdGg9IjExIiBoZWlnaHQ9IjExIiBmaWxsPSIjN2ZiYTAwIi8+CiAgPHJlY3QgeT0iMTMiIHdpZHRoPSIxMSIgaGVpZ2h0PSIxMSIgZmlsbD0iIzAwYTRlZiIvPgogIDxyZWN0IHg9IjEzIiB5PSIxMyIgd2lkdGg9IjExIiBoZWlnaHQ9IjExIiBmaWxsPSIjZmZiOTAwIi8+Cjwvc3ZnPg==',
 		color: '#00A4EF',
 		announcement: '⚡ 300+ Open Positions',
 		positions: 'Cloud, Security, DevOps',
@@ -65,7 +65,7 @@ const hiringAnnouncements = [
 	},
 	{
 		name: 'Netflix',
-		logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1zbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTUuMzk4IDBoLS43OTZBMSAxIDAgMCAwIDQgMXYyMmExIDEgMCAwIDAgLjYwMi45MmwxMS4yIDIuOGMuMzA4LjA3Ny42MTgtLjEyNi42MjItLjQ0NEwyMCAzLjIzNmMwLS4zLS4yNDgtLjU0LS41NDgtLjQ5OGwtOC4wNSAxLjEwNkE1LjM5OCA1LjM5OCAwIDAgMCA1LjM5OCAwWiIgZmlsbD0iI0UyMDYxNCIvPgo8L3N2Zz4K',
+		logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTUuMzk4IDBoLS43OTZBMSAxIDAgMCAwIDQgMXYyMmExIDEgMCAwIDAgLjYwMi45MmwxMS4yIDIuOGMuMzA4LjA3Ny42MTgtLjEyNi42MjItLjQ0NEwyMCAzLjIzNmMwLS4zLS4yNDgtLjU0LS41NDgtLjQ5OGwtOC4wNSAxLjEwNkE1LjM5OCA1LjM5OCAwIDAgMCA1LjM5OCAwWiIgZmlsbD0iI0UyMDYxNCIvPgo8L3N2Zz4K',
 		color: '#E20614',
 		announcement: '🎬 Content & Tech Roles',
 		positions: 'Streaming, Data Science, ML',
@@ -73,7 +73,7 @@ const hiringAnnouncements = [
 	},
 	{
 		name: 'Spotify',
-		logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spotify/spotify-original.svg',
+		logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMiIgZmlsbD0iIzFEQjk1NCIvPgogIDxwYXRoIGQ9Ik0xNy4zIDEwLjVjLTMuMS0xLjgtNy4xLTIuMi0xMS4yLTEuMi0uNC4xLS43LS4xLS44LS41LS4xLS40LjEtLjcuNS0uOCA0LjQtMSA4LjgtLjYgMTIuMyAxLjQuNC4yLjUuNi4zIDEtLjIuNC0uNy41LTEuMS4xWm0tLjEgMy4zYy0uMi4zLS42LjQtMSAuMi0yLjYtMS42LTYuNi0yLTkuNy0xLjEtLjMuMS0uNy0uMS0uOC0uNC0uMS0uMy4xLS43LjQtLjggMy41LTEgNy45LS41IDEwLjggMS4zLjMuMS40LjYuMy44Wm0tMS4xIDMuMmMtLjIuMi0uNS4zLS44LjItMi4yLTEuMy01LTEuNi03LjgtLjktLjMuMS0uNS0uMS0uNi0uNC0uMS0uMy4xLS41LjQtLjYgMy4yLS44IDYuMi0uNCA4LjcgMS0uMi4xLS4zLjUtLjkuN1oiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPg==',
 		color: '#1DB954',
 		announcement: '🎵 Music Tech Innovation',
 		positions: 'Audio Engineering, Backend',

@@ -346,7 +346,7 @@ export default function PostDetails() {
         'min-h-screen',
         isDark ? 'bg-black text-white' : 'bg-white text-black'
       )}
-      maxWidth="2xl"
+      maxWidth="none"
       padding="none"
     >
       {/* X/Twitter-Style Header */}
@@ -355,7 +355,7 @@ export default function PostDetails() {
         isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200',
         isMobile ? 'top-16' : 'top-0'
       )}>
-        <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center justify-between px-24 py-3">
           <div className="flex items-center space-x-4">
             <Button
               variant="ghost"
@@ -377,290 +377,305 @@ export default function PostDetails() {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-2xl mx-auto">
-        <div className={cn(
-          'border-x min-h-screen',
-          isDark ? 'border-gray-800' : 'border-gray-200'
-        )}>
-          
-          {/* Main Post */}
+      {/* Main Content Container - Split Layout for Desktop */}
+      <div className="flex ml-36 mr-auto max-w-7xl">
+        {/* Left Side - Post Content */}
+        <div className="flex-1 max-w-2xl">
           <div className={cn(
-            'p-4 border-b',
+            'border-x min-h-screen',
             isDark ? 'border-gray-800' : 'border-gray-200'
           )}>
-            <div className="flex space-x-3">
-              {/* Author Avatar */}
-              <Link to={`/profile/${post.author.id}`} onClick={(e) => e.stopPropagation()}>
-                <Avatar
-                  src={post.author.avatar_url}
-                  alt={post.author.full_name}
-                  name={post.author.full_name}
-                  size="lg"
-                  className="flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
-                />
-              </Link>
-              
-              {/* Post Content */}
-              <div className="flex-1 min-w-0">
+            
+            {/* Main Post */}
+            <div className={cn(
+              'p-4 border-b',
+              isDark ? 'border-gray-800' : 'border-gray-200'
+            )}>
+              <div className="flex space-x-3">
+                {/* Author Avatar */}
+                <Link to={`/profile/${post.author.id}`} onClick={(e) => e.stopPropagation()}>
+                  <Avatar
+                    src={post.author.avatar_url}
+                    alt={post.author.full_name}
+                    name={post.author.full_name}
+                    size="lg"
+                    className="flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                  />
+                </Link>
                 
-                {/* Author Info */}
-                <div className="flex items-center space-x-2 mb-2">
-                  <Link 
-                    to={`/profile/${post.author.id}`}
-                    className="font-bold hover:underline text-lg"
-                  >
-                    {post.author.full_name}
-                  </Link>
-                  {post.author.verified && (
-                    <CheckCircle className="w-5 h-5 text-blue-500" />
-                  )}
-                  <span className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>
-                    @{post.author.full_name.toLowerCase().replace(/\s+/g, '')}
-                  </span>
-                </div>
-                
-                {/* Post Text */}
-                <div className="mb-4">
-                  <p className="text-xl leading-relaxed whitespace-pre-wrap">
-                    {post.content}
-                  </p>
-                </div>
-
-                {/* Tags */}
-                {post.tags && post.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {post.tags.map((tag, index) => (
-                      <span 
-                        key={index}
-                        className={cn(
-                          'text-sm px-2 py-1 rounded-full border cursor-pointer hover:bg-opacity-80',
-                          isDark 
-                            ? 'text-blue-400 border-blue-400/30 hover:bg-blue-400/10' 
-                            : 'text-blue-600 border-blue-600/30 hover:bg-blue-600/10'
-                        )}
-                      >
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {/* Media */}
-                {post.image_url && (
-                  <div className="mb-4 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
-                    <img
-                      src={post.image_url}
-                      alt={post.media_description || "Post image"}
-                      className="w-full h-auto max-h-[500px] object-cover cursor-pointer hover:opacity-95 transition-opacity"
-                      onClick={() => setShowImageModal(true)}
-                    />
-                  </div>
-                )}
-
-                {post.video_url && (
-                  <div className="mb-4 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
-                    <video
-                      controls
-                      className="w-full h-auto max-h-[500px] object-cover"
-                      src={post.video_url}
+                {/* Post Content */}
+                <div className="flex-1 min-w-0">
+                  
+                  {/* Author Info */}
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Link 
+                      to={`/profile/${post.author.id}`}
+                      className="font-bold hover:underline text-lg"
                     >
-                      Your browser does not support the video tag.
-                    </video>
+                      {post.author.full_name}
+                    </Link>
+                    {post.author.verified && (
+                      <CheckCircle className="w-5 h-5 text-blue-500" />
+                    )}
+                    <span className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                      @{post.author.full_name.toLowerCase().replace(/\s+/g, '')}
+                    </span>
                   </div>
-                )}
+                  
+                  {/* Post Text */}
+                  <div className="mb-4">
+                    <p className="text-xl leading-relaxed whitespace-pre-wrap">
+                      {post.content}
+                    </p>
+                  </div>
 
-                {/* Post Metadata */}
-                <div className={cn(
-                  'flex items-center space-x-4 text-sm py-3 border-t border-b',
-                  isDark ? 'text-gray-400 border-gray-800' : 'text-gray-600 border-gray-200'
-                )}>
-                  <div className="flex items-center space-x-1">
-                    <Clock className="w-4 h-4" />
-                    <span>{new Date(post.created_at).toLocaleString()}</span>
-                  </div>
-                  {post.location && (
-                    <div className="flex items-center space-x-1">
-                      <MapPin className="w-4 h-4" />
-                      <span>{post.location}</span>
+                  {/* Tags */}
+                  {post.tags && post.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {post.tags.map((tag, index) => (
+                        <span 
+                          key={index}
+                          className={cn(
+                            'text-sm px-2 py-1 rounded-full border cursor-pointer hover:bg-opacity-80',
+                            isDark 
+                              ? 'text-blue-400 border-blue-400/30 hover:bg-blue-400/10' 
+                              : 'text-blue-600 border-blue-600/30 hover:bg-blue-600/10'
+                          )}
+                        >
+                          #{tag}
+                        </span>
+                      ))}
                     </div>
                   )}
-                  <div className="flex items-center space-x-1">
-                    <Eye className="w-4 h-4" />
-                    <span>{Math.floor(Math.random() * 1000)} views</span>
-                  </div>
-                </div>
 
-                {/* Engagement Stats */}
-                {(post.likes_count > 0 || post.comments_count > 0 || post.shares_count > 0) && (
+                  {/* Media */}
+                  {post.image_url && (
+                    <div className="mb-4 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
+                      <img
+                        src={post.image_url}
+                        alt={post.media_description || "Post image"}
+                        className="w-full h-auto max-h-[500px] object-cover cursor-pointer hover:opacity-95 transition-opacity"
+                        onClick={() => setShowImageModal(true)}
+                      />
+                    </div>
+                  )}
+
+                  {post.video_url && (
+                    <div className="mb-4 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
+                      <video
+                        controls
+                        className="w-full h-auto max-h-[500px] object-cover"
+                        src={post.video_url}
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
+                  )}
+
+                  {/* Post Metadata */}
                   <div className={cn(
-                    'py-3 border-b',
+                    'flex items-center space-x-4 text-sm py-3 border-t border-b',
+                    isDark ? 'text-gray-400 border-gray-800' : 'text-gray-600 border-gray-200'
+                  )}>
+                    <div className="flex items-center space-x-1">
+                      <Clock className="w-4 h-4" />
+                      <span>{new Date(post.created_at).toLocaleString()}</span>
+                    </div>
+                    {post.location && (
+                      <div className="flex items-center space-x-1">
+                        <MapPin className="w-4 h-4" />
+                        <span>{post.location}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center space-x-1">
+                      <Eye className="w-4 h-4" />
+                      <span>{Math.floor(Math.random() * 1000)} views</span>
+                    </div>
+                  </div>
+
+                  {/* Engagement Stats */}
+                  {(post.likes_count > 0 || post.comments_count > 0 || post.shares_count > 0) && (
+                    <div className={cn(
+                      'py-3 border-b',
+                      isDark ? 'border-gray-800' : 'border-gray-200'
+                    )}>
+                      <div className="flex items-center space-x-6 text-sm">
+                        {post.likes_count > 0 && (
+                          <span className={cn(isDark ? 'text-gray-400' : 'text-gray-600')}>
+                            <strong className={cn(isDark ? 'text-white' : 'text-black')}>
+                              {formatEngagementNumber(post.likes_count)}
+                            </strong> {post.likes_count === 1 ? 'Like' : 'Likes'}
+                          </span>
+                        )}
+                        {post.comments_count > 0 && (
+                          <span className={cn(isDark ? 'text-gray-400' : 'text-gray-600')}>
+                            <strong className={cn(isDark ? 'text-white' : 'text-black')}>
+                              {formatEngagementNumber(post.comments_count)}
+                            </strong> {post.comments_count === 1 ? 'Reply' : 'Replies'}
+                          </span>
+                        )}
+                        {post.shares_count > 0 && (
+                          <span className={cn(isDark ? 'text-gray-400' : 'text-gray-600')}>
+                            <strong className={cn(isDark ? 'text-white' : 'text-black')}>
+                              {formatEngagementNumber(post.shares_count)}
+                            </strong> {post.shares_count === 1 ? 'Repost' : 'Reposts'}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className={cn(
+                    'flex items-center justify-around py-3 border-b',
                     isDark ? 'border-gray-800' : 'border-gray-200'
                   )}>
-                    <div className="flex items-center space-x-6 text-sm">
-                      {post.likes_count > 0 && (
-                        <span className={cn(isDark ? 'text-gray-400' : 'text-gray-600')}>
-                          <strong className={cn(isDark ? 'text-white' : 'text-black')}>
-                            {formatEngagementNumber(post.likes_count)}
-                          </strong> {post.likes_count === 1 ? 'Like' : 'Likes'}
-                        </span>
-                      )}
-                      {post.comments_count > 0 && (
-                        <span className={cn(isDark ? 'text-gray-400' : 'text-gray-600')}>
-                          <strong className={cn(isDark ? 'text-white' : 'text-black')}>
-                            {formatEngagementNumber(post.comments_count)}
-                          </strong> {post.comments_count === 1 ? 'Reply' : 'Replies'}
-                        </span>
-                      )}
-                      {post.shares_count > 0 && (
-                        <span className={cn(isDark ? 'text-gray-400' : 'text-gray-600')}>
-                          <strong className={cn(isDark ? 'text-white' : 'text-black')}>
-                            {formatEngagementNumber(post.shares_count)}
-                          </strong> {post.shares_count === 1 ? 'Repost' : 'Reposts'}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Action Buttons */}
-                <div className={cn(
-                  'flex items-center justify-around py-3 border-b',
-                  isDark ? 'border-gray-800' : 'border-gray-200'
-                )}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => document.getElementById('comment-input')?.focus()}
-                    className={cn(
-                      'flex items-center space-x-2 px-4 py-2 rounded-full transition-colors',
-                      isDark 
-                        ? 'text-gray-400 hover:text-blue-400 hover:bg-blue-500/10' 
-                        : 'text-gray-600 hover:text-blue-600 hover:bg-blue-500/10'
-                    )}
-                  >
-                    <MessageCircle className="w-5 h-5" />
-                    <span className="text-sm">{post.comments_count || ''}</span>
-                  </Button>
-                  
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className={cn(
-                      'flex items-center space-x-2 px-4 py-2 rounded-full transition-colors',
-                      isDark 
-                        ? 'text-gray-400 hover:text-green-400 hover:bg-green-500/10' 
-                        : 'text-gray-600 hover:text-green-600 hover:bg-green-500/10'
-                    )}
-                  >
-                    <Repeat2 className="w-5 h-5" />
-                    <span className="text-sm">{post.shares_count || ''}</span>
-                  </Button>
-                  
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleLikePost}
-                    className={cn(
-                      'flex items-center space-x-2 px-4 py-2 rounded-full transition-colors',
-                      post.has_liked
-                        ? 'text-red-500 hover:text-red-400'
-                        : isDark 
-                          ? 'text-gray-400 hover:text-red-400 hover:bg-red-500/10'
-                          : 'text-gray-600 hover:text-red-600 hover:bg-red-500/10'
-                    )}
-                  >
-                    <Heart className={cn('w-5 h-5', post.has_liked && 'fill-current')} />
-                    <span className="text-sm">{post.likes_count || ''}</span>
-                  </Button>
-                  
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleBookmarkPost}
-                    className={cn(
-                      'flex items-center space-x-2 px-4 py-2 rounded-full transition-colors',
-                      post.has_bookmarked
-                        ? 'text-blue-500 hover:text-blue-400'
-                        : isDark 
-                          ? 'text-gray-400 hover:text-blue-400 hover:bg-blue-500/10'
-                          : 'text-gray-600 hover:text-blue-600 hover:bg-blue-500/10'
-                    )}
-                  >
-                    <Bookmark className={cn('w-5 h-5', post.has_bookmarked && 'fill-current')} />
-                  </Button>
-                  
-                  <div className="relative">
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => setShowMoreOptions(!showMoreOptions)}
+                      onClick={() => document.getElementById('comment-input')?.focus()}
                       className={cn(
-                        'p-2 rounded-full transition-colors',
+                        'flex items-center space-x-2 px-4 py-2 rounded-full transition-colors',
                         isDark 
-                          ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-800' 
-                          : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                          ? 'text-gray-400 hover:text-blue-400 hover:bg-blue-500/10' 
+                          : 'text-gray-600 hover:text-blue-600 hover:bg-blue-500/10'
                       )}
                     >
-                      <Share className="w-5 h-5" />
+                      <MessageCircle className="w-5 h-5" />
+                      <span className="text-sm">{post.comments_count || ''}</span>
                     </Button>
                     
-                    {showMoreOptions && (
-                      <div className={cn(
-                        'absolute right-0 top-full mt-2 w-48 rounded-xl shadow-lg border z-50 py-2',
-                        isDark ? 'bg-black border-gray-700' : 'bg-white border-gray-200'
-                      )}>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={copyPostLink}
-                          className="w-full justify-start px-4 py-2 text-sm"
-                        >
-                          <Copy className="w-4 h-4 mr-3" />
-                          Copy link to post
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="w-full justify-start px-4 py-2 text-sm"
-                        >
-                          <ExternalLink className="w-4 h-4 mr-3" />
-                          Share via...
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="w-full justify-start px-4 py-2 text-sm text-red-500"
-                        >
-                          <Flag className="w-4 h-4 mr-3" />
-                          Report post
-                        </Button>
-                        {post.user_id !== user?.id && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className={cn(
+                        'flex items-center space-x-2 px-4 py-2 rounded-full transition-colors',
+                        isDark 
+                          ? 'text-gray-400 hover:text-green-400 hover:bg-green-500/10' 
+                          : 'text-gray-600 hover:text-green-600 hover:bg-green-500/10'
+                      )}
+                    >
+                      <Repeat2 className="w-5 h-5" />
+                      <span className="text-sm">{post.shares_count || ''}</span>
+                    </Button>
+                    
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleLikePost}
+                      className={cn(
+                        'flex items-center space-x-2 px-4 py-2 rounded-full transition-colors',
+                        post.has_liked
+                          ? 'text-red-500 hover:text-red-400'
+                          : isDark 
+                            ? 'text-gray-400 hover:text-red-400 hover:bg-red-500/10'
+                            : 'text-gray-600 hover:text-red-600 hover:bg-red-500/10'
+                      )}
+                    >
+                      <Heart className={cn('w-5 h-5', post.has_liked && 'fill-current')} />
+                      <span className="text-sm">{post.likes_count || ''}</span>
+                    </Button>
+                    
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleBookmarkPost}
+                      className={cn(
+                        'flex items-center space-x-2 px-4 py-2 rounded-full transition-colors',
+                        post.has_bookmarked
+                          ? 'text-blue-500 hover:text-blue-400'
+                          : isDark 
+                            ? 'text-gray-400 hover:text-blue-400 hover:bg-blue-500/10'
+                            : 'text-gray-600 hover:text-blue-600 hover:bg-blue-500/10'
+                      )}
+                    >
+                      <Bookmark className={cn('w-5 h-5', post.has_bookmarked && 'fill-current')} />
+                    </Button>
+                    
+                    <div className="relative">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowMoreOptions(!showMoreOptions)}
+                        className={cn(
+                          'p-2 rounded-full transition-colors',
+                          isDark 
+                            ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-800' 
+                            : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                        )}
+                      >
+                        <Share className="w-5 h-5" />
+                      </Button>
+                      
+                      {showMoreOptions && (
+                        <div className={cn(
+                          'absolute right-0 top-full mt-2 w-48 rounded-xl shadow-lg border z-50 py-2',
+                          isDark ? 'bg-black border-gray-700' : 'bg-white border-gray-200'
+                        )}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={copyPostLink}
+                            className="w-full justify-start px-4 py-2 text-sm"
+                          >
+                            <Copy className="w-4 h-4 mr-3" />
+                            Copy link to post
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="w-full justify-start px-4 py-2 text-sm"
+                          >
+                            <ExternalLink className="w-4 h-4 mr-3" />
+                            Share via...
+                          </Button>
                           <Button
                             variant="ghost"
                             size="sm"
                             className="w-full justify-start px-4 py-2 text-sm text-red-500"
                           >
-                            <UserX className="w-4 h-4 mr-3" />
-                            Block @{post.author.full_name.toLowerCase().replace(/\s+/g, '')}
+                            <Flag className="w-4 h-4 mr-3" />
+                            Report post
                           </Button>
-                        )}
-                      </div>
-                    )}
+                          {post.user_id !== user?.id && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="w-full justify-start px-4 py-2 text-sm text-red-500"
+                            >
+                              <UserX className="w-4 h-4 mr-3" />
+                              Block @{post.author.full_name.toLowerCase().replace(/\s+/g, '')}
+                            </Button>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Comments Section */}
-          <Comments postId={postId!} className="border-t border-gray-800" />
+            {/* Comments Section - Mobile/Tablet */}
+            {isMobile && (
+              <Comments postId={postId!} className={cn('border-t', isDark ? 'border-gray-800' : 'border-gray-200')} />
+            )}
+          </div>
         </div>
+
+        {/* Right Sidebar - Comments (Desktop Only) */}
+        {!isMobile && (
+          <aside className={cn(
+            'hidden lg:block w-128 border-l ml-3 rounded-2xl sticky top-0 h-screen overflow-y-auto',
+            isDark ? 'border-gray-800' : 'border-gray-200'
+          )}>
+            <Comments postId={postId!} className="h-full" />  
+          </aside>
+        )}
       </div>
 
       {/* Image Modal */}
       {showImageModal && post.image_url && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black backdrop-blur-sm">
           <div className="relative max-w-[90vw] max-h-[90vh]">
             <Button
               variant="ghost"

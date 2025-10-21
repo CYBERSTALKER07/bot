@@ -26,6 +26,9 @@ import Typography from './ui/Typography';
 import Input from './ui/Input';
 import Select from './ui/Select';
 import { cn } from '../lib/cva';
+import { useDebounce } from '../hooks/useDebounce';
+import { JobCardSkeleton } from './ui/Skeleton';
+import { useJobs } from '../hooks/useOptimizedQuery';
 
 interface Job {
   id: string;
@@ -50,123 +53,64 @@ interface Job {
 export default function JobsPage() {
   const { isDark } = useTheme();
   
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
-  const [typeFilter, setTypeFilter] = useState('all');
-  const [experienceFilter, setExperienceFilter] = useState('all');
-  const [salaryFilter, setSalaryFilter] = useState('all');
-  const [showFilters, setShowFilters] = useState(false);
-  const [sortBy, setSortBy] = useState('newest');
-  const [savedJobs, setSavedJobs] = useState<Set<string>>(new Set());
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
-  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+  const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [experienceFilter, setExperienceFilter] = useState<string>('all');
+  const [salaryFilter, setSalaryFilter] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<string>('newest');
 
-  // Mock jobs data
-  useEffect(() => {
-    const mockJobs: Job[] = [
-      {
-        id: '1',
-        title: 'Senior Software Engineer',
-        company: 'Tech Innovations Ltd',
-        location: 'Auckland, NZ',
-        type: 'full-time',
-        salary: '$90,000 - $120,000',
-        description: 'Join our team building next-generation web applications using modern technologies like React, TypeScript, and Node.js...',
-        requirements: ['React', 'TypeScript', 'Node.js', '5+ years experience'],
-        benefits: ['Health Insurance', 'Flexible Hours', 'Remote Work'],
-        postedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-        isRemote: true,
-        experienceLevel: 'senior',
-        industry: 'Technology',
-        featured: true,
-        applicants: 23,
-        companyLogo: 'https://images.unsplash.com/photo-1549924231-f129b911e442?w=80&h=80&fit=crop'
-      },
-      {
-        id: '2',
-        title: 'Marketing Coordinator',
-        company: 'Creative Agency Co',
-        location: 'Wellington, NZ',
-        type: 'full-time',
-        salary: '$55,000 - $70,000',
-        description: 'Support our marketing team with campaign management and creative content development...',
-        requirements: ['Marketing experience', 'Adobe Creative Suite', 'Communication skills'],
-        benefits: ['Training budget', 'Team events', 'Career development'],
-        postedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-        isRemote: false,
-        experienceLevel: 'mid',
-        industry: 'Marketing',
-        applicants: 15
-      },
-      {
-        id: '3',
-        title: 'Data Science Intern',
-        company: 'Analytics Pro',
-        location: 'Christchurch, NZ',
-        type: 'internship',
-        salary: '$25/hour',
-        description: 'Learn data science in a real-world environment with hands-on projects...',
-        requirements: ['Python', 'Statistics', 'Machine learning basics'],
-        benefits: ['Mentorship', 'Learning opportunities', 'Future employment'],
-        postedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-        applicationDeadline: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-        isRemote: false,
-        experienceLevel: 'entry',
-        industry: 'Data Science'
-      },
-      {
-        id: '4',
-        title: 'UX/UI Designer',
-        company: 'Design Studio',
-        location: 'Auckland, NZ',
-        type: 'full-time',
-        salary: '$70,000 - $85,000',
-        description: 'Create exceptional user experiences for web and mobile applications...',
-        requirements: ['Figma', 'UI/UX Design', 'User Research', '3+ years experience'],
-        benefits: ['Creative freedom', 'Latest tools', 'Design conferences'],
-        postedDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-        isRemote: true,
-        experienceLevel: 'mid',
-        industry: 'Design',
-        applicants: 31
-      }
-    ];
+  // Debounce search to reduce operations
+  const debouncedSearch = useDebounce(searchTerm, 300);
+  const debouncedLocation = useDebounce(locationFilter, 300);
+
+  // Fetch real jobs data
+  const { data: jobsData, isLoading: loading, error } = useJobs();
+
+  // Transform to component format
+  const jobs: Job[] = jobsData?.map(job => ({
+    id: job.id,
+    title: job.title,
+    company: job.company,
+    location: job.location,
+    type: job.type,
+    description: job.description || '',
+    requirements: job.requirements || [],
+    benefits: job.benefits || [],
+    salary: job.salary_range || '',
+    experienceLevel: job.experience_level || 'entry',
+    postedDate: new Date(job.created_at),
+    applicants: job.applicants_count || 0,
+    isRemote: job.is_remote || false,
+    logo: job.company_logo,
+    tags: job.tags || [],
+    company_id: job.company_id,
+    employer_id: job.employer_id,
+  })) || [];
+
+  // Filter and search
+  const filteredJobs = jobs.filter(job => {
+    const matchesSearch = job.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+                         job.company.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+                         job.description.toLowerCase().includes(debouncedSearch.toLowerCase());
     
-    setJobs(mockJobs);
-    setFilteredJobs(mockJobs);
-    setLoading(false);
-  }, []);
-
-  // Filter and search functionality
-  useEffect(() => {
-    const filtered = jobs.filter(job => {
-      const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           job.description.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesLocation = !locationFilter || 
-                             job.location.toLowerCase().includes(locationFilter.toLowerCase());
-      
-      const matchesType = typeFilter === 'all' || job.type === typeFilter;
-      const matchesExperience = experienceFilter === 'all' || job.experienceLevel === experienceFilter;
-      
-      return matchesSearch && matchesLocation && matchesType && matchesExperience;
-    });
-
-    // Sort jobs
+    const matchesLocation = !debouncedLocation || 
+                           job.location.toLowerCase().includes(debouncedLocation.toLowerCase());
+    
+    const matchesType = typeFilter === 'all' || job.type === typeFilter;
+    const matchesExperience = experienceFilter === 'all' || job.experienceLevel === experienceFilter;
+    
+    return matchesSearch && matchesLocation && matchesType && matchesExperience;
+  }).sort((a, b) => {
     if (sortBy === 'newest') {
-      filtered.sort((a, b) => b.postedDate.getTime() - a.postedDate.getTime());
+      return b.postedDate.getTime() - a.postedDate.getTime();
     } else if (sortBy === 'salary') {
-      filtered.sort((a, b) => b.salary.localeCompare(a.salary));
+      return b.salary.localeCompare(a.salary);
     } else if (sortBy === 'applicants') {
-      filtered.sort((a, b) => (b.applicants || 0) - (a.applicants || 0));
+      return (b.applicants || 0) - (a.applicants || 0);
     }
-
-    setFilteredJobs(filtered);
-  }, [jobs, searchTerm, locationFilter, typeFilter, experienceFilter, salaryFilter, sortBy]);
+    return 0;
+  });
 
   const toggleSaveJob = (jobId: string) => {
     setSavedJobs(prev => {
@@ -206,12 +150,27 @@ export default function JobsPage() {
         'min-h-screen',
         isDark ? 'bg-black text-white' : 'bg-white text-black'
       )}>
-        <div className="flex justify-center items-center h-64">
-          <div className={cn(
-            'animate-spin rounded-full h-8 w-8 border-b-2',
-            isDark ? 'border-white' : 'border-black'
-          )}></div>
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="space-y-4">
+            {[...Array(6)].map((_, i) => (
+              <JobCardSkeleton key={i} />
+            ))}
+          </div>
         </div>
+      </PageLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageLayout className={cn(
+        'min-h-screen',
+        isDark ? 'bg-black text-white' : 'bg-white text-black'
+      )}>
+        <Card className="p-8 text-center max-w-lg mx-auto mt-8">
+          <p className="text-red-600 mb-4">Error loading jobs</p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
+        </Card>
       </PageLayout>
     );
   }

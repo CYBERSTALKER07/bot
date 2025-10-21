@@ -36,29 +36,26 @@ export default function AnimatedSearchButton({
   const { isDark } = useTheme();
 
   // Debounced search function
-  const debouncedSearch = useCallback(
-    debounce(async (query: string) => {
-      if (query.trim().length < 2) {
-        setSearchResults([]);
-        setShowResults(false);
-        return;
-      }
+  const debouncedSearch = useCallback(async (query: string) => {
+    if (query.trim().length < 2) {
+      setSearchResults([]);
+      setShowResults(false);
+      return;
+    }
 
-      setIsLoading(true);
-      try {
-        const results = await performSearch(query);
-        setSearchResults(results);
-        setShowResults(true);
-      } catch (error) {
-        console.error('Search error:', error);
-        setSearchResults([]);
-        setShowResults(false);
-      } finally {
-        setIsLoading(false);
-      }
-    }, 300),
-    []
-  );
+    setIsLoading(true);
+    try {
+      const results = await performSearch(query);
+      setSearchResults(results);
+      setShowResults(true);
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+      setShowResults(false);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   // Perform search across multiple tables
   const performSearch = async (query: string): Promise<SearchResult[]> => {
@@ -99,12 +96,13 @@ export default function AnimatedSearchButton({
 
       if (posts) {
         posts.forEach(post => {
+          const profile = Array.isArray(post.profiles) ? post.profiles[0] : post.profiles;
           results.push({
             id: post.id,
             type: 'post',
             title: post.content.substring(0, 50) + (post.content.length > 50 ? '...' : ''),
-            subtitle: `by @${post.profiles?.username || 'user'}`,
-            avatar: post.profiles?.avatar_url
+            subtitle: `by @${profile?.username || 'user'}`,
+            avatar: profile?.avatar_url
           });
         });
       }
@@ -199,9 +197,9 @@ export default function AnimatedSearchButton({
     setShowResults(false);
   };
 
-  const handleKeyPress = (e: React.KeyEvent) => {
+  const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleSearchSubmit(e as any);
+      handleSearchSubmit(e as React.FormEvent);
     }
   };
 
@@ -216,11 +214,11 @@ export default function AnimatedSearchButton({
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
-      <style jsx>{`
+      <style>{`
         .container {
           position: relative;
           width: 80px;
-          height: 80px;
+          height: 70px;
           margin: auto;
         }
 
@@ -231,13 +229,13 @@ export default function AnimatedSearchButton({
           left: 0;
           right: 0;
           bottom: 0;
-          width: 80px;
-          height: 80px;
+          width: 70px;
+          height: 70px;
           background-color: ${primaryColor};
           border-radius: 50%;
           z-index: 4;
           box-shadow: 0 0 25px 0 rgba(0, 0, 0, 0.4);
-          transition: 1s all;
+          transition: 0.5s all;
         }
 
         .search:hover {
@@ -475,12 +473,7 @@ export default function AnimatedSearchButton({
                       <img 
                         src={result.avatar} 
                         alt=""
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          borderRadius: '50%',
-                          objectFit: 'cover'
-                        }}
+                        className="w-full h-full rounded-full object-cover"
                       />
                     ) : (
                       result.title.charAt(0).toUpperCase()
@@ -509,7 +502,7 @@ export default function AnimatedSearchButton({
 }
 
 // Debounce utility function
-function debounce<T extends (...args: any[]) => any>(
+function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {

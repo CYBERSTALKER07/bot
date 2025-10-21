@@ -33,7 +33,7 @@ export default function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   
-  const { register } = useAuth();
+  const { signUp } = useAuth();
   const { isDark } = useTheme();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -113,7 +113,18 @@ export default function Register() {
     setLoading(true);
     try {
       const fullName = `${formData.firstName.trim()} ${formData.lastName.trim()}`;
-      await register(formData.email, formData.password, formData.role, fullName);
+      
+      const { error } = await signUp(formData.email, formData.password, {
+        full_name: fullName,
+        username: formData.email.split('@')[0],
+        role: formData.role
+      });
+      
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+        return;
+      }
       
       setSuccess('Registration successful! Please check your email to confirm your account before signing in.');
       

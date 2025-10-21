@@ -28,6 +28,8 @@ import Input from './ui/Input';
 import Select from './ui/Select';
 import Badge from './ui/Badge';
 import { cn } from '../lib/cva';
+import { useBookmarks } from '../hooks/useOptimizedQuery';
+import { PostCardSkeleton } from './ui/Skeleton';
 
 interface SavedItem {
   id: string;
@@ -56,94 +58,48 @@ interface SavedCollection {
 export default function BookmarksPage() {
   const { user } = useAuth();
   const { isDark } = useTheme();
-  const [savedItems, setSavedItems] = useState<SavedItem[]>([]);
-  const [collections, setCollections] = useState<SavedCollection[]>([]);
-  const [filteredItems, setFilteredItems] = useState<SavedItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'all' | 'jobs' | 'posts'>('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [typeFilter, setTypeFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  // Mock data
-  useEffect(() => {
-    const mockItems: SavedItem[] = [
-      {
-        id: '1',
-        type: 'job',
-        title: 'Senior Frontend Developer',
-        company: 'Tech Innovators',
-        location: 'Auckland, NZ',
-        salary: '$85,000 - $110,000',
-        description: 'Build cutting-edge web applications with React and TypeScript...',
-        savedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-        tags: ['React', 'TypeScript', 'Remote'],
-        url: '/job/1',
-        status: 'active',
-        image: 'https://images.unsplash.com/photo-1549924231-f129b911e442?w=80&h=80&fit=crop'
-      },
-      {
-        id: '2',
-        type: 'company',
-        title: 'Microsoft New Zealand',
-        description: 'Leading technology company with opportunities in software development...',
-        savedDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-        tags: ['Technology', 'Software', 'Global'],
-        url: '/company/2',
-        image: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=80&h=80&fit=crop'
-      },
-      {
-        id: '3',
-        type: 'event',
-        title: 'Auckland Tech Career Fair 2025',
-        description: 'Meet top employers and explore career opportunities in tech...',
-        savedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-        tags: ['Networking', 'Career Fair', 'Technology'],
-        url: '/event/3'
-      }
-    ];
+  // Fetch real bookmarks
+  const { data: bookmarksData, isLoading: loading, error } = useBookmarks(user?.id);
 
-    const mockCollections: SavedCollection[] = [
-      {
-        id: '1',
-        name: 'Dream Jobs',
-        description: 'Jobs I really want to apply for',
-        itemCount: 5,
-        createdDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-        color: 'bg-blue-500'
-      },
-      {
-        id: '2',
-        name: 'Tech Companies',
-        description: 'Interesting tech companies to follow',
-        itemCount: 3,
-        createdDate: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
-        color: 'bg-green-500'
-      }
-    ];
+  // Transform to component format
+  const items: SavedItem[] = bookmarksData?.map(bookmark => {
+    if (bookmark.jobs) {
+      return {
+        id: bookmark.id,
+        type: 'job' as const,
+        title: bookmark.jobs.title,
+        company: bookmark.jobs.company,
+        location: bookmark.jobs.location,
+        saved_date: new Date(bookmark.created_at),
+        job_type: bookmark.jobs.type,
+        salary: bookmark.jobs.salary_range,
+      };
+    } else if (bookmark.posts) {
+      return {
+        id: bookmark.id,
+        type: 'post' as const,
+        title: bookmark.posts.content.substring(0, 100),
+        author: bookmark.posts.author?.full_name || 'Unknown',
+        saved_date: new Date(bookmark.created_at),
+        content: bookmark.posts.content,
+        avatar: bookmark.posts.author?.avatar_url,
+      };
+    }
+    return null;
+  }).filter(Boolean) || [];
 
-    setSavedItems(mockItems);
-    setCollections(mockCollections);
-    setFilteredItems(mockItems);
-    setLoading(false);
-  }, []);
-
-  // Filter items
-  useEffect(() => {
-    const filtered = savedItems.filter(item => {
-      const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           (item.company && item.company.toLowerCase().includes(searchTerm.toLowerCase()));
-      
-      const matchesType = typeFilter === 'all' || item.type === typeFilter;
-      const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
-      
-      return matchesSearch && matchesType && matchesStatus;
-    });
-
-    setFilteredItems(filtered);
-  }, [savedItems, searchTerm, typeFilter, statusFilter]);
+  const collections: SavedCollection[] = [
+    {
+      id: '1',
+      name: 'My Bookmarks',
+      description: 'All saved items',
+      items_count: items.length,
+      created_date: new Date(),
+    }
+  ];
 
   const toggleItemSelection = (itemId: string) => {
     setSelectedItems(prev => {
@@ -191,20 +147,52 @@ export default function BookmarksPage() {
     }
   };
 
+  const filteredItems = items.filter(item => {
+    const matchesTab = activeTab === 'all' || item.type === activeTab.slice(0, -1);
+    const matchesSearch = !searchTerm || 
+      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.company?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (item.author?.toLowerCase().includes(searchTerm.toLowerCase()));
+    return matchesTab && matchesSearch;
+  });
+
   if (loading) {
     return (
-      <PageLayout className={isDark ? 'bg-black text-white' : 'bg-white text-black'}>
-        <div className="flex justify-center items-center h-64">
-          <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${
-            isDark ? 'border-white' : 'border-black'
-          }`}></div>
+      <PageLayout className={cn(
+        'min-h-screen transition-colors duration-300 pb-20',
+        isDark ? 'bg-black text-white' : 'bg-gray-50 text-black'
+      )} maxWidth="4xl">
+        <div className="space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <PostCardSkeleton key={i} />
+          ))}
         </div>
       </PageLayout>
     );
   }
 
+  if (error) {
+    return (
+      <PageLayout className={cn(
+        'min-h-screen transition-colors duration-300',
+        isDark ? 'bg-black text-white' : 'bg-gray-50 text-black'
+      )} maxWidth="4xl">
+        <Card className="p-8 text-center">
+          <p className="text-red-600 mb-4">Error loading bookmarks</p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
+        </Card>
+      </PageLayout>
+    );
+  }
+
   return (
-    <PageLayout className={isDark ? 'bg-black text-white' : 'bg-white text-black'} maxWidth="7xl">
+    <PageLayout 
+      className={cn(
+        'min-h-screen transition-colors duration-300 pb-20',
+        isDark ? 'bg-black text-white' : 'bg-gray-50 text-black'
+      )} 
+      maxWidth="4xl"
+    >
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
@@ -213,7 +201,7 @@ export default function BookmarksPage() {
               My Bookmarks
             </Typography>
             <Typography variant="body1" color="textSecondary">
-              {savedItems.length} saved items across {collections.length} collections
+              {items.length} saved items across {collections.length} collections
             </Typography>
           </div>
           

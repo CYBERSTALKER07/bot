@@ -287,9 +287,13 @@ export class ProfileService {
         ...validUpdates
       } = updates;
       
-      // If username is being updated, validate it
+      // If username is being updated, validate and normalize it
       if (validUpdates.username) {
         validUpdates.username = validUpdates.username.toLowerCase().replace(/[^a-z0-9_]/g, '');
+        
+        if (validUpdates.username.length < 3) {
+          throw new Error('Username must be at least 3 characters long');
+        }
       }
 
       // Only update if there are valid fields to update
@@ -310,13 +314,35 @@ export class ProfileService {
 
       if (error) {
         console.error('Supabase update error:', error);
-        throw error;
+        
+        // Check for specific error types
+        if (error.code === '23505' || error.message?.includes('duplicate')) {
+          throw new Error('Username is already taken. Please choose a different username.');
+        }
+        
+        if (error.code === '42501' || error.message?.includes('permission')) {
+          throw new Error('You do not have permission to edit this profile.');
+        }
+        
+        if (error.code === 'PGRST116') {
+          throw new Error('Profile not found. Please refresh and try again.');
+        }
+        
+        if (error.message?.includes('violates')) {
+          throw new Error('Invalid data format. Please check your entries.');
+        }
+        
+        throw new Error(`Failed to update profile: ${error.message}`);
+      }
+
+      if (!data) {
+        throw new Error('No profile data returned from server');
       }
 
       return data;
     } catch (error) {
       console.error('Error updating profile:', error);
-      throw new Error('Failed to update profile');
+      throw error;
     }
   }
 

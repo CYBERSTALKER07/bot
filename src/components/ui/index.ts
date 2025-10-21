@@ -13,6 +13,10 @@ export { default as Carousel } from './Carousel';
 // Existing components (re-export for consistency)
 export { Card, StatsCard, JobCard } from './Card';
 
+// Grid components
+export { BentoCard, BentoGrid } from './BentoGrid';
+export { BentoDemo } from './BentoDemo';
+
 // Performance components
 export { LoadingSpinner, LoadingOverlay, Skeleton, LoadingCard } from './Loading';
 

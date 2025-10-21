@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Heart,
@@ -6,48 +6,33 @@ import {
   Repeat2,
   Share,
   Bookmark,
-  MoreHorizontal,
-  Image as ImageIcon,
-  Smile,
-  Calendar,
-  MapPin,
-  TrendingUp,
   Users,
-  Sparkles,
-  User,
-  FileText,
   Edit3,
   MessageSquare,
   Plus,
   X,
   Camera,
   Video,
-  Send,
   Globe,
   Lock,
   Users2,
-  // New imports for left sidebar
-  Target,
-  Briefcase,
-  GraduationCap,
-  Award,
-  Home,
-  Hash,
-  Bell,
-  Mail,
   Settings,
-  LogOut
+  LogOut,
+  Search,
+  AtSign
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { supabase } from '../lib/supabase';
 import Button from './ui/Button';
-import { Card } from './ui/Card';
 import Avatar from './ui/Avatar';
-import Input from './ui/Input';
 import PageLayout from './ui/PageLayout';
 import { cn } from '../lib/cva';
-import AnimatedSearchButton from './AnimatedSearchButton';
+import { usePosts, useCreatePost, useProfile, useSearch, useRecommendedUsers, useFollowUser, useUnfollowUser, useFollowStatus, useJobs } from '../hooks/useOptimizedQuery';
+import { useDebounce } from '../hooks/useDebounce';
+import { useFollowStatusCache } from '../hooks/useFollowStatusCache';
+import { PostCardSkeleton } from './ui/Skeleton';
+import WhoToFollowItem from './WhoToFollowItem';
 
 interface Post {
   id: string;
@@ -105,13 +90,13 @@ interface Comment {
   id: string;
   post_id: string;
   user_id: string;
-  parent_comment_id?: string;
+  parent_id?: string;
   content: string;
-  likes_count: number;
-  replies_count: number;
+  like_count: number;
+  reply_count: number;
   has_liked: boolean;
   is_edited: boolean;
-  edited_at?: string;
+  updated_at?: string;
   created_at: string;
   author: {
     id: string;
@@ -145,13 +130,103 @@ interface ProfileStats {
   posts: number;
 }
 
+interface SearchResult {
+  id: string;
+  type: 'user';
+  title: string;
+  subtitle?: string;
+  description: string;
+  avatar?: string;
+  verified?: boolean;
+}
+
+interface SearchResultData {
+  users?: Array<{ id: string; full_name: string; username: string; bio?: string; avatar_url?: string; verified?: boolean }>;
+}
+
 export default function Feed() {
   const { user } = useAuth();
   const { isDark } = useTheme();
   const navigate = useNavigate();
   
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: posts = [], isLoading: loading, error } = usePosts(20);
+  const createPostMutation = useCreatePost();
+  const { data: profileData = {}, isLoading: profileLoading } = useProfile(user?.id);
+  const { data: recommendedUsers = [], isLoading: recommendedUsersLoading } = useRecommendedUsers(user?.id, 6);
+  const { data: jobs = [], isLoading: jobsLoading } = useJobs();
+  const followUserMutation = useFollowUser();
+  const unfollowUserMutation = useUnfollowUser();
+  
+  // Search state for right sidebar
+  const [sidebarSearchInput, setSidebarSearchInput] = useState('');
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const searchDropdownRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  
+  // Parse search input to detect @ symbol
+  const isUsernameSearch = sidebarSearchInput.startsWith('@');
+  const cleanSearchQuery = sidebarSearchInput.startsWith('@') ? sidebarSearchInput.slice(1) : sidebarSearchInput;
+  
+  const debouncedSearchQuery = useDebounce(cleanSearchQuery, 300);
+  const { data: searchResults, isLoading: searchLoading } = useSearch(debouncedSearchQuery);
+
+  // Filter and sort search results based on search type
+  const userSearchResults: SearchResult[] = useMemo(() => {
+    const typedResults = searchResults as SearchResultData | undefined;
+    if (!typedResults) return [];
+    
+    const users: SearchResult[] = [];
+    (typedResults.users || []).forEach((user) => {
+      users.push({
+        id: user.id,
+        type: 'user',
+        title: user.full_name,
+        subtitle: `@${user.username}`,
+        description: user.bio || '',
+        avatar: user.avatar_url,
+        verified: user.verified || false,
+      });
+    });
+
+    // If searching by username (@), prioritize exact username matches
+    if (isUsernameSearch && cleanSearchQuery) {
+      users.sort((a, b) => {
+        const aUsername = a.subtitle?.slice(1) || '';
+        const bUsername = b.subtitle?.slice(1) || '';
+        
+        // Exact match first
+        if (aUsername.toLowerCase() === cleanSearchQuery.toLowerCase()) return -1;
+        if (bUsername.toLowerCase() === cleanSearchQuery.toLowerCase()) return 1;
+        
+        // Starts with query
+        if (aUsername.toLowerCase().startsWith(cleanSearchQuery.toLowerCase())) return -1;
+        if (bUsername.toLowerCase().startsWith(cleanSearchQuery.toLowerCase())) return 1;
+        
+        // Default order
+        return 0;
+      });
+    }
+
+    return users;
+  }, [searchResults, isUsernameSearch, cleanSearchQuery]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchDropdownRef.current && !searchDropdownRef.current.contains(event.target as Node)) {
+        setShowSearchDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleAtSymbolClick = () => {
+    setSidebarSearchInput('@');
+    searchInputRef.current?.focus();
+  };
+
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const [isFabOpen, setIsFabOpen] = useState(false);
@@ -159,6 +234,11 @@ export default function Feed() {
   const [pressedFabItem, setPressedFabItem] = useState<string | null>(null);
   const [hoveredFabItem, setHoveredFabItem] = useState<string | null>(null);
   const [draggedOverItem, setDraggedOverItem] = useState<string | null>(null);
+  
+  // Track follow status for recommended users - now with processing state
+  const [followStatus, setFollowStatus] = useState<Record<string, boolean>>({});
+  const [processingFollowId, setProcessingFollowId] = useState<string | null>(null);
+  const [hoveredFollowId, setHoveredFollowId] = useState<string | null>(null);
   
   // Post creation state
   const [showPostModal, setShowPostModal] = useState(false);
@@ -171,20 +251,8 @@ export default function Feed() {
   const [isPosting, setIsPosting] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<File | null>(null);
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
-  
-  // Profile data for left sidebar
-  const [profileData, setProfileData] = useState<ProfileData>({
-    full_name: user?.name || 'User',
-    bio: '',
-    location: '',
-    avatar_url: '',
-    cover_image_url: '',
-    skills: [],
-    portfolio_url: '',
-    website: ''
-  });
 
-  // Profile stats
+  // Profile stats - can be derived from data later
   const [profileStats] = useState<ProfileStats>({
     following: 247,
     followers: 342,
@@ -195,232 +263,27 @@ export default function Feed() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchDropdownRef.current && !searchDropdownRef.current.contains(event.target as Node)) {
+        setShowSearchDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 1024);
     };
 
     window.addEventListener('resize', handleResize);
-    fetchPosts();
-    loadProfileData();
     
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  const loadProfileData = async () => {
-    if (!user) return;
-    
-    try {
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      if (error && error.code !== 'PGRST116') {
-        console.warn('Error loading profile:', error);
-        return;
-      }
-
-      if (profile) {
-        setProfileData({
-          ...profile,
-          skills: profile.skills || []
-        });
-      }
-    } catch (error) {
-      console.error('Error loading profile:', error);
-    }
-  };
-
-  const fetchPosts = async () => {
-    try {
-      // First, try to fetch posts with a simple query
-      const { data: postsData, error: postsError } = await supabase
-        .from('posts')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(20);
-
-      if (postsError) {
-        console.error('Error fetching posts:', postsError);
-        setMockPosts();
-        return;
-      }
-
-      if (postsData && postsData.length > 0) {
-        // Fetch user profiles separately for each post
-        const userIds = [...new Set(postsData.map(post => post.user_id))];
-        
-        const { data: profilesData, error: profilesError } = await supabase
-          .from('profiles')
-          .select('id, full_name, avatar_url, username')
-          .in('id', userIds);
-
-        if (profilesError) {
-          console.warn('Error fetching profiles, using basic user data:', profilesError);
-        }
-
-        // Create a map of user profiles for quick lookup
-        const profilesMap = new Map();
-        if (profilesData) {
-          profilesData.forEach(profile => {
-            profilesMap.set(profile.id, profile);
-          });
-        }
-
-        // Transform posts with proper profile data including avatars
-        const transformedPosts: Post[] = postsData.map(post => {
-          const userProfile = profilesMap.get(post.user_id);
-          
-          return {
-            id: post.id.toString(),
-            content: post.content || '',
-            author: {
-              id: post.user_id.toString(),
-              name: userProfile?.full_name || 'User',
-              username: userProfile?.username || `user${post.user_id}`,
-              avatar_url: userProfile?.avatar_url || undefined,
-              verified: false
-            },
-            created_at: post.created_at,
-            likes_count: post.likes_count || 0,
-            retweets_count: post.shares_count || 0,
-            replies_count: post.comments_count || 0,
-            has_liked: false,
-            has_retweeted: false,
-            has_bookmarked: false,
-            media: post.image_url || post.video_url ? [{
-              type: post.media_type === 'video' || post.video_url ? 'video' : 'image',
-              url: post.image_url || post.video_url || '',
-              alt: 'Post media'
-            }] : undefined
-          };
-        });
-
-        setPosts(transformedPosts);
-      } else {
-        // If no posts in database, show mock data
-        setMockPosts();
-      }
-      
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-      setMockPosts();
-      setLoading(false);
-    }
-  };
-
-  const setMockPosts = () => {
-    const mockPosts: Post[] = [
-      {
-        id: '1',
-        content: 'Just landed my dream job at Google! The interview process was challenging but worth it. Thanks to everyone who supported me during this journey 🚀',
-        author: {
-          id: '1',
-          name: 'Sarah Johnson',
-          username: 'sarahj',
-          verified: true,
-          avatar_url: 'https://images.unsplash.com/photo-1494790108755-2616b612b278?w=40&h=40&fit=crop&crop=face'
-        },
-        created_at: '2024-01-15T10:30:00Z',
-        likes_count: 124,
-        retweets_count: 23,
-        replies_count: 15,
-        has_liked: false,
-        has_retweeted: false,
-        has_bookmarked: false,
-        media: [
-          {
-            type: 'image',
-            url: 'https://images.unsplash.com/photo-1573164574572-cb89e39749b4?w=600&h=400&fit=crop',
-            alt: 'Google office celebration'
-          }
-        ]
-      },
-      {
-        id: '2',
-        content: 'Excited to announce our new startup has raised $2M in seed funding! 🎉 Building the future of remote work collaboration tools. DM me if you\'re interested in joining our team!',
-        author: {
-          id: '2',
-          name: 'Alex Rodriguez',
-          username: 'alexr_startup',
-          verified: false,
-          avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face'
-        },
-        created_at: '2024-01-15T08:15:00Z',
-        likes_count: 89,
-        retweets_count: 34,
-        replies_count: 28,
-        has_liked: true,
-        has_retweeted: false,
-        has_bookmarked: true
-      },
-      {
-        id: '3',
-        content: 'Pro tip for job seekers: Always research the company culture before your interview. It shows genuine interest and helps you ask better questions! #CareerAdvice #JobSearch',
-        author: {
-          id: '3',
-          name: 'Career Coach Pro',
-          username: 'careercoachpro',
-          verified: true,
-          avatar_url: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=40&h=40&fit=crop&crop=face'
-        },
-        created_at: '2024-01-15T06:45:00Z',
-        likes_count: 256,
-        retweets_count: 89,
-        replies_count: 45,
-        has_liked: false,
-        has_retweeted: true,
-        has_bookmarked: false
-      },
-      {
-        id: '4',
-        content: 'Working on an exciting AI project that could revolutionize how we approach data analysis. Can\'t share details yet, but stay tuned! 🤖',
-        author: {
-          id: '4',
-          name: 'Dr. Maya Patel',
-          username: 'mayapatel_ai',
-          verified: true,
-          avatar_url: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=40&h=40&fit=crop&crop=face'
-        },
-        created_at: '2024-01-14T22:30:00Z',
-        likes_count: 178,
-        retweets_count: 56,
-        replies_count: 32,
-        has_liked: false,
-        has_retweeted: false,
-        has_bookmarked: true
-      },
-      {
-        id: '5',
-        content: 'Amazing networking event tonight! Met so many talented developers and entrepreneurs. The tech community here is incredible 💪',
-        author: {
-          id: '5',
-          name: 'Jessica Wong',
-          username: 'jessicaw_tech',
-          verified: false,
-          avatar_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face'
-        },
-        created_at: '2024-01-14T20:15:00Z',
-        likes_count: 67,
-        retweets_count: 12,
-        replies_count: 18,
-        has_liked: true,
-        has_retweeted: false,
-        has_bookmarked: false,
-        media: [
-          {
-            type: 'image',
-            url: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=600&h=400&fit=crop',
-            alt: 'Networking event'
-          }
-        ]
-      }
-    ];
-    setPosts(mockPosts);
-  };
 
   const uploadMedia = async (file: File): Promise<string> => {
     try {
@@ -459,7 +322,7 @@ export default function Feed() {
     }
 
     if (!newPost.content.trim() && !selectedMedia) {
-      return; // Don't post empty content
+      return;
     }
 
     setIsPosting(true);
@@ -467,16 +330,13 @@ export default function Feed() {
       let mediaUrl = '';
       let mediaType = newPost.media_type;
 
-      // Upload media if selected
       if (selectedMedia) {
         mediaUrl = await uploadMedia(selectedMedia);
         mediaType = selectedMedia.type.startsWith('video/') ? 'video' : 'image';
       }
 
-      // Extract hashtags from content
       const hashtags = newPost.content.match(/#[\w]+/g)?.map(tag => tag.slice(1)) || [];
 
-      // Create post in database
       const postData = {
         user_id: user.id,
         content: newPost.content.trim(),
@@ -491,51 +351,8 @@ export default function Feed() {
         shares_count: 0
       };
 
-      const { data, error } = await supabase
-        .from('posts')
-        .insert([postData])
-        .select(`
-          *,
-          profiles!posts_user_id_fkey (
-            username,
-            full_name,
-            avatar_url,
-            verified
-          )
-        `)
-        .single();
-
-      if (error) {
-        throw error;
-      }
-
-      // Transform and add the new post to the feed
-      const newPostData: Post = {
-        id: data.id,
-        content: data.content || '',
-        author: {
-          id: data.user_id,
-          name: data.profiles?.full_name || user.profile.full_name || 'Unknown User',
-          username: data.profiles?.username || user.profile.username,
-          avatar_url: data.profiles?.avatar_url || user.profile.avatar_url || undefined,
-          verified: data.profiles?.verified || user.profile.verified || false
-        },
-        created_at: data.created_at,
-        likes_count: 0,
-        retweets_count: 0,
-        replies_count: 0,
-        has_liked: false,
-        has_retweeted: false,
-        has_bookmarked: false,
-        media: mediaUrl ? [{
-          type: mediaType === 'video' ? 'video' : 'image',
-          url: mediaUrl,
-          alt: 'Post media'
-        }] : undefined
-      };
-
-      // Add new post to the beginning of the feed
-      setPosts(prevPosts => [newPostData, ...prevPosts]);
+      // Use mutation instead of manual supabase call
+      await createPostMutation.mutateAsync(postData);
 
       // Reset form
       setNewPost({
@@ -763,12 +580,30 @@ export default function Feed() {
     return (
       <PageLayout className={isDark ? 'bg-black text-white' : 'bg-white text-black'}>
         <div className={cn(
-          'flex justify-center items-center min-h-screen',
-          isMobile ? 'pt-16 pb-20' : ''
+          'min-h-screen w-full',
+          isDark ? 'bg-black text-white' : 'bg-white text-black',
+          isMobile ? 'pb-20' : 'flex'
         )}>
-          <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${
-            isDark ? 'border-white' : 'border-black'
-          }`}></div>
+          {/* Show skeletons instead of spinner */}
+          <div className="flex-1 max-w-2xl mx-auto">
+            {[...Array(5)].map((_, i) => (
+              <PostCardSkeleton key={i} />
+            ))}
+          </div>
+        </div>
+      </PageLayout>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <PageLayout className={isDark ? 'bg-black text-white' : 'bg-white text-black'}>
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="text-center">
+            <p className="text-red-500 mb-4">Failed to load posts</p>
+            <Button onClick={() => window.location.reload()}>Retry</Button>
+          </div>
         </div>
       </PageLayout>
     );
@@ -781,7 +616,10 @@ export default function Feed() {
       isMobile ? 'pb-20' : 'flex'
     )}>
       {/* Left Sidebar - Hidden on mobile */}
-      <div className="hidden lg:block w-80 p-4 space-y-6 bg-white border-r border-gray-200 ml-20 sticky top-0 h-screen overflow-y-auto">
+      <div className={cn(
+        "lg:block w-80 p-4 space-y-6 bg-white border-r border-gray-200 ml-20 sticky top-0 h-screen overflow-y-auto",
+        isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200'
+      )}>
         {/* User Profile Quick View */}
         <div className="relative rounded-2xl p-4 text-white overflow-hidden">
           {/* Cover Photo Background */}
@@ -837,62 +675,31 @@ export default function Feed() {
         {/* AI Career Assistant - Unique Feature */}
         <div className="bg-primary rounded-2xl p-4 text-white">
           <div className="flex items-center gap-2 mb-3">
-            {/* <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-            </div> */}
+          <Search className="w-5 h-5 inline-block mr-2" /> 
+
             <h3 className="font-bold text-lg">AI search</h3>
           </div>
           <p className="text-sm text-white/90 mb-3">
+ 
             Get personalized career guidance based on your profile and goals
           </p>
-          <div className="space-y-2">
-            <button className="w-full bg-white/20 hover:bg-white/30 rounded-lg p-2 text-xs text-left transition-colors">
-              Daily Career Tip: "Network authentically, not just for opportunities"
-            </button>
-            <button className="w-full bg-white/20 hover:bg-white/30 rounded-lg p-2 text-xs text-left transition-colors">
-              Next Goal: Complete 3 skill assessments this week
-            </button>
-          </div>
+          
+         <Search 
+          className="w-8 h-8 bg-white/20 rounded-full p-2 hover:bg-white/30 transition-colors cursor-pointer inline-block"
+          title="Search for career advice, job matches, skill development plans..."
+         />
         </div>
 
         {/* Skills Development Tracker */}
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-          <div className="p-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <h3 className="font-bold text-gray-900">Skill Progress</h3>
-              <button className="text-[#7BA805] text-sm hover:underline">View All</button>
-            </div>
-          </div>
-          <div className="p-4 space-y-4">
-            {[
-              { skill: 'React', level: 85, trending: true },
-              { skill: 'TypeScript', level: 72, trending: false },
-              { skill: 'Node.js', level: 68, trending: true }
-            ].map((skill, index) => (
-              <div key={index}>
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-gray-900">{skill.skill}</span>
-                  </div>
-                  <span className="text-xs text-gray-600">{skill.level}%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-1.5">
-                  <div 
-                    className="bg-[#BCE953] h-1.5 rounded-full transition-all duration-300"
-                    style={{width: `${skill.level}%`}}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+     
 
         {/* Industry Insights */}
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        <div className={cn("bg-white rounded-2xl border border-gray-200 overflow-hidden", isDark ? 'bg-transparent text-white border-gray-800' : 'bg-white border-gray-200')}>
           <div className="p-4 border-b border-gray-200">
-            <h3 className="font-bold text-gray-900">Industry Pulse</h3>
-            <p className="text-xs text-gray-600">Real-time market insights</p>
+            <h3 className="font-bold ">Industry Pulse</h3>
+            <p className="text-xs ">Real-time market insights</p>
           </div>
-          <div className="divide-y divide-gray-200">
+          <div className="divide-y-[0.7px] divide-gray-200">
             {[
               { 
                 title: 'AI/ML Engineers', 
@@ -913,11 +720,11 @@ export default function Feed() {
                 description: 'Fintech sector leading'
               }
             ].map((insight, index) => (
-              <div key={index} className="p-3 hover:bg-gray-50 transition-colors">
+              <div key={index} className={cn("p-3 hover:bg-gray-50 transition-colors", isDark ? 'text-white hover:bg-gray-800' : 'hover:bg-gray-50')}>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium text-gray-900">{insight.title}</span>
+                  <span className="text-sm font-medium ">{insight.title}</span>
                 </div>
-                <p className="text-xs text-gray-600">{insight.description}</p>
+                <p className="text-xs text-gray-300">{insight.description}</p>
               </div>
             ))}
           </div>
@@ -948,13 +755,12 @@ export default function Feed() {
         </div> */}
 
         {/* Career Opportunities Scanner */}
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        <div className={cn("bg-white rounded-2xl border border-gray-200 overflow-hidden", isDark ? 'bg-transparent text-white border-gray-800' : 'bg-white border-gray-200')}>
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <h3 className="font-bold text-gray-900">jobs that mtach your interest</h3>
+              <h3 className="font-bold ">jobs that mtach your interest</h3>
             </div>
-            <p className="text-xs text-gray-600">Matching your profile in real-time</p>
+            <p className="text-xs text-gray-50">Matching your profile in real-time</p>
           </div>
           <div className="p-4 space-y-3">
             {[
@@ -973,22 +779,15 @@ export default function Feed() {
                 applicants: 45
               }
             ].map((opp, index) => (
-              <div key={index} className="border border-gray-200 rounded-lg p-3">
+              <div key={index} className={cn("border border-gray-200 rounded-lg p-3", isDark ? 'border-gray-800 text-white' : 'border-gray-200')}> 
                 <div className="flex items-center justify-between mb-2">
                   <div>
-                    <h4 className="font-medium text-sm text-gray-900">{opp.role}</h4>
-                    <p className="text-xs text-gray-600">{opp.company}</p>
+                    <h4 className="font-medium text-sm ">{opp.role}</h4>
+                    <p className="text-xs text-gray-200">{opp.company}</p>
                   </div>
-                  <div className="text-right">
-                    <div className={cn(
-                      'text-xs px-2 py-1 rounded-full font-medium',
-                      opp.match >= 90 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-                    )}>
-                      {opp.match}% match
-                    </div>
-                  </div>
+               
                 </div>
-                <div className="flex items-center justify-between text-xs text-gray-500">
+                <div className="flex items-center justify-between text-xs text-lime">
                   <span>{opp.applicants} applied</span>
                   <span>Closes in {opp.timeLeft}</span>
                 </div>
@@ -1007,9 +806,9 @@ export default function Feed() {
         </Button> */}
 
         {/* Recent Connections */}
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        <div className={cn("bg-white rounded-2xl border border-gray-200 overflow-hidden", isDark ? 'bg-transparent text-white border-gray-800' : 'bg-white border-gray-200')}>
           <div className="p-4 border-b border-gray-200">
-            <h3 className="font-bold text-gray-900">Recent Connections</h3>
+            <h3 className={cn("font-bold ",isDark ?  'text-lime' : 'text-asu-maroon' )}>Recent Connections</h3>
           </div>
           <div className="divide-y divide-gray-200">
             {[
@@ -1017,16 +816,16 @@ export default function Feed() {
               { name: 'Sarah Johnson', role: 'Product Manager', avatar: '' },
               { name: 'Mike Rodriguez', role: 'Designer', avatar: '' }
             ].map((connection, index) => (
-              <div key={index} className="p-3 hover:bg-gray-50 transition-colors">
+              <div key={index} className="p-3 hover:bg-neutral-400 transition-colors">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 font-bold text-sm">
+                  <div className="w-8 h-8 rounded-full bg-gray-50  flex items-center justify-center text-gray-700 font-bold text-sm">
                     {connection.name.charAt(0)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm text-gray-900 truncate">
+                    <p className="font-medium text-sm  truncate">
                       {connection.name}
                     </p>
-                    <p className="text-xs text-gray-600 truncate">
+                    <p className="text-xs text-gray-50 truncate">
                       {connection.role}
                     </p>
                   </div>
@@ -1040,14 +839,14 @@ export default function Feed() {
         <div className="space-y-2">
           <button
             onClick={() => navigate('/settings')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-100 transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white hover:text-black transition-colors"
           >
             <Settings className="w-5 h-5" />
             <span>Settings</span>
           </button>
           <button
             onClick={() => {/* handle logout */}}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-black text-white hover:bg-red-700 transition-colors"
           >
             <LogOut className="w-5 h-5" />
             <span>Logout</span>
@@ -1171,7 +970,7 @@ export default function Feed() {
                             <img
                               src={media.url}
                               alt={media.alt || ''}
-                              className="rounded-lg object-cover w-full"
+                              className="rounded-2xl object-cover w-full"
                             />
                           ) : (
                             <video
@@ -1197,7 +996,7 @@ export default function Feed() {
                   )}>
                     {/* Reply Button */}
                     <Button
-                      variant="ghost"
+                      variant="ghost" 
                       size="sm"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -1340,16 +1139,7 @@ export default function Feed() {
                   </div>
                 </div>
                 
-                {!isMobile && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => e.stopPropagation()}
-                    className="p-2 text-white hover:text-gray-700 hover:bg-gray-500/10 rounded-full"
-                  >
-                    <MoreHorizontal className="h-5 w-5" />
-                  </Button>
-                )}
+               
               </div>
             </div>
           ))}
@@ -1373,12 +1163,200 @@ export default function Feed() {
           isDark ? 'border-gray-800' : 'border-gray-200'
         )}>
           <div className="p-4 space-y-6">
+            {/* Search Field with @ Support */}
+            <div className="relative">
+              <div className={cn(
+                'flex items-center gap-2 px-3 py-2 rounded-lg border transition-all',
+                showSearchDropdown
+                  ? isDark
+                    ? 'bg-gray-900/50 border-blue-500'
+                    : 'bg-gray-50 border-blue-500'
+                  : isDark
+                    ? 'bg-gray-900/50 border-gray-700'
+                    : 'bg-gray-100 border-gray-300'
+              )}>
+                <Search className={cn(
+                  'w-4 h-4 flex-shrink-0 transition-colors',
+                  showSearchDropdown
+                    ? isDark ? 'text-blue-400' : 'text-blue-600'
+                    : isDark ? 'text-gray-500' : 'text-gray-400'
+                )} />
+                
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="Search by name or @username"
+                  value={sidebarSearchInput}
+                  onChange={(e) => {
+                    setSidebarSearchInput(e.target.value);
+                    setShowSearchDropdown(true);
+                  }}
+                  onFocus={() => setShowSearchDropdown(true)}
+                  className={cn(
+                    'flex-1 bg-transparent outline-none text-sm',
+                    isDark ? 'text-white placeholder-gray-500' : 'text-black placeholder-gray-400'
+                  )}
+                />
+
+                {/* @ Symbol Quick Button */}
+                {!sidebarSearchInput && (
+                  <button
+                    onClick={handleAtSymbolClick}
+                    title="Search by username"
+                    className={cn(
+                      'p-1 rounded transition-all flex-shrink-0',
+                      isDark
+                        ? 'text-gray-500 hover:text-blue-400 hover:bg-blue-500/10'
+                        : 'text-gray-500 hover:text-blue-600 hover:bg-blue-500/10'
+                    )}
+                  >
+                    <AtSign className="w-4 h-4" />
+                  </button>
+                )}
+
+                {/* Clear Button */}
+                {sidebarSearchInput && (
+                  <button
+                    onClick={() => {
+                      setSidebarSearchInput('');
+                      searchInputRef.current?.focus();
+                    }}
+                    title="Clear search"
+                    className={cn(
+                      'p-1 rounded transition-all flex-shrink-0',
+                      isDark
+                        ? 'text-gray-500 hover:text-white hover:bg-gray-800'
+                        : 'text-gray-500 hover:text-black hover:bg-gray-200'
+                    )}
+                  >
+                    <span className="text-lg">×</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Search Mode Indicator */}
+              {sidebarSearchInput && (
+                <div className={cn(
+                  'mt-1 px-3 text-xs font-medium flex items-center gap-1',
+                  isUsernameSearch
+                    ? isDark ? 'text-blue-400' : 'text-blue-600'
+                    : isDark ? 'text-gray-500' : 'text-gray-600'
+                )}>
+                  {isUsernameSearch ? (
+                    <>
+                      <AtSign className="w-3 h-3" />
+                      <span>Username search</span>
+                    </>
+                  ) : (
+                    <span>Name search</span>
+                  )}
+                </div>
+              )}
+
+              {/* Search Results Dropdown */}
+              {showSearchDropdown && (
+                <div
+                  ref={searchDropdownRef}
+                  className={cn(
+                    'absolute top-full left-0 right-0 mt-2 rounded-lg shadow-lg border z-50',
+                    isDark
+                      ? 'bg-black border-gray-700'
+                      : 'bg-white border-gray-200'
+                  )}
+                >
+                  {searchLoading ? (
+                    <div className={cn(
+                      'p-4 text-center text-sm',
+                      isDark ? 'text-gray-400' : 'text-gray-600'
+                    )}>
+                      Loading...
+                    </div>
+                  ) : userSearchResults.length > 0 ? (
+                    <div className={cn(
+                      'divide-y max-h-80 overflow-y-auto',
+                      isDark ? 'divide-gray-800' : 'divide-gray-200'
+                    )}>
+                      {userSearchResults.map((result) => (
+                        <Link
+                          key={result.id}
+                          to={`/profile/${result.id}`}
+                          onClick={() => {
+                            setShowSearchDropdown(false);
+                            setSidebarSearchInput('');
+                          }}
+                          className={cn(
+                            'flex items-center gap-3 p-3 transition-colors',
+                            isDark
+                              ? 'hover:bg-gray-900/50'
+                              : 'hover:bg-gray-50'
+                          )}
+                        >
+                          {/* Avatar */}
+                          {result.avatar ? (
+                            <img
+                              src={result.avatar}
+                              alt={result.title}
+                              className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                            />
+                          ) : (
+                            <div className={cn(
+                              'w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold',
+                              isDark ? 'bg-gray-800' : 'bg-gray-200'
+                            )}>
+                              {result.title.charAt(0).toUpperCase()}
+                            </div>
+                          )}
+
+                          {/* Content */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1">
+                              <h4 className="font-medium text-sm truncate">{result.title}</h4>
+                              {result.verified && (
+                                <svg className="w-3 h-3 text-blue-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                                </svg>
+                              )}
+                            </div>
+                            
+                            <p className={cn(
+                              'text-xs truncate font-medium',
+                              isUsernameSearch
+                                ? isDark ? 'text-blue-400' : 'text-blue-600'
+                                : isDark ? 'text-gray-500' : 'text-gray-600'
+                            )}>
+                              {result.subtitle}
+                            </p>
+
+                            {result.description && (
+                              <p className={cn(
+                                'text-xs line-clamp-1',
+                                isDark ? 'text-gray-400' : 'text-gray-700'
+                              )}>
+                                {result.description}
+                              </p>
+                            )}
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  ) : sidebarSearchInput ? (
+                    <div className={cn(
+                      'p-4 text-center text-sm',
+                      isDark ? 'text-gray-400' : 'text-gray-600'
+                    )}>
+                      No results for "{sidebarSearchInput}"
+                    </div>
+                  ) : null}
+                </div>
+              )}
+            </div>
+
             {/* Job Recommendations */}
             <div className={cn(
               'rounded-xl p-4 border',
               isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200'
             )}>
-              <h3 className="font-bold text-lg mb-4 flex items-center">
+              <h3 className="font-bold text-2xl font-serif mb-4 flex items-center">
                 <Bookmark className="h-5 w-5 mr-2" />
                 Jobs For You
               </h3>
@@ -1407,8 +1385,8 @@ export default function Feed() {
                   }
                 ].map((job, index) => (
                   <div key={index} className={cn(
-                    'p-3 rounded-xl bg-[#8056E6] hover:bg-gray-800/30 cursor-pointer transition-colors',
-                    isDark ? 'hover:bg-gray-800/30' : 'hover:bg-[#8056E6]/90'
+                    'p-3 rounded-xl bg-[#D5634A] hover:bg-gray-800/30 cursor-pointer transition-colors',
+                    isDark ? 'hover:bg-[#D5634A]/90' : 'hover:bg-[#D5634A]/90'
                   )}>
                     <div className="flex items-center space-x-3 mb-2">
                       <img src={job.logo} alt={job.company} className="w-10 h-10 rounded-lg" />
@@ -1419,11 +1397,11 @@ export default function Feed() {
                         </p>
                       </div>
                     </div>
-                    <p className="text-sm font-medium text-green-500">{job.salary}</p>
+                    {/* <p className="text-sm font-medium text-black">{job.salary}</p> */}
                   </div>
                 ))}
               </div>
-              <Button variant="ghost" className="w-full mt-4 text-black">
+              <Button variant="ghost" className="w-full mt-4 bg-[#D5634A] text-black">
                 View All Jobs
               </Button>
             </div>
@@ -1431,63 +1409,41 @@ export default function Feed() {
             {/* Who to Follow */}
             <div className={cn(
               'rounded-xl p-4 border',
-              isDark ? 'bg-black border-gray-800' : 'bg-lime border-gray-200'
+              isDark ? 'bg-black border-gray-800' : 'bg-black border-gray-200'
             )}>
-              <h3 className="font-bold text-lg mb-4 flex items-center">
+              <h3 className="font-serif text-lg mb-4 flex items-center text-white">
                 <Users className="h-5 w-5 mr-2" />
                 Who to Follow
               </h3>
               <div className="space-y-4">
-                {[
-                  {
-                    name: 'Emily Chen',
-                    username: 'emilychen_dev',
-                    title: 'Senior Engineer at Apple',
-                    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b278?w=40&h=40&fit=crop&crop=face',
-                    verified: true
-                  },
-                  {
-                    name: 'Marcus Johnson',
-                    username: 'marcusj_pm',
-                    title: 'Product Lead at Stripe',
-                    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face',
-                    verified: false
-                  },
-                  {
-                    name: 'Tesla Careers',
-                    username: 'teslacareers',
-                    title: 'Official Tesla Recruiting',
-                    avatar: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=40&h=40&fit=crop&crop=center',
-                    verified: true
-                  }
-                ].map((user, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <img src={user.avatar} alt={user.name} className="w-10 h-10 rounded-full" />
-                      <div>
-                        <div className="flex items-center space-x-1">
-                          <h4 className="font-semibold text-sm">{user.name}</h4>
-                          {user.verified && (
-                            <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                              <span className="text-white text-xs">✓</span>
-                            </div>
-                          )}
-                        </div>
-                        <p className={cn('text-xs', isDark ? 'text-white' : 'text-balance')}>
-                          @{user.username}
-                        </p>
-                        <p className={cn('text-xs', isDark ? 'text-white' : 'text-balance')}>
-                          {user.title}
-                        </p>
-                      </div>
-                    </div>
-                    <Button size="sm" className="rounded-xl w-[70px] h-[30px] bg-[#000000] text-white hover:bg-[#8056E6]">
-                      Follow
-                    </Button>
+                {recommendedUsersLoading ? (
+                  <div className="text-center py-4 text-gray-400">Loading recommendations...</div>
+                ) : recommendedUsers.length > 0 ? (
+                  recommendedUsers.map((recommendedUser) => (
+                    <WhoToFollowItem
+                      key={recommendedUser.id}
+                      user={{
+                        id: recommendedUser.id,
+                        full_name: recommendedUser.full_name,
+                        username: recommendedUser.username,
+                        avatar_url: recommendedUser.avatar_url,
+                        verified: recommendedUser.verified,
+                        bio: recommendedUser.bio
+                      }}
+                      onNavigate={() => {}}
+                    />
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-gray-400 text-sm">
+                    No more users to recommend
                   </div>
-                ))}
+                )}
               </div>
-              <Button variant="ghost" className="w-full mt-4 text-black">
+              <Button
+                variant="ghost"
+                className="w-full mt-4 text-white hover:bg-gray-800/50"
+                onClick={() => navigate('/explore')}
+              >
                 Show More
               </Button>
             </div>
@@ -1497,24 +1453,27 @@ export default function Feed() {
               'rounded-xl p-4 border',
               isDark ? 'bg-black border-gray-800' : 'bg-[#800020] border-gray-200'
             )}>
-              <h3 className="font-bold text-lg mb-4 text-white">Recent Activity</h3>
+              <h3 className="font-bold text-lg mb-4 text-white">recomended vacansies</h3>
               <div className="space-y-3 text-white">
-                {[
-                  { action: 'New job posted', detail: 'Senior Developer at Spotify', time: '2h ago' },
-                  { action: 'Event reminder', detail: 'Tech Networking Meetup', time: '4h ago' },
-                  { action: 'Profile view', detail: '12 people viewed your profile', time: '6h ago' },
-                  { action: 'Application update', detail: 'Your Netflix application is under review', time: '1d ago' }
-                ].map((activity, index) => (
-                  <div key={index} className="text-sm">
-                    <p className="font-medium">{activity.action}</p>
-                    <p className={cn('text-xs', isDark ? 'text-white' : 'text-white')}>
-                      {activity.detail}
-                    </p>
-                    <p className={cn('text-xs', isDark ? 'text-white' : 'text-white')}>
-                      {activity.time}
-                    </p>
+                {jobsLoading ? (
+                  <div className="text-center py-4 text-gray-400">Loading jobs...</div>
+                ) : jobs && jobs.length > 0 ? (
+                  jobs.slice(0, 5).map((job: any, index: number) => (
+                    <div key={job.id || index} className="text-sm p-2 rounded hover:bg-white/10 transition-colors cursor-pointer">
+                      <p className="font-medium">{job.title}</p>
+                      <p className={cn('text-xs', isDark ? 'text-gray-300' : 'text-gray-200')}>
+                        {job.company} • {job.location}
+                      </p>
+                      <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-300')}>
+                        Posted {formatTime(job.created_at)}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-gray-400 text-sm">
+                    No recent jobs available
                   </div>
-                ))}
+                )}
               </div>
             </div>
 
@@ -1528,7 +1487,6 @@ export default function Feed() {
               </div>
               <p>© 2025 TalentLink. All rights reserved.</p>
             </div>
-            <AnimatedSearchButton />
           </div>
         </aside>
       )}
@@ -1657,10 +1615,10 @@ export default function Feed() {
               transition-all duration-300 ease-out border-2 border-white/20
               touch-manipulation select-none transform-gpu
               ${isFabOpen 
-                ? 'bg-red-500 rotate-45 scale-110 shadow-red-500/30' 
+                ? 'bg-black text-white rotate-45 scale-110 ' 
                 : isFabPressed 
-                  ? 'bg-[#BCE953] text-black scale-125 shadow-[#BCE953]/40 ring-4 ring-[#BCE953]/30'
-                  : 'bg-[#BCE953] text-black hover:scale-105 active:scale-95'
+                  ? 'bg-[#CCFE00] text-black scale-125 shadow-[#BCE953]/40 ring-4 ring-[#BCE953]/30'
+                  : 'bg-[#CCFE00] text-black hover:scale-105 active:scale-95'
               }
               text-black font-bold z-50
             `}
@@ -1668,7 +1626,7 @@ export default function Feed() {
               boxShadow: isFabPressed 
                 ? '0 8px 20px rgba(0, 0, 0, 0.25)' 
                 : isFabOpen
-                  ? '0 15px 35px rgba(0, 0, 0, 0.3), 0 0 30px rgba(239, 68, 68, 0.4)'
+                  ? ''
                   : '0 10px 25px rgba(0, 0, 0, 0.2), 0 0 20px rgba(188, 233, 83, 0.3)'
             }}
             aria-label={isFabOpen ? "Close menu" : "Open menu"}

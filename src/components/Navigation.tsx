@@ -26,6 +26,9 @@ import Button from './ui/Button';
 import { cn } from '../lib/cva';
 import { FloatingActionMenu } from './FloatingActionMenu';
 
+// Helper component for thin icons
+const ThinIcon = ({ Icon, ...props }: any) => <Icon strokeWidth={1.5} {...props} />;
+
 interface NavigationItem {
   icon: React.ComponentType<any>;
   label: string;
@@ -62,7 +65,7 @@ export default function Navigation() {
   const getNavigationItems = (): NavigationItem[] => {
     const baseItems = [
       { icon: Home, label: 'Home', path: '/feed' },
-      { icon: Search, label: 'Explore', path: '/jobs' },
+      { icon: Search, label: 'Explore', path: '/search' },
       { icon: Bell, label: 'Notifications', path: '/notifications', badge: 3 },
       // { icon: Mail, label: 'Messages', path: '/messages', badge: 2 },
       // { icon: Bookmark, label: 'Bookmarks', path: '/bookmarks' },
@@ -84,6 +87,7 @@ export default function Navigation() {
         ...baseItems,
         { icon: BarChart3, label: 'Dashboard', path: '/employer-dashboard' },
         { icon: Briefcase, label: 'Post Jobs', path: '/post-job' },
+        { icon: FileText, label: 'My Jobs', path: '/employer/jobs' },
         { icon: Linkedin, label: 'LinkedIn Jobs', path: '/linkedin-job-manager' },
         { icon: Users, label: 'Applicants', path: '/applicants' },
         { icon: User, label: 'Profile', path: '/profile' }
@@ -151,9 +155,9 @@ export default function Navigation() {
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                 isDark ? 'bg-white' : 'bg-black'
               }`}>
-                <Feather className={`h-4 w-4 ${isDark ? 'text-black' : 'text-white'}`} />
+                <ThinIcon Icon={Feather} className={`h-4 w-4 ${isDark ? 'text-black' : 'text-white'}`} />
               </div>
-              <span className={`font-bold text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              <span className={`font-light text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 AUT Handshake
               </span>
             </div>
@@ -170,10 +174,10 @@ export default function Navigation() {
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? (
-                <XIcon className="h-5 w-5" />
+                <ThinIcon Icon={XIcon} className="h-5 w-5" />
               ) : (
-                <div className="w-8 h-8 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center text-sm font-medium">
-                  {user?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || <User className="h-5 w-5" />}
+                <div className="w-8 h-8 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center text-sm font-normal">
+                  {user?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || <ThinIcon Icon={User} className="h-5 w-5" />}
                 </div>
               )}
             </Button>
@@ -210,9 +214,9 @@ export default function Navigation() {
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                 isDark ? 'bg-white' : 'bg-[#800002]'
               }`}>
-                <Feather className={`h-4 w-4 ${isDark ? 'text-black' : 'text-white'}`} />
+                <ThinIcon Icon={Feather} className={`h-4 w-4 ${isDark ? 'text-black' : 'text-white'}`} />
               </div>
-              <span className={`font-bold text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              <span className={`font-light text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 Menu
               </span>
             </div>
@@ -222,7 +226,7 @@ export default function Navigation() {
               onClick={() => setIsMobileMenuOpen(false)}
               className={isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'}
             >
-              <XIcon className="h-5 w-5" />
+              <ThinIcon Icon={XIcon} className="h-5 w-5" />
             </Button>
           </div>
 
@@ -236,8 +240,7 @@ export default function Navigation() {
                 return (
                   <button
                     key={index}
-                    onTouchStart={(e) => {
-                      e.preventDefault();
+                    onTouchStart={() => {
                       // Haptic feedback on touch start
                       if (navigator.vibrate) {
                         navigator.vibrate(10);
@@ -262,8 +265,8 @@ export default function Navigation() {
                     aria-label={`Navigate to ${item.label}`}
                   >
                     <div className="flex items-center space-x-3">
-                      <Icon className="h-5 w-5" />
-                      <span className="font-medium">{item.label}</span>
+                      <ThinIcon Icon={Icon} className="h-5 w-5" />
+                      <span className="font-normal">{item.label}</span>
                     </div>
                     {item.badge && item.badge > 0 && (
                       <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center">
@@ -285,8 +288,8 @@ export default function Navigation() {
                 }}
                 className="w-full justify-start px-3 py-3 text-red-500 hover:bg-red-500/10 rounded-xl"
               >
-                <LogOut className="h-5 w-5 mr-3" />
-                <span className="font-medium">Logout</span>
+                <ThinIcon Icon={LogOut} className="h-5 w-5 mr-3" />
+                <span className="font-normal">Logout</span>
               </Button>
             </div>
           </div>
@@ -330,14 +333,14 @@ export default function Navigation() {
                   aria-label={`Navigate to ${item.label}`}
                 >
                   <div className="relative">
-                    <Icon className="h-6 w-6" />
+                    <ThinIcon Icon={Icon} className="h-6 w-6" />
                     {item.badge && item.badge > 0 && (
                       <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
                         {item.badge > 9 ? '9+' : item.badge}
                       </span>
                     )}
                   </div>
-                  <span className="text-xs mt-1 truncate">{item.label}</span>
+                  <span className="text-xs mt-1 truncate font-normal">{item.label}</span>
                   
                   {/* Active indicator */}
                   {isActive && (
@@ -377,11 +380,11 @@ export default function Navigation() {
             <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
               isDark ? 'bg-white' : 'bg-[#800020]'
             }`}>
-              <Feather className={`h-5 w-5 ${isDark ? 'text-black' : 'text-white'}`} />
+              <ThinIcon Icon={Feather} className={`h-5 w-5 ${isDark ? 'text-black' : 'text-white'}`} />
             </div>
             {isExpanded && (
               <div className="ml-3 overflow-hidden">
-                <h2 className={`font-bold text-xl ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                <h2 className={`font-light text-xl ${isDark ? 'text-white' : 'text-gray-900'}`}>
                   TalentLink
                 </h2>
               </div>
@@ -429,7 +432,7 @@ export default function Navigation() {
                 aria-label={`Navigate to ${item.label}`}
               >
                 <div className="relative">
-                  <Icon className="h-6 w-6" />
+                  <ThinIcon Icon={Icon} className="h-6 w-6" />
                   {item.badge && item.badge > 0 && !isExpanded && (
                     <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
                       {item.badge > 9 ? '9+' : item.badge}
@@ -439,7 +442,7 @@ export default function Navigation() {
                 
                 {isExpanded && (
                   <>
-                    <span className="font-medium text-xl">{item.label}</span>
+                    <span className="font-normal text-xl">{item.label}</span>
                     {item.badge && item.badge > 0 && (
                       <span className="ml-auto bg-red-500 text-white text-sm px-2 py-1 rounded-full min-w-[20px] text-center">
                         {item.badge > 9 ? '9+' : item.badge}
@@ -451,7 +454,7 @@ export default function Navigation() {
                 {/* Tooltip for collapsed state */}
                 {!isExpanded && (
                   <div className={cn(
-                    "absolute left-full ml-4 px-3 py-2 rounded-lg text-sm font-medium",
+                    "absolute left-full ml-4 px-3 py-2 rounded-lg text-sm font-normal",
                     "opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50",
                     "whitespace-nowrap shadow-lg",
                     isDark ? 'bg-gray-800 text-white' : 'bg-white text-gray-900 border'
@@ -478,7 +481,7 @@ export default function Navigation() {
               isExpanded ? 'justify-center' : 'justify-center px-0'
             )}
           >
-            {isExpanded ? 'Post' : <Briefcase className="h-5 w-5" />}
+            {isExpanded ? 'Post' : <ThinIcon Icon={Briefcase} className="h-5 w-5" />}
           </Button>
         </div>
 
@@ -496,7 +499,7 @@ export default function Navigation() {
               )}
             >
               <div className={cn(
-                "rounded-full flex items-center justify-center text-lg font-semibold relative",
+                "rounded-full flex items-center justify-center text-lg font-normal relative",
                 isDark ? 'bg-gray-700 text-white' : 'bg-gray-300 text-gray-800',
                 isExpanded ? 'w-10 h-10' : 'w-8 h-8'
               )}>
@@ -507,7 +510,7 @@ export default function Navigation() {
                 <>
                   <div>
                     <p className={cn(
-                      "font-medium text-sm truncate",
+                      "font-normal text-sm truncate",
                       isDark ? 'text-white' : 'text-gray-900'
                     )}>
                       {user?.full_name || 'User'}
@@ -519,7 +522,7 @@ export default function Navigation() {
                       @{user?.email?.split('@')[0]}
                     </p>
                   </div>
-                  <MoreHorizontal className={cn(
+                  <ThinIcon Icon={MoreHorizontal} className={cn(
                     "h-5 w-5 flex-shrink-0",
                     isDark ? 'text-gray-400' : 'text-gray-600'
                   )} />
@@ -559,7 +562,7 @@ export default function Navigation() {
                       isDark ? 'hover:bg-gray-900 text-white' : 'hover:bg-gray-50 text-gray-900'
                     )}
                   >
-                    <Settings className="h-5 w-5 mr-3 transition-transform duration-200 group-hover:rotate-12" />
+                    <ThinIcon Icon={Settings} className="h-5 w-5 mr-3 transition-transform duration-200 group-hover:rotate-12" />
                     <span className="font-normal text-sm">
                       Settings and privacy
                     </span>
@@ -577,7 +580,7 @@ export default function Navigation() {
                       isDark ? 'hover:bg-gray-900 text-white' : 'hover:bg-gray-50 text-gray-900'
                     )}
                   >
-                    <LogOut className="h-5 w-5 mr-3 transition-transform duration-200 group-hover:-rotate-12" />
+                    <ThinIcon Icon={LogOut} className="h-5 w-5 mr-3 transition-transform duration-200 group-hover:-rotate-12" />
                     <span className="font-normal text-sm">
                       Log out @{user?.email?.split('@')[0]}
                     </span>

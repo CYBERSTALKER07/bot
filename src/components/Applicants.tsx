@@ -39,6 +39,8 @@ import Button from './ui/Button';
 import { Card } from './ui/Card';
 import PageLayout from './ui/PageLayout';
 import { cn } from '../lib/cva';
+import { useApplicants } from '../hooks/useOptimizedQuery';
+import { PostCardSkeleton } from './ui/Skeleton';
 
 interface Applicant {
   id: string;
@@ -75,105 +77,45 @@ export default function Applicants() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState<'name' | 'date' | 'rating'>('date');
 
-  // Enhanced mock data
-  const applicants: Applicant[] = [
-    {
-      id: '1',
-      name: 'Sarah Johnson',
-      email: 'sarah.johnson@asu.edu',
-      phone: '(480) 555-0123',
-      location: 'Phoenix, AZ',
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
-      resume_url: '/resumes/sarah-johnson.pdf',
-      cover_letter: 'I am excited to apply for the Software Engineer position. My experience with React and Node.js makes me a perfect fit for this role. I have worked on several projects that demonstrate my ability to create scalable web applications.',
-      skills: ['React', 'Node.js', 'TypeScript', 'Python', 'AWS', 'GraphQL'],
-      experience_years: 2,
-      education: 'Arizona State University',
-      major: 'Computer Science',
-      gpa: '3.8',
-      graduation_year: 2024,
-      university: 'Arizona State University',
-      applied_date: '2024-01-15',
-      status: 'pending',
-      job_id: '1',
-      job_title: 'Software Engineer Intern',
-      rating: 4.5,
-      portfolio_url: 'https://sarahjohnson.dev'
-    },
-    {
-      id: '2',
-      name: 'Michael Chen',
-      email: 'michael.chen@asu.edu',
-      phone: '(480) 555-0456',
-      location: 'Tempe, AZ',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-      resume_url: '/resumes/michael-chen.pdf',
-      cover_letter: 'As a passionate developer with experience in full-stack development, I believe I would be a valuable addition to your team. My projects showcase my ability to work with modern technologies.',
-      skills: ['JavaScript', 'React', 'MongoDB', 'Express', 'Docker', 'Kubernetes'],
-      experience_years: 1,
-      education: 'Arizona State University',
-      major: 'Software Engineering',
-      gpa: '3.6',
-      graduation_year: 2024,
-      university: 'Arizona State University',
-      applied_date: '2024-01-12',
-      status: 'reviewed',
-      job_id: '1',
-      job_title: 'Software Engineer Intern',
-      rating: 4.2,
-      portfolio_url: 'https://michaelchen.io'
-    },
-    {
-      id: '3',
-      name: 'Emily Rodriguez',
-      email: 'emily.rodriguez@asu.edu',
-      location: 'Scottsdale, AZ',
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
-      resume_url: '/resumes/emily-rodriguez.pdf',
-      cover_letter: 'I am thrilled to apply for the Marketing Intern position. My creative background and analytical skills make me an ideal candidate for this role.',
-      skills: ['Marketing', 'Adobe Creative Suite', 'Social Media', 'Analytics', 'Content Creation'],
-      experience_years: 1,
-      education: 'Arizona State University',
-      major: 'Marketing',
-      gpa: '3.9',
-      graduation_year: 2024,
-      university: 'Arizona State University',
-      applied_date: '2024-01-10',
-      status: 'shortlisted',
-      job_id: '2',
-      job_title: 'Marketing Intern',
-      rating: 4.8
-    },
-    {
-      id: '4',
-      name: 'David Park',
-      email: 'david.park@asu.edu',
-      phone: '(480) 555-0789',
-      location: 'Mesa, AZ',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-      resume_url: '/resumes/david-park.pdf',
-      cover_letter: 'With my strong background in data analysis and machine learning, I am excited to contribute to your data science team.',
-      skills: ['Python', 'R', 'SQL', 'Machine Learning', 'Tableau', 'Pandas'],
-      experience_years: 2,
-      education: 'Arizona State University',
-      major: 'Data Science',
-      gpa: '3.7',
-      graduation_year: 2024,
-      university: 'Arizona State University',
-      applied_date: '2024-01-08',
-      status: 'hired',
-      job_id: '3',
-      job_title: 'Data Science Intern',
-      rating: 4.6,
-      portfolio_url: 'https://davidpark-data.com'
-    }
-  ];
+  // Fetch real applicants data
+  const { data: applicantsData, isLoading: loading, error } = useApplicants(jobFilter !== 'all' ? jobFilter : undefined);
 
-  const jobs = [
-    { id: '1', title: 'Software Engineer Intern' },
-    { id: '2', title: 'Marketing Intern' },
-    { id: '3', title: 'Data Science Intern' }
-  ];
+  // Transform database data to component format
+  const applicants: Applicant[] = applicantsData?.map(app => ({
+    id: app.id,
+    name: app.profiles?.full_name || 'Unknown',
+    email: app.profiles?.email || '',
+    phone: app.profiles?.phone,
+    location: app.jobs?.location || '',
+    avatar: app.profiles?.avatar_url,
+    resume_url: app.resume_url,
+    cover_letter: app.cover_letter || '',
+    skills: app.profiles?.skills || [],
+    experience_years: 0, // Add to profiles table if needed
+    education: app.profiles?.university || '',
+    gpa: undefined,
+    applied_date: app.applied_date,
+    status: app.status,
+    job_id: app.job_id,
+    job_title: app.jobs?.title || '',
+    rating: app.rating,
+    notes: app.notes,
+    university: app.profiles?.university,
+    major: app.profiles?.major,
+    graduation_year: app.profiles?.graduation_year,
+    portfolio_url: app.profiles?.portfolio_url,
+  })) || [];
+
+  // Fetch available jobs for filtering
+  const jobs = React.useMemo(() => {
+    const uniqueJobs = new Map();
+    applicantsData?.forEach(app => {
+      if (app.jobs && !uniqueJobs.has(app.job_id)) {
+        uniqueJobs.set(app.job_id, { id: app.job_id, title: app.jobs.title });
+      }
+    });
+    return Array.from(uniqueJobs.values());
+  }, [applicantsData]);
 
   const filteredApplicants = applicants.filter(applicant => {
     const matchesSearch = applicant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -231,6 +173,29 @@ export default function Applicants() {
     // In a real app, this would make an API call
     console.log(`Updating applicant ${applicantId} status to ${newStatus}`);
   };
+
+  if (loading) {
+    return (
+      <PageLayout className={isDark ? 'bg-black text-white' : 'bg-white text-black'} maxWidth="7xl">
+        <div className="space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <PostCardSkeleton key={i} />
+          ))}
+        </div>
+      </PageLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageLayout className={isDark ? 'bg-black text-white' : 'bg-white text-black'} maxWidth="7xl">
+        <Card className="p-8 text-center">
+          <p className="text-red-600 mb-4">Error loading applicants: {error.message}</p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
+        </Card>
+      </PageLayout>
+    );
+  }
 
   return (
     <PageLayout 

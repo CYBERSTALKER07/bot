@@ -395,7 +395,6 @@ export default function ForStudentsPage() {
       role: "Software Engineering Student",
       school: "MIT",
       quote: "Handshake connected me directly with a Google recruiter. The personalized job recommendations were spot-on, and I landed my dream internship within two weeks!",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b278?w=150&h=150&fit=crop&crop=face",
       company: "Software Engineer Intern at Google",
       rating: 5
     },
@@ -958,11 +957,17 @@ export default function ForStudentsPage() {
                 <div className="bg-gradient-to-br from-purple-50 via-white to-indigo-50 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100">
                   <div className="flex items-center mb-6">
                     <div className="w-16 h-16 rounded-full overflow-hidden mr-4 ring-4 ring-purple-200">
-                      <img 
-                        src={testimonial.avatar} 
-                        alt={testimonial.name}
-                        className="w-full h-full object-cover"
-                      />
+                      {testimonial.avatar ? (
+                        <img 
+                          src={testimonial.avatar} 
+                          alt={testimonial.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-purple-600 flex items-center justify-center text-white font-bold text-lg">
+                          {testimonial.name.charAt(0)}
+                        </div>
+                      )}
                     </div>
                     <div>
                       <h4 className="text-lg font-bold text-gray-900">{testimonial.name}</h4>

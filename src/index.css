@@ -523,6 +523,47 @@
       padding-top: 20px !important;
     }
   }
+
+  /* Shimmer animation for skeletons */
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite linear;
+    background: linear-gradient(
+      to right,
+      #f0f0f0 0%,
+      #f8f8f8 50%,
+      #f0f0f0 100%
+    );
+    background-size: 2000px 100%;
+  }
+
+  .dark .animate-shimmer {
+    background: linear-gradient(
+      to right,
+      #1f2937 0%,
+      #374151 50%,
+      #1f2937 100%
+    );
+    background-size: 2000px 100%;
+  }
+
+  /* Lazy load image fade-in */
+  .lazy-image {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  .lazy-image.loaded {
+    opacity: 1;
+  }
 }
 
 /* Print styles */

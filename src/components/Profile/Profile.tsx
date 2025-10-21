@@ -37,8 +37,12 @@ import { useTheme } from '../../context/ThemeContext';
 import { supabase } from '../../lib/supabase';
 import Button from '../ui/Button';
 import Badge from '../ui/Badge';
+import FollowButton from '../FollowButton';
 import { cn } from '../../lib/cva';
 import AnimatedSearchButton from '../AnimatedSearchButton';
+import { useRecommendedUsers, useFollowUser } from '../../hooks/useOptimizedQuery';
+import { useFollowStatusCache } from '../../hooks/useFollowStatusCache';
+import WhoToFollowItem from '../WhoToFollowItem';
 
 interface ProfileData {
   id?: string;
@@ -127,6 +131,11 @@ export default function Profile() {
     posts: 0
   });
 
+  // Track follow status for recommended users - now with processing state
+  const [followStatus, setFollowStatus] = useState<Record<string, boolean>>({});
+  const [processingFollowId, setProcessingFollowId] = useState<string | null>(null);
+  const [hoveredFollowId, setHoveredFollowId] = useState<string | null>(null);
+
   // Profile data
   const [profileData, setProfileData] = useState<ProfileData>({
     full_name: user?.name || 'User',
@@ -147,29 +156,8 @@ export default function Profile() {
   const [error, setError] = useState('');
 
   // Suggested users data
-  const [suggestedUsers] = useState<SuggestedUser[]>([
-    {
-      id: '1',
-      name: 'kurbonov',
-      username: '@thekurbonov',
-      avatar: '',
-      verified: false
-    },
-    {
-      id: '2',
-      name: 'Sadriddin',
-      username: '@abdoorakhimov',
-      avatar: '',
-      verified: false
-    },
-    {
-      id: '3',
-      name: 'The Economist',
-      username: '@TheEconomist',
-      avatar: '',
-      verified: true
-    }
-  ]);
+  const { data: recommendedUsers } = useRecommendedUsers(user?.id);
+  const followUserMutation = useFollowUser();
 
   // Trending topics data
   const [trendingTopics] = useState<TrendingTopic[]>([
@@ -240,7 +228,14 @@ export default function Profile() {
       loadOtherUserProfile(userId);
       fetchUserPosts(userId);
     }
-  }, [user, userId, isOwnProfile]);
+  }, [user?.id, userId]);
+
+  // Fetch follower/following counts
+  useEffect(() => {
+    if (profileData.id) {
+      fetchFollowerCounts(profileData.id);
+    }
+  }, [profileData.id]);
 
   const loadProfileData = async () => {
     if (!user) return;
@@ -258,6 +253,11 @@ export default function Profile() {
       }
 
       if (profile) {
+        console.log('✅ Own profile loaded:', { 
+          full_name: profile.full_name,
+          avatar_url: profile.avatar_url,
+          cover_image_url: profile.cover_image_url
+        });
         setProfileData({
           ...profile,
           skills: profile.skills || []
@@ -274,21 +274,58 @@ export default function Profile() {
   const loadOtherUserProfile = async (targetUserId: string) => {
     try {
       setLoading(true);
-      // Mock data for other user's profile
-      const mockProfile: ProfileData = {
-        full_name: 'Other User',
-        bio: 'This is another user\'s profile.',
-        location: 'Remote',
+      console.log('👥 Fetching other user profile:', targetUserId);
+      
+      // Fetch real profile data from the database
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', targetUserId)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          console.log('ℹ️ Profile not found');
+        } else {
+          console.error('Error fetching profile:', error);
+        }
+        // Fallback profile
+        setProfileData({
+          id: targetUserId,
+          full_name: 'User',
+          bio: 'Welcome to their profile!',
+          avatar_url: '',
+          cover_image_url: '',
+          skills: [],
+          portfolio_url: '',
+          website: '',
+          location: '',
+          username: `user_${targetUserId.slice(0, 8)}`
+        });
+      } else if (profile) {
+        console.log('✅ Other user profile loaded:', { 
+          full_name: profile.full_name,
+          avatar_url: profile.avatar_url,
+          cover_image_url: profile.cover_image_url
+        });
+        setProfileData({
+          ...profile,
+          skills: profile.skills || []
+        });
+      }
+    } catch (error) {
+      console.error('Error in loadOtherUserProfile:', error);
+      setProfileData({
+        id: targetUserId,
+        full_name: 'User',
+        bio: 'Welcome to their profile!',
         avatar_url: '',
         cover_image_url: '',
-        skills: ['React', 'TypeScript', 'Node.js'],
+        skills: [],
         portfolio_url: '',
-        website: ''
-      };
-      setProfileData(mockProfile);
-    } catch (error) {
-      console.error('Error loading user profile:', error);
-      setError('Failed to load user profile');
+        website: '',
+        location: ''
+      });
     } finally {
       setLoading(false);
     }
@@ -301,7 +338,15 @@ export default function Profile() {
     try {
       setPostsLoading(true);
       
-      // Fetch posts for the user
+      // First, check if user is authenticated
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) {
+        console.log('User not authenticated for posts fetch');
+        setPosts([]);
+        return;
+      }
+      
+      // Fetch posts for the user with proper error handling
       const { data: postsData, error: postsError } = await supabase
         .from('posts')
         .select(`
@@ -310,8 +355,8 @@ export default function Profile() {
           user_id,
           created_at,
           likes_count,
-          shares_count,
           comments_count,
+          shares_count,
           media_type,
           image_url,
           video_url,
@@ -323,18 +368,21 @@ export default function Profile() {
 
       if (postsError) {
         console.error('Error fetching posts:', postsError);
+        // Don't throw error, just log it and show empty state
+        setPosts([]);
         return;
       }
 
-      // Fetch profile data for the user
+      // Fetch profile data for the user with better error handling
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('id, full_name, username, avatar_url')
+        .select('id, full_name, username, avatar_url, verified')
         .eq('id', userIdToFetch)
         .single();
 
       if (profileError) {
         console.warn('Error fetching profile for posts:', profileError);
+        // Use fallback data if profile fetch fails
       }
 
       // Transform posts with author information
@@ -342,10 +390,10 @@ export default function Profile() {
         ...post,
         author: {
           id: userIdToFetch,
-          name: profileData?.full_name || 'User',
-          username: profileData?.username || 'user',
+          name: profileData?.full_name || user?.user_metadata?.full_name || 'User',
+          username: profileData?.username || user?.user_metadata?.username || 'user',
           avatar_url: profileData?.avatar_url,
-          verified: false
+          verified: profileData?.verified || false
         }
       }));
 
@@ -358,7 +406,9 @@ export default function Profile() {
       }));
 
     } catch (error) {
-      console.error('Error fetching user posts:', error);
+      console.error('Error in fetchUserPosts:', error);
+      // Set empty posts array on error instead of crashing
+      setPosts([]);
     } finally {
       setPostsLoading(false);
     }
@@ -372,6 +422,31 @@ export default function Profile() {
     if (!dateString) return 'Joined recently';
     const date = new Date(dateString);
     return `Joined ${date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
+  };
+
+  // Fetch real follower and following counts from database
+  const fetchFollowerCounts = async (userId: string) => {
+    try {
+      // Fetch follower count
+      const { count: followersCount } = await supabase
+        .from('follows')
+        .select('*', { count: 'exact', head: true })
+        .eq('following_id', userId);
+
+      // Fetch following count
+      const { count: followingCount } = await supabase
+        .from('follows')
+        .select('*', { count: 'exact', head: true })
+        .eq('follower_id', userId);
+
+      setProfileStats(prev => ({
+        ...prev,
+        followers: followersCount || 0,
+        following: followingCount || 0
+      }));
+    } catch (error) {
+      console.error('Error fetching follower counts:', error);
+    }
   };
 
   // Sample post data
@@ -485,7 +560,7 @@ export default function Profile() {
           {/* AI Career Assistant - Unique Feature */}
           <div className="bg-primary rounded-2xl p-4 text-white">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 bg-white-/90 rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                 <Target className="w-4 h-4" />
               </div>
               <h3 className="font-bold text-lg">AI Career Coach</h3>
@@ -504,45 +579,15 @@ export default function Profile() {
           </div>
 
           {/* Skills Development Tracker */}
-          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-            <div className="p-4 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h3 className="font-bold text-gray-900">Skill Progress</h3>
-                <button className="text-[#7BA805] text-sm hover:underline">View All</button>
-              </div>
-            </div>
-            <div className="p-4 space-y-4">
-              {[
-                { skill: 'React', level: 85, trending: true },
-                { skill: 'TypeScript', level: 72, trending: false },
-                { skill: 'Node.js', level: 68, trending: true }
-              ].map((skill, index) => (
-                <div key={index}>
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-900">{skill.skill}</span>
-                    
-                    </div>
-                    <span className="text-xs text-gray-600">{skill.level}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-1.5">
-                    <div 
-                      className="bg-[#BCE953] h-1.5 rounded-full transition-all duration-300"
-                      style={{width: `${skill.level}%`}}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+    
 
           {/* Industry Insights */}
-          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-            <div className="p-4 border-b border-gray-200">
-              <h3 className="font-bold text-gray-900">Industry Pulse</h3>
-              <p className="text-xs text-gray-600">Real-time market insights</p>
+          <div className={cn("rounded-2xl border overflow-hidden", isDark ? "bg-black border-gray-800" : "bg-white border-gray-200")}>
+            <div className={cn("p-4 border-b", isDark ? "border-gray-800" : "border-gray-200")}>
+              <h3 className={cn("font-bold", isDark ? "text-gray-300" : "text-gray-900")}>Industry Pulse</h3>
+              <p className={cn("text-xs", isDark ? "text-gray-400" : "text-gray-600")}>Real-time market insights</p>
             </div>
-            <div className="divide-y divide-gray-200">
+            <div className={cn("divide-y", isDark ? "divide-gray-800" : "divide-gray-200")}>
               {[
                 { 
                   title: 'AI/ML Engineers', 
@@ -563,97 +608,20 @@ export default function Profile() {
                   description: 'Fintech sector leading'
                 }
               ].map((insight, index) => (
-                <div key={index} className="p-3 hover:bg-gray-50 transition-colors">
+                <div key={index} className={cn("p-3 transition-colors", isDark ? "hover:bg-gray-800/50" : "hover:bg-gray-50")}>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-gray-900">{insight.title}</span>
-                    {/* <div className={cn(
-                      'flex items-center gap-1 text-xs px-2 py-1 rounded-full',
-                      insight.trend === 'up' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                    )}>
-                      <TrendingUp className="w-3 h-3" />
-                      {insight.change}
-                    </div> */}
+                    <span className={cn("text-sm font-medium", isDark ? "text-gray-300" : "text-gray-900")}>{insight.title}</span>
                   </div>
-                  <p className="text-xs text-gray-600">{insight.description}</p>
+                  <p className={cn("text-xs", isDark ? "text-gray-400" : "text-gray-600")}>{insight.description}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Mentorship Marketplace */}
-          <div className="bg-blue-950 rounded-2xl p-4 text-white">
-            <div className="flex items-center gap-2 mb-3">
-              <Users className="w-5 h-5" />
-              <h3 className="font-bold">Find a Mentor</h3>
-            </div>
-            <p className="text-sm text-white/90 mb-3">
-              Connect with industry professionals for 1-on-1 guidance
-            </p>
-            <div className="flex -space-x-2 mb-3">
-              {[1,2,3,4].map((i) => (
-                <div key={i} className="w-8 h-8 bg-white/20 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold">
-                  {String.fromCharCode(65 + i)}
-                </div>
-              ))}
-              <div className="w-8 h-8 bg-white/30 rounded-full border-2 border-white flex items-center justify-center text-xs">
-                +12
-              </div>
-            </div>
-            <button className="w-full bg-white/20 hover:bg-white/30 rounded-lg py-2 text-sm font-medium transition-colors">
-              Browse Mentors
-            </button>
-          </div>
+        
 
           {/* Career Opportunities Scanner */}
-          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-            <div className="p-4 border-b border-gray-200">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <h3 className="font-bold text-gray-900">Live Opportunities</h3>
-              </div>
-              <p className="text-xs text-gray-600">Matching your profile in real-time</p>
-            </div>
-            <div className="p-4 space-y-3">
-              {[
-                { 
-                  company: 'Google', 
-                  role: 'Frontend Developer',
-                  match: 94,
-                  timeLeft: '2 days',
-                  applicants: 23
-                },
-                { 
-                  company: 'Meta', 
-                  role: 'Product Manager',
-                  match: 87,
-                  timeLeft: '5 days',
-                  applicants: 45
-                }
-              ].map((opp, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <h4 className="font-medium text-sm text-gray-900">{opp.role}</h4>
-                      <p className="text-xs text-gray-600">{opp.company}</p>
-                    </div>
-                    <div className="text-right">
-                      <div className={cn(
-                        'text-xs px-2 py-1 rounded-full font-medium',
-                        opp.match >= 90 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-                      )}>
-                        {opp.match}% match
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-gray-500">
-                    <span>{opp.applicants} applied</span>
-                    <span>Closes in {opp.timeLeft}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
+          
           {/* Create Post Button */}
           <Button
             onClick={() => navigate('/create-post')}
@@ -664,26 +632,26 @@ export default function Profile() {
           </Button>
 
           {/* Recent Connections */}
-          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-            <div className="p-4 border-b border-gray-200">
-              <h3 className="font-bold text-gray-900">Recent Connections</h3>
+          <div className={cn("rounded-2xl border overflow-hidden", isDark ? "bg-black border-gray-800" : "bg-white border-gray-200")}>
+            <div className={cn("p-4 border-b", isDark ? "border-gray-800" : "border-gray-200")}>
+              <h3 className={cn("font-bold", isDark ? "text-gray-300" : "text-gray-900")}>Recent Connections</h3>
             </div>
-            <div className="divide-y divide-gray-200">
+            <div className={cn("divide-y", isDark ? "divide-gray-800" : "divide-gray-200")}>
               {[
                 { name: 'Alex Chen', role: 'Software Engineer', avatar: '' },
                 { name: 'Sarah Johnson', role: 'Product Manager', avatar: '' },
                 { name: 'Mike Rodriguez', role: 'Designer', avatar: '' }
               ].map((connection, index) => (
-                <div key={index} className="p-3 hover:bg-gray-50 transition-colors">
+                <div key={index} className={cn("p-3 transition-colors", isDark ? "hover:bg-gray-800/50" : "hover:bg-gray-50")}>
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 font-bold text-sm">
+                    <div className={cn("w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm", isDark ? "bg-gray-700 text-gray-200" : "bg-gray-300 text-gray-700")}>
                       {connection.name.charAt(0)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm text-gray-900 truncate">
+                      <p className={cn("font-medium text-sm truncate", isDark ? "text-gray-300" : "text-gray-900")}>
                         {connection.name}
                       </p>
-                      <p className="text-xs text-gray-600 truncate">
+                      <p className={cn("text-xs truncate", isDark ? "text-gray-400" : "text-gray-600")}>
                         {connection.role}
                       </p>
                     </div>
@@ -697,14 +665,14 @@ export default function Profile() {
           <div className="space-y-2">
             <button
               onClick={() => navigate('/settings')}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-100 transition-colors"
+              className={cn("w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors", isDark ? "text-gray-400 hover:bg-gray-900" : "text-gray-700 hover:bg-gray-100")}
             >
               <Settings className="w-5 h-5" />
               <span>Settings</span>
             </button>
             <button
               onClick={() => {/* handle logout */}}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition-colors"
+              className={cn("w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors", isDark ? "text-red-400 hover:bg-red-950" : "text-red-600 hover:bg-red-50")}
             >
               <LogOut className="w-5 h-5" />
               <span>Logout</span>
@@ -713,25 +681,25 @@ export default function Profile() {
         </div>
 
         {/* Main Content */}
-        <div className={cn('flex-1 max-w-2xl border-x border-gray-200 bg-white', isDark ? "bg-black text-white" : "bg-gray-50 text-gray-900")}>
+        <div className={cn('flex-1 max-w-2xl border-x', isDark ? "bg-black border-gray-800" : "bg-gray-50 border-gray-200")}>
           {/* Header */}
-          <div className="sticky top-0 backdrop-blur-md bg-white/80 border-b border-gray-200 z-20">
+          <div className={cn("sticky top-0 backdrop-blur-md z-20 border-b", isDark ? "bg-black/80 border-gray-800" : "bg-white/80 border-gray-200")}>
             <div className="flex items-center py-3 px-4">
               <button 
                 onClick={() => navigate(-1)}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors mr-4"
+                className={cn("p-2 rounded-full transition-colors mr-4", isDark ? "hover:bg-gray-900" : "hover:bg-gray-100")}
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <div className="flex-1">
-                <h1 className="font-bold text-xl text-gray-900">
+                <h1 className="font-bold text-xl">
                   {profileData.full_name || user?.name || 'User'}
                 </h1>
-                <p className="text-gray-600 text-sm">
+                <p className={cn("text-sm", isDark ? "text-gray-400" : "text-gray-600")}>
                   {profileStats.posts} posts
                 </p>
               </div>
-              <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+              <button className={cn("p-2 rounded-full transition-colors", isDark ? "hover:bg-gray-900" : "hover:bg-gray-100")}>
                 <MoreHorizontal className="w-5 h-5" />
               </button>
             </div>
@@ -751,7 +719,7 @@ export default function Profile() {
           </div>
 
           {/* Profile Info */}
-          <div className="px-4 pb-4 bg-white">
+          <div className={cn("px-4 pb-4", isDark ? "bg-black" : "bg-white")}>
             <div className="flex justify-between items-start -mt-16 mb-4">
               {/* Avatar */}
               <div className="relative">
@@ -759,50 +727,54 @@ export default function Profile() {
                   <img
                     src={profileData.avatar_url}
                     alt="Profile"
-                    className="w-32 h-32 rounded-full border-4 border-white object-cover shadow-lg"
+                    className="w-32 h-32 rounded-full border-4 border-current object-cover shadow-lg"
                   />
                 ) : (
-                  <div className="w-32 h-32 rounded-full border-4 border-white bg-gray-300 flex items-center justify-center text-gray-700 font-bold text-4xl shadow-lg">
+                  <div className={cn("w-32 h-32 rounded-full border-4 flex items-center justify-center font-bold text-4xl shadow-lg", isDark ? "bg-gray-900 border-black text-gray-400" : "bg-gray-300 border-white text-gray-700")}>
                     {(profileData.full_name || user?.name || 'U').charAt(0)}
                   </div>
                 )}
               </div>
 
               {/* Edit Profile Button */}
-              <div className="mt-4">
-                <Button
-                  variant="outlined"
-                  onClick={handleEditProfile}
-                  className="rounded-full px-6 py-1.5 border-gray-300 text-black hover:bg-transparent font-bold"
-                >
-                  Edit profile
-                </Button>
-              </div>
+              {isOwnProfile ? (
+                <div className="mt-4">
+                  <Button
+                    variant="outlined"
+                    onClick={handleEditProfile}
+                    className={cn("rounded-full px-6 py-1.5 font-bold", isDark ? "border-gray-700 border-none text-white hover:bg-black" : "border-gray-300 text-black hover:bg-gray-100")}
+                  >
+                    Edit profile
+                  </Button>
+                </div>
+              ) : (
+                <FollowButton targetUserId={userId} />
+              )}
             </div>
 
             {/* User Info */}
-            <div className={cn("mb-4", isDark ? "bg-black text-white" : "text-gray-900")}>
+            <div className="mb-4">
               <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-2xl font-bold text-gray-900">
+                <h1 className="text-2xl font-bold">
                   {profileData.full_name || user?.name || 'User'}
                 </h1>
                 {user?.profile?.verified && (
                   <Verified className="w-5 h-5 text-blue-500" />
                 )}
               </div>
-              <p className="text-gray-600 text-base mb-3">
+              <p className={cn("text-base mb-3", isDark ? "text-gray-400" : "text-gray-600")}>
                 @{(profileData.username || (profileData.full_name || user?.name || 'user').toLowerCase().replace(/\s/g, ''))}
               </p>
 
               {/* Bio */}
               <div className="mb-3">
-                <p className="text-gray-900 leading-relaxed">
+                <p className={cn("leading-relaxed", isDark ? "text-gray-300" : "text-gray-900")}>
                   {profileData.bio || 'The Lab Business automation company'}
                 </p>
               </div>
 
               {/* Metadata */}
-              <div className="flex flex-wrap items-center gap-4 text-gray-600 text-sm mb-3">
+              <div className={cn("flex flex-wrap items-center gap-4 text-sm mb-3", isDark ? "text-gray-400" : "text-gray-600")}>
                 {profileData.location && (
                   <div className="flex items-center gap-1">
                     <MapPin className="w-4 h-4" />
@@ -817,19 +789,19 @@ export default function Profile() {
 
               {/* Following/Followers */}
               <div className="flex gap-5">
-                <button className="hover:underline">
-                  <span className="font-bold text-gray-900">
+                <button className={cn("hover:underline", isDark ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900")}>
+                  <span className={cn("font-bold", isDark ? "text-white" : "text-gray-900")}>
                     {profileStats.following}
                   </span>
-                  <span className="text-gray-600 ml-1">
+                  <span className="ml-1">
                     Following
                   </span>
                 </button>
-                <button className="hover:underline">
-                  <span className="font-bold text-gray-900">
+                <button className={cn("hover:underline", isDark ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900")}>
+                  <span className={cn("font-bold", isDark ? "text-white" : "text-gray-900")}>
                     {profileStats.followers}
                   </span>
-                  <span className="text-gray-600 ml-1">
+                  <span className="ml-1">
                     Followers
                   </span>
                 </button>
@@ -837,14 +809,14 @@ export default function Profile() {
             </div>
 
             {/* Verification Banner */}
-            <div className="bg-[#BCE953]/10 border border-[#BCE953] rounded-xl p-4 mb-4">
+            <div className={cn("rounded-xl p-4 mb-4 border", isDark ? "bg-black border-gray-700" : "bg-[#BCE953]/10 border-[#BCE953]")}>
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-[#7BA805] font-bold">You aren't verified yet</span>
-                    <Verified className="w-5 h-5 text-[#7BA805]" />
+                    <span className={cn("font-bold", isDark ? "text-gray-300" : "text-[#7BA805]")}>You aren't verified yet</span>
+                    <Verified className={cn("w-5 h-5", isDark ? "text-gray-400" : "text-[#7BA805]")} />
                   </div>
-                  <p className="text-gray-700 text-sm mb-3">
+                  <p className={cn("text-sm mb-3", isDark ? "text-gray-400" : "text-gray-700")}>
                     Get verified for boosted replies, analytics, ad-free browsing, and more. 
                     Upgrade your profile now.
                   </p>
@@ -855,7 +827,7 @@ export default function Profile() {
                     Get verified
                   </Button>
                 </div>
-                <button className="text-gray-600 hover:text-gray-900">
+                <button className={cn("transition-colors", isDark ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900")}>
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -863,7 +835,7 @@ export default function Profile() {
           </div>
 
           {/* Navigation Tabs */}
-          <div className="border-b border-gray-200 bg-white">
+          <div className={cn("border-b", isDark ? "bg-black border-gray-800" : "bg-white border-gray-200")}>
             <div className="flex">
               {[
                 { id: 'posts', label: 'Posts' },
@@ -879,8 +851,8 @@ export default function Profile() {
                   className={cn(
                     'relative px-4 py-4 text-center font-medium transition-colors flex-1',
                     activeTab === tab.id
-                      ? 'text-gray-900'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? isDark ? "text-white" : "text-gray-900"
+                      : isDark ? "text-gray-400 hover:text-gray-300" : "text-gray-600 hover:text-gray-900"
                   )}
                 >
                   <span className="text-sm">{tab.label}</span>
@@ -893,18 +865,18 @@ export default function Profile() {
           </div>
 
           {/* Posts Content */}
-          <div className={cn("min-h-screen", isDark ? "bg-black text-white" : "bg-gray-50 text-gray-900")}>
+          <div className={cn("min-h-screen", isDark ? "bg-black" : "bg-gray-50")}>
             {postsLoading ? (
               <div className="flex justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#BCE953]"></div>
               </div>
             ) : posts.length === 0 ? (
               <div className="text-center py-12">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                  <MessageCircle className="w-8 h-8 text-gray-400" />
+                <div className={cn("w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center", isDark ? "bg-gray-900" : "bg-gray-100")}>
+                  <MessageCircle className={cn("w-8 h-8", isDark ? "text-gray-700" : "text-gray-400")} />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No posts yet</h3>
-                <p className="text-gray-600 mb-4">
+                <h3 className={cn("text-lg font-semibold mb-2", isDark ? "text-white" : "text-gray-900")}>No posts yet</h3>
+                <p className={cn("mb-4", isDark ? "text-gray-400" : "text-gray-600")}>
                   {isOwnProfile ? "You haven't posted anything yet." : "This user hasn't posted anything yet."}
                 </p>
                 {isOwnProfile && (
@@ -918,9 +890,9 @@ export default function Profile() {
               </div>
             ) : (
               posts.map((post) => (
-                <div key={post.id} className={cn("border-b border-gray-200 p-4 transition-colors cursor-pointe")} onClick={() => navigate(`/post/${post.id}`)}>
+                <div key={post.id} className={cn("border-b p-4 transition-colors cursor-pointer", isDark ? "border-gray-800 hover:bg-black" : "border-gray-200 hover:bg-gray-50")} onClick={() => navigate(`/post/${post.id}`)}>
                   <div className="flex gap-3">
-                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center font-bold flex-shrink-0">
+                    <div className={cn("w-10 h-10 rounded-full flex items-center justify-center font-bold flex-shrink-0", isDark ? "bg-gray-900" : "bg-white")}>
                       {post.author?.avatar_url ? (
                         <img
                           src={post.author.avatar_url}
@@ -928,35 +900,37 @@ export default function Profile() {
                           className="w-10 h-10 rounded-full object-cover"
                         />
                       ) : (
-                        (post.author?.name || 'U').charAt(0)
+                        <span className={isDark ? "text-gray-400" : "text-gray-700"}>
+                          {(post.author?.name || 'U').charAt(0)}
+                        </span>
                       )}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-gray-900">
+                        <span className={cn("font-bold", isDark ? "text-white" : "text-gray-900")}>
                           {post.author?.name || 'User'}
                         </span>
-                        <span className="text-gray-600 text-sm">
+                        <span className={cn("text-sm", isDark ? "text-gray-400" : "text-gray-600")}>
                           @{post.author?.username || 'user'}
                         </span>
-                        <span className="text-gray-600">·</span>
-                        <span className="text-gray-600 text-sm">
+                        <span className={isDark ? "text-gray-600" : "text-gray-600"}>·</span>
+                        <span className={cn("text-sm", isDark ? "text-gray-400" : "text-gray-600")}>
                           {new Date(post.created_at).toLocaleDateString('en-US', {
                             month: 'short',
                             day: 'numeric'
                           })}
                         </span>
-                        <button className="ml-auto text-gray-600 hover:text-gray-900">
+                        <button className={cn("ml-auto transition-colors", isDark ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900")}>
                           <MoreHorizontal className="w-4 h-4" />
                         </button>
                       </div>
-                      <p className="text-gray-900 mb-3 leading-relaxed whitespace-pre-wrap">
+                      <p className={cn("mb-3 leading-relaxed whitespace-pre-wrap", isDark ? "text-gray-300" : "text-gray-900")}>
                         {post.content}
                       </p>
                       
                       {/* Media Content */}
                       {post.image_url && (
-                        <div className="rounded-2xl overflow-hidden mb-3 border border-gray-300">
+                        <div className={cn("rounded-2xl overflow-hidden mb-3 border", isDark ? "border-gray-700" : "border-gray-300")}>
                           <img 
                             src={post.image_url} 
                             alt="Post image"
@@ -966,7 +940,7 @@ export default function Profile() {
                       )}
                       
                       {post.video_url && (
-                        <div className="rounded-2xl overflow-hidden mb-3 border border-gray-300">
+                        <div className={cn("rounded-2xl overflow-hidden mb-3 border", isDark ? "border-gray-700" : "border-gray-300")}>
                           <video 
                             src={post.video_url}
                             controls
@@ -977,38 +951,38 @@ export default function Profile() {
                         </div>
                       )}
                       
-                      <div className="flex items-center justify-between max-w-md text-gray-600">
+                      <div className={cn("flex items-center justify-between max-w-md", isDark ? "text-gray-400" : "text-gray-600")}>
                         <button 
-                          className="flex items-center gap-2 hover:text-blue-500 transition-colors group"
+                          className={cn("flex items-center gap-2 transition-colors group", isDark ? "hover:text-blue-400" : "hover:text-blue-500")}
                           onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/post/${post.id}`);
                           }}
                         >
-                          <div className="p-2 rounded-full group-hover:bg-blue-50">
+                          <div className={cn("p-2 rounded-full", isDark ? "group-hover:bg-blue-500/10" : "group-hover:bg-blue-50")}>
                             <MessageCircle className="w-4 h-4" />
                           </div>
                           <span className="text-sm">{post.comments_count || 0}</span>
                         </button>
-                        <button className="flex items-center gap-2 hover:text-green-500 transition-colors group">
-                          <div className="p-2 rounded-full group-hover:bg-green-50">
+                        <button className={cn("flex items-center gap-2 transition-colors group", isDark ? "hover:text-green-400" : "hover:text-green-500")}>
+                          <div className={cn("p-2 rounded-full", isDark ? "group-hover:bg-green-500/10" : "group-hover:bg-green-50")}>
                             <Repeat2 className="w-4 h-4" />
                           </div>
                           <span className="text-sm">{post.shares_count || 0}</span>
                         </button>
-                        <button className="flex items-center gap-2 hover:text-red-500 transition-colors group">
-                          <div className="p-2 rounded-full group-hover:bg-red-50">
+                        <button className={cn("flex items-center gap-2 transition-colors group", isDark ? "hover:text-red-400" : "hover:text-red-500")}>
+                          <div className={cn("p-2 rounded-full", isDark ? "group-hover:bg-red-500/10" : "group-hover:bg-red-50")}>
                             <Heart className="w-4 h-4" />
                           </div>
                           <span className="text-sm">{post.likes_count || 0}</span>
                         </button>
-                        <button className="flex items-center gap-2 hover:text-blue-500 transition-colors group">
-                          <div className="p-2 rounded-full group-hover:bg-blue-50">
+                        <button className={cn("flex items-center gap-2 transition-colors group", isDark ? "hover:text-blue-400" : "hover:text-blue-500")}>
+                          <div className={cn("p-2 rounded-full", isDark ? "group-hover:bg-blue-500/10" : "group-hover:bg-blue-50")}>
                             <BarChart3 className="w-4 h-4" />
                           </div>
                         </button>
-                        <button className="hover:text-blue-500 transition-colors group">
-                          <div className="p-2 rounded-full group-hover:bg-blue-50">
+                        <button className={cn("transition-colors group", isDark ? "hover:text-blue-400" : "hover:text-blue-500")}>
+                          <div className={cn("p-2 rounded-full", isDark ? "group-hover:bg-blue-500/10" : "group-hover:bg-blue-50")}>
                             <Share className="w-4 h-4" />
                           </div>
                         </button>
@@ -1022,75 +996,77 @@ export default function Profile() {
         </div>
 
         {/* Right Sidebar */}
-        <div className="w-80 p-4 space-y-4 bg-gray-50">
+        <div className={cn("w-80 p-4 space-y-4", isDark ? "bg-black" : "bg-gray-50")}>
           {/* Search Bar */}
-          <AnimatedSearchButton className="fixed top-4 right-4" />
+          <div className={cn("relative rounded-full overflow-hidden", isDark ? "bg-black border-white" : "bg-white border border-gray-300")}>
+            <div className={cn("absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none", isDark ? "text-gray-400" : "text-gray-500")}>
+              <Search className="w-5 h-5 " />
+            </div>
+            <input
+              type="text"
+              placeholder="Search"
+              className={cn("w-full py-2 pl-10 pr-4 rounded-full focus:outline-none border-1 border-white", isDark ? "bg-black text-white placeholder-white focus:bg-black" : "bg-white text-gray-900 placeholder-gray-400 focus:bg-gray-100")}
+            />
+          </div>
 
           {/* You might like */}
-          <div className="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
-            <div className="p-4 border-b border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900">You might like</h2>
+          <div className={cn("rounded-2xl overflow-hidden border shadow-sm", isDark ? "bg-black border-gray-800" : "bg-white border-gray-200")}>
+            <div className={cn("p-4 border-b", isDark ? "border-gray-800" : "border-gray-200")}>
+              <h2 className="text-xl font-serif">You might like</h2>
             </div>
             <div className="divide-y divide-gray-200">
-              {suggestedUsers.map((suggestedUser) => (
-                <div key={suggestedUser.id} className="p-4 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 font-bold">
-                        {suggestedUser.name.charAt(0)}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-1">
-                          <span className="font-bold text-gray-900 text-sm">
-                            {suggestedUser.name}
-                          </span>
-                          {suggestedUser.verified && (
-                            <Verified className="w-4 h-4 text-blue-500" />
-                          )}
-                        </div>
-                        <span className="text-gray-600 text-sm">
-                          {suggestedUser.username}
-                        </span>
-                      </div>
-                    </div>
-                    <Button
-                      variant="primary"
-                      className="bg-gray-900 text-white hover:bg-gray-800 font-bold px-4 py-1.5 rounded-full text-sm"
-                    >
-                      Follow
-                    </Button>
-                  </div>
+              {recommendedUsers && recommendedUsers.length > 0 ? (
+                recommendedUsers.slice(0, 3).map((recommendedUser) => (
+                  <WhoToFollowItem 
+                    key={recommendedUser.id} 
+                    user={{
+                      id: recommendedUser.id,
+                      full_name: recommendedUser.full_name,
+                      username: recommendedUser.username,
+                      avatar_url: recommendedUser.avatar_url,
+                      verified: recommendedUser.verified,
+                      bio: recommendedUser.bio
+                    }}
+                    onNavigate={() => {}}
+                  />
+                ))
+              ) : (
+                <div className={cn("p-4 text-center", isDark ? "text-gray-400" : "text-gray-600")}>
+                  <p className="text-sm">Loading recommendations...</p>
                 </div>
-              ))}
+              )}
             </div>
             <div className="p-4">
-              <button className="text-[#7BA805] hover:underline text-sm">
+              <button 
+                className="text-[#7BA805] hover:underline text-sm"
+                onClick={() => navigate('/explore')}
+              >
                 Show more
               </button>
             </div>
           </div>
 
           {/* What's happening */}
-          <div className="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
-            <div className="p-4 border-b border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900">What's happening</h2>
+          <div className={cn("rounded-2xl overflow-hidden border shadow-sm", isDark ? "bg-black border-gray-800" : "bg-white border-gray-200")}>
+            <div className={cn("p-4 border-b", isDark ? "border-gray-800" : "border-gray-200")}>
+              <h2 className="text-xl font-extralight ">What's happening</h2>
             </div>
             <div className="divide-y divide-gray-200">
               {trendingTopics.map((topic, index) => (
-                <div key={index} className="p-4 hover:bg-gray-50 transition-colors cursor-pointer">
+                <div key={index} className={cn("p-4 transition-colors cursor-pointer", isDark ? "hover:bg-gray-800/50" : "hover:bg-gray-50")}>
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <p className="text-gray-600 text-xs mb-1">
+                      <p className={cn("text-xs mb-1", isDark ? "text-gray-400" : "text-gray-600")}>
                         {topic.category}
                       </p>
-                      <p className="font-bold text-gray-900 mb-1">
+                      <p className={cn("font-sans mb-1", isDark ? "text-white" : "text-gray-900")}>
                         {topic.topic}
                       </p>
-                      <p className="text-gray-600 text-xs">
+                      <p className={cn("text-xs", isDark ? "text-gray-400" : "text-gray-600")}>
                         {topic.posts}
                       </p>
                     </div>
-                    <button className="text-gray-600 hover:text-gray-900">
+                    <button className={cn("transition-colors", isDark ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900")}>
                       <MoreHorizontal className="w-4 h-4" />
                     </button>
                   </div>
@@ -1104,8 +1080,8 @@ export default function Profile() {
             </div>
           </div>
 
-          {/* AI Career Assistant - Unique Feature */}
-          <div className="bg-primary rounded-2xl p-4 text-white">
+          {/* AI Career Assistant */}
+          {/* <div className="bg-primary rounded-2xl p-4 text-white">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                 <Target className="w-4 h-4" />
@@ -1123,51 +1099,16 @@ export default function Profile() {
                 🎯 Next Goal: Complete 3 skill assessments this week
               </button>
             </div>
-          </div>
+          </div> */}
 
           {/* Skills Development Tracker */}
-          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-            <div className="p-4 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h3 className="font-bold text-gray-900">Skill Progress</h3>
-                <button className="text-[#7BA805] text-sm hover:underline">View All</button>
-              </div>
-            </div>
-            <div className="p-4 space-y-4">
-              {[
-                { skill: 'React', level: 85, trending: true },
-                { skill: 'TypeScript', level: 72, trending: false },
-                { skill: 'Node.js', level: 68, trending: true }
-              ].map((skill, index) => (
-                <div key={index}>
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-900">{skill.skill}</span>
-                      {skill.trending && (
-                        <div className="flex items-center gap-1">
-                          <TrendingUp className="w-3 h-3 text-green-500" />
-                          <span className="text-xs text-green-500">+5%</span>
-                        </div>
-                      )}
-                    </div>
-                    <span className="text-xs text-gray-600">{skill.level}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-1.5">
-                    <div 
-                      className="bg-[#BCE953] h-1.5 rounded-full transition-all duration-300"
-                      style={{width: `${skill.level}%`}}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          
 
           {/* Industry Insights */}
-          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-            <div className="p-4 border-b border-gray-200">
-              <h3 className="font-bold text-gray-900">Industry Pulse</h3>
-              <p className="text-xs text-gray-600">Real-time market insights</p>
+          <div className={cn("rounded-2xl border overflow-hidden", isDark ? "bg-black border-gray-800" : "bg-white border-gray-200")}>
+            <div className={cn("p-4 border-b", isDark ? "border-gray-800" : "border-gray-200")}>
+              <h3 className="font-bold">Industry Pulse</h3>
+              <p className={cn("text-xs", isDark ? "text-gray-400" : "text-gray-600")}>Real-time market insights</p>
             </div>
             <div className="divide-y divide-gray-200">
               {[
@@ -1190,54 +1131,45 @@ export default function Profile() {
                   description: 'Fintech sector leading'
                 }
               ].map((insight, index) => (
-                <div key={index} className="p-3 hover:bg-gray-50 transition-colors">
+                <div key={index} className={cn("p-3 transition-colors", isDark ? "hover:bg-gray-800/50" : "hover:bg-gray-50")}>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-gray-900">{insight.title}</span>
+                    <span className={cn("text-sm font-medium", isDark ? "text-white" : "text-gray-900")}>{insight.title}</span>
                     <div className={cn(
                       'flex items-center gap-1 text-xs px-2 py-1 rounded-full',
-                      insight.trend === 'up' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                      insight.trend === 'up' ? 'bg-green-100/20 text-green-400' : 'bg-red-100/20 text-red-400'
                     )}>
                       <TrendingUp className="w-3 h-3" />
                       {insight.change}
                     </div>
                   </div>
-                  <p className="text-xs text-gray-600">{insight.description}</p>
+                  <p className={cn("text-xs", isDark ? "text-gray-400" : "text-gray-600")}>{insight.description}</p>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Mentorship Marketplace */}
-          <div className="bg-lime rounded-2xl p-4 text-black">
+          {/* <div className={cn("rounded-2xl p-4", isDark ? "bg-blue-950 text-white" : "bg-blue-950 text-white")}>
             <div className="flex items-center gap-2 mb-3">
               <Users className="w-5 h-5" />
               <h3 className="font-bold">Find a Mentor</h3>
             </div>
-            <p className="text-sm text-black mb-3">
+            <p className="text-sm text-white/90 mb-3">
               Connect with industry professionals for 1-on-1 guidance
             </p>
-            {/* <div className="flex -space-x-2 mb-3">
-              {[1,2,3,4].map((i) => (
-                <div key={i} className="w-8 h-8 bg-white/20 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold">
-                  {String.fromCharCode(65 + i)}
-                </div>
-              ))}
-              <div className="w-8 h-8 bg-white/30 rounded-full border-2 border-white flex items-center justify-center text-xs">
-                +12
-              </div> */}
-            <button className="w-full bg-primary hover:text-black hover:bg-white text-white rounded-lg py-2 text-sm font-medium transition-colors">
+            <button className="w-full bg-white/20 hover:bg-white/30 rounded-lg py-2 text-sm font-medium transition-colors">
               Browse Mentors
             </button>
-          </div>
+          </div> */}
 
           {/* Career Opportunities Scanner */}
-          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-            <div className="p-4 border-b border-gray-200">
+          <div className={cn("rounded-2xl border overflow-hidden", isDark ? "bg-black border-gray-800" : "bg-white border-gray-200")}>
+            <div className={cn("p-4 border-b", isDark ? "border-gray-800" : "border-gray-200")}>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <h3 className="font-bold text-gray-900">Live Opportunities</h3>
+                <h3 className="font-bold">Live Opportunities</h3>
               </div>
-              <p className="text-xs text-gray-600">Matching your profile in real-time</p>
+              <p className={cn("text-xs", isDark ? "text-gray-400" : "text-gray-600")}>Matching your profile in real-time</p>
             </div>
             <div className="p-4 space-y-3">
               {[
@@ -1256,22 +1188,22 @@ export default function Profile() {
                   applicants: 45
                 }
               ].map((opp, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-3">
+                <div key={index} className={cn("border rounded-lg p-3", isDark ? "border-gray-700" : "border-gray-200")}>
                   <div className="flex items-center justify-between mb-2">
                     <div>
-                      <h4 className="font-medium text-sm text-gray-900">{opp.role}</h4>
-                      <p className="text-xs text-gray-600">{opp.company}</p>
+                      <h4 className={cn("font-medium text-sm", isDark ? "text-white" : "text-gray-900")}>{opp.role}</h4>
+                      <p className={cn("text-xs", isDark ? "text-gray-400" : "text-gray-600")}>{opp.company}</p>
                     </div>
                     <div className="text-right">
                       <div className={cn(
                         'text-xs px-2 py-1 rounded-full font-medium',
-                        opp.match >= 90 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                        opp.match >= 90 ? 'bg-green-100/20 text-green-400' : 'bg-yellow-100/20 text-yellow-400'
                       )}>
                         {opp.match}% match
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between text-xs text-gray-500">
+                  <div className={cn("flex items-center justify-between text-xs", isDark ? "text-gray-400" : "text-gray-500")}>
                     <span>{opp.applicants} applied</span>
                     <span>Closes in {opp.timeLeft}</span>
                   </div>
@@ -1283,30 +1215,23 @@ export default function Profile() {
           {/* Career Growth Card */}
           <div className="bg-[#8056E6] rounded-2xl overflow-hidden shadow-sm">
             <div className="p-4 border-b border-[#8056E6]/30">
-              <h2 className="text-xl font-bold text-white">Career Growth</h2>
+              <h2 className="text-xl font-bold text-white">Profile copletion</h2>
             </div>
             <div className="p-4 space-y-3">
               <div className="text-white">
                 <p className="font-semibold mb-2">Complete your profile</p>
-                <div className="w-full bg-white/20 rounded-full h-2 mb-2">
+                <div className={cn("w-full rounded-full h-2 mb-2", isDark ? "bg-white/20" : "bg-white/30")}>
                   <div className="bg-[#BCE953] h-2 rounded-full" style={{width: '75%'}}></div>
                 </div>
                 <p className="text-sm text-white/90">75% complete</p>
               </div>
-              <div className="text-white">
-                <p className="font-semibold mb-1">Skills to add</p>
-                <p className="text-sm text-white/90">Add 3 more skills to boost your profile visibility</p>
-              </div>
+            
             </div>
-            <div className="p-4">
-              <button className="text-[#BCE953] hover:underline text-sm font-medium">
-                View recommendations
-              </button>
-            </div>
+           
           </div>
 
           {/* Footer */}
-          <div className="text-xs text-gray-600 space-y-2">
+          <div className={cn("text-xs space-y-2", isDark ? "text-gray-400" : "text-gray-600")}>
             <div className="flex flex-wrap gap-3">
               <button className="hover:underline">Terms of Service</button>
               <button className="hover:underline">Privacy Policy</button>

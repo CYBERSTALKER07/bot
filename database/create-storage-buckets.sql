@@ -16,8 +16,8 @@ VALUES (
 -- For user profile cover images
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES (
-  'covers',
-  'covers',
+  'cover-images',
+  'cover-images',
   true, -- Public bucket
   10485760, -- 10MB limit for cover photos
   ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
@@ -97,24 +97,24 @@ FOR SELECT USING (bucket_id = 'avatars');
 -- COVER PHOTOS BUCKET POLICIES
 CREATE POLICY "Users can upload their own covers" ON storage.objects
 FOR INSERT WITH CHECK (
-  bucket_id = 'covers' 
+  bucket_id = 'cover-images' 
   AND auth.uid()::text = (storage.foldername(name))[1]
 );
 
 CREATE POLICY "Users can update their own covers" ON storage.objects
 FOR UPDATE USING (
-  bucket_id = 'covers' 
+  bucket_id = 'cover-images' 
   AND auth.uid()::text = (storage.foldername(name))[1]
 );
 
 CREATE POLICY "Users can delete their own covers" ON storage.objects
 FOR DELETE USING (
-  bucket_id = 'covers' 
+  bucket_id = 'cover-images' 
   AND auth.uid()::text = (storage.foldername(name))[1]
 );
 
 CREATE POLICY "Anyone can view covers" ON storage.objects
-FOR SELECT USING (bucket_id = 'covers');
+FOR SELECT USING (bucket_id = 'cover-images');
 
 -- POST IMAGES BUCKET POLICIES
 CREATE POLICY "Users can upload post images" ON storage.objects
@@ -225,7 +225,7 @@ RETURNS boolean AS $$
 BEGIN
   CASE bucket_name
     WHEN 'avatars' THEN RETURN file_size <= 5242880; -- 5MB
-    WHEN 'covers' THEN RETURN file_size <= 10485760; -- 10MB
+    WHEN 'cover-images' THEN RETURN file_size <= 10485760; -- 10MB
     WHEN 'post-images' THEN RETURN file_size <= 15728640; -- 15MB
     WHEN 'videos' THEN RETURN file_size <= 104857600; -- 100MB
     WHEN 'documents' THEN RETURN file_size <= 52428800; -- 50MB
@@ -248,7 +248,7 @@ SELECT
   allowed_mime_types,
   created_at
 FROM storage.buckets 
-WHERE id IN ('avatars', 'covers', 'post-images', 'videos', 'documents', 'company-assets')
+WHERE id IN ('avatars', 'cover-images', 'post-images', 'videos', 'documents', 'company-assets')
 ORDER BY id;
 
 -- Check policies

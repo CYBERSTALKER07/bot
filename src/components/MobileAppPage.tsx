@@ -263,7 +263,7 @@ export default function MobileAppPage() {
       company: "Tech Corp",
       content: "The mobile app made job hunting so much easier! I found my dream job in just 2 weeks.",
       rating: 5,
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b278?w=80&h=80&fit=crop&crop=face"
+      // Remove avatar to use initials fallback
     },
     {
       name: "Michael Chen",

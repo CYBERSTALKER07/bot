@@ -17,6 +17,7 @@ import CompanySection from './LandingPage/CompanySection';
 import CompanyLogosFlowSection from './LandingPage/CompanyLogosFlowSection';
 import StatsSection from './LandingPage/StatsSection';
 import FeaturesSection from './LandingPage/FeaturesSection';
+import TilesContentSection from './LandingPage/TilesContentSection';
 import HowItWorksSection from './LandingPage/HowItWorksSection';
 import CareerPathSection from './LandingPage/CareerPathSection';
 import IndustrySpotlightSection from './LandingPage/IndustrySpotlightSection';
@@ -108,6 +109,9 @@ export default function LandingPage() {
 
       {/* Features Section */}
       <FeaturesSection featuresRef={featuresRef} />
+
+      {/* Tiles & Content Section */}
+      <TilesContentSection />
 
       {/* How It Works Section */}
       <HowItWorksSection howItWorksRef={howItWorksRef} />

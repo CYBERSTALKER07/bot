@@ -63,7 +63,7 @@ export default function ImageUpload({
     console.log(`📤 Uploading ${type} image:`, fileName);
     
     // Try specific bucket first, fallback to general bucket
-    let bucketName = type === 'avatar' ? 'avatars' : 'covers';
+    let bucketName = type === 'avatar' ? 'avatars' : 'cover-images';
     
     // First attempt with specific bucket
     let { data, error } = await supabase.storage

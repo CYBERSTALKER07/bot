@@ -11,13 +11,13 @@ interface Comment {
   id: string;
   post_id: string;
   user_id: string;
-  parent_comment_id?: string;
+  parent_id?: string;
   content: string;
-  likes_count: number;
-  replies_count: number;
+  like_count: number;
+  reply_count: number;
   has_liked: boolean;
   is_edited: boolean;
-  edited_at?: string;
+  updated_at?: string;
   created_at: string;
   author: {
     id: string;
@@ -88,13 +88,16 @@ export default function Comments({ postId, className }: CommentsProps) {
             };
 
             try {
-              const { data: profile } = await supabase
+              const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
                 .select('full_name, username, avatar_url, verified')
                 .eq('id', comment.user_id)
-                .single();
+                .limit(1);
 
-              if (profile) {
+              if (profileError) {
+                console.log('Profile query error for user:', comment.user_id, profileError);
+              } else if (profileData && profileData.length > 0) {
+                const profile = profileData[0];
                 authorData = {
                   id: comment.user_id,
                   name: profile.full_name || 'User',
@@ -104,20 +107,20 @@ export default function Comments({ postId, className }: CommentsProps) {
                 };
               }
             } catch (profileError) {
-              console.log('Profile not found for user:', comment.user_id);
+              console.log('Error fetching profile for user:', comment.user_id, profileError);
             }
 
             return {
               id: comment.id,
               post_id: comment.post_id,
               user_id: comment.user_id,
-              parent_comment_id: comment.parent_comment_id,
+              parent_id: comment.parent_id,
               content: comment.content,
-              likes_count: comment.likes_count || 0,
-              replies_count: comment.replies_count || 0,
+              like_count: comment.like_count || 0,
+              reply_count: comment.reply_count || 0,
               has_liked: false, // We'll fetch this separately if needed
               is_edited: comment.is_edited || false,
-              edited_at: comment.edited_at,
+              updated_at: comment.updated_at,
               created_at: comment.created_at,
               author: authorData
             };
@@ -149,8 +152,8 @@ export default function Comments({ postId, className }: CommentsProps) {
 
     // Second pass: organize into parent-child relationships
     comments.forEach(comment => {
-      if (comment.parent_comment_id) {
-        const parent = commentMap.get(comment.parent_comment_id);
+      if (comment.parent_id) {
+        const parent = commentMap.get(comment.parent_id);
         if (parent) {
           parent.replies!.push(commentMap.get(comment.id)!);
         }
@@ -188,7 +191,7 @@ export default function Comments({ postId, className }: CommentsProps) {
         .insert([{
           post_id: postId,
           user_id: user.id,
-          parent_comment_id: parentId || null,
+          parent_id: parentId || null,
           content: content.trim()
         }])
         .select('*')
@@ -206,10 +209,10 @@ export default function Comments({ postId, className }: CommentsProps) {
         id: data.id,
         post_id: data.post_id,
         user_id: data.user_id,
-        parent_comment_id: data.parent_comment_id,
+        parent_id: data.parent_id,
         content: data.content,
-        likes_count: 0,
-        replies_count: 0,
+        like_count: 0,
+        reply_count: 0,
         has_liked: false,
         is_edited: false,
         created_at: data.created_at,
@@ -267,7 +270,7 @@ export default function Comments({ postId, className }: CommentsProps) {
         return {
           ...comment,
           replies: [...(comment.replies || []), reply],
-          replies_count: comment.replies_count + 1
+          reply_count: comment.reply_count + 1
         };
       } else if (comment.replies && comment.replies.length > 0) {
         return {
@@ -285,7 +288,7 @@ export default function Comments({ postId, className }: CommentsProps) {
     try {
       // Check if already liked
       const { data: existingLike } = await supabase
-        .from('comment_likes')
+        .from('likes')
         .select('id')
         .eq('comment_id', commentId)
         .eq('user_id', user.id)
@@ -294,14 +297,14 @@ export default function Comments({ postId, className }: CommentsProps) {
       if (existingLike) {
         // Unlike
         await supabase
-          .from('comment_likes')
+          .from('likes')
           .delete()
           .eq('comment_id', commentId)
           .eq('user_id', user.id);
       } else {
         // Like
         await supabase
-          .from('comment_likes')
+          .from('likes')
           .insert([{
             comment_id: commentId,
             user_id: user.id
@@ -328,7 +331,7 @@ export default function Comments({ postId, className }: CommentsProps) {
         return {
           ...comment,
           has_liked: isLiked,
-          likes_count: isLiked ? comment.likes_count + 1 : comment.likes_count - 1
+          like_count: isLiked ? comment.like_count + 1 : comment.like_count - 1
         };
       } else if (comment.replies && comment.replies.length > 0) {
         return {
@@ -349,7 +352,7 @@ export default function Comments({ postId, className }: CommentsProps) {
         .update({
           content: editContent.trim(),
           is_edited: true,
-          edited_at: new Date().toISOString()
+          updated_at: new Date().toISOString()
         })
         .eq('id', commentId)
         .eq('user_id', user?.id);
@@ -433,9 +436,9 @@ export default function Comments({ postId, className }: CommentsProps) {
 
   const CommentItem = ({ comment, depth = 0 }: { comment: Comment; depth?: number }) => (
     <div className={cn(
-      'border-b transition-colors',
+      'border-[0.7px] rounded-xl transition-colors',
       isDark ? 'border-gray-800 hover:bg-gray-950/50' : 'border-gray-200 hover:bg-gray-50/50',
-      depth > 0 && 'ml-8 border-l-2 border-gray-300 dark:border-gray-700 pl-4'
+      depth > 0 && 'ml-8  border-gray-300 dark:border-gray-700 pl-4'
     )}>
       <div className="p-4">
         <div className="flex space-x-3">
@@ -481,7 +484,7 @@ export default function Comments({ postId, className }: CommentsProps) {
                   className={cn(
                     'w-full p-2 border rounded-lg resize-none',
                     isDark 
-                      ? 'bg-gray-800 border-gray-700 text-white' 
+                      ? 'bg-black border-gray-700 text-white' 
                       : 'bg-white border-gray-300 text-gray-900'
                   )}
                   rows={2}
@@ -529,7 +532,7 @@ export default function Comments({ postId, className }: CommentsProps) {
                 )}
               >
                 <Heart className={cn('w-4 h-4', comment.has_liked && 'fill-current')} />
-                <span>{comment.likes_count || ''}</span>
+                <span>{comment.like_count || ''}</span>
               </Button>
 
               <Button
@@ -546,8 +549,7 @@ export default function Comments({ postId, className }: CommentsProps) {
                     : 'text-gray-600 hover:text-blue-600'
                 )}
               >
-                <Reply className="w-4 h-4" />
-                <span>Reply</span>
+                <Reply className="w-5 h-5" />
               </Button>
 
               {comment.user_id === user?.id && (
@@ -567,7 +569,7 @@ export default function Comments({ postId, className }: CommentsProps) {
                     )}
                   >
                     <Edit className="w-4 h-4" />
-                    <span>Edit</span>
+                    <span></span>
                   </Button>
 
                   <Button
@@ -582,7 +584,7 @@ export default function Comments({ postId, className }: CommentsProps) {
                     )}
                   >
                     <Trash2 className="w-4 h-4" />
-                    <span>Delete</span>
+                    <span></span>
                   </Button>
                 </>
               )}
@@ -603,7 +605,7 @@ export default function Comments({ postId, className }: CommentsProps) {
 
             {/* Reply Input */}
             {replyingTo === comment.id && (
-              <div className="mt-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <div className="mt-3 p-3 bg-gray-50 dark:bg-black rounded-lg">
                 <div className="flex space-x-3">
                   <Avatar
                     src={user?.profile?.avatar_url}
@@ -618,21 +620,22 @@ export default function Comments({ postId, className }: CommentsProps) {
                       className={cn(
                         'w-full p-2 border rounded-lg resize-none',
                         isDark 
-                          ? 'bg-gray-700 border-gray-600 text-white' 
+                          ? 'bg-black border-gray-600 text-white' 
                           : 'bg-white border-gray-300 text-gray-900'
                       )}
                       rows={2}
                       placeholder={`Reply to ${comment.author.name}...`}
                     />
-                    <div className="flex space-x-2 mt-2">
+                    <div className="flex rouned-md space-x-2 mt-2">
                       <Button
+                      className='rounded-md'
                         size="sm"
                         onClick={() => handleAddComment(comment.id)}
                         disabled={!replyContent.trim() || isCommenting}
                       >
                         {isCommenting ? 'Replying...' : 'Reply'}
                       </Button>
-                      <Button
+                      <Button className='rouned-md'
                         size="sm"
                         variant="ghost"
                         onClick={() => {
@@ -699,9 +702,9 @@ export default function Comments({ postId, className }: CommentsProps) {
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               className={cn(
-                'w-full p-3 border rounded-lg resize-none',
+                'w-full p-3 border rounded-2xl resize-none',
                 isDark 
-                  ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400' 
+                  ? 'bg-black border-gray-700 text-white placeholder-gray-400' 
                   : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
               )}
               rows={3}
@@ -715,6 +718,7 @@ export default function Comments({ postId, className }: CommentsProps) {
                 {500 - newComment.length} characters remaining
               </span>
               <Button
+              className='rounded-md w-20 h-8'
                 onClick={() => handleAddComment()}
                 disabled={!newComment.trim() || isCommenting || newComment.length > 500}
                 size="sm"

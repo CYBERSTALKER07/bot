@@ -17,6 +17,9 @@ import Button from './ui/Button';
 import Input from './ui/Input';
 import PageLayout from './ui/PageLayout';
 import { cn } from '../lib/cva';
+import { supabase } from '../lib/supabase';
+import { useConversations } from '../hooks/useOptimizedQuery';
+import { PostCardSkeleton } from './ui/Skeleton';
 
 interface Message {
   id: string;
@@ -42,113 +45,106 @@ interface Conversation {
 export default function Messages() {
   const { user } = useAuth();
   const { isDark } = useTheme();
-  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [showSidebar, setShowSidebar] = useState(true);
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Mock data
-  useEffect(() => {
-    const mockConversations: Conversation[] = [
-      {
-        id: '1',
-        participant_id: 'user1',
-        participant_name: 'Sarah Johnson',
-        participant_role: 'student',
-        last_message: 'Thanks for the interview opportunity!',
-        last_message_time: new Date(Date.now() - 3600000).toISOString(),
-        unread_count: 2,
-        job_title: 'Software Engineer Intern'
+  // Fetch real conversations
+  const { data: conversationsData, isLoading: loading, error } = useConversations(user?.id);
+
+  // Transform to component format
+  const conversations: Conversation[] = conversationsData?.map(conv => {
+    const otherParticipant = conv.participant1_id === user?.id ? conv.participant2 : conv.participant1;
+    const lastMessage = conv.messages?.[0];
+
+    return {
+      id: conv.id,
+      participant: {
+        id: otherParticipant?.id || '',
+        name: otherParticipant?.full_name || 'Unknown',
+        avatar: otherParticipant?.avatar_url,
+        username: otherParticipant?.username || '',
+        online: false,
+        last_seen: new Date(),
       },
-      {
-        id: '2',
-        participant_id: 'user2',
-        participant_name: 'Tech Corp HR',
-        participant_role: 'employer',
-        last_message: 'We would like to schedule a follow-up interview',
-        last_message_time: new Date(Date.now() - 7200000).toISOString(),
-        unread_count: 0
-      },
-      {
-        id: '3',
-        participant_id: 'user3',
-        participant_name: 'Mike Chen',
-        participant_role: 'student',
-        last_message: 'Could you share more details about the position?',
-        last_message_time: new Date(Date.now() - 86400000).toISOString(),
-        unread_count: 1
-      }
-    ];
-
-    const mockMessages: Message[] = [
-      {
-        id: '1',
-        content: 'Hi! I saw your application for our Software Engineer position.',
-        sender_id: 'user1',
-        recipient_id: user?.id,
-        timestamp: new Date(Date.now() - 1800000).toISOString(),
-        read: true
-      },
-      {
-        id: '2',
-        content: 'Thank you for reaching out! I\'m very interested in learning more about this opportunity.',
-        sender_id: user?.id || '',
-        recipient_id: 'user1',
-        timestamp: new Date(Date.now() - 1500000).toISOString(),
-        read: true
-      },
-      {
-        id: '3',
-        content: 'Great! Would you be available for a quick call tomorrow?',
-        sender_id: 'user1',
-        recipient_id: user?.id,
-        timestamp: new Date(Date.now() - 1200000).toISOString(),
-        read: false
-      }
-    ];
-
-    setConversations(mockConversations);
-    setMessages(mockMessages);
-    setSelectedConversation('1');
-  }, [user?.id]);
-
-  const handleSendMessage = () => {
-    if (!newMessage.trim() || !selectedConversation) return;
-
-    const message: Message = {
-      id: Date.now().toString(),
-      content: newMessage.trim(),
-      sender_id: user?.id || '',
-      recipient_id: selectedConversation,
-      timestamp: new Date().toISOString(),
-      read: false
+      last_message: lastMessage?.content || '',
+      last_message_time: lastMessage?.created_at ? new Date(lastMessage.created_at) : new Date(),
+      unread_count: 0, // Calculate this if you have read status
+      is_pinned: false,
     };
+  }) || [];
 
-    setMessages(prev => [...prev, message]);
-    setNewMessage('');
+  // Fetch messages for selected conversation
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [loadingMessages, setLoadingMessages] = useState(false);
 
-    // Update conversation
-    setConversations(prev => 
-      prev.map(conv => 
-        conv.id === selectedConversation 
-          ? { ...conv, last_message: newMessage.trim(), last_message_time: new Date().toISOString() }
-          : conv
-      )
-    );
+  useEffect(() => {
+    if (selectedConversation) {
+      fetchMessages(selectedConversation.id);
+    }
+  }, [selectedConversation]);
+
+  const fetchMessages = async (conversationId: string) => {
+    setLoadingMessages(true);
+    try {
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*, sender:sender_id(id, full_name, avatar_url, username)')
+        .eq('conversation_id', conversationId)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      const formattedMessages: Message[] = data?.map(msg => ({
+        id: msg.id,
+        content: msg.content,
+        sender_id: msg.sender_id,
+        sender_name: msg.sender?.full_name || 'Unknown',
+        sender_avatar: msg.sender?.avatar_url,
+        timestamp: new Date(msg.created_at),
+        is_read: msg.is_read || false,
+      })) || [];
+
+      setMessages(formattedMessages);
+    } catch (err) {
+      console.error('Error fetching messages:', err);
+    } finally {
+      setLoadingMessages(false);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || !selectedConversation || !user) return;
+
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .insert([{
+          conversation_id: selectedConversation.id,
+          sender_id: user.id,
+          content: newMessage.trim(),
+        }]);
+
+      if (error) throw error;
+
+      // Refresh messages
+      await fetchMessages(selectedConversation.id);
+      setNewMessage('');
+    } catch (err) {
+      console.error('Error sending message:', err);
+    }
   };
 
   const filteredConversations = conversations.filter(conv =>
-    conv.participant_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (conv.job_title && conv.job_title.toLowerCase().includes(searchTerm.toLowerCase()))
+    conv.participant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    conv.last_message.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const currentConversation = conversations.find(conv => conv.id === selectedConversation);
+  const currentConversation = conversations.find(conv => conv.id === selectedConversation?.id);
   const conversationMessages = messages.filter(msg => 
-    (msg.sender_id === selectedConversation && msg.recipient_id === user?.id) ||
-    (msg.sender_id === user?.id && msg.recipient_id === selectedConversation)
+    (msg.sender_id === selectedConversation?.id && msg.recipient_id === user?.id) ||
+    (msg.sender_id === user?.id && msg.recipient_id === selectedConversation?.id)
   );
 
   const formatTime = (dateString: string) => {
@@ -169,6 +165,31 @@ export default function Messages() {
       default: return 'bg-gray-500';
     }
   };
+
+  if (loading) {
+    return (
+      <PageLayout className={isDark ? 'bg-black text-white' : 'bg-white text-black'} maxWidth="full">
+        <div className="flex h-[calc(100vh-8rem)]">
+          <div className="w-1/3 border-r space-y-2 p-4">
+            {[...Array(5)].map((_, i) => (
+              <PostCardSkeleton key={i} />
+            ))}
+          </div>
+        </div>
+      </PageLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageLayout className={isDark ? 'bg-black text-white' : 'bg-white text-black'} maxWidth="full">
+        <Card className="p-8 text-center">
+          <p className="text-red-600 mb-4">Error loading messages</p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
+        </Card>
+      </PageLayout>
+    );
+  }
 
   return (
     <PageLayout 
@@ -212,9 +233,9 @@ export default function Messages() {
             {filteredConversations.map((conversation) => (
               <div
                 key={conversation.id}
-                onClick={() => setSelectedConversation(conversation.id)}
+                onClick={() => setSelectedConversation(conversation)}
                 className={`p-4 border-b cursor-pointer hover:bg-gray-50/5 transition-colors ${
-                  selectedConversation === conversation.id 
+                  selectedConversation?.id === conversation.id 
                     ? (isDark ? 'bg-gray-900' : 'bg-blue-50') 
                     : ''
                 } ${isDark ? 'border-gray-800' : 'border-gray-200'}`}
@@ -224,18 +245,18 @@ export default function Messages() {
                     isDark ? 'bg-gray-800' : 'bg-gray-200'
                   }`}>
                     <span className="font-medium">
-                      {conversation.participant_name.charAt(0)}
+                      {conversation.participant.name.charAt(0)}
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <p className="font-medium truncate">
-                        {conversation.participant_name}
+                        {conversation.participant.name}
                       </p>
                       <span className={`text-xs ${
                         isDark ? 'text-gray-400' : 'text-gray-500'
                       }`}>
-                        {formatTime(conversation.last_message_time)}
+                        {formatTime(conversation.last_message_time.toString())}
                       </span>
                     </div>
                     <p className={`text-sm mt-1 truncate ${
@@ -302,33 +323,43 @@ export default function Messages() {
               </div>
 
               {/* Messages */}
-              <div 
-                ref={messagesEndRef}
-                className="flex-1 overflow-y-auto p-4 space-y-4"
-              >
-                {conversationMessages.map((message, index) => (
-                  <div
-                    key={index}
-                    className={`flex ${
-                      message.sender_id === user?.id ? 'justify-end' : 'justify-start'
-                    }`}
-                  >
-                    <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
-                      message.sender_id === user?.id
-                        ? 'bg-blue-500 text-white'
-                        : (isDark ? 'bg-gray-800' : 'bg-gray-100')
-                    }`}>
-                      <p className="text-sm">{message.content}</p>
-                      <p className={`text-xs mt-1 ${
-                        message.sender_id === user?.id 
-                          ? 'text-blue-200' 
-                          : (isDark ? 'text-gray-400' : 'text-gray-500')
-                      }`}>
-                        {formatTime(message.timestamp)}
-                      </p>
-                    </div>
+              <div className={`flex-1 overflow-y-auto p-4 space-y-4 ${
+                isDark ? 'bg-black' : 'bg-white'
+              }`}>
+                {loadingMessages ? (
+                  <div className="flex items-center justify-center h-full">
+                    <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>Loading messages...</p>
                   </div>
-                ))}
+                ) : conversationMessages.length === 0 ? (
+                  <div className="flex items-center justify-center h-full">
+                    <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>No messages yet. Start the conversation!</p>
+                  </div>
+                ) : (
+                  conversationMessages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={`flex ${
+                        message.sender_id === user?.id ? 'justify-end' : 'justify-start'
+                      }`}
+                    >
+                      <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                        message.sender_id === user?.id
+                          ? 'bg-blue-500 text-white'
+                          : (isDark ? 'bg-gray-800' : 'bg-gray-100')
+                      }`}>
+                        <p className="break-words">{message.content}</p>
+                        <p className={`text-xs mt-1 ${
+                          message.sender_id === user?.id
+                            ? 'text-blue-100'
+                            : (isDark ? 'text-gray-400' : 'text-gray-600')
+                        }`}>
+                          {formatTime(message.timestamp)}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+                <div ref={messagesEndRef} />
               </div>
 
               {/* Message Input */}

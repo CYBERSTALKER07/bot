@@ -24,6 +24,8 @@ import { Card } from './ui/Card';
 import PageLayout from './ui/PageLayout';
 import Typography from './ui/Typography';
 import { cn } from '../lib/cva';
+import { useNotifications } from '../hooks/useOptimizedQuery';
+import { PostCardSkeleton } from './ui/Skeleton';
 
 interface Notification {
   id: string;
@@ -40,48 +42,23 @@ interface Notification {
 export default function NotificationsPage() {
   const { user } = useAuth();
   const { isDark } = useTheme();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [filter, setFilter] = useState<'all' | 'unread' | 'job_match' | 'application_update'>('all');
-  const [loading, setLoading] = useState(true);
 
-  // Mock notifications data
-  useEffect(() => {
-    const mockNotifications: Notification[] = [
-      {
-        id: '1',
-        type: 'job_match',
-        title: 'New Job Match',
-        message: 'Software Engineer position at Tech Corp matches your profile',
-        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-        isRead: false,
-        actionUrl: '/jobs/1',
-        company: 'Tech Corp'
-      },
-      {
-        id: '2',
-        type: 'application_update',
-        title: 'Application Update',
-        message: 'Your application for Frontend Developer has been reviewed',
-        timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000),
-        isRead: false,
-        actionUrl: '/applications/2',
-        company: 'Innovation Labs'
-      },
-      {
-        id: '3',
-        type: 'message',
-        title: 'New Message',
-        message: 'Sarah from HR sent you a message about the interview',
-        timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000),
-        isRead: true,
-        actionUrl: '/messages',
-        avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b278?w=40&h=40&fit=crop&crop=face'
-      }
-    ];
-    
-    setNotifications(mockNotifications);
-    setLoading(false);
-  }, []);
+  // Fetch real notifications
+  const { data: notificationsData, isLoading: loading, error } = useNotifications(user?.id);
+
+  // Transform to component format
+  const notifications: Notification[] = notificationsData?.map(notif => ({
+    id: notif.id,
+    type: notif.type,
+    title: notif.title,
+    message: notif.message,
+    timestamp: new Date(notif.created_at),
+    isRead: notif.is_read || false,
+    actionUrl: notif.action_url,
+    avatar: notif.avatar_url,
+    company: notif.company,
+  })) || [];
 
   const getNotificationIcon = (type: Notification['type']) => {
     switch (type) {
@@ -123,14 +100,28 @@ export default function NotificationsPage() {
   if (loading) {
     return (
       <PageLayout className={cn(
+        "min-h-screen transition-colors duration-300 pb-20",
+        isDark ? 'bg-black text-white' : 'bg-gray-50 text-black'
+      )} maxWidth="4xl">
+        <div className="space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <PostCardSkeleton key={i} />
+          ))}
+        </div>
+      </PageLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageLayout className={cn(
         "min-h-screen transition-colors duration-300",
         isDark ? 'bg-black text-white' : 'bg-gray-50 text-black'
-      )}>
-        <div className="flex justify-center items-center h-64">
-          <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${
-            isDark ? 'border-white' : 'border-black'
-          }`}></div>
-        </div>
+      )} maxWidth="4xl">
+        <Card className="p-8 text-center">
+          <p className="text-red-600 mb-4">Error loading notifications</p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
+        </Card>
       </PageLayout>
     );
   }
