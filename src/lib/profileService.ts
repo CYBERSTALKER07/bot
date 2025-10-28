@@ -11,21 +11,34 @@ export interface ProfileData {
   avatar_url?: string;
   cover_image_url?: string;
   website?: string;
+  location?: string;
+  // Role and company info
   role?: 'student' | 'employer' | 'admin';
   company_name?: string;
   title?: string;
-  location?: string;
+  // Student-specific fields
+  school?: string;
+  major?: string;
+  graduation_year?: number;
+  gpa?: number;
+  skills?: string[];
+  interests?: string[];
+  // Visibility and verification
   verified?: boolean;
+  is_verified?: boolean;
+  is_private?: boolean;
+  // Counts
+  follower_count?: number;
+  following_count?: number;
+  post_count?: number;
+  // Timestamps
   created_at?: string;
   updated_at?: string;
-  // Legacy fields for backward compatibility (these won't be saved to DB)
+  // Legacy fields for backward compatibility (these won't be saved to DB unless they exist in schema)
   phone?: string;
   linkedin_url?: string;
   github_url?: string;
   portfolio_url?: string;
-  major?: string;
-  graduation_year?: number;
-  skills?: string[];
   industry?: string;
   company_size?: string;
   company_description?: string;
@@ -273,17 +286,19 @@ export class ProfileService {
       // Extract only the fields that exist in the database
       const {
         id,
-        // Remove fields that don't exist in the database
+        created_at,
+        updated_at,
+        // Remove fields that don't exist in the database schema you provided
         phone,
         linkedin_url,
         github_url,
         portfolio_url,
-        major,
-        graduation_year,
-        skills,
         industry,
         company_size,
         company_description,
+        follower_count,
+        following_count,
+        post_count,
         ...validUpdates
       } = updates;
       
@@ -296,6 +311,13 @@ export class ProfileService {
         }
       }
 
+      // Ensure GPA is within valid range
+      if (validUpdates.gpa !== undefined && validUpdates.gpa !== null) {
+        if (validUpdates.gpa < 0 || validUpdates.gpa > 4.0) {
+          throw new Error('GPA must be between 0.0 and 4.0');
+        }
+      }
+
       // Only update if there are valid fields to update
       if (Object.keys(validUpdates).length === 0) {
         // If no valid fields to update, just return current profile
@@ -304,10 +326,7 @@ export class ProfileService {
 
       const { data, error } = await supabase
         .from('profiles')
-        .update({
-          ...validUpdates,
-          updated_at: new Date().toISOString()
-        })
+        .update(validUpdates)
         .eq('id', userId)
         .select()
         .single();

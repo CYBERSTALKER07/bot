@@ -61,27 +61,53 @@ export function useProfileCache(userId: string | undefined) {
 }
 
 /**
- * Hook for aggressive posts caching with pagination support
+ * Hook for posts caching with fallback mechanisms
  */
 export function usePostsCache(limit: number = 20) {
   const cacheKeyRef = useRef<string>(`posts_${limit}`);
 
   const getCachedPosts = useCallback(() => {
-    return postsCache.get<PostData[]>(cacheKeyRef.current) || [];
+    try {
+      return postsCache.get<PostData[]>(cacheKeyRef.current) || [];
+    } catch (error) {
+      console.warn('Failed to get cached posts, returning empty array:', error);
+      return [];
+    }
   }, []);
 
   const setCachedPosts = useCallback((data: PostData[]) => {
-    postsCache.set(cacheKeyRef.current, data);
+    try {
+      if (data && Array.isArray(data)) {
+        postsCache.set(cacheKeyRef.current, data);
+      }
+    } catch (error) {
+      console.warn('Failed to cache posts:', error);
+    }
   }, []);
 
   const appendCachedPosts = useCallback((newPosts: PostData[]) => {
-    const existing = postsCache.get<PostData[]>(cacheKeyRef.current) || [];
-    const merged = [...existing, ...newPosts];
-    postsCache.set(cacheKeyRef.current, merged);
+    try {
+      if (!newPosts || !Array.isArray(newPosts)) return;
+      
+      const existing = postsCache.get<PostData[]>(cacheKeyRef.current) || [];
+      const existingIds = new Set(existing.map(post => post.id));
+      
+      // Filter out duplicates before merging
+      const uniqueNewPosts = newPosts.filter(post => !existingIds.has(post.id));
+      const merged = [...existing, ...uniqueNewPosts];
+      
+      postsCache.set(cacheKeyRef.current, merged);
+    } catch (error) {
+      console.warn('Failed to append cached posts:', error);
+    }
   }, []);
 
   const invalidatePosts = useCallback(() => {
-    postsCache.clear(cacheKeyRef.current);
+    try {
+      postsCache.clear(cacheKeyRef.current);
+    } catch (error) {
+      console.warn('Failed to invalidate posts cache:', error);
+    }
   }, []);
 
   return { getCachedPosts, setCachedPosts, appendCachedPosts, invalidatePosts };
@@ -121,74 +147,143 @@ export function useFollowStatusCache() {
 export function useSearchCache() {
   const getCachedSearch = useCallback((query: string) => {
     if (!query || query.length < 2) return null;
-    return searchCache.get<SearchResult>(`search_${query}`);
+    try {
+      return searchCache.get<SearchResult>(`search_${query}`);
+    } catch (error) {
+      console.warn('Failed to get cached search results:', error);
+      return null;
+    }
   }, []);
 
   const setCachedSearch = useCallback((query: string, results: SearchResult) => {
-    if (query && query.length >= 2) {
-      searchCache.set(`search_${query}`, results);
+    try {
+      if (query && query.length >= 2 && results) {
+        searchCache.set(`search_${query}`, results);
+      }
+    } catch (error) {
+      console.warn('Failed to cache search results:', error);
     }
   }, []);
 
   const clearSearchCache = useCallback(() => {
-    searchCache.clearAll();
+    try {
+      searchCache.clearAll();
+    } catch (error) {
+      console.warn('Failed to clear search cache:', error);
+    }
   }, []);
 
   return { getCachedSearch, setCachedSearch, clearSearchCache };
 }
 
 /**
- * Hook for aggressive jobs caching
+ * Hook for jobs caching with fallback mechanisms
  */
 export function useJobsCache() {
   const cacheKey = 'jobs_list';
 
   const getCachedJobs = useCallback(() => {
-    return jobsCache.get<JobData[]>(cacheKey) || [];
+    try {
+      return jobsCache.get<JobData[]>(cacheKey) || [];
+    } catch (error) {
+      console.warn('Failed to get cached jobs, returning empty array:', error);
+      return [];
+    }
   }, []);
 
   const setCachedJobs = useCallback((data: JobData[]) => {
-    jobsCache.set(cacheKey, data);
+    try {
+      if (data && Array.isArray(data)) {
+        jobsCache.set(cacheKey, data);
+      }
+    } catch (error) {
+      console.warn('Failed to cache jobs:', error);
+    }
   }, []);
 
   const getCachedJob = useCallback((jobId: string) => {
-    return jobsCache.get<JobData>(`job_${jobId}`);
+    try {
+      return jobsCache.get<JobData>(`job_${jobId}`);
+    } catch (error) {
+      console.warn('Failed to get cached job:', error);
+      return null;
+    }
   }, []);
 
   const setCachedJob = useCallback((jobId: string, data: JobData) => {
-    jobsCache.set(`job_${jobId}`, data);
+    try {
+      if (data && jobId) {
+        jobsCache.set(`job_${jobId}`, data);
+      }
+    } catch (error) {
+      console.warn('Failed to cache job:', error);
+    }
   }, []);
 
   const invalidateJobs = useCallback(() => {
-    jobsCache.clearAll();
+    try {
+      jobsCache.clearAll();
+    } catch (error) {
+      console.warn('Failed to invalidate jobs cache:', error);
+    }
   }, []);
 
   return { getCachedJobs, setCachedJobs, getCachedJob, setCachedJob, invalidateJobs };
 }
 
 /**
- * Hook for aggressive companies caching
+ * Hook for companies caching with fallback mechanisms
  */
 export function useCompaniesCache() {
   const cacheKey = 'companies_list';
 
   const getCachedCompanies = useCallback(() => {
-    return companiesCache.get<CompanyData[]>(cacheKey) || [];
+    try {
+      return companiesCache.get<CompanyData[]>(cacheKey) || [];
+    } catch (error) {
+      console.warn('Failed to get cached companies, returning empty array:', error);
+      return [];
+    }
   }, []);
 
   const setCachedCompanies = useCallback((data: CompanyData[]) => {
-    companiesCache.set(cacheKey, data);
+    try {
+      if (data && Array.isArray(data)) {
+        companiesCache.set(cacheKey, data);
+      }
+    } catch (error) {
+      console.warn('Failed to cache companies:', error);
+    }
   }, []);
 
   const getCachedCompany = useCallback((companyId: string) => {
-    return companiesCache.get<CompanyData>(`company_${companyId}`);
+    try {
+      return companiesCache.get<CompanyData>(`company_${companyId}`);
+    } catch (error) {
+      console.warn('Failed to get cached company:', error);
+      return null;
+    }
   }, []);
 
   const setCachedCompany = useCallback((companyId: string, data: CompanyData) => {
-    companiesCache.set(`company_${companyId}`, data);
+    try {
+      if (data && companyId) {
+        companiesCache.set(`company_${companyId}`, data);
+      }
+    } catch (error) {
+      console.warn('Failed to cache company:', error);
+    }
   }, []);
 
-  return { getCachedCompanies, setCachedCompanies, getCachedCompany, setCachedCompany };
+  const invalidateCompanies = useCallback(() => {
+    try {
+      companiesCache.clearAll();
+    } catch (error) {
+      console.warn('Failed to invalidate companies cache:', error);
+    }
+  }, []);
+
+  return { getCachedCompanies, setCachedCompanies, getCachedCompany, setCachedCompany, invalidateCompanies };
 }
 
 /**

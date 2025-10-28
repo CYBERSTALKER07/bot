@@ -1,756 +1,583 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Search,
-  TrendingUp,
   Users,
-  Briefcase,
   Eye,
-  MessageCircle,
   Star,
   Plus,
-  Filter,
-  MoreHorizontal,
-  Sparkles,
-  Building2,
   Calendar,
-  BookOpen,
-  BarChart3,
-  Menu,
+  ArrowUpRight,
+  Play,
+  Pause,
   X,
-  ChevronDown,
-  ChevronUp,
-  Download
+  Bell,
+  MapPin,
+  Heart
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
+import { useJobManagement } from '../../hooks/useJobManagement';
 import Button from '../ui/Button';
-import { Card } from '../ui/Card';
 import { cn } from '../../lib/cva';
 import PageLayout from '../ui/PageLayout';
+import PostEventForm from '../PostEventForm';
+import PostJob from '../PostJob';
+import { supabase } from '../../lib/supabase';
+
+interface Metric {
+  value: number;
+  label: string;
+  color: string;
+  bgColor: string;
+}
+
+interface JobPosting {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  status?: string;
+  applications_count?: number;
+  views_count?: number;
+}
+
+interface EventData {
+  id: string;
+  title: string;
+  event_date: string;
+  status: string;
+  attendees_count: number;
+  location?: string;
+}
+
+interface Applicant {
+  id: string;
+  profiles?: {
+    full_name: string;
+  };
+}
+
+interface Follower {
+  id: string;
+  follower?: {
+    full_name: string;
+    avatar_url?: string;
+  };
+}
 
 export default function EmployerDashboard() {
   const { isDark } = useTheme();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
-  const [expandedSections, setExpandedSections] = useState({
-    skills: false,
-    actions: false,
-    tips: false
-  });
+  const { user } = useAuth();
+  const { fetchEmployerJobs, getJobApplicants } = useJobManagement();
   
-  // Mock data
-  const jobPostings = [
-    { id: 1, title: 'Senior Software Engineer', applicants: 24, views: 156, posted: '2d', status: 'active' },
-    { id: 2, title: 'Product Manager', applicants: 18, views: 89, posted: '5d', status: 'active' },
-    { id: 3, title: 'UX Designer', applicants: 31, views: 203, posted: '1w', status: 'paused' },
-  ];
+  const [showPostEventModal, setShowPostEventModal] = useState(false);
+  const [showPostJobModal, setShowPostJobModal] = useState(false);
+  
+  // Data states
+  const [jobPostings, setJobPostings] = useState<JobPosting[]>([]);
+  const [events, setEvents] = useState<EventData[]>([]);
+  const [recentApplicants, setRecentApplicants] = useState<Applicant[]>([]);
+  const [followers, setFollowers] = useState<Follower[]>([]);
+  const [metrics, setMetrics] = useState<Metric[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [timeTracking, setTimeTracking] = useState({ hours: 1, minutes: 24, seconds: 8, isRunning: false });
 
-  const recentApplicants = [
-    { name: 'Sarah Johnson', position: 'Senior Software Engineer', time: '2h', rating: 4.8 },
-    { name: 'Mike Chen', position: 'Product Manager', time: '4h', rating: 4.6 },
-    { name: 'Emily Davis', position: 'UX Designer', time: '6h', rating: 4.9 },
-  ];
-
-  const metrics = [
-    { label: 'Active Jobs', value: '8', change: '+2', color: 'text-blue-500' },
-    { label: 'Total Applicants', value: '147', change: '+23', color: 'text-green-500' },
-    { label: 'Interviews Scheduled', value: '12', change: '+5', color: 'text-yellow-500' },
-    { label: 'Hired This Month', value: '3', change: '+1', color: 'text-purple-500' },
-  ];
-
-  const trendingSkills = [
-    { skill: 'React', demand: '95%' },
-    { skill: 'Python', demand: '88%' },
-    { skill: 'AWS', demand: '76%' },
-    { skill: 'TypeScript', demand: '72%' },
-    { skill: 'Node.js', demand: '68%' },
-  ];
-
-  const toggleSection = (section: keyof typeof expandedSections) => {
-    setExpandedSections(prev => ({
-      ...prev,
-      [section]: !prev[section]
-    }));
-  };
-
-  // Close mobile sidebar when clicking outside
+  // Fetch all employer data on component mount
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (showMobileSidebar) {
-        const sidebar = document.getElementById('mobile-sidebar');
-        if (sidebar && !sidebar.contains(event.target as Node)) {
-          setShowMobileSidebar(false);
+    const fetchAllData = async () => {
+      if (!user || user.role !== 'employer') {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+
+        // Fetch posted jobs
+        const jobsData = await fetchEmployerJobs();
+        setJobPostings(jobsData as JobPosting[]);
+
+        // Fetch events
+        const { data: eventsData, error: eventsError } = await supabase
+          .from('employer_events')
+          .select('*')
+          .eq('employer_id', user.id)
+          .order('event_date', { ascending: true });
+
+        if (!eventsError && eventsData) {
+          setEvents(eventsData as EventData[]);
         }
+
+        // Fetch followers
+        const { data: followersData, error: followersError } = await supabase
+          .from('follows')
+          .select(`
+            *,
+            follower:follower_id(id, full_name, avatar_url)
+          `)
+          .eq('following_id', user.id)
+          .limit(5);
+
+        if (!followersError && followersData) {
+          setFollowers(followersData as Follower[]);
+        }
+
+        // Fetch all applicants for employer's jobs
+        if (jobsData.length > 0) {
+          const allApplicants: Applicant[] = [];
+          
+          for (const job of jobsData.slice(0, 10)) {
+            const applicants = await getJobApplicants(job.id);
+            allApplicants.push(...(applicants || []));
+          }
+
+          setRecentApplicants(allApplicants.slice(0, 5));
+
+          // Calculate metrics
+          const totalApplicants = allApplicants.length;
+          const activeJobs = jobsData.filter(j => j.status === 'active' || j.status === 'open' || j.status === 'inactive').length;
+          const closedJobs = jobsData.filter(j => j.status === 'closed').length;
+          const followerCount = followersData?.length || 0;
+
+          setMetrics([
+            {
+              value: activeJobs,
+              label: 'Active Jobs',
+              color: 'text-black dark:text-white',
+              bgColor: 'bg-white dark:bg-black'
+              
+            },
+            {
+              value: closedJobs,
+              label: 'Closed Jobs',
+              color: 'text-black dark:text-white',
+              bgColor: 'bg-white dark:bg-black'
+              
+            },
+            {
+              value: totalApplicants,
+              label: 'Total Applicants',
+              color: 'text-black dark:text-white',
+              bgColor: 'bg-white dark:bg-black'
+              
+            },
+           
+          ]);
+        }
+
+      } catch (err) {
+        console.error('Error fetching employer data:', err);
+      } finally {
+        setLoading(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showMobileSidebar]);
+    if (user && user.role === 'employer') {
+      fetchAllData();
+    }
+  }, [user, fetchEmployerJobs, getJobApplicants]);
+
+  // Timer effect
+  useEffect(() => {
+    if (!timeTracking.isRunning) return;
+
+    const interval = setInterval(() => {
+      setTimeTracking(prev => {
+        let { hours, minutes, seconds } = prev;
+        seconds += 1;
+        if (seconds === 60) {
+          seconds = 0;
+          minutes += 1;
+          if (minutes === 60) {
+            minutes = 0;
+            hours += 1;
+          }
+        }
+        return { ...prev, hours, minutes, seconds };
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timeTracking.isRunning]);
+
+  if (loading) {
+    return (
+      <PageLayout className={`min-h-screen flex items-center justify-center ${isDark ? 'bg-black' : 'bg-gray-50'}`}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p>Loading dashboard...</p>
+        </div>
+      </PageLayout>
+    );
+  }
 
   return (
     <PageLayout 
-      className={`min-h-screen ${isDark ? 'bg-black text-white' : 'bg-white text-black'}`}
+      className={`min-h-screen ${isDark ? 'bg-black text-white' : 'bg-gray-50 text-black'}`}
       maxWidth="full"
       padding="none"
     >
-      {/* Mobile Header with Menu Button */}
+      {/* Mobile Header */}
       <div className={cn(
         'sticky top-0 z-50 backdrop-blur-xl border-b lg:hidden ios-header-safe',
         isDark ? 'bg-black/95 border-gray-800' : 'bg-white/95 border-gray-200'
       )}>
-        <div className="flex items-center justify-between px-4 py-3 ios-nav-spacing">
-          <div className="flex items-center space-x-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="p-2 ios-touch-target"
-              onClick={() => setShowMobileSidebar(true)}
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
-            <div>
-              <h1 className="text-lg sm:text-xl font-bold">Employer Hub</h1>
-              <p className={cn(
-                'text-xs sm:text-sm',
-                isDark ? 'text-gray-400' : 'text-gray-600'
-              )}>
-                Manage your hiring pipeline
-              </p>
-            </div>
+        <div className="flex items-center justify-between px-4 py-4 ios-nav-spacing">
+          <div>
+            <h1 className="text-lg font-thin">Dashboard</h1>
+            <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-600')}>
+              Welcome back!
+            </p>
           </div>
-          <Button 
-            className={cn(
-              'rounded-full px-3 sm:px-4 py-2 font-bold text-sm ios-touch-target',
-              isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800'
-            )}
-            onClick={() => window.location.href = '/post-job'}
-          >
-            <Plus className="h-4 w-4 sm:mr-2" />
-            <span className="hidden sm:inline">Post Job</span>
-          </Button>
+          <div className="flex items-center space-x-2">
+            <Button className="p-2" title="Notifications">
+              <Bell className="h-5 w-5" />
+            </Button>
+            <Button 
+              className={cn(
+                'rounded-full px-3 py-2 font-thin text-sm',
+                isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800'
+              )}
+              onClick={() => setShowPostJobModal(true)}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Mobile Sidebar Overlay */}
-      {showMobileSidebar && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="fixed inset-0 bg-black/50" onClick={() => setShowMobileSidebar(false)} />
-          <div 
-            id="mobile-sidebar"
-            className={cn(
-              'fixed left-0 top-0 h-full w-80 max-w-[85vw] overflow-y-auto ios-sidebar-fix ios-safe-area',
-              isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200',
-              'border-r shadow-xl'
-            )}
-          >
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
-              <h2 className="text-lg font-bold">Menu</h2>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="p-2 ios-touch-target"
-                onClick={() => setShowMobileSidebar(false)}
+      {/* Main Content */}
+      <div className="pb-20 lg:pb-0 pt-16 lg:pt-20">
+        <main className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
+          {/* Desktop Header */}
+          <div className="hidden lg:flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-3xl font-thin mb-2">Dashboard</h1>
+              <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                Manage your jobs, events, and applicants
+              </p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Button 
+                className={cn(
+                  'rounded-full px-6 py-2 font-thin',
+                  isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800'
+                )}
+                onClick={() => setShowPostJobModal(true)}
               >
-                <X className="h-5 w-5" />
+                <Plus className="h-4 w-4 mr-2" />
+                Post Job
+              </Button>
+              <Button 
+                className={cn(
+                  'rounded-full px-6 py-2 font-thin',
+                  isDark ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-500 text-white hover:bg-blue-600'
+                )}
+                onClick={() => setShowPostEventModal(true)}
+              >
+                <Calendar className="h-4 w-4 mr-2" />
+                Post Event
               </Button>
             </div>
-            
-            <div className="p-4 space-y-4">
-              {/* Mobile Search */}
-              <div className={cn(
-                'p-3 rounded-2xl',
-                isDark ? 'bg-gray-900' : 'bg-gray-100'
-              )}>
-                <div className="relative">
-                  <Search className={cn(
-                    'absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5',
-                    isDark ? 'text-gray-400' : 'text-gray-500'
-                  )} />
-                  <input
-                    type="text"
-                    placeholder="Search candidates..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className={cn(
-                      'w-full pl-12 pr-4 py-3 rounded-2xl bg-transparent border-none outline-none',
-                      isDark ? 'text-white placeholder-gray-400' : 'text-black placeholder-gray-600'
-                    )}
-                  />
-                </div>
-              </div>
+          </div>
 
-              {/* Mobile Quick Actions */}
-              <div className={cn(
-                'rounded-2xl p-4',
-                isDark ? 'bg-gray-900' : 'bg-gray-100'
-              )}>
-                <button
-                  className="flex items-center justify-between w-full mb-3 ios-nav-item"
-                  onClick={() => toggleSection('actions')}
-                >
-                  <h2 className="text-lg font-bold">Quick Actions</h2>
-                  {expandedSections.actions ? (
-                    <ChevronUp className="h-5 w-5" />
-                  ) : (
-                    <ChevronDown className="h-5 w-5" />
-                  )}
-                </button>
-                {expandedSections.actions && (
-                  <div className="space-y-2">
-                    <Link 
-                      to="/post-job" 
-                      className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors ios-nav-item"
-                      onClick={() => setShowMobileSidebar(false)}
-                    >
-                      <Plus className="h-5 w-5 text-blue-500" />
-                      <span>Post New Job</span>
-                    </Link>
-                    <Link 
-                      to="/applicants" 
-                      className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors ios-nav-item"
-                      onClick={() => setShowMobileSidebar(false)}
-                    >
-                      <Users className="h-5 w-5 text-green-500" />
-                      <span>Review Applicants</span>
-                    </Link>
-                    <Link 
-                      to="/linkedin-job-import" 
-                      className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors ios-nav-item"
-                      onClick={() => setShowMobileSidebar(false)}
-                    >
-                      <Download className="h-5 w-5 text-blue-500" />
-                      <span>Import LinkedIn Jobs</span>
-                    </Link>
-                    <Link 
-                      to="/analytics" 
-                      className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors ios-nav-item"
-                      onClick={() => setShowMobileSidebar(false)}
-                    >
-                      <BarChart3 className="h-5 w-5 text-purple-500" />
-                      <span>View Analytics</span>
-                    </Link>
-                    <Link 
-                      to="/messages" 
-                      className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors ios-nav-item"
-                      onClick={() => setShowMobileSidebar(false)}
-                    >
-                      <MessageCircle className="h-5 w-5 text-yellow-500" />
-                      <span>Messages</span>
-                    </Link>
-                  </div>
+          {/* Mobile: Title + Filters (if needed) */}
+          <div className="lg:hidden mb-4">
+            <h2 className="text-xl font-thin mb-3 text-white">Dashboard</h2>
+          </div>
+
+          {/* Top Metrics Cards - 4 columns on desktop, 2 on mobile */}
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6 lg:mb-8">
+            {metrics.map((metric, index) => (
+              <div 
+                key={index}
+                className={cn(
+                  'rounded-3xl p-3 sm:p-4 lg:p-6 transition-all hover:shadow-lg',
+                  metric.bgColor,
+                  isDark ? 'border border-gray-800' : 'border border-gray-200'
                 )}
+              >
+                <div className="flex items-start justify-between mb-3 sm:mb-4">
+                  <div className="flex-1">
+                    <p className={cn('text-xs lg:text-sm font-medium', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                      {metric.label}
+                    </p>
+                    <p className="text-xl sm:text-2xl lg:text-3xl font-thin mt-1 sm:mt-2">{metric.value}</p>
+                  </div>
+                </div>
+               
               </div>
+            ))}
+          </div>
 
-              {/* Mobile Trending Skills */}
-              <div className={cn(
-                'rounded-2xl p-4',
-                isDark ? 'bg-gray-900' : 'bg-gray-100'
-              )}>
-                <button
-                  className="flex items-center justify-between w-full mb-3 ios-nav-item"
-                  onClick={() => toggleSection('skills')}
-                >
-                  <h2 className="text-lg font-bold">Trending Skills</h2>
-                  {expandedSections.skills ? (
-                    <ChevronUp className="h-5 w-5" />
-                  ) : (
-                    <ChevronDown className="h-5 w-5" />
-                  )}
-                </button>
-                {expandedSections.skills && (
-                  <div className="space-y-3">
-                    {trendingSkills.slice(0, 3).map((skill, index) => (
-                      <div key={index} className="p-2 rounded-lg">
-                        <div className="flex items-center justify-between mb-1">
-                          <p className="font-medium text-sm">{skill.skill}</p>
-                          <span className={cn(
-                            'text-xs',
-                            isDark ? 'text-gray-400' : 'text-gray-600'
-                          )}>
-                            {skill.demand}
-                          </span>
+          {/* Main Grid - Jobs & Events: Desktop 2/3 & 1/3, Mobile stacked */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
+            {/* Posted Jobs - Takes 2/3 on desktop */}
+            <div className={cn(
+              'lg:col-span-2 rounded-3xl p-4 lg:p-6',
+              isDark ? 'bg-black border border-gray-800' : 'bg-white border border-gray-200'
+            )}>
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <h2 className="text-lg sm:text-xl font-thin">Your Posted Jobs</h2>
+                <Link to="/posted-jobs" className="text-blue-500 hover:underline text-xs sm:text-sm whitespace-nowrap">
+                  View all
+                </Link>
+              </div>
+              <div className="space-y-3 sm:space-y-4 max-h-96 overflow-y-auto">
+                {jobPostings.length > 0 ? (
+                  jobPostings.slice(0, 4).map((job) => (
+                    <div
+                      key={job.id}
+                      className={cn(
+                        'p-3 sm:p-4 rounded-xl transition-colors hover:bg-gray-50/5',
+                        isDark ? 'bg-black border-[0.5px] border-gray-800' : 'bg-white'
+                      )}
+                    >
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-sm sm:text-base truncate">{job.title}</h3>
+                          <p className={cn('text-xs mt-1 truncate', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                            {job.company} • {job.location}
+                          </p>
                         </div>
-                        <div className={cn(
-                          'h-2 w-full rounded-full overflow-hidden',
-                          isDark ? 'bg-gray-700' : 'bg-gray-200'
+                        {/* <span className={cn(
+                          'text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0',
+                          job.status === 'open' || job.status === 'active' ? (isDark ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800') :
+                          job.status === 'closed' ? (isDark ? 'bg-red-900 text-red-200' : 'bg-red-100 text-red-800') :
+                          isDark ? 'bg-yellow-900 text-yellow-200' : 'bg-yellow-100 text-yellow-800'
                         )}>
-                          <div 
-                            className="h-full bg-blue-500 transition-all duration-300"
-                            style={{ width: skill.demand }}
-                          />
+                          {job.status || 'draft'}
+                        </span> */}
+                      </div>
+                      <div className="flex flex-wrap items-center gap-3 mt-3 text-xs text-gray-500">
+                        <div className="flex items-center space-x-1">
+                          <Users className="h-3 w-3" />
+                          <span>{job.applications_count || 0} applicants</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <Eye className="h-3 w-3" />
+                          <span>{job.views_count || 0} views</span>
                         </div>
                       </div>
-                    ))}
-                    <Button 
-                      variant="ghost" 
-                      className="w-full text-blue-500 justify-start p-2 text-sm"
-                      onClick={() => setShowMobileSidebar(false)}
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                      No jobs posted yet
+                    </p>
+                    <Button
+                      className="mt-3 text-blue-500 text-sm"
+                      onClick={() => setShowPostJobModal(true)}
                     >
-                      View all skills
+                      Post your first job
                     </Button>
                   </div>
                 )}
               </div>
+            </div>
 
-              {/* Mobile Hiring Tips */}
-              <div className={cn(
-                'rounded-2xl p-4',
-                isDark ? 'bg-gray-900' : 'bg-gray-100'
-              )}>
-                <button
-                  className="flex items-center justify-between w-full mb-3 ios-nav-item"
-                  onClick={() => toggleSection('tips')}
-                >
-                  <h2 className="text-lg font-bold">Hiring Tips</h2>
-                  {expandedSections.tips ? (
-                    <ChevronUp className="h-5 w-5" />
-                  ) : (
-                    <ChevronDown className="h-5 w-5" />
-                  )}
-                </button>
-                {expandedSections.tips && (
-                  <div className="space-y-3">
-                    <div className="p-3 rounded-lg hover:bg-gray-500/10 cursor-pointer transition-colors">
-                      <p className="font-medium text-sm">Write clear job descriptions</p>
-                      <p className={cn(
-                        'text-xs mt-1',
-                        isDark ? 'text-gray-400' : 'text-gray-600'
-                      )}>
-                        Get 30% more applications
-                      </p>
+            {/* Events - Takes 1/3 on desktop */}
+            <div className={cn(
+              'lg:col-span-1 rounded-3xl p-4 lg:p-6',
+              isDark ? 'bg-black border border-gray-800' : 'bg-white border border-gray-200'
+            )}>
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <h2 className="text-lg sm:text-xl font-thin">Your Events</h2>
+                <Link to="/events" className="text-blue-500 hover:underline text-xs sm:text-sm whitespace-nowrap">
+                  View all
+                </Link>
+              </div>
+              <div className="space-y-3 sm:space-y-4 max-h-96 overflow-y-auto">
+                {events.length > 0 ? (
+                  events.slice(0, 3).map((event) => (
+                    <div
+                      key={event.id}
+                      className={cn(
+                        'p-3 sm:p-4 rounded-xl transition-colors hover:bg-gray-50/5',
+                        isDark ? 'bg-black border-[0.7px] border-gray-900' : 'bg-gray-100/50'
+                      )}
+                    >
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-sm sm:text-base truncate">{event.title}</h3>
+                          <div className="flex items-center space-x-1 mt-1 text-xs text-gray-500">
+                            <Calendar className="h-3 w-3 flex-shrink-0" />
+                            <span className="truncate">
+                              {new Date(event.event_date).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric'
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                        <span className={cn(
+                          'text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0',
+                          event.status === 'upcoming' ? (isDark ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800') :
+                          event.status === 'ongoing' ? (isDark ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800') :
+                          isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-200 text-gray-800'
+                        )}>
+                          {event.status}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2 mt-2 text-xs text-gray-500">
+                        <Users className="h-3 w-3" />
+                        <span>{event.attendees_count || 0} attendees</span>
+                        {event.location && (
+                          <>
+                            <span>•</span>
+                            <MapPin className="h-3 w-3" />
+                            <span className="truncate">{event.location}</span>
+                          </>
+                        )}
+                      </div>
                     </div>
-                    <div className="p-3 rounded-lg hover:bg-gray-500/10 cursor-pointer transition-colors">
-                      <p className="font-medium text-sm">Respond quickly</p>
-                      <p className={cn(
-                        'text-xs mt-1',
-                        isDark ? 'text-gray-400' : 'text-gray-600'
-                      )}>
-                        Improve candidate experience
-                      </p>
-                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                      No events posted yet
+                    </p>
+                    <Button
+                      className="mt-3 text-blue-500 text-sm"
+                      onClick={() => setShowPostEventModal(true)}
+                    >
+                      Create your first event
+                    </Button>
                   </div>
                 )}
               </div>
             </div>
           </div>
+
+          {/* Bottom Section - Recent Applicants (2/3), Followers (1/3) on desktop, stacked on mobile */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 lg:mb-8">
+            {/* Recent Applicants - Takes 2/3 on desktop */}
+            <div className={cn(
+              'lg:col-span-2 rounded-3xl p-4 lg:p-6',
+              isDark ? 'bg-black border border-gray-800' : 'bg-white border border-gray-200'
+            )}>
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <h2 className="text-lg sm:text-xl font-thin">Recent Applicants</h2>
+                <Link to="/applicants" className="text-blue-500 hover:underline text-xs sm:text-sm whitespace-nowrap">
+                  View all
+                </Link>
+              </div>
+              <div className="space-y-3 sm:space-y-4">
+                {recentApplicants.length > 0 ? (
+                  recentApplicants.slice(0, 4).map((applicant) => (
+                    <div key={applicant.id} className={cn(
+                      'flex items-center justify-between p-3 sm:p-4 rounded-xl transition-colors',
+                      isDark ? 'hover:bg-black border-[0.7px] border-slate-50' : 'hover:bg-gray-50'
+                    )}>
+                      <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-lg sm:text-xl flex-shrink-0 bg-gradient-to-br from-green-400 to-blue-500">
+                          👤
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm sm:text-base truncate">{applicant.profiles?.full_name || 'Applicant'}</p>
+                          <div className="flex items-center space-x-1 mt-0.5">
+                            <Star className="h-3 w-3 text-yellow-500 fill-current flex-shrink-0" />
+                            <span className="text-xs text-yellow-500">{(Math.random() * 2 + 3).toFixed(1)}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex space-x-1 sm:space-x-2 flex-shrink-0 ml-2">
+                        <Button 
+                          className={cn(
+                            'rounded-lg text-xs px-2 sm:px-3 py-1 sm:py-2',
+                            isDark ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-200 hover:bg-gray-300 text-black'
+                          )}
+                        >
+                          View
+                        </Button>
+                        <Button 
+                          className={cn(
+                            'rounded-lg text-xs px-2 sm:px-3 py-1 sm:py-2',
+                            isDark ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600',
+                            'text-white'
+                          )}
+                        >
+                          Review
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                      No applicants yet
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Followers - Takes 1/3 on desktop */}
+            <div className={cn(
+              'lg:col-span-1 rounded-3xl p-4 lg:p-6',
+              isDark ? 'bg-black border border-gray-800' : 'bg-white border border-gray-200'
+            )}>
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <h2 className="text-lg sm:text-xl font-thin">Followers</h2>
+                <Link to="/followers" className="text-blue-500 hover:underline text-xs sm:text-sm whitespace-nowrap">
+                  View all
+                </Link>
+              </div>
+              <div className="space-y-2 sm:space-y-3">
+                {followers.length > 0 ? (
+                  followers.slice(0, 5).map((follow) => (
+                    <div key={follow.id} className={cn(
+                      'flex items-center justify-between p-2 sm:p-3 rounded-xl transition-colors',
+                      isDark ? 'hover:bg-black border-[0.7px] border-slate-50' : 'hover:bg-gray-50'
+                    )}>
+                      <div className="flex items-center space-x-2 flex-1 min-w-0">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-base sm:text-lg bg-gradient-to-br from-blue-400 to-purple-500 flex-shrink-0">
+                          👤
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-xs sm:text-sm truncate">{follow.follower?.full_name || 'User'}</p>
+                          <p className={cn('text-xs', isDark ? 'text-gray-500' : 'text-gray-500')}>
+                            Recently
+                          </p>
+                        </div>
+                      </div>
+                      <Heart className="h-4 w-4 text-red-500 fill-current flex-shrink-0" />
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-6 sm:py-8">
+                    <p className={cn('text-xs sm:text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                      No followers yet
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+        </main>
+      </div>
+
+      {/* Post Job Modal */}
+      {showPostJobModal && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <PostJob />
+          </div>
         </div>
       )}
 
-      {/* Main Layout Container */}
-      <div className="flex flex-col lg:flex-row max-w-7xl mx-auto">
-        
-        {/* Desktop Header - Hidden on Mobile */}
-        <div className="hidden lg:flex flex-1 max-w-4xl mx-auto">
-          <div className="w-full border-x border-gray-800 dark:border-gray-200">
-            {/* Desktop Header */}
-            <div className={cn(
-              'sticky top-0 z-10 backdrop-blur-xl border-b',
-              isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
-            )}>
-              <div className="flex items-center justify-between px-4 lg:px-6 py-3">
-                <div>
-                  <h1 className="text-xl font-bold">Employer Hub</h1>
-                  <p className={cn(
-                    'text-sm',
-                    isDark ? 'text-gray-400' : 'text-gray-600'
-                  )}>
-                    Manage your hiring pipeline
-                  </p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Button variant="ghost" size="sm" className="p-2">
-                    <Sparkles className="h-5 w-5" />
-                  </Button>
-                  <Button 
-                    className={cn(
-                      'rounded-full px-4 py-2 font-bold',
-                      isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800'
-                    )}
-                    onClick={() => window.location.href = '/post-job'}
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Post Job
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {/* Main Content */}
-            <MainContent 
-              isDark={isDark}
-              metrics={metrics}
-              recentApplicants={recentApplicants}
-              jobPostings={jobPostings}
+      {/* Post Event Modal */}
+      {showPostEventModal && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <PostEventForm
+              onClose={() => setShowPostEventModal(false)}
             />
           </div>
         </div>
-
-        {/* Mobile Main Content */}
-        <div className="lg:hidden w-full">
-          <MainContent 
-            isDark={isDark}
-            metrics={metrics}
-            recentApplicants={recentApplicants}
-            jobPostings={jobPostings}
-          />
-        </div>
-
-        {/* Desktop Right Sidebar */}
-        <div className="hidden lg:block w-80 xl:w-96 p-4 space-y-4">
-          <DesktopSidebar 
-            isDark={isDark}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            trendingSkills={trendingSkills}
-          />
-        </div>
-      </div>
+      )}
     </PageLayout>
   );
 }
-
-// Extracted Main Content Component for reusability
-const MainContent = ({ isDark, metrics, recentApplicants, jobPostings }: {
-  isDark: boolean;
-  metrics: any[];
-  recentApplicants: any[];
-  jobPostings: any[];
-}) => (
-  <>
-    {/* Metrics Overview */}
-    <div className={cn(
-      'border-b p-4 sm:p-6',
-      isDark ? 'border-gray-800' : 'border-gray-200'
-    )}>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {metrics.map((metric, index) => (
-          <div 
-            key={index} 
-            className={cn(
-              'text-center p-3 sm:p-4 rounded-lg hover:bg-gray-50/5 transition-colors ios-touch-target',
-              'min-h-[80px] sm:min-h-[90px] flex flex-col justify-center'
-            )}
-          >
-            <div className={cn(
-              'text-lg sm:text-2xl font-bold mb-1',
-              metric.color
-            )}>
-              {metric.value}
-            </div>
-            <div className={cn(
-              'text-xs sm:text-sm mb-1 line-clamp-2',
-              isDark ? 'text-gray-400' : 'text-gray-600'
-            )}>
-              {metric.label}
-            </div>
-            <div className="text-xs text-green-500">{metric.change}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-
-    {/* Recent Applicants */}
-    <div className={cn(
-      'border-b',
-      isDark ? 'border-gray-800' : 'border-gray-200'
-    )}>
-      <div className="p-4 sm:p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-bold text-lg sm:text-xl">Recent Applicants</h2>
-          <Link 
-            to="/applicants" 
-            className="text-blue-500 hover:underline text-sm ios-touch-target"
-          >
-            View all
-          </Link>
-        </div>
-        <div className="space-y-3 sm:space-y-4">
-          {recentApplicants.map((applicant, index) => (
-            <div 
-              key={index} 
-              className={cn(
-                'flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 rounded-lg',
-                'hover:bg-gray-50/5 transition-colors cursor-pointer space-y-3 sm:space-y-0'
-              )}
-            >
-              <div className="flex items-center space-x-3 flex-1 min-w-0">
-                <div className={cn(
-                  'w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center flex-shrink-0',
-                  isDark ? 'bg-gray-800' : 'bg-gray-200'
-                )}>
-                  <span className="text-base sm:text-lg">👤</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm sm:text-base truncate">{applicant.name}</p>
-                  <p className={cn(
-                    'text-xs sm:text-sm truncate',
-                    isDark ? 'text-gray-400' : 'text-gray-600'
-                  )}>
-                    Applied for {applicant.position}
-                  </p>
-                  <div className="flex items-center space-x-2 mt-1">
-                    <div className="flex items-center space-x-1">
-                      <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                      <span className="text-xs text-yellow-500">{applicant.rating}</span>
-                    </div>
-                    <span className={cn(
-                      'text-xs',
-                      isDark ? 'text-gray-400' : 'text-gray-600'
-                    )}>
-                      {applicant.time} ago
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex space-x-2 flex-shrink-0">
-                <Button 
-                  variant="outlined" 
-                  size="sm" 
-                  className="rounded-full text-sm flex-1 sm:flex-none ios-touch-target"
-                >
-                  View
-                </Button>
-                <Button 
-                  className="bg-blue-500 text-white hover:bg-blue-600 rounded-full px-3 sm:px-4 text-sm flex-1 sm:flex-none ios-touch-target"
-                >
-                  Review
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-
-    {/* Job Postings */}
-    <div className="ios-bottom-safe">
-      <div className="p-4 sm:p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-bold text-lg sm:text-xl">Your Job Postings</h2>
-          <Button variant="ghost" size="sm" className="p-2 ios-touch-target">
-            <Filter className="h-4 w-4" />
-          </Button>
-        </div>
-        
-        <div className="space-y-4 sm:space-y-6">
-          {jobPostings.map((job) => (
-            <Card 
-              key={job.id} 
-              className={cn(
-                'p-4 sm:p-6 transition-colors cursor-pointer hover:bg-gray-50/5',
-                isDark ? 'border-gray-800' : 'border-gray-200'
-              )}
-            >
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 space-y-3 sm:space-y-0">
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-2">
-                    <h3 className="font-bold text-base sm:text-lg truncate">{job.title}</h3>
-                    <span className={cn(
-                      'px-2 py-1 text-xs rounded-full font-medium self-start',
-                      job.status === 'active'
-                        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                        : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                    )}>
-                      {job.status}
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm text-gray-500 mb-3">
-                    <div className="flex items-center space-x-1">
-                      <Users className="h-3 w-3 sm:h-4 sm:w-4" />
-                      <span>{job.applicants} applicants</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
-                      <span>{job.views} views</span>
-                    </div>
-                    <span>Posted {job.posted}</span>
-                  </div>
-                </div>
-                <Button variant="ghost" size="sm" className="self-start p-2 ios-touch-target">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </div>
-              
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0">
-                <div className="flex flex-wrap gap-2">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="flex items-center space-x-2 p-2 text-gray-500 hover:text-blue-500 hover:bg-blue-500/10 rounded-full ios-touch-target"
-                  >
-                    <MessageCircle className="h-4 w-4" />
-                    <span className="text-sm">Messages</span>
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="flex items-center space-x-2 p-2 text-gray-500 hover:text-green-500 hover:bg-green-500/10 rounded-full ios-touch-target"
-                  >
-                    <BarChart3 className="h-4 w-4" />
-                    <span className="text-sm">Analytics</span>
-                  </Button>
-                </div>
-                
-                <div className="flex space-x-2">
-                  <Button 
-                    variant="outlined" 
-                    size="sm" 
-                    className="rounded-full flex-1 sm:flex-none ios-touch-target"
-                  >
-                    Edit
-                  </Button>
-                  <Button 
-                    className="bg-blue-500 text-white hover:bg-blue-600 rounded-full px-3 sm:px-4 flex-1 sm:flex-none ios-touch-target"
-                  >
-                    View Applicants
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </div>
-  </>
-);
-
-// Extracted Desktop Sidebar Component
-const DesktopSidebar = ({ isDark, searchTerm, setSearchTerm, trendingSkills }: {
-  isDark: boolean;
-  searchTerm: string;
-  setSearchTerm: (term: string) => void;
-  trendingSkills: any[];
-}) => (
-  <>
-    {/* Search */}
-    <div className={cn(
-      'sticky top-4 p-3 rounded-2xl',
-      isDark ? 'bg-gray-900' : 'bg-gray-100'
-    )}>
-      <div className="relative">
-        <Search className={cn(
-          'absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5',
-          isDark ? 'text-gray-400' : 'text-gray-500'
-        )} />
-        <input
-          type="text"
-          placeholder="Search candidates..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className={cn(
-            'w-full pl-12 pr-4 py-3 rounded-2xl bg-transparent border-none outline-none text-lg',
-            isDark ? 'text-white placeholder-gray-400' : 'text-black placeholder-gray-600'
-          )}
-        />
-      </div>
-    </div>
-
-    {/* Trending Skills */}
-    <div className={cn(
-      'rounded-2xl p-4',
-      isDark ? 'bg-gray-900' : 'bg-gray-100'
-    )}>
-      <h2 className="text-xl font-bold mb-4">Trending Skills</h2>
-      <div className="space-y-3">
-        {trendingSkills.map((skill, index) => (
-          <div key={index} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-500/10 cursor-pointer transition-colors">
-            <div className="flex-1">
-              <p className="font-medium">{skill.skill}</p>
-              <div className="flex items-center space-x-2 mt-1">
-                <div className={cn(
-                  'h-2 w-16 rounded-full overflow-hidden',
-                  isDark ? 'bg-gray-700' : 'bg-gray-200'
-                )}>
-                  <div 
-                    className="h-full bg-blue-500 transition-all duration-300"
-                    style={{ width: skill.demand }}
-                  />
-                </div>
-                <span className={cn(
-                  'text-xs',
-                  isDark ? 'text-gray-400' : 'text-gray-600'
-                )}>
-                  {skill.demand}
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-      <Button variant="ghost" className="w-full mt-3 text-blue-500 justify-start p-2">
-        View skill insights
-      </Button>
-    </div>
-
-    {/* Quick Actions */}
-    <div className={cn(
-      'rounded-2xl p-4',
-      isDark ? 'bg-gray-900' : 'bg-gray-100'
-    )}>
-      <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
-      <div className="space-y-2">
-        <Link to="/post-job" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors">
-          <Plus className="h-5 w-5 text-blue-500" />
-          <span>Post New Job</span>
-        </Link>
-        <Link to="/applicants" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors">
-          <Users className="h-5 w-5 text-green-500" />
-          <span>Review Applicants</span>
-        </Link>
-        <Link to="/linkedin-job-import" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors">
-          <Download className="h-5 w-5 text-blue-500" />
-          <span>Import LinkedIn Jobs</span>
-        </Link>
-        <Link to="/analytics" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors">
-          <BarChart3 className="h-5 w-5 text-purple-500" />
-          <span>View Analytics</span>
-        </Link>
-        <Link to="/messages" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors">
-          <MessageCircle className="h-5 w-5 text-yellow-500" />
-          <span>Messages</span>
-        </Link>
-      </div>
-    </div>
-
-    {/* Hiring Tips */}
-    <div className={cn(
-      'rounded-2xl p-4',
-      isDark ? 'bg-gray-900' : 'bg-gray-100'
-    )}>
-      <h2 className="text-xl font-bold mb-4">Hiring Tips</h2>
-      <div className="space-y-3">
-        <div className="p-3 rounded-lg hover:bg-gray-500/10 cursor-pointer transition-colors">
-          <p className="font-medium text-sm">Write clear job descriptions</p>
-          <p className={cn(
-            'text-xs mt-1',
-            isDark ? 'text-gray-400' : 'text-gray-600'
-          )}>
-            Jobs with detailed descriptions get 30% more applications
-          </p>
-        </div>
-        <div className="p-3 rounded-lg hover:bg-gray-500/10 cursor-pointer transition-colors">
-          <p className="font-medium text-sm">Respond to candidates quickly</p>
-          <p className={cn(
-            'text-xs mt-1',
-            isDark ? 'text-gray-400' : 'text-gray-600'
-          )}>
-            Fast responses improve candidate experience
-          </p>
-        </div>
-        <div className="p-3 rounded-lg hover:bg-gray-500/10 cursor-pointer transition-colors">
-          <p className="font-medium text-sm">Use skill assessments</p>
-          <p className={cn(
-            'text-xs mt-1',
-            isDark ? 'text-gray-400' : 'text-gray-600'
-          )}>
-            Better evaluate candidate capabilities
-          </p>
-        </div>
-      </div>
-      <Button variant="ghost" className="w-full mt-3 text-blue-500 justify-start p-2">
-        More hiring tips
-      </Button>
-    </div>
-  </>
-);

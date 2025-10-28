@@ -696,7 +696,7 @@ export default function ResumeBuilder() {
                     type="text"
                     placeholder="Enter save name..."
                     className={cn(
-                      "flex-1 px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:outline-none",
+                      "flex-1 px-4 py-2 rounded-lg border transition-all duration-200",
                       isDark 
                         ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-400' 
                         : 'bg-white border-gray-300 text-black placeholder-gray-500'

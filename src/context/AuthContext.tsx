@@ -31,6 +31,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, options?: { full_name?: string; username?: string; role?: 'student' | 'employer' }) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
+  logout: () => Promise<void>;
   updateProfile: (profile: Partial<UserProfile>) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
 }
@@ -327,6 +328,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  const logout = signOut;
+
   const updateProfile = async (profileData: Partial<UserProfile>) => {
     if (!user) throw new Error('No user logged in');
 
@@ -374,6 +377,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     signIn,
     signUp,
     signOut,
+    logout,
     updateProfile,
     resetPassword
   };

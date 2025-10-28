@@ -1,55 +1,178 @@
-import { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
-import { Job } from '../types';
 
-export function useJobs() {
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+// Unified useJobs hook - wrapper around React Query for consistent API
+export function useJobs(jobId?: string) {
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    fetchJobs();
-  }, []);
+  // Use the main React Query hook for jobs
+  const query = useQuery({
+    queryKey: ['jobs'],
+    queryFn: async () => {
+      try {
+        console.log('🔄 [useJobs] Starting to fetch jobs...');
+        
+        const { data, error, status, statusText } = await supabase
+          .from('jobs')
+          .select(`
+            id,
+            title,
+            company,
+            location,
+            type,
+            salary_range,
+            description,
+            skills,
+            is_remote,
+            posted_at,
+            employer_id,
+            status,
+            requirements,
+            benefits,
+            experience_level,
+            department,
+            contact_email,
+            applications_count,
+            views_count,
+            deadline,
+            updated_at
+          `)
+          .eq('status', 'open')
+          .order('posted_at', { ascending: false })
+          .limit(100);
 
-  const fetchJobs = async () => {
-    try {
-      setLoading(true);
-      
-      // Since we don't have a jobs table in the schema, we'll use posts as a placeholder
-      // In a real implementation, you'd create a proper jobs table
-      const { data, error } = await supabase
-        .from('posts')
-        .select(`
-          *,
-          profiles!posts_user_id_fkey(username, full_name)
-        `)
-        .order('created_at', { ascending: false });
+        console.log(`📊 [useJobs] Response status: ${status} ${statusText}`);
 
-      if (error) throw error;
+        if (error) {
+          console.error('❌ [useJobs] Supabase error:', {
+            message: error.message,
+            code: error.code,
+            details: error.details,
+            hint: error.hint
+          });
+          throw error;
+        }
 
-      // Transform posts data to job format for demo purposes
-      const transformedJobs: Job[] = data?.map(post => ({
-        id: post.id,
-        title: post.title || 'Job Opportunity',
-        company: post.profiles?.full_name || 'Company Name',
-        type: 'internship' as const,
-        location: 'Phoenix, AZ',
-        description: post.caption || 'Job description not available',
-        requirements: [],
-        skills: post.tags || [],
-        posted_date: post.created_at,
-        employer_id: post.user_id,
-        created_at: post.created_at,
-        updated_at: post.updated_at
-      })) || [];
+        if (!data) {
+          console.warn('⚠️ [useJobs] No data returned from query');
+          return [];
+        }
 
-      setJobs(transformedJobs);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
+        console.log(`✅ [useJobs] Fetched ${data.length} jobs from database`);
+
+        if (data.length === 0) {
+          console.log('ℹ️ [useJobs] Jobs table is empty or no jobs found');
+          return [];
+        }
+
+        // Get unique employer IDs
+        const employerIds = [...new Set(data.map(job => job.employer_id).filter(Boolean))];
+        console.log(`👥 [useJobs] Found ${employerIds.length} unique employers`);
+
+        // Fetch employer profiles
+        let employerMap = new Map();
+        if (employerIds.length > 0) {
+          try {
+            console.log('🔍 [useJobs] Fetching employer profiles...');
+            const { data: employers, error: employerError } = await supabase
+              .from('profiles')
+              .select('id, full_name, avatar_url, username, company_name, verified')
+              .in('id', employerIds);
+
+            if (employerError) {
+              console.warn('⚠️ [useJobs] Error fetching employers:', employerError.message);
+            } else if (employers && employers.length > 0) {
+              console.log(`✅ [useJobs] Fetched ${employers.length} employer profiles`);
+              employerMap = new Map(employers.map(emp => [emp.id, emp]));
+            } else {
+              console.warn('⚠️ [useJobs] No employer profiles found');
+            }
+          } catch (err) {
+            console.error('❌ [useJobs] Exception fetching employers:', err);
+          }
+        }
+
+        // Transform jobs with all fields properly mapped
+        const result = data.map(job => {
+          const employer = employerMap.get(job.employer_id);
+          return {
+            id: job.id?.toString() || '',
+            title: job.title || 'Job Opportunity',
+            company: job.company || 'Company Name',
+            location: job.location || 'Not specified',
+            type: job.type || 'full-time',
+            salary_range: job.salary_range || '',
+            description: job.description || '',
+            skills: Array.isArray(job.skills) ? job.skills : [],
+            requirements: Array.isArray(job.requirements) ? job.requirements : [],
+            benefits: job.benefits || '',
+            is_remote: job.is_remote === true || job.is_remote === 'true',
+            experience_level: job.experience_level || '',
+            department: job.department || '',
+            contact_email: job.contact_email || '',
+            applications_count: job.applications_count || 0,
+            views_count: job.views_count || 0,
+            posted_at: job.posted_at || job.created_at,
+            created_at: job.posted_at || job.created_at,
+            deadline: job.deadline || null,
+            updated_at: job.updated_at || job.posted_at,
+            status: job.status || 'active',
+            employer_id: job.employer_id,
+            salary: job.salary_range, // Alias for compatibility
+            posted_date: job.posted_at, // Alias for compatibility
+            company_logo: undefined, // Will be fetched separately if needed
+            employer: employer ? {
+              id: employer.id,
+              name: employer.full_name,
+              avatar_url: employer.avatar_url,
+              company_name: employer.company_name,
+              verified: employer.verified
+            } : undefined
+          };
+        });
+
+        console.log(`📊 [useJobs] Successfully transformed ${result.length} jobs`);
+        return result;
+      } catch (error) {
+        console.error('❌ [useJobs] Fatal error:', error);
+        
+        if (error instanceof Error) {
+          console.error('Error details:', {
+            name: error.name,
+            message: error.message,
+            stack: error.stack
+          });
+        }
+        
+        return [];
+      }
+    },
+    staleTime: Infinity, // Never mark as stale - keep cache forever
+    gcTime: Infinity, // Never garbage collect - keep cache forever
+    refetchInterval: 30 * 1000, // Refetch every 30 seconds in the background
+    refetchIntervalInBackground: true, // Continue refetching even when tab is not focused
+    retry: (failureCount, error: any) => {
+      if (failureCount < 3) {
+        if (error?.message?.includes('access control') || error?.message?.includes('permission')) {
+          console.error('🔐 [useJobs] Not retrying due to permission error');
+          return false;
+        }
+        return true;
+      }
+      return false;
+    },
+    retryDelay: (attemptIndex) => {
+      const delay = Math.min(1000 * 2 ** attemptIndex, 10000);
+      console.log(`⏳ [useJobs] Retry attempt ${attemptIndex + 1}, waiting ${delay}ms`);
+      return delay;
+    },
+  });
+
+  // Return data in the format expected by StudentDashboard and other components
+  return {
+    jobs: query.data || [],
+    loading: query.isLoading,
+    error: query.error ? (query.error instanceof Error ? query.error.message : 'An error occurred') : null,
+    refetch: query.refetch
   };
-
-  return { jobs, loading, error, refetch: fetchJobs };
 }

@@ -1,529 +1,616 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
   MapPin,
   Calendar,
   DollarSign,
   Users,
-  Clock,
-  Share,
+  Briefcase,
+  Share2,
   Bookmark,
-  MoreHorizontal,
+  BookmarkCheck,
   CheckCircle,
   Building2,
-  Briefcase,
-  Globe,
+  Clock,
+  X,
   Heart
 } from 'lucide-react';
-import { useJobs } from '../hooks/useJobs';
+import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useJobDetail } from '../hooks/useOptimizedQuery';
 import Button from './ui/Button';
-import { Card } from './ui/Card';
-import Modal from './ui/Modal';
-import PageLayout from './ui/PageLayout';
-import { Typography } from '@mui/material';
 import { cn } from '../lib/cva';
-import { gsap } from 'gsap';
 
 export default function JobDetails() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const { jobs } = useJobs();
+  const { jobId } = useParams<{ jobId: string }>();
+  const { user } = useAuth();
   const { isDark } = useTheme();
-  const [isBookmarked, setIsBookmarked] = useState(false);
+  const navigate = useNavigate();
+  const { data: job, isLoading: loading, error: jobError } = useJobDetail(jobId);
+
   const [showApplyModal, setShowApplyModal] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
   const [coverLetter, setCoverLetter] = useState('');
-  const containerRef = useRef<HTMLDivElement>(null);
-  const heroRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  
-  const job = jobs.find(j => j.id === id);
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const ctx = gsap.context(() => {
-      // Material Design entrance animations
-      gsap.fromTo(heroRef.current, {
-        opacity: 0,
-        y: -50,
-        scale: 0.95
-      }, {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 1,
-        ease: 'power2.out'
-      });
-
-      gsap.fromTo(contentRef.current, {
-        opacity: 0,
-        y: 30
-      }, {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        ease: 'power2.out',
-        delay: 0.3
-      });
-
-      // Floating decorations
-      gsap.to('.job-decoration', {
-        y: -10,
-        x: 5,
-        rotation: 360,
-        duration: 15,
-        repeat: -1,
-        ease: 'none'
-      });
-
-    }, containerRef);
-
-    return () => ctx.revert();
-  }, []);
-
-  if (!job) {
+  if (loading) {
     return (
-      <PageLayout>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <Typography variant="h4" color="textSecondary" className="mb-4">
-              Job not found
-            </Typography>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => navigate('/jobs')}
-            >
-              Back to Jobs
-            </Button>
-          </div>
+      <div className={cn(
+        'min-h-screen flex items-center justify-center p-4',
+        isDark ? 'bg-black' : 'bg-gray-50'
+      )}>
+        <div className={cn(
+          'rounded-3xl p-8 text-center max-w-md w-full',
+          isDark ? 'bg-black border border-gray-800' : 'bg-white border border-gray-200'
+        )}>
+          <p className={cn('font-semibold mb-2', isDark ? 'text-gray-300' : 'text-gray-600')}>Loading job details...</p>
         </div>
-      </PageLayout>
+      </div>
     );
   }
 
-  const handleApply = () => {
+  if (!job || jobError) {
+    return (
+      <div className={cn(
+        'min-h-screen flex items-center justify-center p-4',
+        isDark ? 'bg-black' : 'bg-gray-50'
+      )}>
+        <div className={cn(
+          'rounded-3xl p-8 text-center max-w-md w-full',
+          isDark ? 'bg-black border border-gray-800' : 'bg-white border border-gray-200'
+        )}>
+          <p className="text-red-600 font-semibold mb-2">Job Not Found</p>
+          <p className={cn('text-sm mb-6', isDark ? 'text-gray-400' : 'text-gray-600')}>
+            {jobError instanceof Error ? jobError.message : 'The job you are looking for could not be found.'}
+          </p>
+          <Button onClick={() => navigate('/jobs')}>Back to Jobs</Button>
+        </div>
+      </div>
+    );
+  }
+
+  const handleApply = async () => {
+    if (!user?.id) {
+      navigate('/login');
+      return;
+    }
     setShowApplyModal(true);
   };
 
   const handleSubmitApplication = async () => {
-    // Handle application submission
-    console.log('Application submitted for job:', job.id);
-    console.log('Cover letter:', coverLetter);
-    setShowApplyModal(false);
-    setCoverLetter('');
-  };
-
-  const handleBookmark = () => {
-    setIsBookmarked(!isBookmarked);
-  };
-
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: job.title,
-        text: `Check out this job opportunity: ${job.title} at ${job.company}`,
-        url: window.location.href,
-      });
-    } else {
-      navigator.clipboard.writeText(window.location.href);
+    try {
+      // Handle application submission
+      console.log('Application submitted for job:', job.id);
+      console.log('Cover letter:', coverLetter);
+      setShowApplyModal(false);
+      setCoverLetter('');
+    } catch (err) {
+      console.error('Error submitting application:', err);
     }
   };
 
+  const formatDate = (date: string | undefined) => {
+    if (!date) return 'TBA';
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
   return (
-    <PageLayout 
-      className={isDark ? 'bg-black text-white' : 'bg-white text-gray-900'}
-      maxWidth="4xl"
-      padding="none"
-    >
-      {/* X-style Header */}
-      <div ref={heroRef} className={`sticky top-0 z-50 backdrop-blur-xl ${
-        isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
-      } border-b`}>
-        <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-8">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate(-1)}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div>
-              <Typography variant="h6" className="font-bold">
-                Job Details
-              </Typography>
-              <Typography variant="body2" className="text-gray-500">
-                {job?.company}
-              </Typography>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleBookmark}
-              className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 ${
-                isBookmarked ? 'text-blue-500' : ''
-              }`}
-            >
-              <Bookmark className="h-5 w-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleShare}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900"
-            >
-              <Share className="h-5 w-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900"
-            >
-              <MoreHorizontal className="h-5 w-5" />
-            </Button>
-          </div>
+    <div className={cn(
+      'min-h-screen',
+      isDark ? 'bg-black text-white' : 'bg-gray-50 text-gray-900'
+    )}>
+      {/* Back Button */}
+      <div className={cn(
+        'sticky top-0 z-39 border-b',
+        isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200'
+      )}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <Link
+            to="/jobs"
+            className={cn(
+              'inline-flex items-center space-x-2 transition-colors',
+              isDark
+                ? 'text-blue-400 hover:text-blue-300'
+                : 'text-blue-600 hover:text-blue-700'
+            )}
+          >
+            <ArrowLeft className="h-5 w-5" />
+            <span className="font-medium">Back to Jobs</span>
+          </Link>
         </div>
       </div>
 
-      <div className="px-4 py-6">
-        {/* Job Header - Twitter Post Style */}
-        <Card className={`p-6 mb-6 ${
-          isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
-        } border rounded-2xl hover:bg-opacity-80 transition-all duration-200`}>
-          <div className="flex gap-4">
-            <div className={`w-12 h-12 rounded-full ${
-              isDark ? 'bg-blue-600' : 'bg-blue-500'
-            } flex items-center justify-center flex-shrink-0`}>
-              <Building2 className="h-6 w-6 text-white" />
+      <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 py-8">
+        {/* Job Header - Title & Info Section */}
+        <div className={cn(
+          'rounded-3xl overflow-hidden mb-8 p-8',
+          isDark
+            ? 'bg-black border border-gray-800 shadow-2xl shadow-black/50'
+            : 'bg-white border border-gray-200 shadow-lg'
+        )}>
+          {/* Job Type Badge */}
+          <div className="flex items-center space-x-2 mb-4 w-fit">
+            <span className={cn(
+              'px-4 py-2 rounded-full text-sm font-semibold inline-flex items-center space-x-2',
+              isDark
+                ? 'bg-blue-900/30 text-blue-300 border border-blue-700'
+                : 'bg-blue-50 text-blue-700 border border-blue-200'
+            )}>
+              <Briefcase className="h-4 w-4" />
+              <span>{job.type || 'Full-time'}</span>
+            </span>
+          </div>
+
+          {/* Title and Company */}
+          <h1 className={cn(
+            'text-4xl font-bold mb-2',
+            isDark ? 'text-white' : 'text-gray-900'
+          )}>{job.title}</h1>
+          <p className={cn(
+            'text-lg mb-6',
+            isDark ? 'text-gray-400' : 'text-gray-600'
+          )}>
+            {job.company}
+          </p>
+
+          {/* Quick Info Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            {/* Location */}
+            <div className={cn(
+              'flex items-start space-x-4 p-4 rounded-xl',
+              isDark
+                ? 'bg-gray-900 border border-gray-700'
+                : 'bg-gray-50 border border-gray-200'
+            )}>
+              <MapPin className={cn(
+                'h-6 w-6 flex-shrink-0 mt-1',
+                isDark ? 'text-red-400' : 'text-red-500'
+              )} />
+              <div>
+                <p className={cn('text-sm mb-1', isDark ? 'text-gray-400' : 'text-gray-600')}>Location</p>
+                <p className={cn('text-lg font-semibold', isDark ? 'text-white' : 'text-gray-900')}>{job.location}</p>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <Typography variant="h5" className="font-bold truncate">
-                  {job?.title}
-                </Typography>
-                <CheckCircle className="h-5 w-5 text-blue-500 flex-shrink-0" />
-              </div>
-              <div className="flex items-center gap-4 mb-3 text-gray-500">
-                <span className="font-medium">{job?.company}</span>
-                <span>•</span>
-                <span className="flex items-center gap-1">
-                  <MapPin className="h-4 w-4" />
-                  {job?.location}
-                </span>
-                <span>•</span>
-                <span className="flex items-center gap-1">
-                  <Clock className="h-4 w-4" />
-                  {formatDate(job?.postedAt)}
-                </span>
-              </div>
-              
-              {/* Job Type & Salary */}
-              <div className="flex items-center gap-3 mb-4">
-                <Badge variant="outline" className="rounded-full">
-                  {job?.type}
-                </Badge>
-                <Badge variant="outline" className="rounded-full text-green-600">
-                  <DollarSign className="h-3 w-3 mr-1" />
-                  {job?.salary}
-                </Badge>
-              </div>
 
-              {/* Job Description Preview */}
-              <Typography variant="body1" className="mb-4 line-clamp-3">
-                {job?.description}
-              </Typography>
+            {/* Salary */}
+            <div className={cn(
+              'flex items-start space-x-4 p-4 rounded-xl',
+              isDark
+                ? 'bg-gray-900 border border-gray-700'
+                : 'bg-gray-50 border border-gray-200'
+            )}>
+              <DollarSign className={cn(
+                'h-6 w-6 flex-shrink-0 mt-1',
+                isDark ? 'text-green-400' : 'text-green-500'
+              )} />
+              <div>
+                <p className={cn('text-sm mb-1', isDark ? 'text-gray-400' : 'text-gray-600')}>Salary</p>
+                <p className={cn('text-lg font-semibold', isDark ? 'text-white' : 'text-gray-900')}>{job.salary_range || 'Competitive'}</p>
+              </div>
+            </div>
 
-              {/* Engagement Actions - Twitter Style */}
-              <div className="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-800">
-                <div className="flex items-center gap-8">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex items-center gap-2 text-gray-500 hover:text-gray-900 dark:hover:text-gray-100"
-                  >
-                    <MessageCircle className="h-4 w-4" />
-                    <span className="text-sm">12</span>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex items-center gap-2 text-gray-500 hover:text-green-600"
-                  >
-                    <Repeat2 className="h-4 w-4" />
-                    <span className="text-sm">8</span>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex items-center gap-2 text-gray-500 hover:text-red-500"
-                  >
-                    <Heart className="h-4 w-4" />
-                    <span className="text-sm">24</span>
-                  </Button>
-                </div>
-                <Button
-                  className={`px-8 py-2 rounded-full font-semibold ${
-                    isDark 
-                      ? 'bg-white text-black hover:bg-gray-200' 
-                      : 'bg-black text-white hover:bg-gray-800'
-                  }`}
-                  onClick={handleApply}
-                >
-                  Apply Now
-                </Button>
+            {/* Posted Date */}
+            <div className={cn(
+              'flex items-start space-x-4 p-4 rounded-xl',
+              isDark
+                ? 'bg-gray-900 border border-gray-700'
+                : 'bg-gray-50 border border-gray-200'
+            )}>
+              <Calendar className={cn(
+                'h-6 w-6 flex-shrink-0 mt-1',
+                isDark ? 'text-yellow-400' : 'text-yellow-500'
+              )} />
+              <div>
+                <p className={cn('text-sm mb-1', isDark ? 'text-gray-400' : 'text-gray-600')}>Posted</p>
+                <p className={cn('text-lg font-semibold', isDark ? 'text-white' : 'text-gray-900')}>{formatDate(job.posted_at)}</p>
+              </div>
+            </div>
+
+            {/* Job Type */}
+            <div className={cn(
+              'flex items-start space-x-4 p-4 rounded-xl',
+              isDark
+                ? 'bg-gray-900 border border-gray-700'
+                : 'bg-gray-50 border border-gray-200'
+            )}>
+              <Clock className={cn(
+                'h-6 w-6 flex-shrink-0 mt-1',
+                isDark ? 'text-blue-400' : 'text-blue-500'
+              )} />
+              <div>
+                <p className={cn('text-sm mb-1', isDark ? 'text-gray-400' : 'text-gray-600')}>Type</p>
+                <p className={cn('text-lg font-semibold', isDark ? 'text-white' : 'text-gray-900')}>{job.type || 'Full-time'}</p>
               </div>
             </div>
           </div>
-        </Card>
 
-        {/* Job Details Grid */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Full Description */}
-            <Card className={`p-6 ${
-              isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
-            } border rounded-2xl`}>
-              <Typography variant="h6" className="font-bold mb-4">
-                Job Description
-              </Typography>
-              <div className="prose dark:prose-invert max-w-none">
-                <Typography variant="body1" className="whitespace-pre-wrap leading-relaxed">
-                  {job?.description}
-                </Typography>
-              </div>
-            </Card>
+          {/* Action Buttons */}
+          <div className="flex items-center space-x-3 mb-6">
+            <button
+              onClick={() => setIsBookmarked(!isBookmarked)}
+              aria-label={isBookmarked ? "Remove bookmark" : "Bookmark job"}
+              className={cn(
+                'p-3 rounded-full transition-all',
+                isBookmarked
+                  ? 'bg-yellow-400 text-black'
+                  : isDark
+                    ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+              )}
+            >
+              {isBookmarked ? (
+                <BookmarkCheck className="h-5 w-5" />
+              ) : (
+                <Bookmark className="h-5 w-5" />
+              )}
+            </button>
+
+            <button
+              aria-label="Share job"
+              className={cn(
+                'p-3 rounded-full transition-all',
+                isDark
+                  ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                  : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+              )}
+            >
+              <Share2 className="h-5 w-5" />
+            </button>
+          </div>
+
+          {/* Apply Button */}
+          <div>
+            <button
+              onClick={handleApply}
+              className={cn(
+                'w-full px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 transform hover:scale-105',
+                isDark
+                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
+              )}
+            >
+              Apply Now 🚀
+            </button>
+          </div>
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - Job Details */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Job Description */}
+            <div className={cn(
+              'rounded-3xl p-8',
+              isDark ? 'bg-black border border-gray-800 shadow-2xl shadow-black/50' : 'bg-white border border-gray-200 shadow-lg'
+            )}>
+              <h2 className={cn(
+                'text-2xl font-bold mb-6',
+                isDark ? 'text-white' : 'text-gray-900'
+              )}>About This Job</h2>
+              <p className={cn(
+                'text-lg leading-relaxed whitespace-pre-line',
+                isDark ? 'text-gray-400' : 'text-gray-700'
+              )}>
+                {job.description}
+              </p>
+            </div>
 
             {/* Requirements */}
-            <Card className={`p-6 ${
-              isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
-            } border rounded-2xl`}>
-              <Typography variant="h6" className="font-bold mb-4">
-                Requirements
-              </Typography>
-              <ul className="space-y-3">
-                {job?.requirements?.map((req, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <div className={`w-1.5 h-1.5 rounded-full mt-2 ${
-                      isDark ? 'bg-blue-400' : 'bg-blue-600'
-                    }`}></div>
-                    <Typography variant="body1" className="flex-1">
-                      {req}
-                    </Typography>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-
-            {/* Skills */}
-            <Card className={`p-6 ${
-              isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
-            } border rounded-2xl`}>
-              <Typography variant="h6" className="font-bold mb-4">
-                Required Skills
-              </Typography>
-              <div className="flex flex-wrap gap-2">
-                {job?.skills?.map((skill, index) => (
-                  <Badge 
-                    key={index}
-                    variant="secondary"
-                    className="px-3 py-1 rounded-full text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
-                  >
-                    {skill}
-                  </Badge>
-                ))}
-              </div>
-            </Card>
-
-            {/* Benefits */}
-            {job?.benefits && (
-              <Card className={`p-6 ${
-                isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
-              } border rounded-2xl`}>
-                <Typography variant="h6" className="font-bold mb-4">
-                  Benefits & Perks
-                </Typography>
+            {job.requirements && job.requirements.length > 0 && (
+              <div className={cn(
+                'rounded-3xl p-8',
+                isDark ? 'bg-black border border-gray-800 shadow-2xl shadow-black/50' : 'bg-white border border-gray-200 shadow-lg'
+              )}>
+                <h3 className={cn(
+                  'text-2xl font-bold mb-6',
+                  isDark ? 'text-white' : 'text-gray-900'
+                )}>Requirements</h3>
                 <ul className="space-y-3">
-                  {job.benefits.map((benefit, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <CheckCircle className={`h-5 w-5 mt-0.5 ${
+                  {job.requirements.map((req, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <CheckCircle className={cn(
+                        'h-5 w-5 mt-1 flex-shrink-0',
                         isDark ? 'text-green-400' : 'text-green-600'
-                      }`} />
-                      <Typography variant="body1" className="flex-1">
-                        {benefit}
-                      </Typography>
+                      )} />
+                      <span className={cn(
+                        'text-lg',
+                        isDark ? 'text-gray-400' : 'text-gray-700'
+                      )}>
+                        {req}
+                      </span>
                     </li>
                   ))}
                 </ul>
-              </Card>
+              </div>
+            )}
+
+            {/* Skills */}
+            {job.skills && job.skills.length > 0 && (
+              <div className={cn(
+                'rounded-3xl p-8',
+                isDark ? 'bg-black border border-gray-800 shadow-2xl shadow-black/50' : 'bg-white border border-gray-200 shadow-lg'
+              )}>
+                <h3 className={cn(
+                  'text-2xl font-bold mb-6',
+                  isDark ? 'text-white' : 'text-gray-900'
+                )}>Required Skills</h3>
+                <div className="flex flex-wrap gap-3">
+                  {job.skills.map((skill, idx) => (
+                    <span
+                      key={idx}
+                      className={cn(
+                        'px-4 py-2 rounded-full text-sm font-medium',
+                        isDark
+                          ? 'bg-gray-800 text-gray-300 border border-gray-700'
+                          : 'bg-gray-100 text-gray-700 border border-gray-200'
+                      )}
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Benefits */}
+            {job.benefits && (
+              <div className={cn(
+                'rounded-3xl p-8',
+                isDark ? 'bg-black border border-gray-800 shadow-2xl shadow-black/50' : 'bg-white border border-gray-200 shadow-lg'
+              )}>
+                <h3 className={cn(
+                  'text-2xl font-bold mb-6',
+                  isDark ? 'text-white' : 'text-gray-900'
+                )}>Benefits & Perks</h3>
+                <ul className="space-y-3">
+                  {Array.isArray(job.benefits) ? job.benefits.map((benefit, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <Heart className={cn(
+                        'h-5 w-5 mt-1 flex-shrink-0',
+                        isDark ? 'text-pink-400' : 'text-pink-600'
+                      )} />
+                      <span className={cn(
+                        'text-lg',
+                        isDark ? 'text-gray-400' : 'text-gray-700'
+                      )}>
+                        {benefit}
+                      </span>
+                    </li>
+                  )) : (
+                    <li className="flex items-start gap-3">
+                      <Heart className={cn(
+                        'h-5 w-5 mt-1 flex-shrink-0',
+                        isDark ? 'text-pink-400' : 'text-pink-600'
+                      )} />
+                      <span className={cn(
+                        'text-lg',
+                        isDark ? 'text-gray-400' : 'text-gray-700'
+                      )}>
+                        {job.benefits}
+                      </span>
+                    </li>
+                  )}
+                </ul>
+              </div>
             )}
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Company Info */}
-            <Card className={`p-6 ${
-              isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
-            } border rounded-2xl`}>
-              <Typography variant="h6" className="font-bold mb-4">
-                About the Company
-              </Typography>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <Building2 className={`h-5 w-5 ${
-                    isDark ? 'text-blue-400' : 'text-blue-600'
-                  }`} />
-                  <Typography variant="body2" className="font-medium">
-                    {job?.company}
-                  </Typography>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Users className={`h-5 w-5 ${
-                    isDark ? 'text-blue-400' : 'text-blue-600'
-                  }`} />
-                  <Typography variant="body2" className="text-gray-500">
-                    500+ employees
-                  </Typography>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Globe className={`h-5 w-5 ${
-                    isDark ? 'text-blue-400' : 'text-blue-600'
-                  }`} />
-                  <Typography variant="body2" className="text-gray-500">
-                    www.{job?.company.toLowerCase().replace(/\s+/g, '')}.com
-                  </Typography>
-                </div>
-              </div>
-            </Card>
+          {/* Right Column - Employer Info & Sidebar */}
+          <div className="space-y-8">
+            {/* Employer Card */}
+            {job.employer && (
+              <div className={cn(
+                'rounded-3xl p-8 sticky top-24',
+                isDark ? 'bg-black border border-gray-800 shadow-2xl shadow-black/50' : 'bg-white border border-gray-200 shadow-lg'
+              )}>
+                <h3 className={cn(
+                  'text-xl font-bold mb-6',
+                  isDark ? 'text-white' : 'text-gray-900'
+                )}>About the Company</h3>
 
-            {/* Job Details */}
-            <Card className={`p-6 ${
-              isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
-            } border rounded-2xl`}>
-              <Typography variant="h6" className="font-bold mb-4">
-                Job Details
-              </Typography>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <Briefcase className={`h-5 w-5 ${
-                    isDark ? 'text-blue-400' : 'text-blue-600'
-                  }`} />
-                  <div>
-                    <Typography variant="body2" className="font-medium">
-                      {job?.type}
-                    </Typography>
-                    <Typography variant="caption" className="text-gray-500">
-                      Employment Type
-                    </Typography>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <DollarSign className={`h-5 w-5 ${
-                    isDark ? 'text-green-400' : 'text-green-600'
-                  }`} />
-                  <div>
-                    <Typography variant="body2" className="font-medium">
-                      {job?.salary}
-                    </Typography>
-                    <Typography variant="caption" className="text-gray-500">
-                      Salary Range
-                    </Typography>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Calendar className={`h-5 w-5 ${
-                    isDark ? 'text-blue-400' : 'text-blue-600'
-                  }`} />
-                  <div>
-                    <Typography variant="body2" className="font-medium">
-                      {formatDate(job?.postedAt)}
-                    </Typography>
-                    <Typography variant="caption" className="text-gray-500">
-                      Posted Date
-                    </Typography>
-                  </div>
-                </div>
-              </div>
-            </Card>
+                <div className="flex flex-col items-center text-center mb-6">
+                  {job.employer.avatar_url ? (
+                    <img 
+                      src={job.employer.avatar_url}
+                      alt={job.employer.name}
+                      className="w-16 h-16 rounded-full object-cover mb-4 border-4 border-blue-400"
+                    />
+                  ) : (
+                    <div className={cn(
+                      'w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mb-4 border-4',
+                      isDark
+                        ? 'bg-gradient-to-br from-blue-600 to-purple-600 text-white border-blue-500'
+                        : 'bg-gradient-to-br from-blue-400 to-purple-500 text-white border-blue-400'
+                    )}>
+                      {job.employer.name?.charAt(0).toUpperCase()}
+                    </div>
+                  )}
 
-            {/* Quick Apply */}
-            <Card className={`p-6 ${
-              isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
-            } border rounded-2xl`}>
-              <Button
-                className={`w-full py-3 rounded-full font-semibold ${
-                  isDark 
-                    ? 'bg-white text-black hover:bg-gray-200' 
-                    : 'bg-black text-white hover:bg-gray-800'
-                }`}
+                  <p className={cn(
+                    'text-lg font-bold',
+                    isDark ? 'text-white' : 'text-gray-900'
+                  )}>
+                    {job.employer.name}
+                  </p>
+                  <p className={cn(
+                    'text-sm',
+                    isDark ? 'text-gray-400' : 'text-gray-600'
+                  )}>
+                    {job.employer.company_name}
+                  </p>
+                  {job.employer.verified && (
+                    <div className="mt-2 flex items-center space-x-1 text-blue-500">
+                      <CheckCircle className="h-4 w-4" />
+                      <span className="text-xs font-semibold">Verified</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center gap-2">
+                    <Users className={cn(
+                      'h-5 w-5',
+                      isDark ? 'text-blue-400' : 'text-blue-600'
+                    )} />
+                    <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>
+                      View employer profile
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Building2 className={cn(
+                      'h-5 w-5',
+                      isDark ? 'text-blue-400' : 'text-blue-600'
+                    )} />
+                    <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>
+                      {job.location}
+                    </span>
+                  </div>
+                </div>
+
+                <button className={cn(
+                  'w-full px-4 py-2 rounded-lg font-semibold transition-all',
+                  isDark
+                    ? 'bg-blue-900/20 text-blue-400 hover:bg-blue-900/30'
+                    : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                )}>
+                  View Employer Profile
+                </button>
+              </div>
+            )}
+
+            {/* Quick Apply Card */}
+            <div className={cn(
+              'rounded-3xl p-8',
+              isDark ? 'bg-black border border-gray-800 shadow-2xl shadow-black/50' : 'bg-white border border-gray-200 shadow-lg'
+            )}>
+              <h3 className={cn(
+                'text-xl font-bold mb-4',
+                isDark ? 'text-white' : 'text-gray-900'
+              )}>Ready to Apply?</h3>
+              <p className={cn(
+                'text-sm mb-4',
+                isDark ? 'text-gray-400' : 'text-gray-600'
+              )}>
+                Submit your application and let the employer know why you're a great fit!
+              </p>
+              <button
                 onClick={handleApply}
+                className={cn(
+                  'w-full px-6 py-3 rounded-lg font-semibold transition-all',
+                  isDark
+                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                )}
               >
-                Apply for this Position
-              </Button>
-              <Typography variant="body2" className="text-center mt-3 text-gray-500">
-                Join 24 other applicants
-              </Typography>
-            </Card>
+                Start Application
+              </button>
+              <p className={cn(
+                'text-center text-sm mt-3',
+                isDark ? 'text-gray-500' : 'text-gray-500'
+              )}>
+                Join other applicants
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Application Modal */}
-      <Modal
-        isOpen={showApplyModal}
-        onClose={() => setShowApplyModal(false)}
-        title="Apply for Position"
-      >
-        <div className="space-y-6">
-          <div>
-            <Typography variant="h6" color="textPrimary" className="mb-2">
-              {job.title}
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              {job.company} • {job.location}
-            </Typography>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Cover Letter
-            </label>
-            <textarea
-              value={coverLetter}
-              onChange={(e) => setCoverLetter(e.target.value)}
-              rows={6}
-              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                isDark 
-                  ? 'bg-dark-surface border-dark-accent text-dark-text' 
-                  : 'bg-white border-gray-300 text-gray-900'
-              }`}
-              placeholder="Tell us why you're interested in this position..."
-            />
-          </div>
+      {showApplyModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className={cn(
+            'rounded-3xl p-8 max-w-md w-full',
+            isDark ? 'bg-black border border-gray-800' : 'bg-white'
+          )}>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className={cn(
+                'text-2xl font-bold',
+                isDark ? 'text-white' : 'text-gray-900'
+              )}>Apply for Position</h3>
+              <button
+                onClick={() => setShowApplyModal(false)}
+                aria-label="Close application modal"
+                className={cn(
+                  'p-2 rounded-full transition-colors',
+                  isDark
+                    ? 'hover:bg-gray-800 text-gray-400'
+                    : 'hover:bg-gray-100 text-gray-500'
+                )}
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
 
-          <div className="flex justify-end space-x-3">
-            <Button
-              variant="outlined"
-              onClick={() => setShowApplyModal(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleSubmitApplication}
-            >
-              Submit Application
-            </Button>
+            <div className="mb-4">
+              <p className={cn(
+                'font-semibold text-lg mb-1',
+                isDark ? 'text-white' : 'text-gray-900'
+              )}>
+                {job.title}
+              </p>
+              <p className={cn(
+                'text-sm',
+                isDark ? 'text-gray-400' : 'text-gray-600'
+              )}>
+                {job.company} • {job.location}
+              </p>
+            </div>
+
+            <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleSubmitApplication(); }}>
+              <div>
+                <label className={cn(
+                  'block text-sm font-medium mb-2',
+                  isDark ? 'text-gray-300' : 'text-gray-700'
+                )}>
+                  Cover Letter (Optional)
+                </label>
+                <textarea
+                  value={coverLetter}
+                  onChange={(e) => setCoverLetter(e.target.value)}
+                  className={cn(
+                    'w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none',
+                    isDark
+                      ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
+                  )}
+                  rows={4}
+                  placeholder="Tell us why you're interested in this position..."
+                />
+              </div>
+
+              <div className="flex space-x-4">
+                <button
+                  type="button"
+                  onClick={() => setShowApplyModal(false)}
+                  className={cn(
+                    'flex-1 px-6 py-3 border rounded-lg font-medium transition-colors',
+                    isDark
+                      ? 'border-gray-700 text-gray-300 hover:bg-gray-800'
+                      : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                  )}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className={cn(
+                    'flex-1 px-6 py-3 rounded-lg font-medium text-white transition-all',
+                    isDark
+                      ? 'bg-blue-600 hover:bg-blue-700'
+                      : 'bg-blue-600 hover:bg-blue-700'
+                  )}
+                >
+                  Submit Application
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-      </Modal>
-    </PageLayout>
+      )}
+    </div>
   );
 }

@@ -54,6 +54,8 @@ export interface Job {
   id: string;
   title: string;
   company: string;
+  company_logo?: string;
+  company_id?: number;
   type: 'internship' | 'full-time' | 'part-time';
   location: string;
   salary?: string;

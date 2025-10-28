@@ -178,8 +178,8 @@ export const profileCache = new CacheManager({
 });
 
 export const postsCache = new CacheManager({
-  storage: 'localStorage',
-  ttl: 10 * 60 * 1000, // 10 minutes
+  storage: 'memory', // Use memory storage instead of localStorage for posts
+  ttl: 60 * 60 * 1000, // Increase TTL to 1 hour instead of 10 minutes
   prefix: 'posts_'
 });
 
@@ -190,20 +190,21 @@ export const followCache = new CacheManager({
 });
 
 export const searchCache = new CacheManager({
-  storage: 'sessionStorage', // Session-only for search
-  ttl: 15 * 60 * 1000, // 15 minutes
+  storage: 'memory', // Use memory storage instead of sessionStorage
+  ttl: 60 * 60 * 1000, // Increase TTL to 1 hour for consistency
   prefix: 'search_'
 });
 
+// Update cache configurations for explore section data
 export const jobsCache = new CacheManager({
-  storage: 'localStorage',
-  ttl: 30 * 60 * 1000, // 30 minutes
+  storage: 'memory', // Use memory storage instead of localStorage
+  ttl: 60 * 60 * 1000, // Increase TTL to 1 hour
   prefix: 'jobs_'
 });
 
 export const companiesCache = new CacheManager({
-  storage: 'localStorage',
-  ttl: 60 * 60 * 1000, // 1 hour - companies change slowly
+  storage: 'memory', // Use memory storage for better reliability
+  ttl: 60 * 60 * 1000, // Keep 1 hour TTL
   prefix: 'companies_'
 });
 

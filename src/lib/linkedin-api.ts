@@ -1,4 +1,5 @@
 import { Job } from '../types';
+import { fetchWithSafariHeaders } from './supabase';
 
 interface LinkedInConfig {
   clientId: string;
@@ -63,25 +64,35 @@ export class LinkedInJobService {
    * Exchange authorization code for access token
    */
   async getAccessToken(code: string): Promise<LinkedInAccessToken> {
-    const response = await fetch('https://www.linkedin.com/oauth/v2/accessToken', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        grant_type: 'authorization_code',
-        code,
-        client_id: this.config.clientId,
-        client_secret: this.config.clientSecret,
-        redirect_uri: this.config.redirectUri,
-      }),
-    });
+    try {
+      const response = await fetch('https://www.linkedin.com/oauth/v2/accessToken', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json',
+        },
+        mode: 'cors',
+        credentials: 'omit', // LinkedIn token endpoint doesn't need credentials
+        body: new URLSearchParams({
+          grant_type: 'authorization_code',
+          code,
+          client_id: this.config.clientId,
+          client_secret: this.config.clientSecret,
+          redirect_uri: this.config.redirectUri,
+        }).toString(),
+      });
 
-    if (!response.ok) {
-      throw new Error(`LinkedIn OAuth error: ${response.statusText}`);
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('LinkedIn OAuth error response:', errorData);
+        throw new Error(`LinkedIn OAuth error: ${response.statusText}`);
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error('Error getting LinkedIn access token:', error);
+      throw error;
     }
-
-    return response.json();
   }
 
   /**
@@ -100,52 +111,74 @@ export class LinkedInJobService {
       start?: number;
     }
   ): Promise<LinkedInJobData[]> {
-    const searchParams = new URLSearchParams();
-    
-    if (params.keywords) searchParams.set('keywords', params.keywords);
-    if (params.location) searchParams.set('location', params.location);
-    if (params.company) searchParams.set('company', params.company);
-    if (params.experienceLevel) searchParams.set('experienceLevel', params.experienceLevel);
-    if (params.jobType) searchParams.set('jobType', params.jobType);
-    if (params.count) searchParams.set('count', params.count.toString());
-    if (params.start) searchParams.set('start', params.start.toString());
+    try {
+      const searchParams = new URLSearchParams();
+      
+      if (params.keywords) searchParams.set('keywords', params.keywords);
+      if (params.location) searchParams.set('location', params.location);
+      if (params.company) searchParams.set('company', params.company);
+      if (params.experienceLevel) searchParams.set('experienceLevel', params.experienceLevel);
+      if (params.jobType) searchParams.set('jobType', params.jobType);
+      if (params.count) searchParams.set('count', params.count.toString());
+      if (params.start) searchParams.set('start', params.start.toString());
 
-    const response = await fetch(
-      `${this.baseUrl}/jobSearch?${searchParams.toString()}`,
-      {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-          'X-Restli-Protocol-Version': '2.0.0',
-        },
+      const response = await fetch(
+        `${this.baseUrl}/jobSearch?${searchParams.toString()}`,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+            'X-Restli-Protocol-Version': '2.0.0',
+            'Accept': 'application/json',
+          },
+          mode: 'cors',
+          credentials: 'omit',
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('LinkedIn API error response:', errorData);
+        throw new Error(`LinkedIn API error: ${response.statusText}`);
       }
-    );
 
-    if (!response.ok) {
-      throw new Error(`LinkedIn API error: ${response.statusText}`);
+      const data = await response.json();
+      return data.elements || [];
+    } catch (error) {
+      console.error('Error searching LinkedIn jobs:', error);
+      throw error;
     }
-
-    const data = await response.json();
-    return data.elements || [];
   }
 
   /**
    * Get job details by job ID
    */
   async getJobDetails(accessToken: string, jobId: string): Promise<LinkedInJobData> {
-    const response = await fetch(`${this.baseUrl}/jobs/${jobId}`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'X-Restli-Protocol-Version': '2.0.0',
-      },
-    });
+    try {
+      const response = await fetch(`${this.baseUrl}/jobs/${jobId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+          'X-Restli-Protocol-Version': '2.0.0',
+          'Accept': 'application/json',
+        },
+        mode: 'cors',
+        credentials: 'omit',
+      });
 
-    if (!response.ok) {
-      throw new Error(`LinkedIn API error: ${response.statusText}`);
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('LinkedIn API error response:', errorData);
+        throw new Error(`LinkedIn API error: ${response.statusText}`);
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error('Error fetching LinkedIn job details:', error);
+      throw error;
     }
-
-    return response.json();
   }
 
   /**
@@ -253,9 +286,9 @@ export class LinkedInJobService {
 
 // Environment configuration
 export const linkedInConfig: LinkedInConfig = {
-  clientId: process.env.REACT_APP_LINKEDIN_CLIENT_ID || '',
-  clientSecret: process.env.REACT_APP_LINKEDIN_CLIENT_SECRET || '',
-  redirectUri: process.env.REACT_APP_LINKEDIN_REDIRECT_URI || `${window.location.origin}/auth/linkedin/callback`,
+  clientId: import.meta.env.REACT_APP_LINKEDIN_CLIENT_ID || '',
+  clientSecret: import.meta.env.REACT_APP_LINKEDIN_CLIENT_SECRET || '',
+  redirectUri: import.meta.env.REACT_APP_LINKEDIN_REDIRECT_URI || `${window.location.origin}/auth/linkedin/callback`,
   scope: [
     'r_liteprofile',
     'r_emailaddress',

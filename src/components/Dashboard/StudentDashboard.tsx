@@ -170,7 +170,7 @@ export default function StudentDashboard() {
               {/* Mobile Search */}
               <div className={cn(
                 'p-3 rounded-2xl',
-                isDark ? 'bg-gray-900' : 'bg-gray-100'
+                isDark ? 'bg-black' : 'bg-gray-100'
               )}>
                 <div className="relative">
                   <Search className={cn(
@@ -193,7 +193,7 @@ export default function StudentDashboard() {
               {/* Mobile Quick Actions */}
               <div className={cn(
                 'rounded-2xl p-4',
-                isDark ? 'bg-gray-900' : 'bg-gray-100'
+                isDark ? 'bg-black' : 'bg-gray-100'
               )}>
                 <button
                   className="flex items-center justify-between w-full mb-3 ios-nav-item"
@@ -247,7 +247,7 @@ export default function StudentDashboard() {
               {/* Mobile Trending Topics */}
               <div className={cn(
                 'rounded-2xl p-4',
-                isDark ? 'bg-gray-900' : 'bg-gray-100'
+                isDark ? 'bg-black' : 'bg-gray-100'
               )}>
                 <button
                   className="flex items-center justify-between w-full mb-3 ios-nav-item"
@@ -287,7 +287,7 @@ export default function StudentDashboard() {
               {/* Mobile Who to Follow */}
               <div className={cn(
                 'rounded-2xl p-4',
-                isDark ? 'bg-gray-900' : 'bg-gray-100'
+                isDark ? 'bg-black' : 'bg-gray-100'
               )}>
                 <button
                   className="flex items-center justify-between w-full mb-3 ios-nav-item"
@@ -352,14 +352,14 @@ export default function StudentDashboard() {
       )}
 
       {/* Main Layout Container */}
-      <div className="flex flex-col lg:flex-row max-w-7xl mx-auto">
+      <div className="flex flex-col lg:flex-row max-w-7xl rounded-3xl border mx-auto">
         
         {/* Desktop Header - Hidden on Mobile */}
         <div className="hidden lg:flex flex-1 max-w-4xl mx-auto">
-          <div className="w-full border-x border-gray-800 dark:border-gray-200">
+          <div className="w-full border rounded-3xl border-gray-800 dark:border-gray-800">
             {/* Desktop Header */}
             <div className={cn(
-              'sticky top-0 z-10 backdrop-blur-xl border-b',
+              'sticky top-0 z-10 backdrop-blur-xl border-b ',
               isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
             )}>
               <div className="flex items-center justify-between px-4 lg:px-6 py-3">
@@ -423,7 +423,7 @@ const MainContent = ({ isDark, jobs, filteredJobs, recentActivity }: {
   <>
     {/* Quick Stats */}
     <div className={cn(
-      'border-b p-4 sm:p-6',
+      'border rounded-bl-3xl rounded-br-3xl p-4 sm:p-6',
       isDark ? 'border-gray-800' : 'border-gray-200'
     )}>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
@@ -480,11 +480,11 @@ const MainContent = ({ isDark, jobs, filteredJobs, recentActivity }: {
 
     {/* Recent Activity */}
     <div className={cn(
-      'border-b',
+      'border-b rounded-bl-3xl rounded-br-3xl ',
       isDark ? 'border-gray-800' : 'border-gray-200'
     )}>
-      <div className="p-4 sm:p-6">
-        <h2 className="font-bold text-lg sm:text-xl mb-4">Recent Activity</h2>
+      <div className="p-4 sm:p-6 ">
+        <h2 className="font-bold  text-lg sm:text-xl mb-4">Recent Activity</h2>
         <div className="space-y-3 sm:space-y-4">
           {recentActivity.map((activity, index) => (
             <div 
@@ -528,7 +528,7 @@ const MainContent = ({ isDark, jobs, filteredJobs, recentActivity }: {
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-bold text-lg sm:text-xl">Recommended for You</h2>
           <Link 
-            to="/jobs" 
+            to="/jobs"  
             className="text-blue-500 hover:underline text-sm ios-touch-target"
           >
             View all
@@ -540,7 +540,7 @@ const MainContent = ({ isDark, jobs, filteredJobs, recentActivity }: {
             <Card 
               key={job.id} 
               className={cn(
-                'p-4 sm:p-6 transition-colors cursor-pointer hover:bg-gray-50/5',
+                'p-4 sm:p-6 transition-colors rounded-br-3xl rounded-bl-3xl cursor-pointer hover:bg-gray-50/5',
                 isDark ? 'border-gray-800' : 'border-gray-200'
               )}
             >
@@ -628,10 +628,10 @@ const DesktopSidebar = ({ isDark, searchTerm, setSearchTerm, trendingTopics, sug
   <>
     {/* Search */}
     <div className={cn(
-      'sticky top-4 p-3 rounded-2xl',
-      isDark ? 'bg-gray-900' : 'bg-gray-100'
+      'sticky top-0 p-3 backdrop-blur-3xl rounded-3xl border border-gray-800',
+      isDark ? 'bg-black' : 'bg-gray-100'
     )}>
-      <div className="relative">
+      <div className="relative border-gray-800 border rounded-3xl">
         <Search className={cn(
           'absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5',
           isDark ? 'text-gray-400' : 'text-gray-500'
@@ -651,8 +651,8 @@ const DesktopSidebar = ({ isDark, searchTerm, setSearchTerm, trendingTopics, sug
 
     {/* Trending */}
     <div className={cn(
-      'rounded-2xl p-4',
-      isDark ? 'bg-gray-900' : 'bg-gray-100'
+      'rounded-3xl p-4 border border-gray-800',
+      isDark ? 'bg-black' : 'bg-gray-100'
     )}>
       <h2 className="text-xl font-bold mb-4">What's trending</h2>
       <div className="space-y-3">
@@ -678,8 +678,8 @@ const DesktopSidebar = ({ isDark, searchTerm, setSearchTerm, trendingTopics, sug
 
     {/* Who to follow */}
     <div className={cn(
-      'rounded-2xl p-4',
-      isDark ? 'bg-gray-900' : 'bg-gray-100'
+      'rounded-3xl border border-gray-800 p-4',
+      isDark ? 'bg-black' : 'bg-gray-100'
     )}>
       <h2 className="text-xl font-bold mb-4">Who to follow</h2>
       <div className="space-y-3">
@@ -722,8 +722,8 @@ const DesktopSidebar = ({ isDark, searchTerm, setSearchTerm, trendingTopics, sug
 
     {/* Quick Actions */}
     <div className={cn(
-      'rounded-2xl p-4',
-      isDark ? 'bg-gray-900' : 'bg-gray-100'
+      'rounded-3xl border border-gray-800 p-4',
+      isDark ? 'bg-black' : 'bg-gray-100'
     )}>
       <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
       <div className="space-y-2">

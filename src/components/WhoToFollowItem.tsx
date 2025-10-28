@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useFollowUser, useUnfollowUser, useFollowStatus } from '../hooks/useOptimizedQuery';
@@ -26,7 +26,7 @@ export default function WhoToFollowItem({ user, onNavigate }: WhoToFollowItemPro
   const [processingFollowId, setProcessingFollowId] = useState<string | null>(null);
 
   // Get actual follow status from database
-  const { data: isFollowing = false, isLoading: statusLoading } = useFollowStatus(
+  const { data: isFollowing = false, isLoading: statusLoading, refetch } = useFollowStatus(
     currentUser?.id,
     user.id
   );
@@ -55,6 +55,8 @@ export default function WhoToFollowItem({ user, onNavigate }: WhoToFollowItemPro
         {
           onSuccess: () => {
             setProcessingFollowId(null);
+            // Refetch to get the latest status
+            refetch();
           },
           onError: () => {
             setProcessingFollowId(null);
@@ -71,6 +73,8 @@ export default function WhoToFollowItem({ user, onNavigate }: WhoToFollowItemPro
         {
           onSuccess: () => {
             setProcessingFollowId(null);
+            // Refetch to get the latest status
+            refetch();
           },
           onError: () => {
             setProcessingFollowId(null);
@@ -82,7 +86,10 @@ export default function WhoToFollowItem({ user, onNavigate }: WhoToFollowItemPro
 
   return (
     <div
-      className="flex items-center justify-between cursor-pointer hover:bg-gray-900/50 p-2 rounded-lg transition-colors"
+      className={cn(
+        "flex items-center justify-between cursor-pointer p-2 rounded-lg transition-colors",
+        isDark ? 'hover:bg-gray-900/50' : 'hover:bg-gray-100'
+      )}
       onMouseEnter={() => setHoveredFollowId(user.id)}
       onMouseLeave={() => setHoveredFollowId(null)}
     >
@@ -101,13 +108,19 @@ export default function WhoToFollowItem({ user, onNavigate }: WhoToFollowItemPro
             className="w-10 h-10 rounded-full object-cover flex-shrink-0"
           />
         ) : (
-          <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0 text-white font-bold text-sm">
+          <div className={cn(
+            "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold text-sm",
+            isDark ? 'bg-gray-700' : 'bg-gray-400'
+          )}>
             {user.full_name?.charAt(0).toUpperCase() || 'U'}
           </div>
         )}
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-1">
-            <h4 className="font-semibold text-sm text-white truncate">
+            <h4 className={cn(
+              "font-semibold text-sm truncate",
+              isDark ? 'text-white' : 'text-black'
+            )}>
               {user.full_name}
             </h4>
             {user.verified && (
@@ -116,11 +129,17 @@ export default function WhoToFollowItem({ user, onNavigate }: WhoToFollowItemPro
               </div>
             )}
           </div>
-          <p className="text-xs text-gray-400 truncate">
+          <p className={cn(
+            "text-xs truncate",
+            isDark ? 'text-gray-400' : 'text-gray-600'
+          )}>
             @{user.username}
           </p>
           {user.bio && (
-            <p className="text-xs text-gray-500 line-clamp-1">
+            <p className={cn(
+              "text-xs line-clamp-1",
+              isDark ? 'text-gray-500' : 'text-gray-600'
+            )}>
               {user.bio}
             </p>
           )}
@@ -129,25 +148,30 @@ export default function WhoToFollowItem({ user, onNavigate }: WhoToFollowItemPro
 
       {/* Follow Button */}
       <Button
-        size="sm"
+        size="medium"
         className={cn(
-          "rounded-xl w-[80px] h-[32px] font-semibold text-xs flex-shrink-0 ml-2 transition-all",
-          isFollowing
+          "rounded-xl w-[80px] h-[32px] font-semibold text-xs flex-shrink-0 ml-2 transition-all duration-300",
+          isDark
             ? "bg-white text-black hover:bg-gray-100 border border-gray-300"
-            : "bg-white text-black hover:bg-gray-100 border border-gray-300"
+            : "bg-black text-black hover:bg-gray-900 border border-gray-800"
         )}
         onClick={handleFollowClick}
         disabled={processingFollowId === user.id || statusLoading}
       >
-        {statusLoading
-          ? 'Loading...'
-          : processingFollowId === user.id
+        <span className={cn(
+          "inline-block transition-all duration-300 ease-in-out",
+          hoveredFollowId === user.id && isFollowing ? "scale-95 opacity-70" : "scale-100 opacity-100"
+        )}>
+          {statusLoading
             ? 'Loading...'
-            : isFollowing
-              ? hoveredFollowId === user.id
-                ? 'Unfollow'
-                : 'Following'
-              : 'Follow'}
+            : processingFollowId === user.id
+              ? 'Loading...'
+              : isFollowing
+                ? hoveredFollowId === user.id
+                  ? 'Unfollow'
+                  : 'Following'
+                : 'Follow'}
+        </span>
       </Button>
     </div>
   );

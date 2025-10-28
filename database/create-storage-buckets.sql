@@ -67,12 +67,58 @@ VALUES (
   ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/svg+xml']
 ) ON CONFLICT (id) DO NOTHING;
 
+-- 7. EVENT BANNERS BUCKET
+-- For event banner images
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'event-banners',
+  'event-banners',
+  true, -- Public bucket
+  10485760, -- 10MB limit
+  ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif']
+) ON CONFLICT (id) DO NOTHING;
+
 -- =============================================
 -- ROW LEVEL SECURITY POLICIES
 -- =============================================
 
+-- Drop existing policies to recreate them properly
+DROP POLICY IF EXISTS "Users can upload their own avatars" ON storage.objects;
+DROP POLICY IF EXISTS "Users can update their own avatars" ON storage.objects;
+DROP POLICY IF EXISTS "Users can delete their own avatars" ON storage.objects;
+DROP POLICY IF EXISTS "Anyone can view avatars" ON storage.objects;
+
+DROP POLICY IF EXISTS "Users can upload their own covers" ON storage.objects;
+DROP POLICY IF EXISTS "Users can update their own covers" ON storage.objects;
+DROP POLICY IF EXISTS "Users can delete their own covers" ON storage.objects;
+DROP POLICY IF EXISTS "Anyone can view covers" ON storage.objects;
+
+DROP POLICY IF EXISTS "Users can upload post images" ON storage.objects;
+DROP POLICY IF EXISTS "Users can update their own post images" ON storage.objects;
+DROP POLICY IF EXISTS "Users can delete their own post images" ON storage.objects;
+DROP POLICY IF EXISTS "Anyone can view post images" ON storage.objects;
+
+DROP POLICY IF EXISTS "Users can upload videos" ON storage.objects;
+DROP POLICY IF EXISTS "Users can update their own videos" ON storage.objects;
+DROP POLICY IF EXISTS "Users can delete their own videos" ON storage.objects;
+DROP POLICY IF EXISTS "Anyone can view videos" ON storage.objects;
+
+DROP POLICY IF EXISTS "Users can upload their own documents" ON storage.objects;
+DROP POLICY IF EXISTS "Users can update their own documents" ON storage.objects;
+DROP POLICY IF EXISTS "Users can delete their own documents" ON storage.objects;
+DROP POLICY IF EXISTS "Users can only view their own documents" ON storage.objects;
+
+DROP POLICY IF EXISTS "Users can upload company assets" ON storage.objects;
+DROP POLICY IF EXISTS "Users can update their own company assets" ON storage.objects;
+DROP POLICY IF EXISTS "Users can delete their own company assets" ON storage.objects;
+DROP POLICY IF EXISTS "Anyone can view company assets" ON storage.objects;
+
+DROP POLICY IF EXISTS "Users can upload event banners" ON storage.objects;
+DROP POLICY IF EXISTS "Users can update their own event banners" ON storage.objects;
+DROP POLICY IF EXISTS "Users can delete their own event banners" ON storage.objects;
+DROP POLICY IF EXISTS "Anyone can view event banners" ON storage.objects;
+
 -- AVATARS BUCKET POLICIES
--- Users can upload, update, and delete their own avatars
 CREATE POLICY "Users can upload their own avatars" ON storage.objects
 FOR INSERT WITH CHECK (
   bucket_id = 'avatars' 
@@ -207,6 +253,28 @@ FOR DELETE USING (
 CREATE POLICY "Anyone can view company assets" ON storage.objects
 FOR SELECT USING (bucket_id = 'company-assets');
 
+-- EVENT BANNERS BUCKET POLICIES
+CREATE POLICY "Users can upload event banners" ON storage.objects
+FOR INSERT WITH CHECK (
+  bucket_id = 'event-banners' 
+  AND auth.uid()::text = (storage.foldername(name))[1]
+);
+
+CREATE POLICY "Users can update their own event banners" ON storage.objects
+FOR UPDATE USING (
+  bucket_id = 'event-banners' 
+  AND auth.uid()::text = (storage.foldername(name))[1]
+);
+
+CREATE POLICY "Users can delete their own event banners" ON storage.objects
+FOR DELETE USING (
+  bucket_id = 'event-banners' 
+  AND auth.uid()::text = (storage.foldername(name))[1]
+);
+
+CREATE POLICY "Anyone can view event banners" ON storage.objects
+FOR SELECT USING (bucket_id = 'event-banners');
+
 -- =============================================
 -- HELPER FUNCTIONS
 -- =============================================
@@ -230,6 +298,7 @@ BEGIN
     WHEN 'videos' THEN RETURN file_size <= 104857600; -- 100MB
     WHEN 'documents' THEN RETURN file_size <= 52428800; -- 50MB
     WHEN 'company-assets' THEN RETURN file_size <= 10485760; -- 10MB
+    WHEN 'event-banners' THEN RETURN file_size <= 10485760; -- 10MB
     ELSE RETURN false;
   END CASE;
 END;
@@ -248,7 +317,7 @@ SELECT
   allowed_mime_types,
   created_at
 FROM storage.buckets 
-WHERE id IN ('avatars', 'cover-images', 'post-images', 'videos', 'documents', 'company-assets')
+WHERE id IN ('avatars', 'cover-images', 'post-images', 'videos', 'documents', 'company-assets', 'event-banners')
 ORDER BY id;
 
 -- Check policies

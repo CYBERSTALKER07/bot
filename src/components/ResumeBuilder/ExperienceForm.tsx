@@ -41,7 +41,7 @@ export function ExperienceForm({
                 value={exp.company}
                 onChange={(e) => updateExperience(exp.id, 'company', e.target.value)}
                 className={cn(
-                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  "px-4 py-3 rounded-xl border transition-all duration-200",
                   isDark 
                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -53,7 +53,7 @@ export function ExperienceForm({
                 value={exp.position}
                 onChange={(e) => updateExperience(exp.id, 'position', e.target.value)}
                 className={cn(
-                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  "px-4 py-3 rounded-xl border transition-all duration-200",
                   isDark 
                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -65,7 +65,7 @@ export function ExperienceForm({
                 value={exp.startDate}
                 onChange={(e) => updateExperience(exp.id, 'startDate', e.target.value)}
                 className={cn(
-                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  "px-4 py-3 rounded-xl border transition-all duration-200",
                   isDark 
                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -79,7 +79,7 @@ export function ExperienceForm({
                   onChange={(e) => updateExperience(exp.id, 'endDate', e.target.value)}
                   disabled={exp.current}
                   className={cn(
-                    "flex-1 px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    "flex-1 px-4 py-3 rounded-xl border transition-all duration-200",
                     exp.current && "opacity-50",
                     isDark 
                       ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
@@ -91,7 +91,7 @@ export function ExperienceForm({
                     type="checkbox"
                     checked={exp.current}
                     onChange={(e) => updateExperience(exp.id, 'current', e.target.checked)}
-                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
                   />
                   Current
                 </label>
@@ -112,7 +112,7 @@ export function ExperienceForm({
             onChange={(e) => updateExperience(exp.id, 'description', e.target.value)}
             rows={4}
             className={cn(
-              "w-full px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none",
+              "w-full px-4 py-3 rounded-xl border transition-all duration-200 resize-none",
               isDark 
                 ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                 : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'

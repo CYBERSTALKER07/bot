@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { UserPlus, UserCheck, Loader } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -25,11 +25,10 @@ export default function FollowButton({
 }: FollowButtonProps) {
   const { user } = useAuth();
   const { isDark } = useTheme();
-  const [isFollowing, setIsFollowing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   // Check if current user follows target user
-  const { data: followStatus = false, isLoading: statusLoading } = useFollowStatus(
+  const { data: followStatus = false, isLoading: statusLoading, refetch } = useFollowStatus(
     user?.id,
     targetUserId
   );
@@ -37,11 +36,6 @@ export default function FollowButton({
   // Follow/unfollow mutations
   const followMutation = useFollowUser();
   const unfollowMutation = useUnfollowUser();
-
-  // Update local state when follow status changes
-  useEffect(() => {
-    setIsFollowing(followStatus);
-  }, [followStatus]);
 
   // Handle follow/unfollow
   const handleToggleFollow = async (e: React.MouseEvent) => {
@@ -58,13 +52,12 @@ export default function FollowButton({
     setIsLoading(true);
 
     try {
-      if (isFollowing) {
+      if (followStatus) {
         // Unfollow
         await unfollowMutation.mutateAsync({
           followerId: user.id,
           followingId: targetUserId,
         });
-        setIsFollowing(false);
         onFollowChange?.(false);
       } else {
         // Follow
@@ -72,13 +65,12 @@ export default function FollowButton({
           followerId: user.id,
           followingId: targetUserId,
         });
-        setIsFollowing(true);
         onFollowChange?.(true);
       }
+      // Refetch to get the latest status
+      refetch();
     } catch (error) {
       console.error('Error toggling follow status:', error);
-      // Revert on error
-      setIsFollowing(!isFollowing);
     } finally {
       setIsLoading(false);
     }
@@ -106,26 +98,26 @@ export default function FollowButton({
     <Button
       onClick={handleToggleFollow}
       disabled={isLoading}
-      variant={isFollowing ? 'outlined' : variant}
+      variant={followStatus ? 'outlined' : variant}
       size={size}
       className={cn(
         'transition-all duration-200',
-        isFollowing && isDark
+        followStatus && isDark
           ? 'border-gray-600 text-gray-300 hover:border-gray-500 hover:bg-gray-900/50'
-          : isFollowing && !isDark
+          : followStatus && !isDark
             ? 'border-gray-400 text-gray-700 hover:border-gray-300 hover:bg-gray-100/50'
             : '',
         className
       )}
-      startIcon={isFollowing ? UserCheck : UserPlus}
+      startIcon={followStatus ? UserCheck : UserPlus}
     >
       {isLoading ? (
         <>
           <Loader className="w-4 h-4 animate-spin" />
-          {showLabel && <span>{isFollowing ? 'Unfollowing...' : 'Following...'}</span>}
+          {showLabel && <span>{followStatus ? 'Unfollowing...' : 'Following...'}</span>}
         </>
       ) : (
-        showLabel && <span>{isFollowing ? 'Following' : 'Follow'}</span>
+        showLabel && <span>{followStatus ? 'Following' : 'Follow'}</span>
       )}
     </Button>
   );

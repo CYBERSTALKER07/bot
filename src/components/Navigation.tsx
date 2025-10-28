@@ -17,7 +17,8 @@ import {
   MoreHorizontal,
   X as XIcon,
   Brain,
-  Linkedin
+  Linkedin,
+  X
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -25,6 +26,7 @@ import { useScrollDirection } from '../hooks/useScrollDirection';
 import Button from './ui/Button';
 import { cn } from '../lib/cva';
 import { FloatingActionMenu } from './FloatingActionMenu';
+import PostEventForm from './PostEventForm';
 
 // Helper component for thin icons
 const ThinIcon = ({ Icon, ...props }: any) => <Icon strokeWidth={1.5} {...props} />;
@@ -34,6 +36,7 @@ interface NavigationItem {
   label: string;
   path: string;
   badge?: number;
+  font: 'serif' | 'sans-serif';
 }
 
 // X-Style Navigation
@@ -48,6 +51,7 @@ export default function Navigation() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isUserCardOpen, setIsUserCardOpen] = useState(false);
+  const [showPostEventModal, setShowPostEventModal] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -74,7 +78,7 @@ export default function Navigation() {
     if (user?.role === 'student') {
       return [
         ...baseItems,
-        { icon: Brain, label: 'AI Jobs', path: '/ai-job-recommendations' },
+        { icon: Briefcase, label: 'Jobs', path: '/jobs' },
         { icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
         { icon: Building2, label: 'Companies', path: '/companies' },
         { icon: FileText, label: 'Applications', path: '/applications' },
@@ -85,10 +89,9 @@ export default function Navigation() {
     } else if (user?.role === 'employer') {
       return [
         ...baseItems,
-        { icon: BarChart3, label: 'Dashboard', path: '/employer-dashboard' },
+        { icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
         { icon: Briefcase, label: 'Post Jobs', path: '/post-job' },
-        { icon: FileText, label: 'My Jobs', path: '/employer/jobs' },
-        { icon: Linkedin, label: 'LinkedIn Jobs', path: '/linkedin-job-manager' },
+        { icon: Calendar, label: 'Post Event', path: '/post-event' },
         { icon: Users, label: 'Applicants', path: '/applicants' },
         { icon: User, label: 'Profile', path: '/profile' }
       ];
@@ -128,6 +131,13 @@ export default function Navigation() {
       navigator.vibrate(10);
     }
     
+    // Handle Post Event modal separately
+    if (path === '/post-event') {
+      setShowPostEventModal(true);
+      setIsMobileMenuOpen(false);
+      return;
+    }
+    
     // Visual feedback - could add press state here
     console.log(`Navigating to: ${item.label} (${path})`);
     
@@ -143,7 +153,7 @@ export default function Navigation() {
       <>
         {/* Mobile Top Bar */} 
         
-        <header className={`fixed top-0 left-0 right-0 z-50 border-b ${
+        <header className={`fixed top-0 left-0 right-0 z-50 border-none ${
           isDark ? 'bg-black/95 backdrop-blur-xl border-gray-800' : 'bg-white/95 backdrop-blur-xl border-gray-200'
         }`}>
           {/* iOS Status Bar Safe Area */}
@@ -151,7 +161,7 @@ export default function Navigation() {
           <div className="h-5 bg-black ios-only" /> */}
           
           <div className="flex items-center justify-between px-4 py-3">
-            <div className="flex items-center space-x-3">
+            {/* <div className="flex items-center space-x-3">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                 isDark ? 'bg-white' : 'bg-black'
               }`}>
@@ -160,7 +170,7 @@ export default function Navigation() {
               <span className={`font-light text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 AUT Handshake
               </span>
-            </div>
+            </div> */}
             
             <Button
               variant="ghost"
@@ -176,8 +186,18 @@ export default function Navigation() {
               {isMobileMenuOpen ? (
                 <ThinIcon Icon={XIcon} className="h-5 w-5" />
               ) : (
-                <div className="w-8 h-8 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center text-sm font-normal">
-                  {user?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || <ThinIcon Icon={User} className="h-5 w-5" />}
+                <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-normal overflow-hidden border border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-700">
+                  {user?.profile?.avatar_url ? (
+                    <img
+                      src={user.profile.avatar_url}
+                      alt={user?.full_name || 'User'}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-gray-700 dark:text-gray-200 font-semibold">
+                      {user?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
+                    </span>
+                  )}
                 </div>
               )}
             </Button>
@@ -248,7 +268,6 @@ export default function Navigation() {
                     }}
                     onClick={(e) => {
                       e.preventDefault();
-                      setIsMobileMenuOpen(false);
                       handleNavItemPress(item.path, item);
                     }}
                     className={cn(
@@ -297,7 +316,7 @@ export default function Navigation() {
 
         {/* Bottom Navigation with Scroll-based Visibility */}
         <nav className={cn(
-          'fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl border-t transition-all duration-300 ios-bottom-nav',
+          'fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl border-t transition-all duration-300 ios-bottom-nav rounded-tl-3xl rounded-tr-3xl',
           isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200',
           // Apply scroll-based visibility with smooth animation
           isBottomNavVisible 
@@ -327,8 +346,8 @@ export default function Navigation() {
                     'flex flex-col items-center justify-center py-2 transition-all duration-200 relative ios-touch-target',
                     'active:scale-95 active:bg-gray-100/20 transform-gpu',
                     isActive 
-                      ? isDark ? 'text-white' : 'text-black'
-                      : isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-800'
+                      ? 'text-white'
+                      : 'text-white/70 hover:text-white'
                   )}
                   aria-label={`Navigate to ${item.label}`}
                 >
@@ -344,10 +363,7 @@ export default function Navigation() {
                   
                   {/* Active indicator */}
                   {isActive && (
-                    <div className={cn(
-                      "absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 rounded-full",
-                      isDark ? 'bg-white' : 'bg-black'
-                    )} />
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 rounded-full bg-white" />
                   )}
                 </button>
               );
@@ -357,6 +373,17 @@ export default function Navigation() {
 
         {/* Mobile Floating Action Menu - Enhanced with advanced interactions */}
         <FloatingActionMenu />
+
+        {/* Post Event Modal */}
+        {showPostEventModal && (
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
+            <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <PostEventForm
+                onClose={() => setShowPostEventModal(false)}
+              />
+            </div>
+          </div>
+        )}
       </>
     );
   }
@@ -377,15 +404,21 @@ export default function Navigation() {
         {/* Logo/Brand */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-800">
           <div className="flex items-center justify-center">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-              isDark ? 'bg-white' : 'bg-[#800020]'
-            }`}>
-              <ThinIcon Icon={Feather} className={`h-5 w-5 ${isDark ? 'text-black' : 'text-white'}`} />
-            </div>
+          <div className="ml-3 overflow-hidden">
+                <h2 className={cn(
+                  "font-serif text-2xl  tracking-tight transition-all duration-200",
+                  isDark ? 'text-white' : 'text-black'
+                )}>
+                  X
+                </h2>
+              </div>
             {isExpanded && (
               <div className="ml-3 overflow-hidden">
-                <h2 className={`font-light text-xl ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                  TalentLink
+                <h2 className={cn(
+                  "font-black text-xl tracking-tight transition-all duration-200",
+                  isDark ? 'text-white' : 'text-black'
+                )}>
+                  WorkX
                 </h2>
               </div>
             )}
@@ -499,12 +532,21 @@ export default function Navigation() {
               )}
             >
               <div className={cn(
-                "rounded-full flex items-center justify-center text-lg font-normal relative",
+                "rounded-full flex items-center justify-center text-lg font-normal relative overflow-hidden border border-gray-300 dark:border-gray-600",
                 isDark ? 'bg-gray-700 text-white' : 'bg-gray-300 text-gray-800',
                 isExpanded ? 'w-10 h-10' : 'w-8 h-8'
               )}>
-                {user?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
-                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-900"></div>
+                {user?.profile?.avatar_url ? (
+                  <img
+                    src={user.profile.avatar_url}
+                    alt={user?.full_name || 'User'}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-gray-700 dark:text-gray-200 font-semibold">
+                    {user?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
+                  </span>
+                )}
               </div>
               {isExpanded && (
                 <>
@@ -600,13 +642,6 @@ export default function Navigation() {
         />
       )}
 
-      {/* User Card */}
-      {/* <UserCard 
-        isOpen={isUserCardOpen}
-        onClose={() => setIsUserCardOpen(false)}
-        position={isExpanded ? "bottom-right" : "bottom-left"}
-      /> */}
-
       {/* Main Content Spacer */}
       <div className={cn(
         "transition-all duration-300",
@@ -617,6 +652,17 @@ export default function Navigation() {
 
       {/* Floating Action Button with Curved Menu - Bottom Right */}
       <FloatingActionMenu />
+
+      {/* Post Event Modal */}
+      {showPostEventModal && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <PostEventForm
+              onClose={() => setShowPostEventModal(false)}
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 }

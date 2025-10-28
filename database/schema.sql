@@ -101,6 +101,18 @@ CREATE TABLE post_shares (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Retweets table: tracks retweets (X/Twitter-style) - UUID based for Supabase compatibility
+CREATE TABLE post_retweets (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  post_id UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  is_quote_retweet BOOLEAN DEFAULT FALSE,
+  quote_content TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(post_id, user_id)
+);
+
 -- Poll Options table: for poll-type posts
 CREATE TABLE poll_options (
   id SERIAL PRIMARY KEY,
@@ -140,6 +152,37 @@ CREATE TABLE event_attendees (
   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   status VARCHAR(50) DEFAULT 'attending', -- 'attending', 'maybe', 'not_attending'
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(event_id, user_id)
+);
+
+-- Events table: events posted by employers.
+CREATE TABLE employer_events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  employer_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  title VARCHAR(255) NOT NULL,
+  description TEXT NOT NULL,
+  event_date TIMESTAMP WITH TIME ZONE NOT NULL,
+  event_end_date TIMESTAMP WITH TIME ZONE,
+  location VARCHAR(255),
+  virtual_link VARCHAR(512),
+  event_type VARCHAR(50) DEFAULT 'recruiting', -- 'recruiting', 'webinar', 'networking', 'workshop', 'conference'
+  banner_image_url VARCHAR(512),
+  capacity INTEGER,
+  attendees_count INTEGER DEFAULT 0,
+  is_featured BOOLEAN DEFAULT FALSE,
+  status VARCHAR(50) DEFAULT 'upcoming', -- 'upcoming', 'ongoing', 'completed', 'cancelled'
+  tags TEXT[] DEFAULT ARRAY[]::TEXT[],
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Event attendees tracking
+CREATE TABLE event_attendees (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_id UUID NOT NULL REFERENCES employer_events(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  status VARCHAR(50) DEFAULT 'registered', -- 'registered', 'attended', 'cancelled'
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE(event_id, user_id)
 );
 
@@ -237,6 +280,12 @@ CREATE INDEX idx_notifications_user_id ON notifications(user_id);
 CREATE INDEX idx_notifications_read ON notifications(read);
 CREATE INDEX idx_user_connections_follower ON user_connections(follower_id);
 CREATE INDEX idx_user_connections_following ON user_connections(following_id);
+CREATE INDEX idx_employer_events_employer_id ON employer_events(employer_id);
+CREATE INDEX idx_employer_events_event_date ON employer_events(event_date);
+CREATE INDEX idx_employer_events_status ON employer_events(status);
+CREATE INDEX idx_employer_events_created_at ON employer_events(created_at DESC);
+CREATE INDEX idx_event_attendees_event_id ON event_attendees(event_id);
+CREATE INDEX idx_event_attendees_user_id ON event_attendees(user_id);
 
 -- Triggers to update counts
 CREATE OR REPLACE FUNCTION update_post_likes_count()

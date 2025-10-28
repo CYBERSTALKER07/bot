@@ -19,7 +19,9 @@ import {
   Settings,
   LogOut,
   Search,
-  AtSign
+  AtSign,
+  MapPin,
+  DollarSign
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -27,12 +29,17 @@ import { supabase } from '../lib/supabase';
 import Button from './ui/Button';
 import Avatar from './ui/Avatar';
 import PageLayout from './ui/PageLayout';
+import RetweetButton from './RetweetButton';
+import VideoPlayer from './ui/VideoPlayer';
 import { cn } from '../lib/cva';
-import { usePosts, useCreatePost, useProfile, useSearch, useRecommendedUsers, useFollowUser, useUnfollowUser, useFollowStatus, useJobs } from '../hooks/useOptimizedQuery';
+import { usePosts, useCreatePost, useProfile, useSearch, useRecommendedUsers, useFollowUser, useUnfollowUser, useFollowStatus, useRecommendedCompanies, useEmployerEvents, useLikePost, useUnlikePost, useMatchedJobs, useMostLikedPosts } from '../hooks/useOptimizedQuery';
+import { useJobs } from '../hooks/useJobs';
 import { useDebounce } from '../hooks/useDebounce';
 import { useFollowStatusCache } from '../hooks/useFollowStatusCache';
-import { PostCardSkeleton } from './ui/Skeleton';
+import { useCreateRetweet, useRemoveRetweet } from '../hooks/useRetweet';
+import { PostCardSkeleton, RightSidebarSearchSkeleton, RightSidebarJobsSkeleton, RightSidebarWhoToFollowSkeleton, LeftSidebarSkeleton, RightSidebarSkeleton } from './ui/Skeleton';
 import WhoToFollowItem from './WhoToFollowItem';
+import AnimatedList from './AnimatedList';
 
 interface Post {
   id: string;
@@ -149,14 +156,70 @@ export default function Feed() {
   const { isDark } = useTheme();
   const navigate = useNavigate();
   
-  const { data: posts = [], isLoading: loading, error } = usePosts(20);
+  const { data: posts = [], isLoading: loading, error } = usePosts(20, user?.id);
   const createPostMutation = useCreatePost();
   const { data: profileData = {}, isLoading: profileLoading } = useProfile(user?.id);
   const { data: recommendedUsers = [], isLoading: recommendedUsersLoading } = useRecommendedUsers(user?.id, 6);
-  const { data: jobs = [], isLoading: jobsLoading } = useJobs();
+  const { jobs = [], loading: jobsLoading, error: jobsError } = useJobs(); // Fix: Destructure correctly
+  const { data: recommendedCompanies = [], isLoading: companiesLoading } = useRecommendedCompanies(3);
+  const { data: employerEvents = [], isLoading: eventsLoading } = useEmployerEvents();
+  const { data: matchedJobs = [], isLoading: matchedJobsLoading } = useMatchedJobs(user?.id);
+  const { data: mostLikedPosts = [], isLoading: mostLikedPostsLoading } = useMostLikedPosts(3);
   const followUserMutation = useFollowUser();
   const unfollowUserMutation = useUnfollowUser();
+  const createRetweetMutation = useCreateRetweet();
+  const removeRetweetMutation = useRemoveRetweet();
+  const likePostMutation = useLikePost();
+  const unlikePostMutation = useUnlikePost();
   
+  // Track retweet operations in progress
+  const [retweetingPostIds, setRetweetingPostIds] = useState<Set<string>>(new Set());
+  
+  // Profile stats - fetch real data from database
+  const [profileStats, setProfileStats] = useState<ProfileStats>({
+    following: 0,
+    followers: 0,
+    posts: 0
+  });
+
+  // Fetch profile stats when user ID changes
+  useEffect(() => {
+    const fetchProfileStats = async () => {
+      if (!user?.id) return;
+
+      try {
+        // Fetch followers count
+        const { count: followersCount } = await supabase
+          .from('follows')
+          .select('*', { count: 'exact', head: true })
+          .eq('following_id', user.id);
+
+        // Fetch following count
+        const { count: followingCount } = await supabase
+          .from('follows')
+          .select('*', { count: 'exact', head: true })
+          .eq('follower_id', user.id);
+
+        // Fetch posts count
+        const { count: postsCount } = await supabase
+          .from('posts')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id);
+
+        setProfileStats({
+          followers: followersCount || 0,
+          following: followingCount || 0,
+          posts: postsCount || 0
+        });
+      } catch (error) {
+        console.error('Error fetching profile stats:', error);
+        // Keep default stats on error
+      }
+    };
+
+    fetchProfileStats();
+  }, [user?.id]);
+
   // Search state for right sidebar
   const [sidebarSearchInput, setSidebarSearchInput] = useState('');
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
@@ -235,6 +298,9 @@ export default function Feed() {
   const [hoveredFabItem, setHoveredFabItem] = useState<string | null>(null);
   const [draggedOverItem, setDraggedOverItem] = useState<string | null>(null);
   
+  // Tab switcher state - for jobs and vacancies feed
+  const [activeTab, setActiveTab] = useState<'for-you' | 'explore'>('for-you');
+  
   // Track follow status for recommended users - now with processing state
   const [followStatus, setFollowStatus] = useState<Record<string, boolean>>({});
   const [processingFollowId, setProcessingFollowId] = useState<string | null>(null);
@@ -252,13 +318,6 @@ export default function Feed() {
   const [selectedMedia, setSelectedMedia] = useState<File | null>(null);
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
 
-  // Profile stats - can be derived from data later
-  const [profileStats] = useState<ProfileStats>({
-    following: 247,
-    followers: 342,
-    posts: 42
-  });
-  
   const timelineRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
@@ -407,29 +466,46 @@ export default function Feed() {
   const handleLike = async (postId: string) => {
     if (!user) return;
     
-    setPosts(posts.map(post => {
-      if (post.id === postId) {
-        const newLikedState = !post.has_liked;
-        return {
-          ...post,
-          has_liked: newLikedState,
-          likes_count: newLikedState ? post.likes_count + 1 : post.likes_count - 1
-        };
-      }
-      return post;
-    }));
+    // Track which posts have been liked for optimistic UI updates
+    const post = posts.find(p => p.id === postId || p.original_post?.id === postId);
+    if (!post) return;
 
-    // Add haptic feedback for mobile
-    if (navigator.vibrate) {
-      navigator.vibrate(50);
+    try {
+      if (post.has_liked) {
+        // Unlike the post
+        await unlikePostMutation.mutateAsync({
+          postId: postId,
+          userId: user.id
+        });
+      } else {
+        // Like the post
+        await likePostMutation.mutateAsync({
+          postId: postId,
+          userId: user.id
+        });
+      }
+
+      // Add haptic feedback for mobile
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+    } catch (error) {
+      console.error('Error toggling like:', error);
+      alert('Failed to update like. Please try again.');
     }
   };
 
   const handleRetweet = async (postId: string, withComment = false) => {
-    if (!user) return;
+    if (!user) {
+      console.error('No user logged in');
+      return;
+    }
 
     const originalPost = posts.find(p => p.id === postId);
-    if (!originalPost) return;
+    if (!originalPost) {
+      console.error('Post not found');
+      return;
+    }
 
     if (withComment) {
       // Navigate to create post with retweet context
@@ -442,56 +518,49 @@ export default function Feed() {
       return;
     }
 
-    // Simple retweet - create a retweet post
-    const retweetPost: Post = {
-      id: `retweet-${Date.now()}`,
-      content: '',
-      is_retweet: true,
-      original_post: {
-        id: originalPost.id,
-        content: originalPost.content,
-        author: originalPost.author,
-        created_at: originalPost.created_at,
-        media: originalPost.media
-      },
-      retweeted_by: {
-        id: user.id,
-        name: user.profile?.full_name || user.name || 'You',
-        username: user.profile?.username || 'you',
-        avatar_url: user.profile?.avatar_url
-      },
-      author: user.profile || {
-        id: user.id,
-        name: user.name || 'You',
-        username: 'you',
-        verified: false
-      },
-      created_at: new Date().toISOString(),
-      likes_count: 0,
-      retweets_count: 0,
-      replies_count: 0,
-      has_liked: false,
-      has_retweeted: false,
-      has_bookmarked: false
-    };
+    // Check if already retweeting this post
+    if (retweetingPostIds.has(postId)) {
+      console.log('Already processing retweet for this post');
+      return;
+    }
 
-    // Add retweet to feed and update original post
-    setPosts(prevPosts => [
-      retweetPost,
-      ...prevPosts.map(post => 
-        post.id === postId 
-          ? { 
-              ...post, 
-              has_retweeted: !post.has_retweeted,
-              retweets_count: post.has_retweeted ? post.retweets_count - 1 : post.retweets_count + 1
-            }
-          : post
-      )
-    ]);
+    try {
+      // Add to processing set
+      setRetweetingPostIds(prev => new Set([...prev, postId]));
 
-    // Add haptic feedback
-    if (navigator.vibrate) {
-      navigator.vibrate([50, 100, 50]);
+      if (originalPost.has_retweeted) {
+        // Remove retweet
+        await removeRetweetMutation.mutateAsync({
+          postId: originalPost.id,
+          userId: user.id
+        });
+      } else {
+        // Create retweet
+        await createRetweetMutation.mutateAsync({
+          postId: originalPost.id,
+          userId: user.id,
+          isQuoteRetweet: false,
+          quoteContent: undefined
+        });
+      }
+
+      // Add haptic feedback
+      if (navigator.vibrate) {
+        navigator.vibrate([50, 100, 50]);
+      }
+
+      console.log(originalPost.has_retweeted ? '✅ Retweet removed' : '✅ Retweet added');
+    } catch (error) {
+      console.error('Error handling retweet:', error);
+      // Show error toast or alert
+      alert('Failed to retweet. Please try again.');
+    } finally {
+      // Remove from processing set
+      setRetweetingPostIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(postId);
+        return newSet;
+      });
     }
   };
 
@@ -584,12 +653,32 @@ export default function Feed() {
           isDark ? 'bg-black text-white' : 'bg-white text-black',
           isMobile ? 'pb-20' : 'flex'
         )}>
-          {/* Show skeletons instead of spinner */}
+          {/* Left Sidebar Skeleton - Hidden on mobile */}
+          {!isMobile && (
+            <div className={cn(
+              "hidden lg:block ml-18 w-80 p-4 space-y-6 bg-white border-r border-gray-200 sticky top-0 h-screen overflow-y-auto scrollbar-hide",
+              isDark ? 'bg-black border-blbg-black' : 'bg-white border-gray-200'
+            )}>
+              <LeftSidebarSkeleton />
+            </div>
+          )}
+
+          {/* Main Feed Skeleton */}
           <div className="flex-1 max-w-2xl mx-auto">
             {[...Array(5)].map((_, i) => (
               <PostCardSkeleton key={i} />
             ))}
           </div>
+
+          {/* Right Sidebar Skeleton - Desktop Only */}
+          {!isMobile && (
+            <div className={cn(
+              'hidden xl:block scrollbar-hide w-[400px] border-l sticky top-0 h-screen mr-0 overflow-y-auto',
+              isDark ? 'border-blbg-black' : 'border-gray-200'
+            )}>
+              <RightSidebarSkeleton />
+            </div>
+          )}
         </div>
       </PageLayout>
     );
@@ -617,8 +706,8 @@ export default function Feed() {
     )}>
       {/* Left Sidebar - Hidden on mobile */}
       <div className={cn(
-        "lg:block w-80 p-4 space-y-6 bg-white border-r border-gray-200 ml-20 sticky top-0 h-screen overflow-y-auto",
-        isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200'
+        "hidden lg:block ml-18 w-80 p-4 space-y-6 bg-white border-r border-gray-200 sticky top-0 h-screen overflow-y-auto scrollbar-hide",
+        isDark ? 'bg-black border-blbg-black' : 'bg-white border-gray-200'
       )}>
         {/* User Profile Quick View */}
         <div className="relative rounded-2xl p-4 text-white overflow-hidden">
@@ -630,7 +719,7 @@ export default function Feed() {
               className="absolute inset-0 w-full h-full object-cover rounded-2xl"
             />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl" />
+            <div className="absolute inset-0 bg-gradient-to-r from-border-gray-900 to-purple-600 rounded-2xl" />
           )}
           
           {/* Dark overlay for better text readability */}
@@ -684,49 +773,32 @@ export default function Feed() {
             Get personalized career guidance based on your profile and goals
           </p>
           
-         <Search 
-          className="w-8 h-8 bg-white/20 rounded-full p-2 hover:bg-white/30 transition-colors cursor-pointer inline-block"
-          title="Search for career advice, job matches, skill development plans..."
-         />
+       
         </div>
 
         {/* Skills Development Tracker */}
      
 
         {/* Industry Insights */}
-        <div className={cn("bg-white rounded-2xl border border-gray-200 overflow-hidden", isDark ? 'bg-transparent text-white border-gray-800' : 'bg-white border-gray-200')}>
+        <div className={cn("bg-white rounded-2xl border border-gray-200 overflow-hidden", isDark ? 'bg-transparent text-white border-blbg-black' : 'bg-white border-gray-200')}>
           <div className="p-4 border-b border-gray-200">
-            <h3 className="font-bold ">Industry Pulse</h3>
-            <p className="text-xs ">Real-time market insights</p>
+            <h3 className="font-serif ">TrendingUp</h3>
           </div>
           <div className="divide-y-[0.7px] divide-gray-200">
-            {[
-              { 
-                title: 'AI/ML Engineers', 
-                change: '+23%', 
-                trend: 'up',
-                description: 'Demand surge this month'
-              },
-              { 
-                title: 'Full-Stack Developers', 
-                change: '+15%', 
-                trend: 'up',
-                description: 'Remote opportunities rising'
-              },
-              { 
-                title: 'UX Designers', 
-                change: '+8%', 
-                trend: 'up',
-                description: 'Fintech sector leading'
-              }
-            ].map((insight, index) => (
-              <div key={index} className={cn("p-3 hover:bg-gray-50 transition-colors", isDark ? 'text-white hover:bg-gray-800' : 'hover:bg-gray-50')}>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium ">{insight.title}</span>
+            {mostLikedPostsLoading ? (
+              <div className="text-center py-4 text-gray-500">Loading trending posts...</div>
+            ) : mostLikedPosts && mostLikedPosts.length > 0 ? (
+              mostLikedPosts.map((post, index) => (
+                <div key={index} className={cn("p-3 hover:bg-gray-50 transition-colors", isDark ? 'text-white hover:bg-black' : 'hover:bg-gray-50')}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-medium ">{post.author.name}</span>
+                  </div>
+                  <p className="text-xs text-gray-300">{post.content}</p>
                 </div>
-                <p className="text-xs text-gray-300">{insight.description}</p>
-              </div>
-            ))}
+              ))
+            ) : (
+              <div className="text-center py-4 text-gray-500">No trending posts found</div>
+            )}
           </div>
         </div>
 
@@ -755,44 +827,100 @@ export default function Feed() {
         </div> */}
 
         {/* Career Opportunities Scanner */}
-        <div className={cn("bg-white rounded-2xl border border-gray-200 overflow-hidden", isDark ? 'bg-transparent text-white border-gray-800' : 'bg-white border-gray-200')}>
+        <div className={cn("bg-white rounded-2xl border border-gray-200 overflow-hidden", isDark ? 'bg-transparent text-white border-blbg-black' : 'bg-white border-gray-200')}>
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center gap-2">
-              <h3 className="font-bold ">jobs that mtach your interest</h3>
+              <h3 className="font-bold ">Jobs That Match Your Profile</h3>
             </div>
-            <p className="text-xs text-gray-50">Matching your profile in real-time</p>
+            <p className="text-xs text-gray-400">AI-powered recommendations based on your skills and interests</p>
           </div>
           <div className="p-4 space-y-3">
-            {[
-              { 
-                company: 'Google', 
-                role: 'Frontend Developer',
-                match: 94,
-                timeLeft: '2 days',
-                applicants: 23
-              },
-              { 
-                company: 'Meta', 
-                role: 'Product Manager',
-                match: 87,
-                timeLeft: '5 days',
-                applicants: 45
-              }
-            ].map((opp, index) => (
-              <div key={index} className={cn("border border-gray-200 rounded-lg p-3", isDark ? 'border-gray-800 text-white' : 'border-gray-200')}> 
-                <div className="flex items-center justify-between mb-2">
-                  <div>
-                    <h4 className="font-medium text-sm ">{opp.role}</h4>
-                    <p className="text-xs text-gray-200">{opp.company}</p>
+            {matchedJobsLoading ? (
+              <div className="text-center py-4 text-gray-500">Loading matched jobs...</div>
+            ) : matchedJobs && matchedJobs.length > 0 ? (
+              matchedJobs.slice(0, 3).map((job: any, index: number) => (
+                <div
+                  key={job.id || index}
+                  className={cn(
+                    'border border-gray-200 rounded-lg p-3 hover:shadow-md transition-all cursor-pointer',
+                    isDark ? 'border-blbg-black text-white hover:border-blue-500/50' : 'border-gray-200 hover:border-blue-400'
+                  )} 
+                  onClick={() => navigate(`/job/${job.id}`)}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex-1">
+                      <h4 className="font-medium text-sm truncate">{job.title}</h4>
+                      <p className="text-xs text-gray-400 truncate">{job.company}</p>
+                    </div>
+                    {/* Match Percentage Badge */}
+                    {job.matchPercentage > 0 && (
+                      <div className={cn(
+                        "ml-2 px-2 py-1 rounded-full text-xs font-bold flex-shrink-0",
+                        job.matchPercentage >= 70 
+                          ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                          : job.matchPercentage >= 50
+                            ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                            : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                      )}>
+                        {job.matchPercentage}% Match
+                      </div>
+                    )}
                   </div>
-               
+                  
+                  {/* Match Reasons */}
+                  {job.matchReasons && job.matchReasons.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {job.matchReasons.map((reason: string, idx: number) => (
+                        <span
+                          key={idx}
+                          className={cn(
+                            'text-xs px-2 py-0.5 rounded-full',
+                            isDark 
+                              ? 'bg-blue-900/30 text-blue-300' 
+                              : 'bg-blue-50 text-blue-600'
+                          )}
+                        >
+                          ✓ {reason}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  
+                  <div className="flex items-center justify-between text-xs text-gray-400">
+                    <span className="flex items-center gap-1">
+                      <MapPin className="h-3 w-3" />
+                      {job.location}
+                    </span>
+                    {job.type && (
+                      <span className={cn(
+                        'px-2 py-0.5 rounded-full',
+                        isDark ? 'bg-gray-800' : 'bg-gray-100'
+                      )}>
+                        {job.type}
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center justify-between text-xs text-lime">
-                  <span>{opp.applicants} applied</span>
-                  <span>Closes in {opp.timeLeft}</span>
-                </div>
+              ))
+            ) : (
+              <div className="text-center py-4 text-gray-500">
+                <p className="text-sm mb-2">No matched jobs yet</p>
+                <p className="text-xs text-gray-400">Complete your profile to get personalized recommendations</p>
               </div>
-            ))}
+            )}
+          </div>
+          <div className="p-3 border-t border-gray-200 text-center">
+            <button 
+              onClick={() => navigate('/jobs')}
+              className={cn(
+                "text-sm font-medium transition-colors",
+                isDark 
+                  ? 'text-blue-400 hover:text-blue-300' 
+                  : 'text-blue-600 hover:text-blue-700'
+              )}
+            >
+              View All Matched Jobs →
+            </button>
           </div>
         </div>
 
@@ -806,32 +934,134 @@ export default function Feed() {
         </Button> */}
 
         {/* Recent Connections */}
-        <div className={cn("bg-white rounded-2xl border border-gray-200 overflow-hidden", isDark ? 'bg-transparent text-white border-gray-800' : 'bg-white border-gray-200')}>
-          <div className="p-4 border-b border-gray-200">
-            <h3 className={cn("font-bold ",isDark ?  'text-lime' : 'text-asu-maroon' )}>Recent Connections</h3>
+        <div className={cn("bg-white rounded-2xl border border-gray-200 overflow-hidden", isDark ? 'bg-transparent text-white border-[0.7px] border-b border-blbg-black bg-black' : 'bg-white border-gray-200')}>
+          <div className="p-4 border-b border-gray-900">
+            <h3 className={cn("font-serif ",isDark ?  'text-white' : 'text-asu-maroon' )}>Upcoming Events</h3>
           </div>
-          <div className="divide-y divide-gray-200">
-            {[
-              { name: 'Alex Chen', role: 'Software Engineer', avatar: '' },
-              { name: 'Sarah Johnson', role: 'Product Manager', avatar: '' },
-              { name: 'Mike Rodriguez', role: 'Designer', avatar: '' }
-            ].map((connection, index) => (
-              <div key={index} className="p-3 hover:bg-neutral-400 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gray-50  flex items-center justify-center text-gray-700 font-bold text-sm">
-                    {connection.name.charAt(0)}
+          
+          {eventsLoading ? (
+            <div className="p-4 text-center text-gray-500">Loading events...</div>
+          ) : employerEvents && employerEvents.length > 0 ? (
+            <div className="p-0 ">
+              <AnimatedList
+                items={employerEvents}
+                maxHeight="320px"
+                width="100%"
+                showGradients={true}
+                enableArrowNavigation={true}
+                displayScrollbar={false}
+                renderItem={(event, index, isSelected) => (
+                  <div
+                    className={cn(
+                      'p-3 rounded-3xl w-full transition-all cursor-pointer border mx-2',
+                      isDark
+                        ? isSelected
+                          ? 'bg-gray-700/25 border-none '
+                          : 'bg-black border-none hover:bg-gray-900/50'
+                        : isSelected
+                          ? 'bg-blue-50 border-blue-400s'
+                          : 'bg-gray-50 border-gray-200 hover:bg-gray-900/50'
+                    )}
+                    onClick={() => navigate(`/event/${event.id}`)}
+                  >
+                    <div className="flex items-start gap-3">
+                      {/* Employer Avatar - Fetch from employer profile */}
+                      {event.employer?.avatar_url ? (
+                        <img 
+                          src={event.employer.avatar_url} 
+                          alt={event.employer.name}
+                          className="w-16 h-16 rounded-2xl object-cover flex-shrink-0 border border-none"
+                          onError={(e) => {
+                            // Fallback if image fails to load
+                            const img = e.target as HTMLImageElement;
+                            img.style.display = 'none';
+                          }}
+                        />
+                      ) : (
+                        <div className={cn(
+                          "w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 border",
+                          isDark 
+                            ? 'bg-gradient-to-br from-blue-600 to-purple-600 text-white border-purple-500' 
+                            : 'bg-gradient-to-br from-blue-400 to-purple-500 text-white border-purple-400'
+                        )}>
+                          {event.employer?.name?.charAt(0).toUpperCase() || event.title?.charAt(0).toUpperCase() || '📅'}
+                        </div>
+                      )}
+                      
+                      <div className="flex-1  min-w-0">
+                        {/* Event Title */}
+                        <p className={cn(
+                          "font-serif text-sm truncate font-semibold",
+                          isDark ? 'text-white' : 'text-gray-900'
+                        )}>
+                          {event.title}
+                        </p>
+                        
+                        {/* Employer Name */}
+                        <p className={cn(
+                          "text-xs truncate font-medium",
+                          isDark ? 'text-gray-400' : 'text-gray-600'
+                        )}>
+                          {event.employer?.company_name || event.employer?.name || 'Unknown Employer'}
+                        </p>
+                        
+                        {/* Event Date */}
+                        <p className={cn(
+                          "text-xs truncate",
+                          isDark ? 'text-gray-500' : 'text-gray-500'
+                        )}>
+                          {event.event_date ? new Date(event.event_date).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          }) : 'TBA'}
+                        </p>
+                        
+                        {/* Event Type Badge */}
+                        {event.event_type && (
+                          <p className={cn(
+                            "text-xs mt-1 inline-block px-2 py-0.5 rounded-full font-semibold",
+                            isDark 
+                              ? 'bg-blue-900/30 text-blue-300' 
+                              : 'bg-blue-100 text-blue-700'
+                          )}>
+                            {event.event_type}
+                          </p>
+                        )}
+                      </div>
+                      
+                      {/* Attendees Count Badge */}
+                      {event.attendees_count > 0 && (
+                        <div className={cn(
+                          "text-xs font-bold flex-shrink-0 px-2 py-1 rounded-full",
+                          isDark ? 'bg-green-900/30 text-green-300' : 'bg-green-100 text-green-700'
+                        )}>
+                          {event.attendees_count} 👥
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm  truncate">
-                      {connection.name}
-                    </p>
-                    <p className="text-xs text-gray-50 truncate">
-                      {connection.role}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
+                )}
+                onItemSelect={(event) => navigate(`/event/${event.id}`)}
+              />
+            </div>
+          ) : (
+            <div className="p-4 text-center text-gray-500">No upcoming events</div>
+          )}
+          
+          <div className="p-3 border-none border-gray-200 text-center">
+            <button 
+              onClick={() => navigate('/events')}
+              className={cn(
+                "text-sm font-medium transition-colors",
+                isDark 
+                  ? 'text-blue-400 hover:text-blue-300' 
+                  : 'text-blue-600 hover:text-blue-700'
+              )}
+            >
+              View All Events →
+            </button>
           </div>
         </div>
 
@@ -858,298 +1088,498 @@ export default function Feed() {
       <main className={cn(
         'flex-1',
         isMobile 
-          ? 'pt-16 px-0' 
-          : 'lg:ml-0 max-w-2xl mx-auto'
+          ? 'pt-16 p-0' 
+          : 'lg:ml-5 max-w-2xl mx-auto'
       )}>
-        {/* Mobile/Desktop Header */}
+        {/* Mobile/Desktop Header with Tab Switcher */}
         <div className={cn(
           'sticky top-0 z-10 backdrop-blur-xl border-none',
-          isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200',
+          isDark ? 'bg-black/80 border-none' : 'bg-white/80 border-none',
           isMobile ? 'top-16' : 'top-0'
         )}>
-          
-          {/* Mobile Create Post Button */}
-       
+          {/* Tab Switcher - Like X/Twitter */}
+          <div className="flex items-center justify-center">
+            <button
+              onClick={() => setActiveTab('for-you')}
+              className={cn(
+                'flex-1 px-4 py-3 font-semibold text-center transition-all border-b-2 relative',
+                activeTab === 'for-you'
+                  ? isDark 
+                    ? 'text-white border-gray-900' 
+                    : 'text-black border-black'
+                  : isDark
+                    ? 'text-gray-500 border-transparent hover:text-gray-300'
+                    : 'text-gray-600 border-transparent hover:text-blbg-black',
+                isMobile ? 'text-sm' : 'text-base'
+              )}
+              title="View personalized job recommendations"
+            >
+              For You
+            </button>
+            <button
+              onClick={() => setActiveTab('explore')}
+              className={cn(
+                'flex-1 px-4 py-3 font-semibold text-center transition-all border-b-2 relative',
+                activeTab === 'explore'
+                  ? isDark 
+                    ? 'text-white border-gray-900' 
+                    : 'text-black border-black'
+                  : isDark
+                    ? 'text-gray-500 border-transparent hover:text-gray-300'
+                    : 'text-gray-600 border-transparent hover:text-blbg-black',
+                isMobile ? 'text-sm' : 'text-base'
+              )}
+              title="Explore all posted jobs and vacancies"
+            >
+              Explore
+            </button>
+          </div>
         </div>
 
-        {/* Posts Feed */}
-        <div className={cn(
-          'border-[0.5px] divide-y',
-          isDark ? 'border-gray-800 divide-gray-800' : 'divide-gray-200'
-        )}>
-          {posts.map((post) => (
-            <div 
-              key={post.id} 
-              className={cn(
-                'transition-colors cursor-pointer',
-                isDark ? 'hover:bg-gray-950/50' : 'hover:bg-gray-50/50',
-                isMobile ? 'p-3' : 'p-4'
-              )}
-              onClick={() => navigate(`/post/${post.original_post?.id || post.id}`)}
-            >
-              {/* Retweet Header - Shows when this is a retweet */}
-              {post.is_retweet && post.retweeted_by && (
-                <div className={cn(
-                  'flex items-center space-x-2 mb-3 text-gray-500',
-                  isMobile ? 'text-xs' : 'text-sm'
-                )}>
-                  <Repeat2 className={cn(isMobile ? 'h-3 w-3' : 'h-4 w-4')} />
-                  <Link 
-                    to={`/profile/${post.retweeted_by.id}`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="hover:underline font-medium"
-                  >
-                    {post.retweeted_by.name} retweeted
-                  </Link>
-                </div>
-              )}
-
-              <div className={cn('flex space-x-3', isMobile ? 'space-x-2' : 'space-x-3')}>
-                {/* Display original author avatar for retweets, otherwise current author */}
-                <Link 
-                  to={`/profile/${post.is_retweet ? post.original_post?.author.id : post.author.id}`} 
-                  onClick={(e) => e.stopPropagation()}
-                  className="flex-shrink-0 hover:opacity-80 transition-opacity"
-                >
-                  <Avatar
-                    src={post.is_retweet ? post.original_post?.author.avatar_url : post.author.avatar_url}
-                    alt={post.is_retweet ? post.original_post?.author.name : post.author.name}
-                    name={post.is_retweet ? post.original_post?.author.name : post.author.name}
-                    size={isMobile ? 'sm' : 'md'}
-                    className="cursor-pointer"
-                  />
-                </Link>
-                
-                <div className="flex-1 min-w-0">
-                  {/* Author Info - Shows original author for retweets */}
-                  <div className={cn(
-                    'flex items-center mb-1',
-                    isMobile ? 'flex-col items-start space-y-1' : 'space-x-2'
-                  )}>
-                    <div className="flex items-center space-x-2">
-                      <Link 
-                        to={`/profile/${post.is_retweet ? post.original_post?.author.id : post.author.id}`}
-                        onClick={(e) => e.stopPropagation()}
-                        className={cn(
-                          'font-bold hover:underline cursor-pointer',
-                          isMobile ? 'text-sm' : 'text-base'
-                        )}
-                      >
-                        {post.is_retweet ? post.original_post?.author.name : post.author.name}
-                      </Link>
-                      {(post.is_retweet ? post.original_post?.author.verified : post.author.verified) && (
-                        <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                          <span className="text-white text-xs">✓</span>
-                        </div>
-                      )}
-                    </div>
+        {/* Jobs Feed - Filtered by active tab - Display as Posts */}
+        {activeTab === 'explore' && jobs && jobs.length > 0 ? (
+          <div className={cn(
+            'border-[0.5px] divide-y',
+            isDark ? 'border-blbg-black divide-blbg-black' : 'divide-gray-200'
+          )}>
+            {jobs.map((job: any, index: number) => (
+              <div
+                key={job.id || index}
+                className={cn(
+                  'transition-colors cursor-pointer p-4',
+                  isDark ? 'hover:bg-gray-950/50' : 'hover:bg-gray-50/50'
+                )}
+                onClick={() => navigate(`/job/${job.id}`)}
+              >
+                {/* Job Post Header - Like Social Post */}
+                <div className="flex items-start space-x-3 mb-3">
+                  {/* Company Avatar */}
+                  <div className="flex-shrink-0">
                     <div className={cn(
-                      'flex items-center space-x-1 text-gray-500',
-                      isMobile ? 'text-xs' : 'text-sm'
+                      'w-12 h-12 rounded-lg flex items-center justify-center font-bold text-white text-base',
+                      'bg-gradient-to-br from-border-gray-900 to-purple-600'
                     )}>
-                      <span>@{post.is_retweet ? post.original_post?.author.username : post.author.username}</span>
-                      <span>·</span>
-                      <span>{formatTime(post.is_retweet ? post.original_post?.created_at || post.created_at : post.created_at)}</span>
+                      {job.company?.charAt(0) || '💼'}
                     </div>
                   </div>
-                  
-                  {/* Post Content - Shows original content for retweets */}
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <h3 className="font-bold text-base">
+                        {job.title}
+                      </h3>
+                    </div>
+                    <p className={cn(
+                      'text-sm mb-1',
+                      isDark ? 'text-gray-400' : 'text-gray-600'
+                    )}>
+                      <span className="font-medium">{job.company}</span>
+                      <span className="mx-1">•</span>
+                      <span>{formatTime(job.created_at)}</span>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Location & Job Info */}
+                <div className="space-y-2 mb-3">
                   <p className={cn(
-                    'leading-normal mb-3 whitespace-pre-wrap',
-                    isMobile ? 'text-sm' : 'text-base'
+                    'text-sm flex items-center space-x-2',
+                    isDark ? 'text-gray-300' : 'text-gray-700'
                   )}>
-                    {post.is_retweet ? post.original_post?.content : post.content}
+                    <MapPin className="h-4 w-4 flex-shrink-0" />
+                    <span>{job.location}</span>
                   </p>
 
-                  {/* Media Content - Shows original media for retweets */}
-                  {(post.is_retweet ? post.original_post?.media : post.media) && (
-                    <div className="grid grid-cols-1 gap-2 mb-3">
-                      {(post.is_retweet ? post.original_post?.media : post.media)?.map((media, index) => (
-                        <div key={index} className="relative">
-                          {media.type === 'image' ? (
-                            <img
-                              src={media.url}
-                              alt={media.alt || ''}
-                              className="rounded-2xl object-cover w-full"
-                            />
-                          ) : (
-                            <video
-                              autoPlay
-                              muted
-                              loop
-                              playsInline
-                              className="rounded-lg w-full"
-                            >
-                              <source src={media.url} type="video/mp4" />
-                              Your browser does not support the video tag.
-                            </video>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  
-                  {/* Post Actions - Enhanced with dropdown for retweet options */}
-                  <div className={cn(
-                    'flex items-center justify-between',
-                    isMobile ? 'max-w-full' : 'max-w-md'
-                  )}>
-                    {/* Reply Button */}
-                    <Button
-                      variant="ghost" 
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/post/${post.original_post?.id || post.id}`);
-                      }}
-                      className={cn(
-                        'flex items-center space-x-2 rounded-full group transition-colors',
-                        isDark 
-                          ? 'text-gray-400 hover:text-blue-400 hover:bg-blue-500/10' 
-                          : 'text-gray-600 hover:text-blue-600 hover:bg-blue-500/10',
-                        isMobile ? 'p-1' : 'p-2'
-                      )}
-                    >
-                      <MessageCircle className={cn(isMobile ? 'h-4 w-4' : 'h-5 w-5')} />
-                      <span className={cn(isMobile ? 'text-xs' : 'text-sm')}>{post.replies_count}</span>
-                    </Button>
-                    
-                    {/* Retweet Button with Dropdown */}
-                    <div className="relative group">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRetweet(post.original_post?.id || post.id);
-                        }}
-                        onContextMenu={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          // Show retweet options menu
-                        }}
+                  {/* Job Type & Salary Badges */}
+                  <div className="flex flex-wrap gap-2">
+                    {job.type && (
+                      <span className={cn(
+                        'px-3 py-1 rounded-full text-xs font-medium',
+                        isDark ? 'bg-blue-900/30 text-border-gray-900' : 'bg-blue-100 text-blue-700'
+                      )}>
+                        {job.type}
+                      </span>
+                    )}
+                    {job.salary_range && (
+                      <span className={cn(
+                        'px-3 py-1 rounded-full text-xs font-medium flex items-center space-x-1',
+                        isDark ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-700'
+                      )}>
+                        <DollarSign className="h-3 w-3" />
+                        <span>{job.salary_range}</span>
+                      </span>
+                    )}
+                    {job.is_remote && (
+                      <span className={cn(
+                        'px-3 py-1 rounded-full text-xs font-medium',
+                        isDark ? 'bg-purple-900/30 text-purple-400' : 'bg-purple-100 text-purple-700'
+                      )}>
+                        🌍 Remote
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Job Description */}
+                <p className={cn(
+                  'line-clamp-3 mb-3 text-sm',
+                  isDark ? 'text-gray-300' : 'text-gray-700'
+                )}>
+                  {job.description || 'No description available'}
+                </p>
+
+                {/* Skills Tags */}
+                {job.skills && job.skills.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {job.skills.slice(0, 5).map((skill: string, i: number) => (
+                      <span
+                        key={i}
                         className={cn(
-                          'flex items-center space-x-2 rounded-full group transition-colors',
-                          post.has_retweeted
-                            ? 'text-green-500 hover:text-green-400'
-                            : isDark 
-                              ? 'text-gray-400 hover:text-green-400 hover:bg-green-500/10'
-                              : 'text-gray-600 hover:text-green-600 hover:bg-green-500/10',
-                          isMobile ? 'p-1' : 'p-2'
+                          'px-2 py-1 rounded text-xs',
+                          isDark ? 'bg-black text-gray-300' : 'bg-gray-200 text-gray-700'
                         )}
                       >
-                        <Repeat2 className={cn(isMobile ? 'h-4 w-4' : 'h-5 w-5')} />
-                        <span className={cn(isMobile ? 'text-xs' : 'text-sm')}>{post.retweets_count}</span>
-                      </Button>
-                      
-                      {/* Retweet Options Dropdown */}
-                      <div className={cn(
-                        'absolute bottom-full left-0 mb-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 py-1 min-w-[160px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10'
+                        {skill}
+                      </span>
+                    ))}
+                    {job.skills.length > 5 && (
+                      <span className={cn(
+                        'px-2 py-1 rounded text-xs font-medium',
+                        isDark ? 'text-gray-400' : 'text-gray-600'
                       )}>
-                        <button
+                        +{job.skills.length - 5} more
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {/* Action Buttons - Like Post Actions */}
+                <div className="flex items-center justify-between pt-3 border-t">
+                  {/* Like Button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    className={cn(
+                      'flex items-center space-x-2 px-3 py-2 rounded-full transition-colors text-sm',
+                      isDark
+                        ? 'text-gray-400 hover:text-red-400 hover:bg-red-500/10'
+                        : 'text-gray-600 hover:text-red-600 hover:bg-red-500/10'
+                    )}
+                  >
+                    <Heart className="h-4 w-4" />
+                    <span>Like</span>
+                  </button>
+
+                  {/* View Details Button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/job/${job.id}`);
+                    }}
+                    className={cn(
+                      'flex items-center space-x-2 px-3 py-2 rounded-full transition-colors text-sm',
+                      isDark
+                        ? 'text-gray-400 hover:text-border-gray-900 hover:bg-border-gray-900/10'
+                        : 'text-gray-600 hover:text-blue-600 hover:bg-border-gray-900/10'
+                    )}
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    <span>Details</span>
+                  </button>
+
+                  {/* Share Button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    className={cn(
+                      'flex items-center space-x-2 px-3 py-2 rounded-full transition-colors text-sm',
+                      isDark
+                        ? 'text-gray-400 hover:text-green-400 hover:bg-green-500/10'
+                        : 'text-gray-600 hover:text-green-600 hover:bg-green-500/10'
+                    )}
+                  >
+                    <Share className="h-4 w-4" />
+                    <span>Share</span>
+                  </button>
+
+                  {/* Bookmark Button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    className={cn(
+                      'flex items-center space-x-2 px-3 py-2 rounded-full transition-colors text-sm',
+                      isDark
+                        ? 'text-gray-400 hover:text-yellow-400 hover:bg-yellow-500/10'
+                        : 'text-gray-600 hover:text-yellow-600 hover:bg-yellow-500/10'
+                    )}
+                  >
+                    <Bookmark className="h-4 w-4" />
+                    <span>Save</span>
+                  </button>
+
+                  {/* Apply Button - Primary CTA */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/job/${job.id}`);
+                    }}
+                    className={cn(
+                      'ml-auto px-4 py-2 rounded-full text-sm font-semibold transition-colors',
+                      isDark
+                        ? 'bg-blue-600 text-white hover:bg-blue-700'
+                        : 'bg-black text-white hover:bg-black'
+                    )}
+                  >
+                    Apply
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : activeTab === 'explore' && (!jobs || jobs.length === 0) ? (
+          <div className={cn(
+            'p-8 text-center',
+            isDark ? 'text-gray-400' : 'text-gray-600'
+          )}>
+            <p className="text-lg font-semibold mb-2">No jobs available</p>
+            <p className="text-sm">Check back soon for new opportunities!</p>
+          </div>
+        ) : activeTab === 'for-you' ? (
+          <>
+            {/* For You Tab - Show only posts (no jobs) */}
+            {/* Posts Feed */}
+            <div className={cn(
+              'border-[0.5px] divide-y rounded-3xl',
+              isDark ? 'border-blbg-black divide-blbg-black' : 'divide-gray-200'
+            )}>
+              {posts.map((post) => (
+                <div 
+                  key={post.id} 
+                  className={cn(
+                    'transition-colors cursor-pointer',
+                    isDark ? 'hover:bg-gray-950/50' : 'hover:bg-gray-50/50',
+                    isMobile ? 'p-3' : 'p-4'
+                  )}
+                  onClick={() => navigate(`/post/${post.original_post?.id || post.id}`)}
+                >
+                  {/* Retweet Header - Shows when this is a retweet */}
+                  {post.is_retweet && post.retweeted_by && (
+                    <div className={cn(
+                      'flex items-center space-x-2 mb-3 text-gray-500',
+                      isMobile ? 'text-xs' : 'text-sm'
+                    )}>
+                      <Repeat2 className={cn(isMobile ? 'h-3 w-3' : 'h-4 w-4')} />
+                      <Link 
+                        to={`/profile/${post.retweeted_by.id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="hover:underline font-medium"
+                      >
+                        {post.retweeted_by.name} retweeted
+                      </Link>
+                    </div>
+                  )}
+
+                  <div className={cn('flex space-x-3', isMobile ? 'space-x-2' : 'space-x-3')}>
+                    {/* Display original author avatar for retweets, otherwise current author */}
+                    <Link 
+                      to={`/profile/${post.is_retweet ? post.original_post?.author.id : post.author.id}`} 
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex-shrink-0 hover:opacity-80 transition-opacity"
+                    >
+                      <Avatar
+                        src={post.is_retweet ? post.original_post?.author.avatar_url : post.author.avatar_url}
+                        alt={post.is_retweet ? post.original_post?.author.name : post.author.name}
+                        name={post.is_retweet ? post.original_post?.author.name : post.author.name}
+                        size={isMobile ? 'sm' : 'md'}
+                        className="cursor-pointer"
+                      />
+                    </Link>
+                    
+                    <div className="flex-1 min-w-0">
+                      {/* Author Info - Shows original author for retweets */}
+                      <div className={cn(
+                        'flex items-center mb-1',
+                        isMobile ? 'flex-col items-start space-y-1' : 'space-x-2'
+                      )}>
+                        <div className="flex items-center space-x-2">
+                          <Link 
+                            to={`/profile/${post.is_retweet ? post.original_post?.author.id : post.author.id}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className={cn(
+                              'font-bold hover:underline cursor-pointer',
+                              isMobile ? 'text-sm' : 'text-base'
+                            )}
+                          >
+                            {post.is_retweet ? post.original_post?.author.name : post.author.name}
+                          </Link>
+                          {(post.is_retweet ? post.original_post?.author.verified : post.author.verified) && (
+                            <div className="w-4 h-4 bg-border-gray-900 rounded-full flex items-center justify-center">
+                              <span className="text-white text-xs">✓</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className={cn(
+                          'flex items-center space-x-1 text-gray-500',
+                          isMobile ? 'text-xs' : 'text-sm'
+                        )}>
+                          <span>@{post.is_retweet ? post.original_post?.author.username : post.author.username}</span>
+                          <span>·</span>
+                          <span>{formatTime(post.is_retweet ? post.original_post?.created_at || post.created_at : post.created_at)}</span>
+                        </div>
+                      </div>
+                      
+                      {/* Post Content - Shows original content for retweets */}
+                      <p className={cn(
+                        'leading-normal mb-3 whitespace-pre-wrap',
+                        isMobile ? 'text-sm' : 'text-base'
+                      )}>
+                        {post.is_retweet ? post.original_post?.content : post.content}
+                      </p>
+
+                      {/* Media Content - Shows original media for retweets */}
+                      {(post.is_retweet ? post.original_post?.media : post.media) && (
+                        <div className="grid grid-cols-1 border-gray-800 border rounded-3xl gap-2 mb-3">
+                          {(post.is_retweet ? post.original_post?.media : post.media)?.map((media, index) => (
+                            <div key={index} className="relative">
+                              {media.type === 'image' ? (
+                                <img
+                                  src={media.url}
+                                  alt={media.alt || ''}
+                                  className="rounded-3xl object-cover w-full"
+                                />
+                              ) : (
+                                <VideoPlayer
+                                  src={media.url}
+                                  className="rounded-3xl h-[600px] w-full"
+                                />
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {/* Post Actions - Enhanced with dropdown for retweet options */}
+                      <div className={cn(
+                        'flex items-center justify-between',
+                        isMobile ? 'max-w-full' : 'max-w-md'
+                      )}>
+                        {/* Reply Button */}
+                        <Button
+                          variant="ghost" 
+                          size="sm"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleRetweet(post.original_post?.id || post.id, false);
+                            navigate(`/post/${post.original_post?.id || post.id}`);
                           }}
-                          className="w-full px-4 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center space-x-2 text-sm"
+                          className={cn(
+                            'flex items-center space-x-2 rounded-full group transition-colors',
+                            isDark 
+                              ? 'text-gray-400 hover:text-border-gray-900 hover:bg-border-gray-900/10' 
+                              : 'text-gray-600 hover:text-blue-600 hover:bg-border-gray-900/10',
+                            isMobile ? 'p-1' : 'p-2'
+                          )}
                         >
-                          <Repeat2 className="h-4 w-4" />
-                          <span>Retweet</span>
-                        </button>
-                        <button
+                          <MessageCircle className={cn(isMobile ? 'h-4 w-4' : 'h-5 w-5')} />
+                          <span className={cn(isMobile ? 'text-xs' : 'text-sm')}>{post.replies_count}</span>
+                        </Button>
+                        
+                        {/* Retweet Button with Dropdown */}
+                        <RetweetButton
+                          postId={post.id}
+                          hasRetweeted={post.has_retweeted}
+                          retweetsCount={post.retweets_count}
+                          onRetweet={() => handleRetweet(post.id)}
+                          onQuoteRetweet={() => handleRetweet(post.id, true)}
+                          isMobile={isMobile}
+                          isDark={isDark}
+                        />
+                        
+                        {/* Like Button */}
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleRetweet(post.original_post?.id || post.id, true);
+                            handleLike(post.original_post?.id || post.id);
                           }}
-                          className="w-full px-4 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center space-x-2 text-sm"
+                          className={cn(
+                            'flex items-center space-x-2 rounded-full group transition-colors',
+                            post.has_liked
+                              ? 'text-red-500 hover:text-red-400'
+                              : isDark 
+                                ? 'text-gray-400 hover:text-red-400 hover:bg-red-500/10'
+                                : 'text-gray-600 hover:text-red-600 hover:bg-red-500/10',
+                            isMobile ? 'p-1' : 'p-2'
+                          )}
                         >
-                          <Edit3 className="h-4 w-4" />
-                          <span>Quote Retweet</span>
-                        </button>
+                          <Heart className={cn(
+                            post.has_liked ? 'fill-current' : '',
+                            isMobile ? 'h-4 w-4' : 'h-5 w-5'
+                          )} />
+                          <span className={cn(isMobile ? 'text-xs' : 'text-sm')}>{post.likes_count}</span>
+                        </Button>
+                        
+                        {/* Share Button */}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleShare(post.original_post || post);
+                          }}
+                          className={cn(
+                            'flex items-center space-x-2 rounded-full group transition-colors',
+                            isDark 
+                              ? 'text-gray-400 hover:text-border-gray-900 hover:bg-border-gray-900/10' 
+                              : 'text-gray-600 hover:text-blue-600 hover:bg-border-gray-900/10',
+                            isMobile ? 'p-1' : 'p-2'
+                          )}
+                        >
+                          <Share className={cn(isMobile ? 'h-4 w-4' : 'h-5 w-5')} />
+                        </Button>
+                        
+                        {/* Bookmark Button */}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleBookmark(post.original_post?.id || post.id);
+                          }}
+                          className={cn(
+                            'flex items-center space-x-2 rounded-full group transition-colors',
+                            post.has_bookmarked
+                              ? 'text-yellow-500 hover:text-yellow-400'
+                              : isDark 
+                                ? 'text-gray-400 hover:text-yellow-400 hover:bg-yellow-500/10'
+                                : 'text-gray-600 hover:text-yellow-600 hover:bg-yellow-500/10',
+                            isMobile ? 'p-1' : 'p-2'
+                          )}
+                        >
+                          <Bookmark className={cn(
+                            post.has_bookmarked ? 'fill-current' : '',
+                            isMobile ? 'h-4 w-4' : 'h-5 w-5'
+                          )} />
+                        </Button>
                       </div>
                     </div>
                     
-                    {/* Like Button */}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleLike(post.original_post?.id || post.id);
-                      }}
-                      className={cn(
-                        'flex items-center space-x-2 rounded-full group transition-colors',
-                        post.has_liked
-                          ? 'text-red-500 hover:text-red-400'
-                          : isDark 
-                            ? 'text-gray-400 hover:text-red-400 hover:bg-red-500/10'
-                            : 'text-gray-600 hover:text-red-600 hover:bg-red-500/10',
-                        isMobile ? 'p-1' : 'p-2'
-                      )}
-                    >
-                      <Heart className={cn(
-                        post.has_liked ? 'fill-current' : '',
-                        isMobile ? 'h-4 w-4' : 'h-5 w-5'
-                      )} />
-                      <span className={cn(isMobile ? 'text-xs' : 'text-sm')}>{post.likes_count}</span>
-                    </Button>
-                    
-                    {/* Share Button */}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleShare(post.original_post || post);
-                      }}
-                      className={cn(
-                        'flex items-center space-x-2 rounded-full group transition-colors',
-                        isDark 
-                          ? 'text-gray-400 hover:text-blue-400 hover:bg-blue-500/10'
-                          : 'text-gray-600 hover:text-blue-600 hover:bg-blue-500/10',
-                        isMobile ? 'p-1' : 'p-2'
-                      )}
-                    >
-                      <Share className={cn(isMobile ? 'h-4 w-4' : 'h-5 w-5')} />
-                    </Button>
-                    
-                    {/* Bookmark Button */}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleBookmark(post.original_post?.id || post.id);
-                      }}
-                      className={cn(
-                        'flex items-center space-x-2 rounded-full group transition-colors',
-                        post.has_bookmarked
-                          ? 'text-yellow-500 hover:text-yellow-400'
-                          : isDark 
-                            ? 'text-gray-400 hover:text-yellow-400 hover:bg-yellow-500/10'
-                            : 'text-gray-600 hover:text-yellow-600 hover:bg-yellow-500/10',
-                        isMobile ? 'p-1' : 'p-2'
-                      )}
-                    >
-                      <Bookmark className={cn(
-                        post.has_bookmarked ? 'fill-current' : '',
-                        isMobile ? 'h-4 w-4' : 'h-5 w-5'
-                      )} />
-                    </Button>
+                   
                   </div>
                 </div>
-                
-               
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </>
+        ) : null}
 
         {/* Loading More */}
         <div className={cn('text-center', isMobile ? 'p-4' : 'p-8')}>
           <Button
             variant="ghost"
-            className="text-blue-500 hover:bg-blue-500/10"
+            className="text-border-gray-900 hover:bg-border-gray-900/10"
           >
             Show more posts
           </Button>
@@ -1159,8 +1589,8 @@ export default function Feed() {
       {/* Right Sidebar - Desktop Only */}
       {!isMobile && (
         <aside className={cn(
-          'hidden xl:block w-[400px] border-l sticky top-0 h-screen mr-0 overflow-y-auto',
-          isDark ? 'border-gray-800' : 'border-gray-200'
+          'hidden xl:block scrollbar-hide w-[400px] border-l sticky top-0 h-screen mr-0 overflow-y-auto',
+          isDark ? 'border-blbg-black' : 'border-gray-200'
         )}>
           <div className="p-4 space-y-6">
             {/* Search Field with @ Support */}
@@ -1169,8 +1599,8 @@ export default function Feed() {
                 'flex items-center gap-2 px-3 py-2 rounded-lg border transition-all',
                 showSearchDropdown
                   ? isDark
-                    ? 'bg-gray-900/50 border-blue-500'
-                    : 'bg-gray-50 border-blue-500'
+                    ? 'bg-gray-900/50 border-gray-900'
+                    : 'bg-gray-50 border-gray-900'
                   : isDark
                     ? 'bg-gray-900/50 border-gray-700'
                     : 'bg-gray-100 border-gray-300'
@@ -1178,7 +1608,7 @@ export default function Feed() {
                 <Search className={cn(
                   'w-4 h-4 flex-shrink-0 transition-colors',
                   showSearchDropdown
-                    ? isDark ? 'text-blue-400' : 'text-blue-600'
+                    ? isDark ? 'text-border-gray-900' : 'text-blue-600'
                     : isDark ? 'text-gray-500' : 'text-gray-400'
                 )} />
                 
@@ -1206,8 +1636,8 @@ export default function Feed() {
                     className={cn(
                       'p-1 rounded transition-all flex-shrink-0',
                       isDark
-                        ? 'text-gray-500 hover:text-blue-400 hover:bg-blue-500/10'
-                        : 'text-gray-500 hover:text-blue-600 hover:bg-blue-500/10'
+                        ? 'text-gray-500 hover:text-border-gray-900 hover:bg-border-gray-900/10'
+                        : 'text-gray-500 hover:text-blue-600 hover:bg-border-gray-900/10'
                     )}
                   >
                     <AtSign className="w-4 h-4" />
@@ -1225,7 +1655,7 @@ export default function Feed() {
                     className={cn(
                       'p-1 rounded transition-all flex-shrink-0',
                       isDark
-                        ? 'text-gray-500 hover:text-white hover:bg-gray-800'
+                        ? 'text-gray-500 hover:text-white hover:bg-black'
                         : 'text-gray-500 hover:text-black hover:bg-gray-200'
                     )}
                   >
@@ -1239,7 +1669,7 @@ export default function Feed() {
                 <div className={cn(
                   'mt-1 px-3 text-xs font-medium flex items-center gap-1',
                   isUsernameSearch
-                    ? isDark ? 'text-blue-400' : 'text-blue-600'
+                    ? isDark ? 'text-border-gray-900' : 'text-blue-600'
                     : isDark ? 'text-gray-500' : 'text-gray-600'
                 )}>
                   {isUsernameSearch ? (
@@ -1274,7 +1704,7 @@ export default function Feed() {
                   ) : userSearchResults.length > 0 ? (
                     <div className={cn(
                       'divide-y max-h-80 overflow-y-auto',
-                      isDark ? 'divide-gray-800' : 'divide-gray-200'
+                      isDark ? 'divide-blbg-black' : 'divide-gray-200'
                     )}>
                       {userSearchResults.map((result) => (
                         <Link
@@ -1301,7 +1731,7 @@ export default function Feed() {
                           ) : (
                             <div className={cn(
                               'w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold',
-                              isDark ? 'bg-gray-800' : 'bg-gray-200'
+                              isDark ? 'bg-black' : 'bg-gray-200'
                             )}>
                               {result.title.charAt(0).toUpperCase()}
                             </div>
@@ -1312,7 +1742,7 @@ export default function Feed() {
                             <div className="flex items-center gap-1">
                               <h4 className="font-medium text-sm truncate">{result.title}</h4>
                               {result.verified && (
-                                <svg className="w-3 h-3 text-blue-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                                <svg className="w-3 h-3 text-border-gray-900 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
                                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
                                 </svg>
                               )}
@@ -1321,7 +1751,7 @@ export default function Feed() {
                             <p className={cn(
                               'text-xs truncate font-medium',
                               isUsernameSearch
-                                ? isDark ? 'text-blue-400' : 'text-blue-600'
+                                ? isDark ? 'text-border-gray-900' : 'text-blue-600'
                                 : isDark ? 'text-gray-500' : 'text-gray-600'
                             )}>
                               {result.subtitle}
@@ -1354,62 +1784,104 @@ export default function Feed() {
             {/* Job Recommendations */}
             <div className={cn(
               'rounded-xl p-4 border',
-              isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200'
+              isDark ? 'bg-black border-blbg-black' : 'bg-white border-gray-200'
             )}>
               <h3 className="font-bold text-2xl font-serif mb-4 flex items-center">
                 <Bookmark className="h-5 w-5 mr-2" />
                 Jobs For You
               </h3>
               <div className="space-y-4">
-                {[
-                  {
-                    title: 'Frontend Developer',
-                    company: 'Google',
-                    location: 'Remote',
-                    salary: '$120k - $180k',
-                    logo: 'https://images.unsplash.com/photo-1573804633927-bfcbcd909acd?w=40&h=40&fit=crop&crop=center'
-                  },
-                  {
-                    title: 'Product Manager',
-                    company: 'Meta',
-                    location: 'San Francisco',
-                    salary: '$150k - $200k',
-                    logo: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=40&h=40&fit=crop&crop=center'
-                  },
-                  {
-                    title: 'Data Scientist',
-                    company: 'Netflix',
-                    location: 'Los Angeles',
-                    salary: '$140k - $190k',
-                    logo: 'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=40&h=40&fit=crop&crop=center'
-                  }
-                ].map((job, index) => (
-                  <div key={index} className={cn(
-                    'p-3 rounded-xl bg-[#D5634A] hover:bg-gray-800/30 cursor-pointer transition-colors',
-                    isDark ? 'hover:bg-[#D5634A]/90' : 'hover:bg-[#D5634A]/90'
-                  )}>
-                    <div className="flex items-center space-x-3 mb-2">
-                      <img src={job.logo} alt={job.company} className="w-10 h-10 rounded-lg" />
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-white text-sm">{job.title}</h4>
-                        <p className={cn('text-xs', isDark ? 'text-white' : 'text-white')}>
-                          {job.company} • {job.location}
-                        </p>
+                {companiesLoading ? (
+                  <div className="text-center py-4 text-gray-400">Loading companies...</div>
+                ) : recommendedCompanies && recommendedCompanies.length > 0 ? (
+                  recommendedCompanies.map((company: any, index: number) => (
+                    <div
+                      key={company.id || index}
+                      className={cn(
+                        'p-3 rounded-xl hover:bg-black/30 cursor-pointer transition-colors',
+                        isDark ? 'bg-gray-700/25 hover:bg-gray-900/50' : 'bg-gray-100 hover:bg-gray-200'
+                      )}
+                      onClick={() => navigate(`/company/${company.id}`)}
+                    >
+                      <div className="flex items-start space-x-3 mb-2">
+                        {/* Company Avatar */}
+                        {company.logo_url ? (
+                          <img
+                            src={company.logo_url}
+                            alt={company.name}
+                            className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+                          />
+                        ) : (
+                          <div className={cn(
+                            'w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 font-bold text-sm text-white',
+                            'bg-gradient-to-br from-border-gray-900 to-purple-600'
+                          )}>
+                            {company.name?.charAt(0) || '🏢'}
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <h4 className={cn(
+                            'font-semibold text-sm truncate',
+                            isDark ? 'text-white' : 'text-gray-900'
+                          )}>
+                            {company.name}
+                          </h4>
+                          <p className={cn(
+                            'text-xs truncate',
+                            isDark ? 'text-gray-400' : 'text-gray-600'
+                          )}>
+                            {company.industry || 'Technology'}
+                          </p>
+                        </div>
                       </div>
+                      {company.location && (
+                        <p className={cn(
+                          'text-xs flex items-center gap-1',
+                          isDark ? 'text-gray-400' : 'text-gray-600'
+                        )}>
+                          <MapPin className="h-3 w-3 flex-shrink-0" />
+                          {company.location}
+                        </p>
+                      )}
                     </div>
-                    {/* <p className="text-sm font-medium text-black">{job.salary}</p> */}
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-gray-400 text-sm">
+                    No companies hiring at the moment
                   </div>
-                ))}
+                )}
               </div>
-              <Button variant="ghost" className="w-full mt-4 bg-[#D5634A] text-black">
-                View All Jobs
-              </Button>
+              <div className="mt-4 space-y-2">
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    'w-full',
+                    isDark ? 'text-border-gray-900 hover:bg-border-gray-900/10' : 'text-blue-600 hover:bg-border-gray-900/10'
+                  )}
+                  onClick={() => navigate('/explore')}
+                  title="View all jobs, companies, profiles, and events"
+                >
+                  Explore All Companies
+                </Button>
+                {/* <Button
+                  className={cn(
+                    'w-full font-semibold py-2 rounded-lg transition-colors',
+                    isDark 
+                      ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                      : 'bg-blue-600 text-white hover:bg-blue-700'
+                  )}
+                  onClick={() => navigate('/explore')}
+                  title="Explore all recommended jobs, companies, profiles, and events"
+                >
+                  Explore More →
+                </Button> */}
+              </div>
             </div>
 
             {/* Who to Follow */}
             <div className={cn(
               'rounded-xl p-4 border',
-              isDark ? 'bg-black border-gray-800' : 'bg-black border-gray-200'
+              isDark ? 'bg-black border-blbg-black' : 'bg-black border-gray-200'
             )}>
               <h3 className="font-serif text-lg mb-4 flex items-center text-white">
                 <Users className="h-5 w-5 mr-2" />
@@ -1419,7 +1891,7 @@ export default function Feed() {
                 {recommendedUsersLoading ? (
                   <div className="text-center py-4 text-gray-400">Loading recommendations...</div>
                 ) : recommendedUsers.length > 0 ? (
-                  recommendedUsers.map((recommendedUser) => (
+                  recommendedUsers.slice(0, 3).map((recommendedUser) => (
                     <WhoToFollowItem
                       key={recommendedUser.id}
                       user={{
@@ -1441,7 +1913,7 @@ export default function Feed() {
               </div>
               <Button
                 variant="ghost"
-                className="w-full mt-4 text-white hover:bg-gray-800/50"
+                className="w-full mt-4 text-white hover:bg-black/50"
                 onClick={() => navigate('/explore')}
               >
                 Show More
@@ -1451,15 +1923,19 @@ export default function Feed() {
             {/* Recent Activity */}
             <div className={cn(
               'rounded-xl p-4 border',
-              isDark ? 'bg-black border-gray-800' : 'bg-[#800020] border-gray-200'
+              isDark ? 'bg-black border-blbg-black' : 'bg-[#800020] border-gray-200'
             )}>
               <h3 className="font-bold text-lg mb-4 text-white">recomended vacansies</h3>
               <div className="space-y-3 text-white">
                 {jobsLoading ? (
                   <div className="text-center py-4 text-gray-400">Loading jobs...</div>
                 ) : jobs && jobs.length > 0 ? (
-                  jobs.slice(0, 5).map((job: any, index: number) => (
-                    <div key={job.id || index} className="text-sm p-2 rounded hover:bg-white/10 transition-colors cursor-pointer">
+                  jobs.slice(0, 4).map((job: any, index: number) => (
+                    <div 
+                      key={job.id || index} 
+                      className="text-sm p-2 rounded hover:bg-white/10 transition-colors cursor-pointer"
+                      onClick={() => navigate(`/job/${job.id}`)}
+                    >
                       <p className="font-medium">{job.title}</p>
                       <p className={cn('text-xs', isDark ? 'text-gray-300' : 'text-gray-200')}>
                         {job.company} • {job.location}
@@ -1509,7 +1985,7 @@ export default function Feed() {
           {/* FAB Menu Items - Using mobile curved positioning and animations */}
           <div className="relative">
             {[
-              { id: 'post', icon: Edit3, label: 'Create Post', color: 'bg-blue-500 hover:bg-blue-600', action: () => navigate('/create-post') },
+              { id: 'post', icon: Edit3, label: 'Create Post', color: 'bg-border-gray-900 hover:bg-blue-600', action: () => navigate('/create-post') },
               { id: 'message', icon: MessageSquare, label: 'Messages', color: 'bg-green-500 hover:bg-green-600', action: () => navigate('/messages') },
               { id: 'share', icon: Share, label: 'Share', color: 'bg-purple-500 hover:bg-purple-600', action: () => console.log('Share') },
               { id: 'bookmark', icon: Bookmark, label: 'Bookmarks', color: 'bg-orange-500 hover:bg-orange-600', action: () => navigate('/bookmarks') }
@@ -1640,7 +2116,7 @@ export default function Feed() {
       {/* Post Creation Modal */}
       {showPostModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-lg mx-4 p-6 relative">
+          <div className="bg-white dark:bg-black rounded-lg shadow-lg w-full max-w-lg mx-4 p-6 relative">
             <button
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               onClick={() => setShowPostModal(false)}

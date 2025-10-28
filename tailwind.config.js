@@ -160,7 +160,6 @@ export default {
         // Legacy support (keeping for compatibility)
         'asu-maroon': '#8C1D40',
         'asu-gold': '#FFC627',
-        lime: '#E3FF70',
         'dark-bg': '#0A0A0A',
         'dark-surface': '#111111',
         'dark-accent': '#E3FF70',
@@ -204,6 +203,11 @@ export default {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+      },
+
+      borderWidth: {
+        '0.5': '0.5px',
+        '0.7': '0.7px',
       },
 
       // Professional Shadows

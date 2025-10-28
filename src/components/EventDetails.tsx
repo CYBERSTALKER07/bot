@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { 
   Calendar, 
   MapPin, 
@@ -11,7 +9,7 @@ import {
   ExternalLink,
   Share2,
   Bookmark,
-  BookmarkPlus,
+  BookmarkCheck,
   Star,
   TrendingUp,
   Award,
@@ -23,340 +21,537 @@ import {
   Globe,
   CheckCircle,
   X,
-  Plus
+  Plus,
+  Mail,
+  Phone,
+  LinkIcon,
+  User
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { Event } from '../types';
 import { supabase } from '../lib/supabase';
-import Typography from './ui/Typography';
+import { useEmployerEvent, useEventAttendees, useEventRegistrationStatus, useRegisterForEvent, useUnregisterFromEvent } from '../hooks/useOptimizedQuery';
 import Button from './ui/Button';
-import { Card } from './ui/Card';
-import Modal from './ui/Modal';
-
-gsap.registerPlugin(ScrollTrigger);
+import { cn } from '../lib/cva';
 
 export default function EventDetails() {
-  const { id } = useParams<{ id: string }>();
+  const { eventId } = useParams<{ eventId: string }>();
   const { user } = useAuth();
   const { isDark } = useTheme();
   const navigate = useNavigate();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
   
-  const [event, setEvent] = useState<Event | null>(null);
-  const [isRegistered, setIsRegistered] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
   const [registrationData, setRegistrationData] = useState({
     dietary_restrictions: '',
     accessibility_needs: '',
     questions: ''
   });
 
-  useEffect(() => {
-    if (id) {
-      fetchEvent();
-      checkRegistrationStatus();
-    }
-  }, [id, user?.id]);
-
-  const fetchEvent = async () => {
-    if (!id) return;
-    
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const { data, error } = await supabase
-        .from('events')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (error) throw error;
-
-      setEvent(data);
-    } catch (err) {
-      console.error('Error fetching event:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load event');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const checkRegistrationStatus = async () => {
-    if (!id || !user?.id) return;
-    
-    try {
-      const { data, error } = await supabase
-        .from('event_registrations')
-        .select('id')
-        .eq('event_id', id)
-        .eq('user_id', user.id)
-        .single();
-
-      if (error && error.code !== 'PGRST116') {
-        throw error;
-      }
-
-      setIsRegistered(!!data);
-    } catch (err) {
-      console.error('Error checking registration status:', err);
-    }
-  };
+  // Fetch event data
+  const { data: event, isLoading: eventLoading, error: eventError } = useEmployerEvent(eventId);
+  
+  // Fetch event attendees
+  const { data: attendees = [], isLoading: attendeesLoading } = useEventAttendees(eventId);
+  
+  // Check registration status
+  const { data: registrationStatus } = useEventRegistrationStatus(eventId, user?.id);
+  
+  // Mutations
+  const registerMutation = useRegisterForEvent();
+  const unregisterMutation = useUnregisterFromEvent();
 
   const handleRegister = async () => {
     if (!event?.id || !user?.id) return;
 
     try {
-      const { error } = await supabase
-        .from('event_registrations')
-        .insert([{
-          event_id: event.id,
-          user_id: user.id,
-          registered_at: new Date().toISOString(),
-          dietary_restrictions: registrationData.dietary_restrictions,
-          accessibility_needs: registrationData.accessibility_needs,
-          questions: registrationData.questions
-        }]);
-
-      if (error) throw error;
-
-      setIsRegistered(true);
+      await registerMutation.mutateAsync({
+        eventId: event.id,
+        userId: user.id
+      });
       setShowRegisterModal(false);
-      
-      // Update attendee count
-      await supabase
-        .from('events')
-        .update({ attendees: (event.attendees || 0) + 1 })
-        .eq('id', event.id);
-
-      setEvent(prev => prev ? { ...prev, attendees: (prev.attendees || 0) + 1 } : null);
     } catch (err) {
       console.error('Error registering for event:', err);
     }
   };
 
-  useEffect(() => {
-    if (!event) return;
+  const handleUnregister = async () => {
+    if (!event?.id || !user?.id) return;
 
-    const ctx = gsap.context(() => {
-      // Header animation
-      gsap.fromTo(headerRef.current, {
-        opacity: 0,
-        y: -50,
-        scale: 0.9
-      }, {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 1.2,
-        ease: 'power3.out'
+    try {
+      await unregisterMutation.mutateAsync({
+        eventId: event.id,
+        userId: user.id
       });
-
-      // Content animation
-      gsap.fromTo(contentRef.current, {
-        opacity: 0,
-        y: 50
-      }, {
-        opacity: 1,
-        y: 0,
-        duration: 1,
-        ease: 'power3.out',
-        delay: 0.3
-      });
-
-      // Floating decorations
-      gsap.to('.event-decoration', {
-        y: -15,
-        x: 10,
-        rotation: 360,
-        duration: 20,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut'
-      });
-
-    }, containerRef);
-
-    return () => ctx.revert();
-  }, [event]);
-
-  const getEventTypeColor = (type: string) => {
-    switch (type) {
-      case 'career_fair':
-        return 'bg-blue-100 text-blue-800';
-      case 'workshop':
-        return 'bg-green-100 text-green-800';
-      case 'info_session':
-        return 'bg-purple-100 text-purple-800';
-      case 'networking':
-        return 'bg-orange-100 text-orange-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+    } catch (err) {
+      console.error('Error unregistering from event:', err);
     }
   };
 
-  const getEventTypeIcon = (type: string) => {
-    switch (type) {
-      case 'career_fair':
-        return <Building2 className="h-5 w-5" />;
-      case 'workshop':
-        return <Award className="h-5 w-5" />;
-      case 'info_session':
-        return <Users className="h-5 w-5" />;
-      case 'networking':
-        return <Globe className="h-5 w-5" />;
-      default:
-        return <Calendar className="h-5 w-5" />;
-    }
-  };
-
-  if (loading) {
+  if (eventLoading) {
     return (
-      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center">
-            <div className={`animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4 ${
-              isDark ? 'border-lime' : 'border-asu-maroon'
-            }`}></div>
-            <Typography variant="body1" color="textSecondary">
-              Loading event details...
-            </Typography>
-          </div>
+      <div className={cn(
+        'min-h-screen flex items-center justify-center',
+        isDark ? 'bg-black' : 'bg-gray-50'
+      )}>
+        <div className="text-center">
+          <div className={cn(
+            'animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4',
+            isDark ? 'border-blue-500' : 'border-blue-600'
+          )}></div>
+          <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>Loading event details...</p>
         </div>
       </div>
     );
   }
 
-  if (error || !event) {
+  if (eventError || !event) {
     return (
-      <div className={`min-h-screen ${isDark ? 'bg-dark-bg' : 'bg-gray-50'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Card className="p-8 text-center">
-            <Typography variant="h6" className="text-red-600 mb-2">
-              {error || 'Event Not Found'}
-            </Typography>
-            <Typography variant="body1" color="textSecondary" className="mb-4">
-              {error || 'The event you are looking for could not be found.'}
-            </Typography>
-            <Button onClick={() => navigate('/events')} variant="outlined">
-              Back to Events
-            </Button>
-          </Card>
+      <div className={cn(
+        'min-h-screen flex items-center justify-center p-4',
+        isDark ? 'bg-black' : 'bg-gray-50'
+      )}>
+        <div className={cn(
+          'rounded-3xl p-8 text-center max-w-md w-full',
+          isDark ? 'bg-black' : 'bg-white'
+        )}>
+          <p className="text-red-600 font-semibold mb-2">Event Not Found</p>
+          <p className={cn('text-sm mb-6', isDark ? 'text-gray-400' : 'text-gray-600')}>
+            {eventError || 'The event you are looking for could not be found.'}
+          </p>
+          <Button onClick={() => navigate('/events')}>Back to Events</Button>
         </div>
       </div>
     );
   }
 
-  const registrationProgress = (event.attendees_count / event.max_attendees) * 100;
+  const isRegistered = registrationStatus?.isRegistered || false;
+  const registrationPercentage = event.capacity ? (event.attendees_count / event.capacity) * 100 : 0;
+  const spotsRemaining = event.capacity ? Math.max(0, event.capacity - event.attendees_count) : 'Unlimited';
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-gray-50 to-white relative">
-      {/* Remove decorative elements */}
+    <div className={cn(
+      'min-h-screen',
+      isDark ? 'bg-black text-white' : 'bg-gray-50 text-blbg-black'
+    )}>
+      {/* Back Button */}
+      <div className={cn(
+        'sticky top-0 z-39 border-b mr-52',
+        isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200'
+      )}>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <Link 
+            to="/events" 
+            className={cn(
+              'inline-flex items-center space-x-2 transition-colors',
+              isDark 
+                ? 'text-blue-400 hover:text-blue-300' 
+                : 'text-blue-600 hover:text-blue-700'
+            )}
+          >
+            <ArrowLeft className="h-5 w-5" />
+            <span className="font-medium">Back to Events</span>
+          </Link>
+        </div>
+      </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back Button */}
-        <Link 
-          to="/events" 
-          className="inline-flex items-center space-x-2 text-asu-maroon hover:text-asu-maroon-dark transition-colors mb-8 font-medium"
-        >
-          <ArrowLeft className="h-5 w-5" />
-          <span>Back to Events</span>
-        </Link>
+      <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 py-8">
+        {/* Event Header - Title & Info Section */}
+        <div className={cn(
+          'rounded-3xl overflow-hidden mb-8 p-8',
+          isDark 
+            ? 'bg-black border border-gray-800 shadow-2xl shadow-black/50' 
+            : 'bg-white border border-gray-200 shadow-lg'
+        )}>
+          {/* Event Type Badge */}
+          <div className="flex items-center space-x-2 mb-4 w-fit">
+            <span className={cn(
+              'px-4 py-2 rounded-full text-sm font-semibold inline-flex items-center space-x-2',
+              isDark 
+                ? 'bg-blue-900/30 text-blue-300 border border-blue-700' 
+                : 'bg-white/20 text-gray-900 border border-gray-300'
+            )}>
+              <span>{event.event_type || 'Event'}</span>
+            </span>
+          </div>
 
-        {/* Header */}
-        <div ref={headerRef} className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark rounded-3xl p-8 text-white relative overflow-hidden mb-8">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-asu-gold/20 rounded-full blur-xl"></div>
-          
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-4">
-              <div className={`flex items-center space-x-2 px-4 py-2 rounded-full ${getEventTypeColor(event.type).replace('text-', 'text-white bg-white/20')}`}>
-                {getEventTypeIcon(event.type)}
-                <span className="font-semibold text-white">{event.type.replace('_', ' ')}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <button className="p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors">
-                  <Share2 className="h-5 w-5" />
-                </button>
-                <button className="p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors">
-                  <BookmarkPlus className="h-5 w-5" />
-                </button>
+          {/* Title and Description */}
+          <h1 className={cn(
+            'text-4xl font-bold mb-4',
+            isDark ? 'text-white' : 'text-gray-900'
+          )}>{event.title}</h1>
+          <p className={cn(
+            'text-lg mb-6',
+            isDark ? 'text-gray-400' : 'text-gray-700'
+          )}>{event.description}</p>
+
+          {/* Quick Info Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            {/* Date & Time */}
+            <div className={cn(
+              'flex items-start space-x-4 p-4 rounded-xl',
+              isDark 
+                ? 'bg-gray-900 border border-gray-700' 
+                : 'bg-gray-50 border border-gray-200'
+            )}>
+              <Calendar className={cn(
+                'h-6 w-6 flex-shrink-0 mt-1',
+                isDark ? 'text-yellow-400' : 'text-yellow-500'
+              )} />
+              <div>
+                <p className={cn('text-sm mb-1', isDark ? 'text-gray-400' : 'text-gray-600')}>Date & Time</p>
+                <p className={cn('text-lg font-semibold', isDark ? 'text-white' : 'text-gray-900')}>
+                  {event.event_date ? new Date(event.event_date).toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  }) : 'TBA'}
+                </p>
               </div>
             </div>
-            
-            <h1 className="text-4xl font-bold mb-4">{event.title}</h1>
-            <p className="text-xl text-white/90 mb-6">{event.description}</p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <div className="flex items-center space-x-3 bg-white/20 backdrop-blur-sm rounded-xl p-4">
-                <Calendar className="h-6 w-6 text-asu-gold" />
-                <div>
-                  <p className="font-semibold">{new Date(event.date).toLocaleDateString()}</p>
-                  <p className="text-sm text-white/80">{event.time}</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-3 bg-white/20 backdrop-blur-sm rounded-xl p-4">
-                {event.is_virtual ? <Video className="h-6 w-6 text-green-400" /> : <MapPin className="h-6 w-6 text-blue-400" />}
-                <div>
-                  <p className="font-semibold">{event.is_virtual ? 'Virtual Event' : 'In-Person'}</p>
-                  <p className="text-sm text-white/80">{event.location}</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-3 bg-white/20 backdrop-blur-sm rounded-xl p-4">
-                <Users className="h-6 w-6 text-purple-400" />
-                <div>
-                  <p className="font-semibold">{event.attendees_count} / {event.max_attendees}</p>
-                  <p className="text-sm text-white/80">Attendees</p>
-                </div>
+
+            {/* Location */}
+            <div className={cn(
+              'flex items-start space-x-4 p-4 rounded-xl',
+              isDark 
+                ? 'bg-gray-900 border border-gray-700' 
+                : 'bg-gray-50 border border-gray-200'
+            )}>
+              {event.virtual_link ? (
+                <Video className={cn(
+                  'h-6 w-6 flex-shrink-0 mt-1',
+                  isDark ? 'text-green-400' : 'text-green-500'
+                )} />
+              ) : (
+                <MapPin className={cn(
+                  'h-6 w-6 flex-shrink-0 mt-1',
+                  isDark ? 'text-red-400' : 'text-red-500'
+                )} />
+              )}
+              <div>
+                <p className={cn('text-sm mb-1', isDark ? 'text-gray-400' : 'text-gray-600')}>{event.virtual_link ? 'Virtual' : 'Location'}</p>
+                <p className={cn('text-lg font-semibold', isDark ? 'text-white' : 'text-gray-900')}>{event.location || (event.virtual_link ? 'Online' : 'TBA')}</p>
               </div>
             </div>
 
-            {/* Registration Progress */}
-            <div className="mb-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-white/90">Registration Progress</span>
-                <span className="text-sm text-white/80">{Math.round(registrationProgress)}% Full</span>
-              </div>
-              <div className="w-full bg-white/20 rounded-full h-2">
-                <div 
-                  className="bg-asu-gold h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${registrationProgress}%` }}
-                ></div>
+            {/* Attendees */}
+            <div className={cn(
+              'flex items-start space-x-4 p-4 rounded-xl',
+              isDark 
+                ? 'bg-gray-900 border border-gray-700' 
+                : 'bg-gray-50 border border-gray-200'
+            )}>
+              <Users className={cn(
+                'h-6 w-6 flex-shrink-0 mt-1',
+                isDark ? 'text-purple-400' : 'text-purple-500'
+              )} />
+              <div>
+                <p className={cn('text-sm mb-1', isDark ? 'text-gray-400' : 'text-gray-600')}>Attendees</p>
+                <p className={cn('text-lg font-semibold', isDark ? 'text-white' : 'text-gray-900')}>{event.attendees_count} / {event.capacity || '∞'}</p>
               </div>
             </div>
+          </div>
 
-            {/* Registration Button */}
+          {/* Registration Progress & Action Buttons */}
+          <div className="mt-8 flex items-center justify-between">
+            <div className="flex-1">
+              {event.capacity && (
+                <div className="mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>Capacity</span>
+                    <span className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>{Math.round(registrationPercentage)}%</span>
+                  </div>
+                  <div className={cn(
+                    'w-full h-2 rounded-full overflow-hidden',
+                    isDark ? 'bg-gray-700' : 'bg-gray-300'
+                  )}>
+                    <div 
+                      className="h-full bg-gradient-to-r from-yellow-400 to-yellow-300 transition-all duration-300"
+                      style={{ width: `${Math.min(registrationPercentage, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center space-x-3 ml-6">
+              <button 
+                onClick={() => setIsBookmarked(!isBookmarked)}
+                className={cn(
+                  'p-3 rounded-full transition-all',
+                  isBookmarked 
+                    ? 'bg-yellow-400 text-black' 
+                    : isDark
+                      ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                      : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                )}
+                title="Bookmark event"
+              >
+                {isBookmarked ? (
+                  <BookmarkCheck className="h-5 w-5" />
+                ) : (
+                  <Bookmark className="h-5 w-5" />
+                )}
+              </button>
+
+              <button 
+                className={cn(
+                  'p-3 rounded-full transition-all',
+                  isDark
+                    ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                )}
+                title="Share event"
+              >
+                <Share2 className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Registration Button */}
+          <div className="mt-6">
             {!isRegistered ? (
               <button
                 onClick={() => setShowRegisterModal(true)}
-                className="bg-asu-gold text-asu-maroon px-8 py-4 rounded-2xl font-bold text-lg hover:bg-yellow-300 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                disabled={event.capacity && event.attendees_count >= event.capacity}
+                className={cn(
+                  'w-full px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100',
+                  isDark
+                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                )}
               >
-                Register Now 🎯
+                {event.capacity && event.attendees_count >= event.capacity ? 'Event Full' : 'Register Now 🎯'}
               </button>
             ) : (
-              <div className="flex items-center space-x-2 bg-green-500 text-white px-6 py-3 rounded-2xl font-semibold">
+              <div className={cn(
+                'flex items-center justify-center space-x-2 py-4 rounded-2xl font-semibold',
+                isDark
+                  ? 'bg-green-900/20 text-green-400 border border-green-700'
+                  : 'bg-green-50 text-green-700 border border-green-200'
+              )}>
                 <CheckCircle className="h-5 w-5" />
                 <span>You're Registered! 🎉</span>
               </div>
             )}
           </div>
+
         </div>
 
-        {/* Content */}
-        <div ref={contentRef} className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
-          <div className="p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Event Details</h2>
-            <div className="prose prose-lg max-w-none">
-              <div className="whitespace-pre-line text-gray-700 leading-relaxed">
-                {event.long_description}
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - Event Details */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Event Description Card */}
+            <div className={cn(
+              'rounded-3xl p-8',
+              isDark ? 'bg-black border border-gray-800 shadow-2xl shadow-black/50' : 'bg-white border border-gray-200 shadow-lg'
+            )}>
+              <h2 className={cn(
+                'text-2xl font-bold mb-6',
+                isDark ? 'text-white' : 'text-gray-900'
+              )}>About This Event</h2>
+              <p className={cn(
+                'text-lg leading-relaxed whitespace-pre-line',
+                isDark ? 'text-gray-400' : 'text-gray-700'
+              )}>
+                {event.description}
+              </p>
+            </div>
+
+            {/* Event Banner Image - Now Under Description */}
+            {event.banner_image_url && (
+              <div className={cn(
+                'rounded-3xl overflow-hidden',
+                isDark ? 'border border-gray-800' : 'border border-gray-200'
+              )}>
+                  
+
+                <img 
+                  src={event.banner_image_url} 
+                  alt={event.title}
+                  className="w-full h-80 object-cover inset-0 bg-black/100 via-transparent to-transparent "
+                  
+                />
+                             
+
               </div>
+            )}
+
+            {/* Virtual Link */}
+            {event.virtual_link && (
+              <div className={cn(
+                'rounded-3xl p-8',
+                isDark ? 'bg-black border border-gray-800 shadow-2xl shadow-black/50' : 'bg-white border border-gray-200 shadow-lg'
+              )}>
+                <h3 className={cn(
+                  'text-xl font-bold mb-4 flex items-center space-x-2',
+                  isDark ? 'text-white' : 'text-gray-900'
+                )}>
+                  <Video className="h-5 w-5" />
+                  <span>Virtual Event Link</span>
+                </h3>
+                <a 
+                  href={event.virtual_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn(
+                    'inline-flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all',
+                    isDark
+                      ? 'bg-blue-900/20 text-blue-400 hover:bg-blue-900/30'
+                      : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                  )}
+                >
+                  <span>Join Meeting</span>
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+              </div>
+            )}
+          </div>
+
+          {/* Right Column - Employer & Attendees */}
+          <div className="space-y-8">
+            {/* Employer Card */}
+            {event.employer && (
+              <div className={cn(
+                'rounded-3xl p-8 sticky top-24',
+                isDark ? 'bg-black border border-gray-800 shadow-2xl shadow-black/50' : 'bg-white border border-gray-200 shadow-lg'
+              )}>
+                <h3 className={cn(
+                  'text-xl font-bold mb-6',
+                  isDark ? 'text-white' : 'text-blbg-black'
+                )}>Hosted By</h3>
+
+                {/* Employer Avatar */}
+                <div className="flex flex-col items-center text-center mb-6">
+                  {event.employer.avatar_url ? (
+                    <img 
+                      src={event.employer.avatar_url}
+                      alt={event.employer.name}
+                      className="w-20 h-20 rounded-full object-cover mb-4 border-2 border-white"
+                    />
+                  ) : (
+                    <div className={cn(
+                      'w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold mb-4 border-4',
+                      isDark
+                        ? 'bg-gradient-to-br from-blue-600 to-purple-600 text-white border-blue-500'
+                        : 'bg-gradient-to-br from-blue-400 to-purple-500 text-white border-blue-400'
+                    )}>
+                      {event.employer.name?.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  
+                  <p className={cn(
+                    'text-lg font-bold',
+                    isDark ? 'text-white' : 'text-blbg-black'
+                  )}>
+                    {event.employer.name}
+                  </p>
+                  <p className={cn(
+                    'text-sm',
+                    isDark ? 'text-gray-400' : 'text-gray-600'
+                  )}>
+                    {event.employer.company_name}
+                  </p>
+                  {event.employer.verified && (
+                    <div className="mt-2 flex items-center space-x-1 text-blue-500">
+                      <CheckCircle className="h-4 w-4" />
+                      <span className="text-xs font-semibold">Verified</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* View Profile Button */}
+                <Link
+                  to={`/profile/${event.employer.id}`}
+                  className={cn(
+                    'block w-full text-center px-4 py-2 rounded-lg font-semibold transition-all',
+                    isDark
+                      ? 'bg-blue-900/20 text-blue-400 hover:bg-blue-900/30'
+                      : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                  )}
+                >
+                  View Employer Profile
+                </Link>
+              </div>
+            )}
+
+            {/* Attendees */}
+            <div className={cn(
+              'rounded-3xl p-8',
+              isDark ? 'bg-black border border-gray-800 shadow-2xl shadow-black/50' : 'bg-white border border-gray-200 shadow-lg'
+            )}>
+              <h3 className={cn(
+                'text-xl font-bold mb-6 flex items-center justify-between',
+                isDark ? 'text-white' : 'text-blbg-black'
+              )}>
+                <span>Attendees</span>
+                <span className={cn(
+                  'text-sm px-3 py-1 rounded-full',
+                  isDark
+                    ? 'bg-gray-800 text-gray-400'
+                    : 'bg-gray-100 text-gray-600'
+                )}>
+                  {attendees.length}
+                </span>
+              </h3>
+
+              {attendeesLoading ? (
+                <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>Loading attendees...</p>
+              ) : attendees.length > 0 ? (
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {attendees.slice(0, 8).map((attendee) => (
+                    <div key={attendee.id} className={cn(
+                      'flex items-center space-x-3 p-3 rounded-lg',
+                      isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-50'
+                    )}>
+                      {attendee.profiles?.avatar_url ? (
+                        <img 
+                          src={attendee.profiles.avatar_url}
+                          alt={attendee.profiles.full_name}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className={cn(
+                          'w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold',
+                          isDark
+                            ? 'bg-gradient-to-br from-blue-600 to-purple-600 text-white'
+                            : 'bg-gradient-to-br from-blue-400 to-purple-500 text-white'
+                        )}>
+                          {attendee.profiles?.full_name?.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className={cn(
+                          'font-medium truncate',
+                          isDark ? 'text-white' : 'text-blbg-black'
+                        )}>
+                          {attendee.profiles?.full_name}
+                        </p>
+                        <p className={cn(
+                          'text-xs truncate',
+                          isDark ? 'text-gray-400' : 'text-gray-600'
+                        )}>
+                          @{attendee.profiles?.username}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                  {attendees.length > 8 && (
+                    <p className={cn(
+                      'text-center text-sm py-2',
+                      isDark ? 'text-gray-400' : 'text-gray-600'
+                    )}>
+                      +{attendees.length - 8} more attending
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>No attendees yet</p>
+              )}
             </div>
           </div>
         </div>
@@ -365,12 +560,23 @@ export default function EventDetails() {
       {/* Registration Modal */}
       {showRegisterModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-md w-full">
+          <div className={cn(
+            'rounded-3xl p-8 max-w-md w-full',
+            isDark ? 'bg-black' : 'bg-white'
+          )}>
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-gray-900">Register for Event</h3>
+              <h3 className={cn(
+                'text-2xl font-bold',
+                isDark ? 'text-white' : 'text-blbg-black'
+              )}>Register for Event</h3>
               <button
                 onClick={() => setShowRegisterModal(false)}
-                className="p-2 hover:bg-gray-100 rounded-full"
+                className={cn(
+                  'p-2 rounded-full transition-colors',
+                  isDark
+                    ? 'hover:bg-gray-800 text-gray-400'
+                    : 'hover:bg-gray-100 text-gray-500'
+                )}
               >
                 <X className="h-6 w-6" />
               </button>
@@ -378,41 +584,44 @@ export default function EventDetails() {
 
             <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleRegister(); }}>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className={cn(
+                  'block text-sm font-medium mb-2',
+                  isDark ? 'text-gray-300' : 'text-gray-700'
+                )}>
                   Dietary Restrictions (Optional)
                 </label>
                 <textarea
                   value={registrationData.dietary_restrictions}
                   onChange={(e) => setRegistrationData(prev => ({ ...prev, dietary_restrictions: e.target.value }))}
-                  className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-asu-maroon focus:border-transparent"
-                  rows={3}
-                  placeholder="Any dietary restrictions or food allergies?"
+                  className={cn(
+                    'w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none',
+                    isDark
+                      ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
+                      : 'bg-white border-gray-300 text-blbg-black placeholder-gray-400'
+                  )}
+                  rows={2}
+                  placeholder="Any dietary restrictions?"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className={cn(
+                  'block text-sm font-medium mb-2',
+                  isDark ? 'text-gray-300' : 'text-gray-700'
+                )}>
                   Accessibility Needs (Optional)
                 </label>
                 <textarea
                   value={registrationData.accessibility_needs}
                   onChange={(e) => setRegistrationData(prev => ({ ...prev, accessibility_needs: e.target.value }))}
-                  className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-asu-maroon focus:border-transparent"
-                  rows={3}
-                  placeholder="Any accessibility accommodations needed?"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Questions for Organizers (Optional)
-                </label>
-                <textarea
-                  value={registrationData.questions}
-                  onChange={(e) => setRegistrationData(prev => ({ ...prev, questions: e.target.value }))}
-                  className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-asu-maroon focus:border-transparent"
-                  rows={3}
-                  placeholder="Any questions about the event?"
+                  className={cn(
+                    'w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none',
+                    isDark
+                      ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
+                      : 'bg-white border-gray-300 text-blbg-black placeholder-gray-400'
+                  )}
+                  rows={2}
+                  placeholder="Any accessibility accommodations?"
                 />
               </div>
 
@@ -420,15 +629,26 @@ export default function EventDetails() {
                 <button
                   type="button"
                   onClick={() => setShowRegisterModal(false)}
-                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
+                  className={cn(
+                    'flex-1 px-6 py-3 border rounded-lg font-medium transition-colors',
+                    isDark
+                      ? 'border-gray-700 text-gray-300 hover:bg-gray-800'
+                      : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                  )}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-6 py-3 bg-asu-maroon text-white rounded-xl hover:bg-asu-maroon-dark transition-colors"
+                  disabled={registerMutation.isPending}
+                  className={cn(
+                    'flex-1 px-6 py-3 rounded-lg font-medium text-white transition-all disabled:opacity-50',
+                    isDark
+                      ? 'bg-blue-600 hover:bg-blue-700'
+                      : 'bg-blue-600 hover:bg-blue-700'
+                  )}
                 >
-                  Register
+                  {registerMutation.isPending ? 'Registering...' : 'Register'}
                 </button>
               </div>
             </form>

@@ -74,6 +74,7 @@ const BookmarksPage = lazy(() => import('./components/BookmarksPage'));
 const CreatePost = lazy(() => import('./components/CreatePost'));
 const SearchDemoPage = lazy(() => import('./components/SearchDemoPage'));
 const SearchPage = lazy(() => import('./components/SearchPage'));
+const ExplorePage = lazy(() => import('./components/ExplorePage'));
 
 // LinkedIn Integration
 const LinkedInJobImport = lazy(() => import('./components/LinkedIn/LinkedInJobImport'));
@@ -91,7 +92,7 @@ function LoadingFallback({ message = 'Loading...' }: { message?: string }) {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-dark-bg flex items-center justify-center transition-colors duration-300">
       <div className="flex flex-col items-center space-y-4">
-        <Loader2 className="h-8 w-8 animate-spin text-asu-maroon dark:text-lime" />
+        <Loader2 className="h-8 w-8 animate-spin text-asu-maroon dark:text-white" />
         <span className="text-gray-600 dark:text-dark-muted text-sm font-medium">{message}</span>
       </div>
     </div>
@@ -595,6 +596,13 @@ function AppContent() {
             <ProtectedRoute>
               <Suspense fallback={<LoadingFallback message="Loading AI job recommendations..." />}>
                 <AIJobRecommendations />
+              </Suspense>
+            </ProtectedRoute>
+          } />
+          <Route path="/explore" element={
+            <ProtectedRoute>
+              <Suspense fallback={<LoadingFallback message="Loading explore page..." />}>
+                <ExplorePage />
               </Suspense>
             </ProtectedRoute>
           } />

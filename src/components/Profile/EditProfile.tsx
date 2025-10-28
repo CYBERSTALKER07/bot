@@ -35,6 +35,12 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
 
   const [profileData, setProfileData] = useState<ProfileData & {
     display_name?: string;
+    school?: string;
+    major?: string;
+    graduation_year?: number;
+    gpa?: number;
+    skills?: string[];
+    interests?: string[];
   }>({
     full_name: '',
     username: '',
@@ -46,7 +52,13 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
     company_name: '',
     title: '',
     verified: false,
-    display_name: ''
+    display_name: '',
+    school: '',
+    major: '',
+    graduation_year: undefined,
+    gpa: undefined,
+    skills: [],
+    interests: []
   });
 
   const [originalData, setOriginalData] = useState<typeof profileData>(profileData);
@@ -120,6 +132,21 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
       newErrors.portfolio_url = 'Please enter a valid portfolio URL';
     }
 
+    // Validate GPA
+    if (profileData.gpa !== undefined && profileData.gpa !== null && profileData.gpa !== 0) {
+      if (profileData.gpa < 0 || profileData.gpa > 4.0) {
+        newErrors.gpa = 'GPA must be between 0.0 and 4.0';
+      }
+    }
+
+    // Validate graduation year
+    if (profileData.graduation_year) {
+      const currentYear = new Date().getFullYear();
+      if (profileData.graduation_year < 1950 || profileData.graduation_year > currentYear + 10) {
+        newErrors.graduation_year = 'Please enter a valid graduation year';
+      }
+    }
+
     // Role-specific validation
     if (user?.role === 'employer') {
       if (!profileData.company_name?.trim()) {
@@ -169,7 +196,7 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
     try {
       setSaving(true);
       
-      // Prepare data for saving - clean and validate
+      // Prepare data for saving - include all new fields
       const saveData: Partial<ProfileData> = {
         full_name: profileData.full_name?.trim(),
         username: profileData.username?.toLowerCase().trim(),
@@ -178,7 +205,13 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
         avatar_url: profileData.avatar_url,
         cover_image_url: profileData.cover_image_url,
         website: profileData.website?.trim(),
-        role: profileData.role
+        role: profileData.role,
+        school: profileData.school?.trim(),
+        major: profileData.major?.trim(),
+        graduation_year: profileData.graduation_year,
+        gpa: profileData.gpa,
+        skills: profileData.skills,
+        interests: profileData.interests
       };
 
       // Add role-specific fields
@@ -464,6 +497,81 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
               <p className="text-xs text-gray-500">Role cannot be changed after account creation</p>
             </div>
           </div>
+
+          {/* Education & Skills Section */}
+          {user?.role === 'student' && (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold">Education & Skills</h2>
+              
+              {/* Education Fields */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {renderField('School/University', 'school', 'e.g., Stanford University', 'text', <GraduationCap className="w-4 h-4" />)}
+                {renderField('Major', 'major', 'e.g., Computer Science', 'text', <BookOpen className="w-4 h-4" />)}
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {renderField('Graduation Year', 'graduation_year', '2025', 'number', <Calendar className="w-4 h-4" />)}
+                {renderField('GPA', 'gpa', '3.5 (out of 4.0)', 'number', <Award className="w-4 h-4" />)}
+              </div>
+              
+              {/* Skills Array Field */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-900 dark:text-white">
+                  Skills
+                </label>
+                <div className="relative">
+                  <div className="absolute left-3 top-3 text-gray-400">
+                    <Award className="w-4 h-4" />
+                  </div>
+                  <textarea
+                    value={profileData.skills?.join(', ') || ''}
+                    onChange={(e) => handleSkillsChange(e.target.value)}
+                    placeholder="e.g., JavaScript, React, Python, SQL (comma-separated)"
+                    className={cn(
+                      'w-full px-3 py-2 pl-10 border rounded-lg resize-none transition-colors',
+                      'border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-500',
+                      'bg-white dark:bg-gray-900 text-gray-900 dark:text-white',
+                      'focus:outline-none focus:ring-2'
+                    )}
+                    rows={2}
+                  />
+                </div>
+                <p className="text-xs text-gray-500">
+                  Separate skills with commas. These help match you with relevant opportunities.
+                </p>
+              </div>
+              
+              {/* Interests Array Field */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-900 dark:text-white">
+                  Interests
+                </label>
+                <div className="relative">
+                  <div className="absolute left-3 top-3 text-gray-400">
+                    <Award className="w-4 h-4" />
+                  </div>
+                  <textarea
+                    value={profileData.interests?.join(', ') || ''}
+                    onChange={(e) => {
+                      const interests = e.target.value.split(',').map(s => s.trim()).filter(Boolean);
+                      handleInputChange('interests', interests);
+                    }}
+                    placeholder="e.g., Artificial Intelligence, Web Development, Data Science (comma-separated)"
+                    className={cn(
+                      'w-full px-3 py-2 pl-10 border rounded-lg resize-none transition-colors',
+                      'border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-500',
+                      'bg-white dark:bg-gray-900 text-gray-900 dark:text-white',
+                      'focus:outline-none focus:ring-2'
+                    )}
+                    rows={2}
+                  />
+                </div>
+                <p className="text-xs text-gray-500">
+                  What are you passionate about? Separate interests with commas.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Bottom padding for scrolling space */}
           <div className="pb-8" />

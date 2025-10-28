@@ -4,7 +4,6 @@ import {
   ArrowLeft,
   Calendar,
   MapPin,
-  LinkIcon,
   Mail,
   MoreHorizontal,
   MessageCircle,
@@ -13,11 +12,9 @@ import {
   TrendingUp,
   Heart,
   Share,
-  Edit,
   Search,
   X,
   Verified,
-  Smartphone,
   BarChart3,
   Home,
   Hash,
@@ -27,22 +24,20 @@ import {
   LogOut,
   Plus,
   Briefcase,
-  GraduationCap,
   Award,
   Target,
-  Repeat2
+  Repeat2,
+  Feather
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { supabase } from '../../lib/supabase';
 import Button from '../ui/Button';
-import Badge from '../ui/Badge';
 import FollowButton from '../FollowButton';
 import { cn } from '../../lib/cva';
-import AnimatedSearchButton from '../AnimatedSearchButton';
-import { useRecommendedUsers, useFollowUser } from '../../hooks/useOptimizedQuery';
-import { useFollowStatusCache } from '../../hooks/useFollowStatusCache';
+import { useRecommendedUsers, useMatchedJobs } from '../../hooks/useOptimizedQuery';
 import WhoToFollowItem from '../WhoToFollowItem';
+import { ProfileHeaderSkeleton, ProfileTabsSkeleton, ProfilePostsSkeleton, ProfileSidebarSkeleton, LeftSidebarSkeleton } from '../ui/Skeleton';
 
 interface ProfileData {
   id?: string;
@@ -79,6 +74,16 @@ interface TrendingTopic {
   topic: string;
   posts: string;
   trending?: boolean;
+  hashtag?: string;
+  engagement?: number;
+}
+
+interface IndustryInsight {
+  title: string;
+  change: string;
+  trend: 'up' | 'down' | 'stable';
+  description: string;
+  count?: number;
 }
 
 interface Post {
@@ -157,31 +162,17 @@ export default function Profile() {
 
   // Suggested users data
   const { data: recommendedUsers } = useRecommendedUsers(user?.id);
-  const followUserMutation = useFollowUser();
+  
+  // Fetch matched jobs with intelligent matching
+  const { data: matchedJobs = [], isLoading: matchedJobsLoading } = useMatchedJobs(user?.id, 2);
 
-  // Trending topics data
-  const [trendingTopics] = useState<TrendingTopic[]>([
-    {
-      category: 'Only on X · Trending',
-      topic: '#KengNamping',
-      posts: '96.6K posts'
-    },
-    {
-      category: 'Entertainment · Trending',
-      topic: 'Brand New Day',
-      posts: '4,533 posts'
-    },
-    {
-      category: 'Politics · Trending',
-      topic: 'North Korea',
-      posts: '37.7K posts'
-    },
-    {
-      category: 'Politics · Trending',
-      topic: 'Hegseth',
-      posts: '43.3K posts'
-    }
-  ]);
+  // Trending topics data - now dynamic
+  const [trendingTopics, setTrendingTopics] = useState<TrendingTopic[]>([]);
+  const [trendingLoading, setTrendingLoading] = useState(true);
+
+  // Industry insights data - now dynamic
+  const [industryInsights, setIndustryInsights] = useState<IndustryInsight[]>([]);
+  const [insightsLoading, setInsightsLoading] = useState(true);
 
   // Navigation items for left sidebar
   const navigationItems = [
@@ -236,6 +227,12 @@ export default function Profile() {
       fetchFollowerCounts(profileData.id);
     }
   }, [profileData.id]);
+
+  // Fetch dynamic trending topics based on hashtags and engagement
+  useEffect(() => {
+    fetchTrendingTopics();
+    fetchIndustryInsights();
+  }, []);
 
   const loadProfileData = async () => {
     if (!user) return;
@@ -414,6 +411,264 @@ export default function Profile() {
     }
   };
 
+  const fetchTrendingTopics = async () => {
+    try {
+      setTrendingLoading(true);
+      
+      // Fetch recent posts with tags (last 7 days for relevance)
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      
+      const { data: postsWithTags, error } = await supabase
+        .from('posts')
+        .select('id, tags, likes_count, comments_count, shares_count, created_at')
+        .not('tags', 'is', null)
+        .gte('created_at', sevenDaysAgo.toISOString())
+        .order('created_at', { ascending: false })
+        .limit(200);
+
+      if (error) {
+        console.error('Error fetching trending topics:', error);
+        setTrendingTopics([]);
+        return;
+      }
+
+      // Process hashtags and calculate engagement
+      const hashtagStats = new Map<string, { count: number; engagement: number }>();
+      
+      postsWithTags?.forEach(post => {
+        const engagement = (post.likes_count || 0) + (post.comments_count || 0) + (post.shares_count || 0);
+        post.tags?.forEach((tag: string) => {
+          const cleanTag = tag.startsWith('#') ? tag : `#${tag}`;
+          const current = hashtagStats.get(cleanTag) || { count: 0, engagement: 0 };
+          hashtagStats.set(cleanTag, {
+            count: current.count + 1,
+            engagement: current.engagement + engagement
+          });
+        });
+      });
+
+      // Sort by engagement and post count
+      const sortedTopics = Array.from(hashtagStats.entries())
+        .sort((a, b) => {
+          const scoreA = a[1].engagement * 2 + a[1].count;
+          const scoreB = b[1].engagement * 2 + b[1].count;
+          return scoreB - scoreA;
+        })
+        .slice(0, 5)
+        .map(([hashtag, stats]) => ({
+          category: stats.engagement > 50 ? 'Trending · Hot' : 'Trending',
+          topic: hashtag,
+          posts: `${stats.count.toLocaleString()} post${stats.count !== 1 ? 's' : ''}`,
+          trending: stats.engagement > 30,
+          hashtag: hashtag,
+          engagement: stats.engagement
+        }));
+
+      // If we don't have enough trending topics, add some based on recent activity
+      if (sortedTopics.length < 3) {
+        // Fetch recent jobs data
+        const { data: recentJobs } = await supabase
+          .from('jobs')
+          .select('title, company')
+          .eq('status', 'open')
+          .order('posted_at', { ascending: false })
+          .limit(5);
+
+        // Fetch recent events
+        const { data: recentEvents } = await supabase
+          .from('employer_events')
+          .select('title, attendees_count')
+          .eq('status', 'upcoming')
+          .order('created_at', { ascending: false })
+          .limit(3);
+
+        // Add job-related trending topics
+        if (recentJobs && recentJobs.length > 0) {
+          sortedTopics.push({
+            category: 'Jobs · Trending',
+            topic: `${recentJobs[0].title}`,
+            posts: `${recentJobs.length} new opening${recentJobs.length !== 1 ? 's' : ''}`,
+            trending: true
+          });
+        }
+
+        // Add event-related trending topics
+        if (recentEvents && recentEvents.length > 0) {
+          const totalAttendees = recentEvents.reduce((sum, evt) => sum + (evt.attendees_count || 0), 0);
+          sortedTopics.push({
+            category: 'Events · Live',
+            topic: recentEvents[0].title,
+            posts: `${totalAttendees} interested`,
+            trending: true
+          });
+        }
+      }
+
+      setTrendingTopics(sortedTopics);
+    } catch (error) {
+      console.error('Error in fetchTrendingTopics:', error);
+      setTrendingTopics([]);
+    } finally {
+      setTrendingLoading(false);
+    }
+  };
+
+  const fetchIndustryInsights = async () => {
+    try {
+      setInsightsLoading(true);
+      
+      // Get current date and 30 days ago for comparison
+      const now = new Date();
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const sixtyDaysAgo = new Date();
+      sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
+
+      // Fetch recent jobs (last 30 days)
+      const { data: recentJobs, error: jobsError } = await supabase
+        .from('jobs')
+        .select('id, title, skills, type, posted_at, status')
+        .gte('posted_at', thirtyDaysAgo.toISOString())
+        .eq('status', 'open');
+
+      // Fetch previous period jobs (30-60 days ago) for comparison
+      const { data: previousJobs } = await supabase
+        .from('jobs')
+        .select('id, title, skills, type, posted_at, status')
+        .gte('posted_at', sixtyDaysAgo.toISOString())
+        .lt('posted_at', thirtyDaysAgo.toISOString())
+        .eq('status', 'open');
+
+      if (jobsError) {
+        console.error('Error fetching jobs for insights:', jobsError);
+        setIndustryInsights([]);
+        return;
+      }
+
+      // Analyze job titles to find trending roles
+      const roleCounts = new Map<string, { current: number; previous: number }>();
+      
+      // Count current period jobs
+      recentJobs?.forEach(job => {
+        const role = job.title.toLowerCase();
+        const current = roleCounts.get(role) || { current: 0, previous: 0 };
+        roleCounts.set(role, { ...current, current: current.current + 1 });
+      });
+
+      // Count previous period jobs
+      previousJobs?.forEach(job => {
+        const role = job.title.toLowerCase();
+        const current = roleCounts.get(role) || { current: 0, previous: 0 };
+        roleCounts.set(role, { ...current, previous: current.previous + 1 });
+      });
+
+      // Analyze skills demand
+      const skillCounts = new Map<string, { current: number; previous: number }>();
+      
+      recentJobs?.forEach(job => {
+        job.skills?.forEach((skill: string) => {
+          const current = skillCounts.get(skill) || { current: 0, previous: 0 };
+          skillCounts.set(skill, { ...current, current: current.current + 1 });
+        });
+      });
+
+      previousJobs?.forEach(job => {
+        job.skills?.forEach((skill: string) => {
+          const current = skillCounts.get(skill) || { current: 0, previous: 0 };
+          skillCounts.set(skill, { ...current, previous: current.previous + 1 });
+        });
+      });
+
+      // Calculate percentage changes and create insights
+      const insights: IndustryInsight[] = [];
+
+      // Top trending roles
+      const topRoles = Array.from(roleCounts.entries())
+        .map(([role, counts]) => {
+          const change = counts.previous > 0 
+            ? ((counts.current - counts.previous) / counts.previous) * 100
+            : counts.current > 0 ? 100 : 0;
+          return { role, counts, change };
+        })
+        .filter(item => item.counts.current > 0)
+        .sort((a, b) => b.change - a.change)
+        .slice(0, 2);
+
+      topRoles.forEach(item => {
+        insights.push({
+          title: item.role.split(' ').map(word => 
+            word.charAt(0).toUpperCase() + word.slice(1)
+          ).join(' '),
+          change: item.change > 0 ? `+${Math.round(item.change)}%` : `${Math.round(item.change)}%`,
+          trend: item.change > 0 ? 'up' : item.change < 0 ? 'down' : 'stable',
+          description: `${item.counts.current} new opening${item.counts.current !== 1 ? 's' : ''} this month`,
+          count: item.counts.current
+        });
+      });
+
+      // Top trending skills
+      const topSkills = Array.from(skillCounts.entries())
+        .map(([skill, counts]) => {
+          const change = counts.previous > 0 
+            ? ((counts.current - counts.previous) / counts.previous) * 100
+            : counts.current > 0 ? 100 : 0;
+          return { skill, counts, change };
+        })
+        .filter(item => item.counts.current > 0)
+        .sort((a, b) => b.change - a.change)
+        .slice(0, 1);
+
+      topSkills.forEach(item => {
+        insights.push({
+          title: item.skill,
+          change: item.change > 0 ? `+${Math.round(item.change)}%` : `${Math.round(item.change)}%`,
+          trend: item.change > 0 ? 'up' : item.change < 0 ? 'down' : 'stable',
+          description: `Required in ${item.counts.current} job${item.counts.current !== 1 ? 's' : ''}`,
+          count: item.counts.current
+        });
+      });
+
+      // If no insights yet, add general market insights
+      if (insights.length === 0 && recentJobs && recentJobs.length > 0) {
+        insights.push({
+          title: 'Job Market',
+          change: `${recentJobs.length} openings`,
+          trend: 'up',
+          description: 'Active opportunities available',
+          count: recentJobs.length
+        });
+      }
+
+      // Fallback: If still no insights, show static helpful data
+      if (insights.length === 0) {
+        insights.push(
+          {
+            title: 'Growing Demand',
+            change: 'Trending',
+            trend: 'up',
+            description: 'Complete your profile to see personalized insights',
+            count: 0
+          },
+          {
+            title: 'Remote Work',
+            change: 'Popular',
+            trend: 'up',
+            description: 'Many remote positions available',
+            count: 0
+          }
+        );
+      }
+
+      setIndustryInsights(insights);
+    } catch (error) {
+      console.error('Error in fetchIndustryInsights:', error);
+      setIndustryInsights([]);
+    } finally {
+      setInsightsLoading(false);
+    }
+  };
+
   const handleEditProfile = () => {
     navigate('/profile/edit');
   };
@@ -463,10 +718,30 @@ export default function Profile() {
   if (loading) {
     return (
       <div className={cn(
-        "flex items-center justify-center min-h-screen",
-        isDark ? "bg-black" : "bg-white"
+        "min-h-screen",
+        isDark ? "bg-black text-white" : "bg-gray-50 text-gray-900"
       )}>
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#BCE953]"></div>
+        <div className="max-w-7xl mx-auto flex">
+          {/* Left Sidebar Skeleton */}
+          <div className={cn(
+            "hidden lg:block w-80 p-4 space-y-6 border-r sticky top-0 h-screen overflow-y-auto",
+            isDark ? "bg-black border-gray-800" : "bg-white border-gray-200"
+          )}>
+            <LeftSidebarSkeleton />
+          </div>
+
+          {/* Main Content Skeleton */}
+          <div className={cn('flex-1 max-w-2xl border-x', isDark ? "bg-black border-gray-800" : "bg-gray-50 border-gray-200")}>
+            <ProfileHeaderSkeleton />
+            <ProfileTabsSkeleton />
+            <ProfilePostsSkeleton />
+          </div>
+
+          {/* Right Sidebar Skeleton */}
+          <div className={cn("w-80 p-4 space-y-4", isDark ? "bg-black" : "bg-gray-50")}>
+            <ProfileSidebarSkeleton />
+          </div>
+        </div>
       </div>
     );
   }
@@ -568,14 +843,7 @@ export default function Profile() {
             <p className="text-sm text-white/90 mb-3">
               Get personalized career guidance based on your profile and goals
             </p>
-            <div className="space-y-2">
-              <button className="w-full bg-white/20 hover:bg-white/30 rounded-lg p-2 text-xs text-left transition-colors">
-                Daily Career Tip: "Network authentically, not just for opportunities"
-              </button>
-              <button className="w-full bg-white/20 hover:bg-white/30 rounded-lg p-2 text-xs text-left transition-colors">
-                Next Goal: Complete 3 skill assessments this week
-              </button>
-            </div>
+       
           </div>
 
           {/* Skills Development Tracker */}
@@ -588,26 +856,7 @@ export default function Profile() {
               <p className={cn("text-xs", isDark ? "text-gray-400" : "text-gray-600")}>Real-time market insights</p>
             </div>
             <div className={cn("divide-y", isDark ? "divide-gray-800" : "divide-gray-200")}>
-              {[
-                { 
-                  title: 'AI/ML Engineers', 
-                  change: '+23%', 
-                  trend: 'up',
-                  description: 'Demand surge this month'
-                },
-                { 
-                  title: 'Full-Stack Developers', 
-                  change: '+15%', 
-                  trend: 'up',
-                  description: 'Remote opportunities rising'
-                },
-                { 
-                  title: 'UX Designers', 
-                  change: '+8%', 
-                  trend: 'up',
-                  description: 'Fintech sector leading'
-                }
-              ].map((insight, index) => (
+              {industryInsights.map((insight, index) => (
                 <div key={index} className={cn("p-3 transition-colors", isDark ? "hover:bg-gray-800/50" : "hover:bg-gray-50")}>
                   <div className="flex items-center justify-between mb-1">
                     <span className={cn("text-sm font-medium", isDark ? "text-gray-300" : "text-gray-900")}>{insight.title}</span>
@@ -625,7 +874,10 @@ export default function Profile() {
           {/* Create Post Button */}
           <Button
             onClick={() => navigate('/create-post')}
-            className="w-full bg-[#BCE953] hover:bg-[#A8D543] text-black font-bold py-3 rounded-full flex items-center justify-center gap-2"
+            className={cn(
+              "w-full font-bold py-3 rounded-full flex items-center justify-center gap-2",
+              isDark ? "bg-white text-black hover:bg-gray-200" : "bg-black text-white hover:bg-gray-800"
+            )}
           >
             <Plus className="w-5 h-5" />
             Create Post
@@ -727,29 +979,76 @@ export default function Profile() {
                   <img
                     src={profileData.avatar_url}
                     alt="Profile"
-                    className="w-32 h-32 rounded-full border-4 border-current object-cover shadow-lg"
+                    className="w-32 h-32 rounded-full border-4 border-black object-cover shadow-lg"
                   />
                 ) : (
                   <div className={cn("w-32 h-32 rounded-full border-4 flex items-center justify-center font-bold text-4xl shadow-lg", isDark ? "bg-gray-900 border-black text-gray-400" : "bg-gray-300 border-white text-gray-700")}>
                     {(profileData.full_name || user?.name || 'U').charAt(0)}
-                  </div>
+                  </div> 
                 )}
               </div>
 
               {/* Edit Profile Button */}
-              {isOwnProfile ? (
-                <div className="mt-4">
-                  <Button
-                    variant="outlined"
-                    onClick={handleEditProfile}
-                    className={cn("rounded-full px-6 py-1.5 font-bold", isDark ? "border-gray-700 border-none text-white hover:bg-black" : "border-gray-300 text-black hover:bg-gray-100")}
-                  >
-                    Edit profile
-                  </Button>
-                </div>
-              ) : (
-                <FollowButton targetUserId={userId} />
-              )}
+                {isOwnProfile ? (
+                  <div className="mt-4 group">
+                    <Button
+                      variant="outlined"
+                      onClick={handleEditProfile}
+                      className={cn(
+                        "rounded-3xl px-6 py-1.5 font-thin transition-all duration-300 flex items-center gap-2 overflow-hidden relative",
+                        isDark 
+                          ? "border-none text-white hover:bg-black/90 bg-black" 
+                          : "border-none text-black hover:bg-gray-100 hover:border-gray-400"
+                      )}
+                      onMouseEnter={(e) => {
+                        const span = e.currentTarget.querySelector('.edit-text');
+                        if (span) {
+                          // Animate text transformation
+                          gsap.to(span, {
+                            scale: 0.8,
+                            opacity: 0,
+                            duration: 0.2,
+                            ease: "power2.in",
+                            onComplete: () => {
+                              span.textContent = "Profile";
+                              gsap.to(span, {
+                                scale: 1,
+                                opacity: 1,
+                                duration: 0.2,
+                                ease: "power2.out"
+                              });
+                            }
+                          });
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        const span = e.currentTarget.querySelector('.edit-text');
+                        if (span) {
+                          gsap.to(span, {
+                            scale: 0.8,
+                            opacity: 0,
+                            duration: 0.2,
+                            ease: "power2.in",
+                            onComplete: () => {
+                              span.textContent = "Edit";
+                              gsap.to(span, {
+                                scale: 1,
+                                opacity: 1,
+                                duration: 0.2,
+                                ease: "power2.out"
+                              });
+                            }
+                          });
+                        }
+                      }}
+                    >
+                      <Feather className="w-4 h-4 transition-all duration-300 group-hover:scale-110 group-hover:rotate-12" />
+                      <span className="edit-text inline-block">Edit</span>
+                    </Button>
+                  </div>
+                ) : (
+                  <FollowButton targetUserId={userId} />
+                )}
             </div>
 
             {/* User Info */}
@@ -821,7 +1120,7 @@ export default function Profile() {
                     Upgrade your profile now.
                   </p>
                   <Button
-                    variant="primary"
+                    variant="filled"
                     className="bg-[#BCE953] hover:bg-[#A8D543] text-black font-bold px-4 py-1.5 rounded-full text-sm"
                   >
                     Get verified
@@ -1080,30 +1379,6 @@ export default function Profile() {
             </div>
           </div>
 
-          {/* AI Career Assistant */}
-          {/* <div className="bg-primary rounded-2xl p-4 text-white">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                <Target className="w-4 h-4" />
-              </div>
-              <h3 className="font-bold text-lg">AI Career Coach</h3>
-            </div>
-            <p className="text-sm text-white/90 mb-3">
-              Get personalized career guidance based on your profile and goals
-            </p>
-            <div className="space-y-2">
-              <button className="w-full bg-white/20 hover:bg-white/30 rounded-lg p-2 text-xs text-left transition-colors">
-                💡 Daily Career Tip: "Network authentically, not just for opportunities"
-              </button>
-              <button className="w-full bg-white/20 hover:bg-white/30 rounded-lg p-2 text-xs text-left transition-colors">
-                🎯 Next Goal: Complete 3 skill assessments this week
-              </button>
-            </div>
-          </div> */}
-
-          {/* Skills Development Tracker */}
-          
-
           {/* Industry Insights */}
           <div className={cn("rounded-2xl border overflow-hidden", isDark ? "bg-black border-gray-800" : "bg-white border-gray-200")}>
             <div className={cn("p-4 border-b", isDark ? "border-gray-800" : "border-gray-200")}>
@@ -1148,20 +1423,6 @@ export default function Profile() {
             </div>
           </div>
 
-          {/* Mentorship Marketplace */}
-          {/* <div className={cn("rounded-2xl p-4", isDark ? "bg-blue-950 text-white" : "bg-blue-950 text-white")}>
-            <div className="flex items-center gap-2 mb-3">
-              <Users className="w-5 h-5" />
-              <h3 className="font-bold">Find a Mentor</h3>
-            </div>
-            <p className="text-sm text-white/90 mb-3">
-              Connect with industry professionals for 1-on-1 guidance
-            </p>
-            <button className="w-full bg-white/20 hover:bg-white/30 rounded-lg py-2 text-sm font-medium transition-colors">
-              Browse Mentors
-            </button>
-          </div> */}
-
           {/* Career Opportunities Scanner */}
           <div className={cn("rounded-2xl border overflow-hidden", isDark ? "bg-black border-gray-800" : "bg-white border-gray-200")}>
             <div className={cn("p-4 border-b", isDark ? "border-gray-800" : "border-gray-200")}>
@@ -1172,72 +1433,75 @@ export default function Profile() {
               <p className={cn("text-xs", isDark ? "text-gray-400" : "text-gray-600")}>Matching your profile in real-time</p>
             </div>
             <div className="p-4 space-y-3">
-              {[
-                { 
-                  company: 'Google', 
-                  role: 'Frontend Developer',
-                  match: 94,
-                  timeLeft: '2 days',
-                  applicants: 23
-                },
-                { 
-                  company: 'Meta', 
-                  role: 'Product Manager',
-                  match: 87,
-                  timeLeft: '5 days',
-                  applicants: 45
-                }
-              ].map((opp, index) => (
-                <div key={index} className={cn("border rounded-lg p-3", isDark ? "border-gray-700" : "border-gray-200")}>
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <h4 className={cn("font-medium text-sm", isDark ? "text-white" : "text-gray-900")}>{opp.role}</h4>
-                      <p className={cn("text-xs", isDark ? "text-gray-400" : "text-gray-600")}>{opp.company}</p>
-                    </div>
-                    <div className="text-right">
-                      <div className={cn(
-                        'text-xs px-2 py-1 rounded-full font-medium',
-                        opp.match >= 90 ? 'bg-green-100/20 text-green-400' : 'bg-yellow-100/20 text-yellow-400'
-                      )}>
-                        {opp.match}% match
+              {matchedJobsLoading ? (
+                <div className="text-center py-4 text-gray-400">Loading opportunities...</div>
+              ) : matchedJobs && matchedJobs.length > 0 ? (
+                matchedJobs.map((job: any, index: number) => (
+                  <div 
+                    key={job.id || index} 
+                    className={cn("border rounded-lg p-3 cursor-pointer transition-all hover:shadow-md", isDark ? "border-gray-700 hover:border-gray-600" : "border-gray-200 hover:border-gray-400")}
+                    onClick={() => navigate(`/job/${job.id}`)}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex-1 min-w-0">
+                        <h4 className={cn("font-medium text-sm truncate", isDark ? "text-white" : "text-gray-900")}>{job.title}</h4>
+                        <p className={cn("text-xs truncate", isDark ? "text-gray-400" : "text-gray-600")}>{job.company}</p>
+                      </div>
+                      <div className="text-right ml-2">
+                        <div className={cn(
+                          'text-xs px-2 py-1 rounded-full font-medium',
+                          job.matchPercentage >= 70 
+                            ? 'bg-green-100/20 text-green-400' 
+                            : job.matchPercentage >= 50
+                              ? 'bg-yellow-100/20 text-yellow-400'
+                              : 'bg-blue-100/20 text-blue-400'
+                        )}>
+                          {job.matchPercentage}% match
+                        </div>
                       </div>
                     </div>
+                    
+                    {/* Match Reasons */}
+                    {job.matchReasons && job.matchReasons.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {job.matchReasons.slice(0, 2).map((reason: string, idx: number) => (
+                          <span
+                            key={idx}
+                            className={cn(
+                              'text-xs px-2 py-0.5 rounded-full',
+                              isDark 
+                                ? 'bg-blue-900/30 text-blue-300' 
+                                : 'bg-blue-50 text-blue-600'
+                            )}
+                          >
+                            ✓ {reason}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    
+                    <div className={cn("flex items-center justify-between text-xs", isDark ? "text-gray-400" : "text-gray-500")}>
+                      <span>{job.location || 'Remote'}</span>
+                      <span>{job.type || 'Full-time'}</span>
+                    </div>
                   </div>
-                  <div className={cn("flex items-center justify-between text-xs", isDark ? "text-gray-400" : "text-gray-500")}>
-                    <span>{opp.applicants} applied</span>
-                    <span>Closes in {opp.timeLeft}</span>
-                  </div>
+                ))
+              ) : (
+                <div className="text-center py-4 text-gray-400 text-sm">
+                  <p className="mb-2">No matched opportunities yet</p>
+                  <p className="text-xs">Complete your profile to get personalized recommendations</p>
                 </div>
-              ))}
+              )}
             </div>
           </div>
 
-          {/* Career Growth Card */}
-          <div className="bg-[#8056E6] rounded-2xl overflow-hidden shadow-sm">
-            <div className="p-4 border-b border-[#8056E6]/30">
-              <h2 className="text-xl font-bold text-white">Profile copletion</h2>
-            </div>
-            <div className="p-4 space-y-3">
-              <div className="text-white">
-                <p className="font-semibold mb-2">Complete your profile</p>
-                <div className={cn("w-full rounded-full h-2 mb-2", isDark ? "bg-white/20" : "bg-white/30")}>
-                  <div className="bg-[#BCE953] h-2 rounded-full" style={{width: '75%'}}></div>
-                </div>
-                <p className="text-sm text-white/90">75% complete</p>
-              </div>
-            
-            </div>
-           
-          </div>
-
-          {/* Footer */}
-          <div className={cn("text-xs space-y-2", isDark ? "text-gray-400" : "text-gray-600")}>
-            <div className="flex flex-wrap gap-3">
-              <button className="hover:underline">Terms of Service</button>
+          {/* Footer Links */}
+          <div className={cn("text-xs space-y-2 p-3 rounded-2xl", isDark ? "bg-gray-900/50 text-gray-500" : "bg-gray-100 text-gray-600")}>
+            <div className="flex flex-wrap gap-2">
               <button className="hover:underline">Privacy Policy</button>
               <button className="hover:underline">Cookie Policy</button>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2">
               <button className="hover:underline">Accessibility</button>
               <button className="hover:underline">Ads info</button>
               <button className="hover:underline">More</button>

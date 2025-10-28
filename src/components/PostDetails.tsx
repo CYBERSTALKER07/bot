@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
   ArrowLeft,
@@ -14,21 +14,19 @@ import {
   Clock,
   Eye,
   CheckCircle,
-  GraduationCap,
-  Building2,
-  Shield,
   Flag,
   UserX
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { supabase } from '../lib/supabase';
 import Button from './ui/Button';
 import { Card } from './ui/Card';
 import Avatar from './ui/Avatar';
 import PageLayout from './ui/PageLayout';
 import Comments from './ui/Comments';
 import { cn } from '../lib/cva';
+import { usePostDetail, useLikePost, useUnlikePost } from '../hooks/useOptimizedQuery';
+import { PostDetailsPageSkeleton } from './ui/Skeleton';
 
 interface PostDetail {
   id: string;
@@ -49,7 +47,6 @@ interface PostDetail {
     avatar_url?: string;
     role: 'student' | 'employer' | 'admin';
     company?: string;
-    title?: string;
     verified: boolean;
     bio?: string;
     location?: string;
@@ -58,28 +55,7 @@ interface PostDetail {
   has_bookmarked: boolean;
   tags?: string[];
   location?: string;
-  article_link?: string;
   media_description?: string;
-}
-
-interface Comment {
-  id: string;
-  post_id: string;
-  user_id: string;
-  content: string;
-  likes_count: number;
-  replies_count: number;
-  created_at: string;
-  updated_at: string;
-  author: {
-    id: string;
-    full_name: string;
-    avatar_url?: string;
-    role: string;
-    verified: boolean;
-  };
-  has_liked: boolean;
-  replies?: Comment[];
 }
 
 export default function PostDetails() {
@@ -89,15 +65,22 @@ export default function PostDetails() {
   const { isDark } = useTheme();
   
   const [post, setPost] = useState<PostDetail | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [newComment, setNewComment] = useState('');
   const [showImageModal, setShowImageModal] = useState(false);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
-  const [isCommenting, setIsCommenting] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  const [isLikeLoading, setIsLikeLoading] = useState(false);
 
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  // Use the new usePostDetail hook
+  const { data: postData, isLoading: loading, error } = usePostDetail(postId, user?.id);
+  const likePostMutation = useLikePost();
+  const unlikePostMutation = useUnlikePost();
+
+  // Update local post state when hook data changes
+  useEffect(() => {
+    if (postData) {
+      setPost(postData as PostDetail);
+    }
+  }, [postData]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -107,83 +90,48 @@ export default function PostDetails() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(() => {
-    if (postId) {
-      fetchPostDetails();
-    }
-  }, [postId]);
-
-  // Simplified data fetching since we can't guarantee the profile joins work
-  const fetchPostDetails = async () => {
-    if (!postId) return;
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      // Simple query without profile joins first
-      const { data, error } = await supabase
-        .from('posts')
-        .select('*')
-        .eq('id', postId)
-        .single();
-
-      if (error) throw error;
-
-      const postDetail: PostDetail = {
-        id: data.id,
-        user_id: data.user_id,
-        content: data.content || '',
-        image_url: data.image_url,
-        video_url: data.video_url,
-        post_type: data.media_type || 'text',
-        visibility: data.visibility || 'public',
-        likes_count: data.likes_count || 0,
-        comments_count: data.comments_count || 0,
-        shares_count: data.shares_count || 0,
-        created_at: data.created_at,
-        updated_at: data.updated_at,
-        author: {
-          id: data.user_id,
-          full_name: 'User', // Will fetch separately if needed
-          role: 'student',
-          verified: false
-        },
-        has_liked: false, // TODO: Implement user-specific likes
-        has_bookmarked: false, // TODO: Implement user-specific bookmarks
-        tags: data.tags,
-        location: data.location
-      };
-
-      setPost(postDetail);
-    } catch (err) {
-      console.error('Error fetching post details:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load post');
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Handle like/unlike post
   const handleLikePost = async () => {
     if (!post || !user?.id) return;
 
+    setIsLikeLoading(true);
     try {
-      // Toggle like optimistically
       setPost(prev => prev ? {
         ...prev,
         has_liked: !prev.has_liked,
         likes_count: prev.has_liked ? prev.likes_count - 1 : prev.likes_count + 1
       } : null);
 
-      // TODO: Implement actual like/unlike logic
+      // Make the API call
+      if (post.has_liked) {
+        // Unlike the post
+        await unlikePostMutation.mutateAsync({
+          postId: post.id,
+          userId: user.id
+        });
+      } else {
+        // Like the post
+        await likePostMutation.mutateAsync({
+          postId: post.id,
+          userId: user.id
+        });
+      }
+
+      // Add haptic feedback for mobile
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
     } catch (err) {
       console.error('Error toggling like:', err);
-      // Revert on error
+      // Revert optimistic update on error
       setPost(prev => prev ? {
         ...prev,
         has_liked: !prev.has_liked,
-        likes_count: prev.has_liked ? prev.likes_count + 1 : prev.likes_count - 1
+        likes_count: prev.has_liked ? prev.likes_count - 1 : prev.likes_count + 1
       } : null);
+      alert('Failed to update like. Please try again.');
+    } finally {
+      setIsLikeLoading(false);
     }
   };
 
@@ -196,66 +144,10 @@ export default function PostDetails() {
         has_bookmarked: !prev.has_bookmarked
       } : null);
       
-      // TODO: Implement actual bookmark logic
+      // TODO: Implement actual bookmark logic with database
     } catch (err) {
       console.error('Error toggling bookmark:', err);
     }
-  };
-
-  const handleAddComment = async () => {
-    if (!newComment.trim() || !post || !user?.id) return;
-
-    setIsCommenting(true);
-    try {
-      // Create mock comment for now
-      const newCommentObj: Comment = {
-        id: Date.now().toString(),
-        post_id: post.id,
-        user_id: user.id,
-        content: newComment.trim(),
-        likes_count: 0,
-        replies_count: 0,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        author: {
-          id: user.id,
-          full_name: user.profile?.full_name || 'You',
-          avatar_url: user.profile?.avatar_url,
-          role: user.profile?.role || 'student',
-          verified: user.profile?.verified || false
-        },
-        has_liked: false,
-        replies: []
-      };
-
-      setNewComment('');
-
-      // Update post comments count
-      setPost(prev => prev ? {
-        ...prev,
-        comments_count: prev.comments_count + 1
-      } : null);
-    } catch (err) {
-      console.error('Error adding comment:', err);
-    } finally {
-      setIsCommenting(false);
-    }
-  };
-
-  const formatTimeAgo = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-    if (diffInSeconds < 60) return 'now';
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h`;
-    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d`;
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined 
-    });
   };
 
   const copyPostLink = () => {
@@ -270,44 +162,9 @@ export default function PostDetails() {
     return num.toString();
   };
 
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case 'student': return <GraduationCap className="h-4 w-4" />;
-      case 'employer': return <Building2 className="h-4 w-4" />;
-      case 'admin': return <Shield className="h-4 w-4" />;
-      default: return null;
-    }
-  };
-
-  const getRoleColor = (role: string) => {
-    switch (role) {
-      case 'student': return isDark ? 'text-blue-400' : 'text-blue-600';
-      case 'employer': return isDark ? 'text-green-400' : 'text-green-600';
-      case 'admin': return isDark ? 'text-purple-400' : 'text-purple-600';
-      default: return isDark ? 'text-gray-400' : 'text-gray-600';
-    }
-  };
-
   if (loading) {
     return (
-      <PageLayout 
-        className={cn(
-          'min-h-screen',
-          isDark ? 'bg-black text-white' : 'bg-white text-black'
-        )}
-        maxWidth="2xl"
-        padding="default"
-      >
-        <div className="text-center py-16">
-          <div className={cn(
-            'animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4',
-            isDark ? 'border-white' : 'border-black'
-          )}></div>
-          <p className={cn('text-lg', isDark ? 'text-gray-300' : 'text-gray-600')}>
-            Loading post...
-          </p>
-        </div>
-      </PageLayout>
+      <PostDetailsPageSkeleton isDark={isDark} />
     );
   }
 
@@ -318,19 +175,17 @@ export default function PostDetails() {
           'min-h-screen',
           isDark ? 'bg-black text-white' : 'bg-white text-black'
         )}
-        maxWidth="2xl"
-        padding="default"
+        maxWidth="md"
       >
         <Card className="p-8 text-center">
           <h2 className="text-xl font-bold text-red-500 mb-2">
             Post Not Found
           </h2>
           <p className={cn('mb-4', isDark ? 'text-gray-400' : 'text-gray-600')}>
-            {error || 'The post you are looking for does not exist or has been removed.'}
+            {error ? (error as Error).message : 'The post you are looking for does not exist or has been removed.'}
           </p>
           <Button 
-            onClick={() => navigate('/feed')} 
-            variant="outline"
+            onClick={() => navigate('/feed')}
             className="px-6 py-2"
           >
             Back to Feed
@@ -346,7 +201,7 @@ export default function PostDetails() {
         'min-h-screen',
         isDark ? 'bg-black text-white' : 'bg-white text-black'
       )}
-      maxWidth="none"
+      maxWidth="full"
       padding="none"
     >
       {/* X/Twitter-Style Header */}
@@ -358,8 +213,6 @@ export default function PostDetails() {
         <div className="flex items-center justify-between px-24 py-3">
           <div className="flex items-center space-x-4">
             <Button
-              variant="ghost"
-              size="sm"
               onClick={() => navigate(-1)}
               className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900"
             >
@@ -531,8 +384,6 @@ export default function PostDetails() {
                     isDark ? 'border-gray-800' : 'border-gray-200'
                   )}>
                     <Button
-                      variant="ghost"
-                      size="sm"
                       onClick={() => document.getElementById('comment-input')?.focus()}
                       className={cn(
                         'flex items-center space-x-2 px-4 py-2 rounded-full transition-colors',
@@ -546,8 +397,6 @@ export default function PostDetails() {
                     </Button>
                     
                     <Button
-                      variant="ghost"
-                      size="sm"
                       className={cn(
                         'flex items-center space-x-2 px-4 py-2 rounded-full transition-colors',
                         isDark 
@@ -560,9 +409,8 @@ export default function PostDetails() {
                     </Button>
                     
                     <Button
-                      variant="ghost"
-                      size="sm"
                       onClick={handleLikePost}
+                      disabled={isLikeLoading}
                       className={cn(
                         'flex items-center space-x-2 px-4 py-2 rounded-full transition-colors',
                         post.has_liked
@@ -577,8 +425,6 @@ export default function PostDetails() {
                     </Button>
                     
                     <Button
-                      variant="ghost"
-                      size="sm"
                       onClick={handleBookmarkPost}
                       className={cn(
                         'flex items-center space-x-2 px-4 py-2 rounded-full transition-colors',
@@ -594,8 +440,6 @@ export default function PostDetails() {
                     
                     <div className="relative">
                       <Button
-                        variant="ghost"
-                        size="sm"
                         onClick={() => setShowMoreOptions(!showMoreOptions)}
                         className={cn(
                           'p-2 rounded-full transition-colors',
@@ -613,8 +457,6 @@ export default function PostDetails() {
                           isDark ? 'bg-black border-gray-700' : 'bg-white border-gray-200'
                         )}>
                           <Button
-                            variant="ghost"
-                            size="sm"
                             onClick={copyPostLink}
                             className="w-full justify-start px-4 py-2 text-sm"
                           >
@@ -622,16 +464,12 @@ export default function PostDetails() {
                             Copy link to post
                           </Button>
                           <Button
-                            variant="ghost"
-                            size="sm"
                             className="w-full justify-start px-4 py-2 text-sm"
                           >
                             <ExternalLink className="w-4 h-4 mr-3" />
                             Share via...
                           </Button>
                           <Button
-                            variant="ghost"
-                            size="sm"
                             className="w-full justify-start px-4 py-2 text-sm text-red-500"
                           >
                             <Flag className="w-4 h-4 mr-3" />
@@ -639,8 +477,6 @@ export default function PostDetails() {
                           </Button>
                           {post.user_id !== user?.id && (
                             <Button
-                              variant="ghost"
-                              size="sm"
                               className="w-full justify-start px-4 py-2 text-sm text-red-500"
                             >
                               <UserX className="w-4 h-4 mr-3" />
@@ -678,7 +514,6 @@ export default function PostDetails() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black backdrop-blur-sm">
           <div className="relative max-w-[90vw] max-h-[90vh]">
             <Button
-              variant="ghost"
               onClick={() => setShowImageModal(false)}
               className="absolute top-4 right-4 z-10 bg-black/50 text-white hover:bg-black/70 rounded-full p-2"
             >

@@ -58,8 +58,16 @@ export default defineConfig({
     // })
   ],
   optimizeDeps: {
-    exclude: ['lucide-react'],
-    include: ['react', 'react-dom', 'react-router-dom']
+    include: [
+      'react', 
+      'react-dom',
+      'react-dom/client',
+      'react-router-dom', 
+      'lucide-react',
+      '@tanstack/react-query',
+      '@tanstack/react-query-devtools'
+    ],
+    force: true
   },
   build: {
     chunkSizeWarningLimit: 1000,
@@ -94,13 +102,28 @@ export default defineConfig({
     target: 'es2015',
     cssMinify: true
   },
-  // Performance optimizations
+  // Performance optimizations with CORS proxy support
   server: {
     fs: {
       cachedChecks: false
     },
     hmr: {
       overlay: false // Disable error overlay temporarily
+    },
+    // CORS proxy for development
+    proxy: {
+      // Proxy external API calls to avoid CORS issues in development
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
+    },
+    // Add CORS headers for development
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     }
   },
   esbuild: {

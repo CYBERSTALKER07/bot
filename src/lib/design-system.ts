@@ -11,7 +11,6 @@ export const designTokens = {
     brand: {
       primary: '#8C1D40', // ASU Maroon
       secondary: '#FFC627', // ASU Gold
-      accent: '#E3FF70', // Lime accent
       success: '#22C55E',
       warning: '#F59E0B',
       error: '#EF4444',
