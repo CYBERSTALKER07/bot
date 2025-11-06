@@ -29,7 +29,6 @@ declare global {
 }
 
 // Lazy load components for better performance
-const LandingPage = lazy(() => import('./components/LandingPage'));
 const Login = lazy(() => import('./components/Auth/Login'));
 const Register = lazy(() => import('./components/Auth/Register'));
 const ProfileSetup = lazy(() => import('./components/Profile/ProfileSetup'));
@@ -202,14 +201,6 @@ function DashboardRouter() {
   );
 }
 
-// Utility function to detect if app is running as PWA
-const isPWA = () => {
-  // Check if running through Capacitor (mobile app)
-  const isCapacitor = window.Capacitor?.isNativePlatform();
-  
-  return isCapacitor || false;
-};
-
 // Component to handle smart routing based on PWA vs Web
 function SmartHomeRoute() {
   const { user, loading } = useAuth();
@@ -224,17 +215,8 @@ function SmartHomeRoute() {
     return <Navigate to="/feed" replace />;
   }
   
-  // If running as PWA, skip landing page and go to login
-  if (isPWA()) {
-    return <Navigate to="/login" replace />;
-  }
-  
-  // If running in web browser, show landing page
-  return (
-    <Suspense fallback={<LoadingFallback message="Loading homepage..." />}>
-      <LandingPage />
-    </Suspense>
-  );
+  // If not authenticated, redirect to login
+  return <Navigate to="/login" replace />;
 }
 
 function AppContent() {

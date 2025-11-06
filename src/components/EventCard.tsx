@@ -224,40 +224,7 @@ export default function EventCard({
             </div>
           )}
 
-          {/* Stats - Attendees */}
-          {capacity && (
-            <div className="mb-3">
-              <div className="flex items-center justify-between mb-1.5">
-                <span className={cn(
-                  'text-xs font-medium flex items-center gap-1',
-                  isDark ? 'text-gray-400' : 'text-gray-600'
-                )}>
-                  <Users className="h-3.5 w-3.5" />
-                  Attending
-                </span>
-                <span className={cn(
-                  'text-xs font-sans',
-                  capacityPercentage > 80 ? 'text-red-500' : 'text-green-500'
-                )}>
-                  {attendees_count}/{capacity}
-                </span>
-              </div>
-              <div className={cn(
-                'h-1.5 rounded-full overflow-hidden',
-                isDark ? 'bg-gray-700' : 'bg-gray-200'
-              )}>
-                <div
-                  className={cn(
-                    'h-full transition-all duration-300',
-                    capacityPercentage > 80
-                      ? 'bg-gradient-to-r from-red-500 to-red-400'
-                      : 'bg-gradient-to-r from-blue-500 to-teal-400'
-                  )}
-                  data-width={Math.min(capacityPercentage, 100)}
-                />
-              </div>
-            </div>
-          )}
+       
 
           {/* Spacer */}
           <div className="flex-1" />
@@ -269,8 +236,8 @@ export default function EventCard({
               onRegister?.();
             }}
             disabled={isRegistered}
-            className={cn(
-              'w-full px-4 py-2.5 rounded-xl font-sem-font-sans text-sm transition-all duration-200 flex items-center justify-center gap-2',
+            className={cn(  
+              'w-full px-4 py-2.5  rounded-xl font-sem-font-sans text-sm transition-all duration-200 flex items-center justify-center gap-2',
               isRegistered
                 ? isDark
                   ? 'bg-gray-700 text-gray-300 cursor-default'

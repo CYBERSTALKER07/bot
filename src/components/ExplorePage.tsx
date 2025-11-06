@@ -167,7 +167,7 @@ export default function ExplorePage() {
         <main className={cn('max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8')}>
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-thin mb-2">Discover</h1>
+            <h1 className="text-3xl font-bold mb-2">Discover</h1>
             <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>
               Find opportunities, companies, people and events all in one place
             </p>
@@ -175,19 +175,19 @@ export default function ExplorePage() {
 
           {/* Jobs For You - Grid Layout */}
           <div className={cn(
-            'rounded-3xl p-4 lg:p-6 mb-6 lg:mb-8',
-            isDark ? 'bg-black border border-gray-800' : 'bg-white border border-gray-200'
+            'rounded-2xl p-4 lg:p-6 mb-6 lg:mb-8 border',
+            isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200'
           )}>
             <div className="flex items-center justify-between mb-4 sm:mb-6">
-              <h2 className="text-lg sm:text-xl font-thin flex items-center gap-2">
+              <h2 className="text-lg sm:text-xl font-bold flex items-center gap-2">
                 <Briefcase className="h-5 w-5" />
                 Jobs For You
               </h2>
               <button
                 onClick={() => navigate('/jobs')}
                 className={cn(
-                  'text-blue-500 hover:underline text-xs sm:text-sm whitespace-nowrap',
-                  isDark ? 'text-blue-400' : 'text-blue-600'
+                  'text-xs sm:text-sm font-semibold whitespace-nowrap hover:underline',
+                  isDark ? 'text-white' : 'text-black'
                 )}
               >
                 View all
@@ -203,16 +203,19 @@ export default function ExplorePage() {
                   <div 
                     key={job.id} 
                     className={cn(
-                      'rounded-2xl p-3 sm:p-4 border transition-all cursor-pointer hover:shadow-lg',
+                      'rounded-xl p-3 sm:p-4 border transition-all cursor-pointer',
                       isDark 
-                        ? 'bg-black border-gray-800 hover:bg-gray-900/50' 
-                        : 'bg-white border-gray-200 hover:bg-gray-50'
+                        ? 'bg-black border-gray-800 hover:border-gray-600 hover:shadow-lg' 
+                        : 'bg-white border-gray-200 hover:border-gray-400 hover:shadow-lg'
                     )} 
                     onClick={() => navigate(`/job/${job.id}`)}
                   >
                     {/* Card Header */}
                     <div className="flex items-start gap-3 mb-3">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center font-bold text-white bg-gradient-to-br from-blue-500 to-purple-600 flex-shrink-0">
+                      <div className={cn(
+                        'w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center font-bold flex-shrink-0',
+                        isDark ? 'bg-white text-black' : 'bg-black text-white'
+                      )}>
                         {job.company.charAt(0)}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -226,20 +229,26 @@ export default function ExplorePage() {
                     {/* Location & Tags */}
                     <div className="flex flex-wrap gap-2 mb-3">
                       {job.location && (
-                        <span className={cn('px-2 py-1 rounded-full text-xs flex items-center gap-1', isDark ? 'bg-gray-800 text-gray-300' : 'bg-gray-200 text-gray-700')}>
+                        <span className={cn(
+                          'px-2 py-1 rounded-full text-xs flex items-center gap-1 border',
+                          isDark ? 'bg-gray-900 text-gray-300 border-gray-800' : 'bg-gray-100 text-gray-700 border-gray-200'
+                        )}>
                           <MapPin className="h-3 w-3" />
                           {job.location}
                         </span>
                       )}
                       {job.type && (
-                        <span className={cn('px-2 py-1 rounded-full text-xs font-medium', isDark ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-100 text-blue-700')}>
+                        <span className={cn(
+                          'px-2 py-1 rounded-full text-xs font-semibold border',
+                          isDark ? 'bg-white/10 text-white border-gray-700' : 'bg-black/5 text-black border-gray-300'
+                        )}>
                           {job.type}
                         </span>
                       )}
                     </div>
 
                     {/* Description */}
-                    <p className={cn('text-xs sm:text-sm line-clamp-2 mb-2', isDark ? 'text-gray-300' : 'text-gray-700')}>
+                    <p className={cn('text-xs sm:text-sm line-clamp-2 mb-2', isDark ? 'text-gray-400' : 'text-gray-600')}>
                       {job.description}
                     </p>
 
@@ -247,12 +256,15 @@ export default function ExplorePage() {
                     {job.skills && job.skills.length > 0 && (
                       <div className="flex flex-wrap gap-1 mb-3">
                         {job.skills.slice(0, 2).map((skill, i) => (
-                          <span key={i} className={cn('px-2 py-0.5 rounded text-xs', isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-300 text-gray-700')}>
+                          <span key={i} className={cn(
+                            'px-2 py-0.5 rounded text-xs border',
+                            isDark ? 'bg-gray-900 text-gray-300 border-gray-800' : 'bg-gray-100 text-gray-700 border-gray-200'
+                          )}>
                             {skill}
                           </span>
                         ))}
                         {job.skills.length > 2 && (
-                          <span className={cn('px-2 py-0.5 rounded text-xs font-medium', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                          <span className={cn('px-2 py-0.5 rounded text-xs font-medium', isDark ? 'text-gray-500' : 'text-gray-500')}>
                             +{job.skills.length - 2}
                           </span>
                         )}
@@ -260,14 +272,39 @@ export default function ExplorePage() {
                     )}
 
                     {/* Action Buttons */}
-                    <div className="flex gap-2 pt-2 sm:pt-3 border-t">
-                      <Button variant="text" size="small" onClick={(e: React.MouseEvent) => e.stopPropagation()} title="Like this job" className={cn('flex-1 flex items-center justify-center gap-1 rounded-lg text-xs', isDark ? 'text-gray-400 hover:text-red-400' : 'text-gray-600 hover:text-red-600')}>
+                    <div className="flex gap-2 pt-2 sm:pt-3 border-t" style={{ borderColor: isDark ? 'rgb(31, 41, 55)' : 'rgb(229, 231, 235)' }}>
+                      <Button 
+                        variant="text" 
+                        size="small" 
+                        onClick={(e: React.MouseEvent) => e.stopPropagation()} 
+                        title="Like this job" 
+                        className={cn(
+                          'flex-1 flex items-center justify-center gap-1 rounded-lg text-xs transition-colors',
+                          isDark ? 'text-gray-400 hover:text-white hover:bg-gray-900' : 'text-gray-600 hover:text-black hover:bg-gray-100'
+                        )}
+                      >
                         <Heart className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
-                      <Button variant="text" size="small" onClick={(e: React.MouseEvent) => e.stopPropagation()} title="Bookmark" className={cn('flex-1 flex items-center justify-center gap-1 rounded-lg text-xs', isDark ? 'text-gray-400 hover:text-yellow-400' : 'text-gray-600 hover:text-yellow-600')}>
+                      <Button 
+                        variant="text" 
+                        size="small" 
+                        onClick={(e: React.MouseEvent) => e.stopPropagation()} 
+                        title="Bookmark" 
+                        className={cn(
+                          'flex-1 flex items-center justify-center gap-1 rounded-lg text-xs transition-colors',
+                          isDark ? 'text-gray-400 hover:text-white hover:bg-gray-900' : 'text-gray-600 hover:text-black hover:bg-gray-100'
+                        )}
+                      >
                         <Bookmark className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
-                      <Button className={cn('flex-1 text-xs px-2 sm:px-3 py-1 sm:py-2 rounded-lg font-semibold', isDark ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-black text-white hover:bg-gray-900')} onClick={(e: React.MouseEvent) => { e.stopPropagation(); navigate(`/job/${job.id}`); }} title="View job details">
+                      <Button 
+                        className={cn(
+                          'flex-1 text-xs px-2 sm:px-3 py-1 sm:py-2 rounded-full font-bold transition-colors',
+                          isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-900'
+                        )} 
+                        onClick={(e: React.MouseEvent) => { e.stopPropagation(); navigate(`/job/${job.id}`); }} 
+                        title="View job details"
+                      >
                         Apply
                       </Button>
                     </div>
@@ -286,19 +323,19 @@ export default function ExplorePage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 lg:mb-8">
             {/* Companies - 2/3 */}
             <div className={cn(
-              'lg:col-span-2 rounded-3xl p-4 lg:p-6',
-              isDark ? 'bg-black border border-gray-800' : 'bg-white border border-gray-200'
+              'lg:col-span-2 rounded-2xl p-4 lg:p-6 border',
+              isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200'
             )}>
               <div className="flex items-center justify-between mb-4 sm:mb-6">
-                <h2 className="text-lg sm:text-xl font-thin flex items-center gap-2">
+                <h2 className="text-lg sm:text-xl font-bold flex items-center gap-2">
                   <Building2 className="h-5 w-5" />
                   Featured Companies
                 </h2>
                 <button
                   onClick={() => navigate('/companies')}
                   className={cn(
-                    'text-blue-500 hover:underline text-xs sm:text-sm whitespace-nowrap',
-                    isDark ? 'text-blue-400' : 'text-blue-600'
+                    'text-xs sm:text-sm font-semibold whitespace-nowrap hover:underline',
+                    isDark ? 'text-white' : 'text-black'
                   )}
                 >
                   View all
@@ -318,13 +355,19 @@ export default function ExplorePage() {
                     enableArrowNavigation={true}
                     displayScrollbar={true}
                     renderItem={(company: CompanyData) => (
-                      <div className={cn('rounded-2xl p-3 sm:p-4 border transition-all cursor-pointer hover:shadow-lg', isDark ? 'bg-black border-gray-800 hover:bg-gray-900/50' : 'bg-white border-gray-200 hover:bg-gray-50')} onClick={() => navigate(`/company/${company.id}`)}>
+                      <div className={cn(
+                        'rounded-xl p-3 sm:p-4 border transition-all cursor-pointer',
+                        isDark ? 'bg-black border-gray-800 hover:border-gray-600 hover:shadow-lg' : 'bg-white border-gray-200 hover:border-gray-400 hover:shadow-lg'
+                      )} onClick={() => navigate(`/company/${company.id}`)}>
                         <div className="flex items-start gap-3">
                           <div className="flex-shrink-0">
                             {company.logo_url ? (
-                              <img src={company.logo_url} alt={company.name} className="w-12 h-12 rounded-lg object-cover" />
+                              <img src={company.logo_url} alt={company.name} className="w-12 h-12 rounded-xl object-cover grayscale" />
                             ) : (
-                              <div className="w-12 h-12 rounded-lg flex items-center justify-center font-bold text-white text-sm bg-gradient-to-br from-blue-500 to-purple-600">
+                              <div className={cn(
+                                'w-12 h-12 rounded-xl flex items-center justify-center font-bold text-sm',
+                                isDark ? 'bg-white text-black' : 'bg-black text-white'
+                              )}>
                                 {company.name.charAt(0)}
                               </div>
                             )}
@@ -358,19 +401,19 @@ export default function ExplorePage() {
 
             {/* Upcoming Events - 1/3 */}
             <div className={cn(
-              'lg:col-span-1 rounded-3xl p-4 lg:p-0',
-              isDark ? 'bg-black border border-gray-800' : 'bg-white border border-gray-200'
+              'lg:col-span-1 rounded-2xl p-4 lg:p-6 border',
+              isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200'
             )}>
               <div className="flex items-center justify-between mb-4 sm:mb-6">
-                <h2 className="text-lg sm:text-xl font-thin flex items-center gap-2">
+                <h2 className="text-lg sm:text-xl font-bold flex items-center gap-2">
                   <Calendar className="h-5 w-5" />
                   Events
                 </h2>
                 <button
                   onClick={() => navigate('/events')}
                   className={cn(
-                    'text-blue-500 hover:underline text-xs sm:text-sm whitespace-nowrap',
-                    isDark ? 'text-blue-400' : 'text-blue-600'
+                    'text-xs sm:text-sm font-semibold whitespace-nowrap hover:underline',
+                    isDark ? 'text-white' : 'text-black'
                   )}
                 >
                   View all
@@ -390,13 +433,19 @@ export default function ExplorePage() {
                     enableArrowNavigation={true}
                     displayScrollbar={false}
                     renderItem={(event: EventData) => (
-                      <div className={cn('rounded-2xl p-3 sm:p-4 border transition-all cursor-pointer hover:shadow-lg', isDark ? 'bg-black border-gray-800 hover:bg-gray-900/50' : 'bg-white border-gray-200 hover:bg-gray-50')} onClick={() => navigate(`/event/${event.id}`)}>
+                      <div className={cn(
+                        'rounded-xl p-3 sm:p-4 border transition-all cursor-pointer',
+                        isDark ? 'bg-black border-gray-800 hover:border-gray-600 hover:shadow-lg' : 'bg-white border-gray-200 hover:border-gray-400 hover:shadow-lg'
+                      )} onClick={() => navigate(`/event/${event.id}`)}>
                         <div className="flex items-start gap-3">
                           <div className="flex-shrink-0">
                             {event.employer?.avatar_url ? (
-                              <img src={event.employer.avatar_url} alt={event.employer.name} className="w-10 h-10 rounded-lg object-cover" />
+                              <img src={event.employer.avatar_url} alt={event.employer.name} className="w-10 h-10 rounded-xl object-cover grayscale" />
                             ) : (
-                              <div className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-white text-sm bg-gradient-to-br from-blue-500 to-purple-600">
+                              <div className={cn(
+                                'w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm',
+                                isDark ? 'bg-white text-black' : 'bg-black text-white'
+                              )}>
                                 {event.employer?.name?.charAt(0) || '📅'}
                               </div>
                             )}
@@ -429,19 +478,19 @@ export default function ExplorePage() {
 
           {/* Who to Follow - Full Width */}
           <div className={cn(
-            'rounded-3xl p-4 lg:p-6 ',
-            isDark ? 'bg-black border border-gray-800' : 'bg-white border border-gray-200'
+            'rounded-2xl p-4 lg:p-6 border',
+            isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200'
           )}>
             <div className="flex items-center justify-between mb-4 sm:mb-6">
-              <h2 className="text-lg sm:text-xl font-thin flex items-center gap-2">
+              <h2 className="text-lg sm:text-xl font-bold flex items-center gap-2">
                 <Users className="h-5 w-5" />
                 Who to Follow
               </h2>
               <button
                 onClick={() => navigate('/people')}
                 className={cn(
-                  'text-blue-500 hover:underline text-xs sm:text-sm whitespace-nowrap',
-                  isDark ? 'text-blue-400' : 'text-blue-600'
+                  'text-xs sm:text-sm font-semibold whitespace-nowrap hover:underline',
+                  isDark ? 'text-white' : 'text-black'
                 )}
               >
                 View all
@@ -453,7 +502,7 @@ export default function ExplorePage() {
               </div>
             ) : profilesData && profilesData.length > 0 ? (
               <div className={cn(
-                'rounded-2xl overflow-hidden border',
+                'rounded-xl overflow-hidden border',
                 isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200'
               )}>
                 <AnimatedList
@@ -467,15 +516,18 @@ export default function ExplorePage() {
                     <div className={cn(
                       'p-4 border-b transition-all cursor-pointer flex flex-col items-center text-center',
                       isDark 
-                        ? 'border-gray-800 hover:bg-gray-900/50' 
+                        ? 'border-gray-800 hover:bg-gray-900' 
                         : 'border-gray-200 hover:bg-gray-50'
                     )}>
                       {/* Profile Avatar */}
                       <div className="mb-3">
                         {profile.avatar_url ? (
-                          <img src={profile.avatar_url} alt={profile.full_name} className="w-12 h-12 rounded-full object-cover" />
+                          <img src={profile.avatar_url} alt={profile.full_name} className="w-12 h-12 rounded-full object-cover grayscale" />
                         ) : (
-                          <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white bg-gradient-to-br from-blue-500 to-purple-600">
+                          <div className={cn(
+                            'w-12 h-12 rounded-full flex items-center justify-center font-bold',
+                            isDark ? 'bg-white text-black' : 'bg-black text-white'
+                          )}>
                             {profile.full_name.charAt(0)}
                           </div>
                         )}
@@ -486,8 +538,11 @@ export default function ExplorePage() {
                         <div className="flex items-center justify-center gap-1 mb-1">
                           <h3 className="font-bold text-sm truncate">{profile.full_name}</h3>
                           {profile.verified && (
-                            <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0" title="Verified user">
-                              <span className="text-white text-xs">✓</span>
+                            <div className={cn(
+                              'w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0',
+                              isDark ? 'bg-white' : 'bg-black'
+                            )} title="Verified user">
+                              <span className={cn('text-xs font-bold', isDark ? 'text-black' : 'text-white')}>✓</span>
                             </div>
                           )}
                         </div>
@@ -512,7 +567,12 @@ export default function ExplorePage() {
                           }
                         }}
                         title={profile.is_following ? 'Unfollow this user' : 'Follow this user'}
-                        className={cn('w-full px-3 py-2 rounded-lg font-semibold text-sm transition-colors', profile.is_following ? isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-200 text-black hover:bg-gray-300' : 'bg-blue-600 text-white hover:bg-blue-700')}
+                        className={cn(
+                          'w-full px-3 py-2 rounded-full font-bold text-sm transition-colors',
+                          profile.is_following 
+                            ? isDark ? 'bg-transparent text-white border border-gray-700 hover:bg-gray-900' : 'bg-transparent text-black border border-gray-300 hover:bg-gray-100' 
+                            : isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-900'
+                        )}
                       >
                         {profile.is_following ? 'Following' : 'Follow'}
                       </Button>

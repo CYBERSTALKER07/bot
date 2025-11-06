@@ -37,7 +37,7 @@ import { useJobs } from '../hooks/useJobs';
 import { useDebounce } from '../hooks/useDebounce';
 import { useFollowStatusCache } from '../hooks/useFollowStatusCache';
 import { useCreateRetweet, useRemoveRetweet } from '../hooks/useRetweet';
-import { PostCardSkeleton, RightSidebarSearchSkeleton, RightSidebarJobsSkeleton, RightSidebarWhoToFollowSkeleton, LeftSidebarSkeleton, RightSidebarSkeleton } from './ui/Skeleton';
+import { Skeleton, PostCardSkeleton, RightSidebarSearchSkeleton, RightSidebarJobsSkeleton, RightSidebarWhoToFollowSkeleton, LeftSidebarSkeleton, RightSidebarSkeleton } from './ui/Skeleton';
 import WhoToFollowItem from './WhoToFollowItem';
 import AnimatedList from './AnimatedList';
 
