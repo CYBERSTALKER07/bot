@@ -647,40 +647,65 @@ export default function Feed() {
 
   if (loading) {
     return (
-      <PageLayout className={isDark ? 'bg-black text-white' : 'bg-white text-black'}>
-        <div className={cn(
-          'min-h-screen w-full',
-          isDark ? 'bg-black text-white' : 'bg-white text-black',
-          isMobile ? 'pb-20' : 'flex'
-        )}>
-          {/* Left Sidebar Skeleton - Hidden on mobile */}
-          {!isMobile && (
-            <div className={cn(
-              "hidden lg:block ml-18 w-80 p-4 space-y-6 bg-white border-r order-blbg-black sticky top-0 h-screen overflow-y-auto scrollbar-hide",
-              isDark ? 'bg-black border-blbg-black' : 'bg-white order-blbg-black'
-            )}>
-              <LeftSidebarSkeleton />
-            </div>
-          )}
+      <div className={cn(
+        'min-h-screen w-full',
+        isDark ? 'bg-black text-white' : 'bg-white text-black',
+        isMobile ? 'pb-20' : 'flex'
+      )}>
+        {/* Left Sidebar Skeleton - Hidden on mobile */}
+        {!isMobile && (
+          <div className={cn(
+            "hidden lg:block ml-18 w-80 p-4 space-y-6 border-r sticky top-0 h-screen overflow-y-auto scrollbar-hide",
+            isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200'
+          )}>
+            <LeftSidebarSkeleton />
+          </div>
+        )}
 
-          {/* Main Feed Skeleton */}
-          <div className="flex-1 max-w-2xl mx-auto">
+        {/* Main Feed Skeleton */}
+        <div className={cn(
+          'flex-1',
+          isMobile 
+            ? 'pt-16 p-0' 
+            : 'lg:ml-5 max-w-2xl mx-auto'
+        )}>
+          {/* Header Skeleton */}
+          <div className={cn(
+            'sticky top-0 z-10 backdrop-blur-xl border-b',
+            isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200',
+            isMobile ? 'top-16' : 'top-0'
+          )}>
+            <div className="flex items-center justify-center">
+              <div className="flex-1 px-4 py-3">
+                <Skeleton width="30%" height={20} />
+              </div>
+              <div className="flex-1 px-4 py-3">
+                <Skeleton width="30%" height={20} />
+              </div>
+            </div>
+          </div>
+
+          {/* Post Cards Skeleton */}
+          <div className={cn(
+            'border-x divide-y',
+            isDark ? 'border-gray-800 divide-gray-800' : 'border-gray-200 divide-gray-200'
+          )}>
             {[...Array(5)].map((_, i) => (
               <PostCardSkeleton key={i} />
             ))}
           </div>
-
-          {/* Right Sidebar Skeleton - Desktop Only */}
-          {!isMobile && (
-            <div className={cn(
-              'hidden xl:block scrollbar-hide w-[400px] border-l sticky top-0 h-screen mr-0 overflow-y-auto',
-              isDark ? 'border-blbg-black' : 'order-blbg-black'
-            )}>
-              <RightSidebarSkeleton />
-            </div>
-          )}
         </div>
-      </PageLayout>
+
+        {/* Right Sidebar Skeleton - Desktop Only */}
+        {!isMobile && (
+          <div className={cn(
+            'hidden xl:block scrollbar-hide w-[400px] border-l sticky top-0 h-screen mr-0 overflow-y-auto',
+            isDark ? 'border-gray-800' : 'border-gray-200'
+          )}>
+            <RightSidebarSkeleton />
+          </div>
+        )}
+      </div>
     );
   }
 

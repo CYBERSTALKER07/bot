@@ -1618,13 +1618,50 @@ export function useLikePost() {
         throw error;
       }
     },
+    // OPTIMISTIC UPDATE: Update UI immediately before database confirms
+    onMutate: async ({ postId, userId }) => {
+      // Cancel any outgoing refetches so they don't overwrite our optimistic update
+      await queryClient.cancelQueries({ queryKey: ['posts'] });
+
+      // Snapshot the previous value
+      const previousPosts = queryClient.getQueryData(['posts']);
+
+      // Optimistically update the cache
+      queryClient.setQueryData(['posts'], (old: any) => {
+        if (!old) return old;
+
+        return old.map((post: any) => {
+          if (post.id === postId) {
+            return {
+              ...post,
+              has_liked: true,
+              likes_count: (post.likes_count || 0) + 1
+            };
+          }
+          return post;
+        });
+      });
+
+      // Return context with previous data for rollback on error
+      return { previousPosts };
+    },
     onSuccess: (data) => {
       console.log('✅ Post liked successfully');
-      // Refetch posts to get updated like counts
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
     },
-    onError: (error: any) => {
+    // If mutation fails, rollback to previous state
+    onError: (error: any, variables, context: any) => {
       console.error('Like mutation error:', error?.message || error);
+      
+      // Rollback to previous state
+      if (context?.previousPosts) {
+        queryClient.setQueryData(['posts'], context.previousPosts);
+      }
+    },
+    // Always refetch after error or success to sync with server
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      queryClient.invalidateQueries({ queryKey: ['postDetail'] });
+      queryClient.invalidateQueries({ queryKey: ['mostLikedPosts'] });
     }
   });
 }
@@ -1655,13 +1692,50 @@ export function useUnlikePost() {
         throw error;
       }
     },
+    // OPTIMISTIC UPDATE: Update UI immediately before database confirms
+    onMutate: async ({ postId, userId }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['posts'] });
+
+      // Snapshot the previous value
+      const previousPosts = queryClient.getQueryData(['posts']);
+
+      // Optimistically update the cache
+      queryClient.setQueryData(['posts'], (old: any) => {
+        if (!old) return old;
+
+        return old.map((post: any) => {
+          if (post.id === postId) {
+            return {
+              ...post,
+              has_liked: false,
+              likes_count: Math.max(0, (post.likes_count || 0) - 1) // Prevent negative counts
+            };
+          }
+          return post;
+        });
+      });
+
+      // Return context with previous data for rollback on error
+      return { previousPosts };
+    },
     onSuccess: () => {
       console.log('✅ Post unliked successfully');
-      // Refetch posts to get updated like counts
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
     },
-    onError: (error: any) => {
+    // If mutation fails, rollback to previous state
+    onError: (error: any, variables, context: any) => {
       console.error('Unlike mutation error:', error?.message || error);
+      
+      // Rollback to previous state
+      if (context?.previousPosts) {
+        queryClient.setQueryData(['posts'], context.previousPosts);
+      }
+    },
+    // Always refetch after error or success to sync with server
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      queryClient.invalidateQueries({ queryKey: ['postDetail'] });
+      queryClient.invalidateQueries({ queryKey: ['mostLikedPosts'] });
     }
   });
 }
