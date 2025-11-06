@@ -18,7 +18,8 @@ import {
   X as XIcon,
   Brain,
   Linkedin,
-  X
+  X,
+  Plus
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -510,11 +511,11 @@ export default function Navigation() {
           <Button
             className={cn(
               "w-full rounded-full font-bold transition-all duration-200",
-              isDark ? 'bg-white text-black hover:bg-black' : 'bg-black text-black hover:bg-black-text-white',
+              isDark ? 'bg-black text-white hover:bg-white hover:text-black border-gray-800 border rounded-3xl' : 'bg-black text-black hover:bg-black-text-white',
               isExpanded ? 'justify-center' : 'justify-center px-0'
             )}
           >
-            {isExpanded ? 'Post' : <ThinIcon Icon={Briefcase} className="h-5 w-5" />}
+            {isExpanded ? 'Post' : <ThinIcon Icon={Plus} className="h-5 w-5" />}
           </Button>
         </div>
 

@@ -513,49 +513,7 @@ export default function CreatePost() {
                     </div>
                     
                     {/* Image Validation Feedback */}
-                    {imageValidation && newPost.media_type === 'image' && (
-                      <div className={cn(
-                        'mt-2 p-3 rounded-lg border text-sm',
-                        imageValidation.isValid 
-                          ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300'
-                          : 'bg-yellow-50 border-yellow-200 text-yellow-800 dark:bg-yellow-900/20 dark:border-yellow-800 dark:text-yellow-300'
-                      )}>
-                        <div className="flex items-start space-x-2">
-                          {imageValidation.isValid ? (
-                            <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                          ) : (
-                            <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                          )}
-                          <div className="flex-1">
-                            <div className="font-medium mb-1">
-                              {imageValidation.isValid ? 'Image optimized for X/Twitter' : 'Image optimization recommended'}
-                            </div>
-                            <div className="text-xs space-y-1">
-                              <div>
-                                📐 {imageValidation.dimensions.width}×{imageValidation.dimensions.height}px 
-                                ({imageValidation.aspectRatio}) • 📁 {formatFileSize(imageValidation.size)}
-                              </div>
-                              {imageValidation.warnings.map((warning, index) => (
-                                <div key={index} className="text-red-600 dark:text-red-400">⚠️ {warning}</div>
-                              ))}
-                              {imageValidation.suggestions.map((suggestion, index) => (
-                                <div key={index} className="text-blue-600 dark:text-blue-400">💡 {suggestion}</div>
-                              ))}
-                            </div>
-                            
-                            {imageValidation.suggestions.length > 0 && (
-                              <Button
-                                onClick={() => setShowImageOptimizer(true)}
-                                className="mt-2 text-xs bg-blue-500 text-white hover:bg-blue-600 px-3 py-1 rounded-full"
-                              >
-                                <Crop className="w-3 h-3 mr-1" />
-                                Optimize for X/Twitter
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                
                   </div>
                 )}
 
@@ -571,7 +529,7 @@ export default function CreatePost() {
                       variant="ghost"
                       size="sm"
                       onClick={() => fileInputRef.current?.click()}
-                      className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-full"
+                      className="p-2 text-blbg-black hover:bg-black/10 rounded-full"
                     >
                       <ImageIcon className="w-5 h-5" />
                     </Button>
@@ -580,7 +538,7 @@ export default function CreatePost() {
                       variant="ghost"
                       size="sm"
                       onClick={() => videoInputRef.current?.click()}
-                      className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-full"
+                      className="p-2 text-blbg-black hover:bg-black/10 rounded-full"
                     >
                       <Video className="w-5 h-5" />
                     </Button>
@@ -590,7 +548,7 @@ export default function CreatePost() {
                       variant="ghost"
                       size="sm"
                       onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                      className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-full"
+                      className="p-2 text-blbg-black hover:bg-black/10 rounded-full"
                     >
                       <Smile className="w-5 h-5" />
                     </Button>
@@ -599,14 +557,14 @@ export default function CreatePost() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-full"
+                      className="p-2 text-blbg-black hover:bg-black/10 rounded-full"
                     >
                       <MapPin className="w-5 h-5" />
                     </Button>
                   </div>
 
                   {/* Visibility Indicator */}
-                  <div className="flex items-center space-x-2 text-blue-500">
+                  <div className="flex items-center space-x-2 text-blbg-black">
                     {getVisibilityIcon()}
                     <span className="text-sm font-medium capitalize">
                       {newPost.visibility}
@@ -642,17 +600,21 @@ export default function CreatePost() {
       {showImageOptimizer && selectedMedia && imageValidation && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className={cn(
-            'bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden',
-            'animate-in zoom-in-95 fade-in duration-200'
+            'rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden',
+            'animate-in zoom-in-95 fade-in duration-200',
+            isDark ? 'bg-black border border-gray-800' : 'bg-white border border-gray-200'
           )}>
             {/* Modal Header */}
             <div className={cn(
               'px-6 py-4 border-b flex items-center justify-between',
-              isDark ? 'border-gray-700' : 'border-gray-200'
+              isDark ? 'border-gray-800' : 'border-gray-200'
             )}>
               <div>
                 <h2 className="text-xl font-bold">Optimize for X/Twitter</h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className={cn(
+                  "text-sm",
+                  isDark ? 'text-gray-400' : 'text-gray-500'
+                )}>
                   Choose the best format for your post
                 </p>
               </div>
@@ -660,7 +622,10 @@ export default function CreatePost() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowImageOptimizer(false)}
-                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                className={cn(
+                  "p-2 rounded-full",
+                  isDark ? 'hover:bg-gray-900' : 'hover:bg-gray-100'
+                )}
               >
                 <X className="w-5 h-5" />
               </Button>
@@ -670,10 +635,13 @@ export default function CreatePost() {
             <div className="p-6 space-y-4">
               <div className={cn(
                 'p-4 rounded-lg border',
-                isDark ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'
+                isDark ? 'bg-gray-900 border-gray-800' : 'bg-gray-50 border-gray-200'
               )}>
                 <h3 className="font-medium mb-2">Current Image</h3>
-                <div className="text-sm space-y-1 text-gray-600 dark:text-gray-400">
+                <div className={cn(
+                  "text-sm space-y-1",
+                  isDark ? 'text-gray-400' : 'text-gray-600'
+                )}>
                   <div>📐 {imageValidation.dimensions.width}×{imageValidation.dimensions.height}px</div>
                   <div>📏 Aspect Ratio: {imageValidation.aspectRatio}</div>
                   <div>📁 File Size: {formatFileSize(imageValidation.size)}</div>
@@ -688,19 +656,26 @@ export default function CreatePost() {
                 <button
                   onClick={() => handleOptimizeImage('16:9')}
                   className={cn(
-                    'w-full p-4 rounded-lg border-2 border-dashed text-left transition-all',
-                    'hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20',
-                    isDark ? 'border-gray-600 hover:border-blue-400' : 'border-gray-300'
+                    'w-full p-4 rounded-lg border-2 text-left transition-all',
+                    isDark 
+                      ? 'border-gray-800 hover:border-gray-600 hover:bg-gray-900' 
+                      : 'border-gray-200 hover:border-gray-400 hover:bg-gray-50'
                   )}
                 >
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="font-medium">📱 Mobile Optimized (16:9)</div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                      <div className={cn(
+                        "text-sm",
+                        isDark ? 'text-gray-400' : 'text-gray-500'
+                      )}>
                         1200×675px • Best for mobile feeds
                       </div>
                     </div>
-                    <div className="w-12 h-7 bg-gradient-to-r from-blue-500 to-blue-600 rounded"></div>
+                    <div className={cn(
+                      "w-12 h-7 rounded",
+                      isDark ? 'bg-gray-700' : 'bg-gray-300'
+                    )}></div>
                   </div>
                 </button>
 
@@ -708,32 +683,42 @@ export default function CreatePost() {
                 <button
                   onClick={() => handleOptimizeImage('1:1')}
                   className={cn(
-                    'w-full p-4 rounded-lg border-2 border-dashed text-left transition-all',
-                    'hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-900/20',
-                    isDark ? 'border-gray-600 hover:border-green-400' : 'border-gray-300'
+                    'w-full p-4 rounded-lg border-2 text-left transition-all',
+                    isDark 
+                      ? 'border-gray-800 hover:border-gray-600 hover:bg-gray-900' 
+                      : 'border-gray-200 hover:border-gray-400 hover:bg-gray-50'
                   )}
                 >
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="font-medium">⬜ Square Format (1:1)</div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                      <div className={cn(
+                        "text-sm",
+                        isDark ? 'text-gray-400' : 'text-gray-500'
+                      )}>
                         1080×1080px • Consistent across all devices
                       </div>
                     </div>
-                    <div className="w-7 h-7 bg-gradient-to-r from-green-500 to-green-600 rounded"></div>
+                    <div className={cn(
+                      "w-7 h-7 rounded",
+                      isDark ? 'bg-gray-700' : 'bg-gray-300'
+                    )}></div>
                   </div>
                 </button>
               </div>
 
               {/* Optimization Benefits */}
               <div className={cn(
-                'p-4 rounded-lg',
-                isDark ? 'bg-blue-900/20 border border-blue-800' : 'bg-blue-50 border border-blue-200'
+                'p-4 rounded-lg border',
+                isDark ? 'bg-gray-900 border-gray-800' : 'bg-gray-50 border-gray-200'
               )}>
-                <h4 className="font-medium text-blue-900 dark:text-blue-300 mb-2">
+                <h4 className="font-medium mb-2">
                   ✨ What optimization does:
                 </h4>
-                <ul className="text-sm space-y-1 text-blue-800 dark:text-blue-300">
+                <ul className={cn(
+                  "text-sm space-y-1",
+                  isDark ? 'text-gray-400' : 'text-gray-600'
+                )}>
                   <li>• Resizes to X/Twitter recommended dimensions</li>
                   <li>• Centers important content to prevent cropping</li>
                   <li>• Optimizes file size for faster loading</li>

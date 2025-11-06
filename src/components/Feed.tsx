@@ -656,8 +656,8 @@ export default function Feed() {
           {/* Left Sidebar Skeleton - Hidden on mobile */}
           {!isMobile && (
             <div className={cn(
-              "hidden lg:block ml-18 w-80 p-4 space-y-6 bg-white border-r border-gray-200 sticky top-0 h-screen overflow-y-auto scrollbar-hide",
-              isDark ? 'bg-black border-blbg-black' : 'bg-white border-gray-200'
+              "hidden lg:block ml-18 w-80 p-4 space-y-6 bg-white border-r order-blbg-black sticky top-0 h-screen overflow-y-auto scrollbar-hide",
+              isDark ? 'bg-black border-blbg-black' : 'bg-white order-blbg-black'
             )}>
               <LeftSidebarSkeleton />
             </div>
@@ -674,7 +674,7 @@ export default function Feed() {
           {!isMobile && (
             <div className={cn(
               'hidden xl:block scrollbar-hide w-[400px] border-l sticky top-0 h-screen mr-0 overflow-y-auto',
-              isDark ? 'border-blbg-black' : 'border-gray-200'
+              isDark ? 'border-blbg-black' : 'order-blbg-black'
             )}>
               <RightSidebarSkeleton />
             </div>
@@ -706,8 +706,8 @@ export default function Feed() {
     )}>
       {/* Left Sidebar - Hidden on mobile */}
       <div className={cn(
-        "hidden lg:block ml-18 w-80 p-4 space-y-6 bg-white border-r border-gray-200 sticky top-0 h-screen overflow-y-auto scrollbar-hide",
-        isDark ? 'bg-black border-blbg-black' : 'bg-white border-gray-200'
+        "hidden lg:block ml-18 w-80 p-4 space-y-6 bg-white border-r order-blbg-black sticky top-0 h-screen overflow-y-auto scrollbar-hide",
+        isDark ? 'bg-black border-blbg-black' : 'bg-white order-blbg-black'
       )}>
         {/* User Profile Quick View */}
         <div className="relative rounded-2xl p-4 text-white overflow-hidden">
@@ -762,15 +762,15 @@ export default function Feed() {
         </div>
 
         {/* AI Career Assistant - Unique Feature */}
-        <div className="bg-primary rounded-2xl p-4 text-white">
+        <div className="bg-black order-blbg-black border rounded-3xl p-4 text-white">
           <div className="flex items-center gap-2 mb-3">
           <Search className="w-5 h-5 inline-block mr-2" /> 
 
-            <h3 className="font-bold text-lg">AI search</h3>
+            <h3 className="font-bold text-lg">WorkX AI assistan</h3>
           </div>
           <p className="text-sm text-white/90 mb-3">
  
-            Get personalized career guidance based on your profile and goals
+            Get personalized career guidance with the help of AI powered by Grok
           </p>
           
        
@@ -780,11 +780,11 @@ export default function Feed() {
      
 
         {/* Industry Insights */}
-        <div className={cn("bg-white rounded-2xl border border-gray-200 overflow-hidden", isDark ? 'bg-transparent text-white border-blbg-black' : 'bg-white border-gray-200')}>
-          <div className="p-4 border-b border-gray-200">
+        <div className={cn("bg-white rounded-2xl border  overflow-hidden", isDark ? 'bg-transparent text-white border-blbg-black' : 'bg-white order-blbg-black')}>
+          <div className="p-4 border-b order-blbg-black">
             <h3 className="font-serif ">TrendingUp</h3>
           </div>
-          <div className="divide-y-[0.7px] divide-gray-200">
+          <div className="divide-y-[0.7px] order-blbg-black">
             {mostLikedPostsLoading ? (
               <div className="text-center py-4 text-gray-500">Loading trending posts...</div>
             ) : mostLikedPosts && mostLikedPosts.length > 0 ? (
@@ -821,14 +821,14 @@ export default function Feed() {
               +12
             </div>
           </div>
-          <button className="w-full bg-white/20 hover:bg-white/30 rounded-lg py-2 text-sm font-medium transition-colors">
+          <button className="w-full bg-white/20 hover:bg-white/30 rounded-3xl py-2 text-sm font-medium transition-colors">
             Browse Mentors
           </button>
         </div> */}
 
         {/* Career Opportunities Scanner */}
-        <div className={cn("bg-white rounded-2xl border border-gray-200 overflow-hidden", isDark ? 'bg-transparent text-white border-blbg-black' : 'bg-white border-gray-200')}>
-          <div className="p-4 border-b border-gray-200">
+        <div className={cn("bg-white rounded-2xl border order-blbg-black overflow-hidden", isDark ? 'bg-transparent text-white border-blbg-black' : 'bg-white order-blbg-black')}>
+          <div className="p-4 border-b order-blbg-black">
             <div className="flex items-center gap-2">
               <h3 className="font-bold ">Jobs That Match Your Profile</h3>
             </div>
@@ -842,8 +842,8 @@ export default function Feed() {
                 <div
                   key={job.id || index}
                   className={cn(
-                    'border border-gray-200 rounded-lg p-3 hover:shadow-md transition-all cursor-pointer',
-                    isDark ? 'border-blbg-black text-white hover:border-blue-500/50' : 'border-gray-200 hover:border-blue-400'
+                    'border order-blbg-black rounded-3xl p-3 hover:shadow-md transition-all cursor-pointer',
+                    isDark ? 'border-blbg-black text-white hover:border-blue-500/50' : 'order-blbg-black hover:border-blue-400'
                   )} 
                   onClick={() => navigate(`/job/${job.id}`)}
                 >
@@ -909,7 +909,7 @@ export default function Feed() {
               </div>
             )}
           </div>
-          <div className="p-3 border-t border-gray-200 text-center">
+          <div className="p-3 border-t order-blbg-black text-center">
             <button 
               onClick={() => navigate('/jobs')}
               className={cn(
@@ -934,7 +934,7 @@ export default function Feed() {
         </Button> */}
 
         {/* Recent Connections */}
-        <div className={cn("bg-white rounded-2xl border border-gray-200 overflow-hidden", isDark ? 'bg-transparent text-white border-[0.7px] border-b border-blbg-black bg-black' : 'bg-white border-gray-200')}>
+        <div className={cn("bg-white rounded-2xl border order-blbg-black overflow-hidden", isDark ? 'bg-transparent text-white border-[0.7px] border-b border-blbg-black bg-black' : 'bg-white order-blbg-black')}>
           <div className="p-4 border-b border-gray-900">
             <h3 className={cn("font-serif ",isDark ?  'text-white' : 'text-asu-maroon' )}>Upcoming Events</h3>
           </div>
@@ -960,7 +960,7 @@ export default function Feed() {
                           : 'bg-black border-none hover:bg-gray-900/50'
                         : isSelected
                           ? 'bg-blue-50 border-blue-400s'
-                          : 'bg-gray-50 border-gray-200 hover:bg-gray-900/50'
+                          : 'bg-gray-50 order-blbg-black hover:bg-gray-900/50'
                     )}
                     onClick={() => navigate(`/event/${event.id}`)}
                   >
@@ -1050,7 +1050,7 @@ export default function Feed() {
             <div className="p-4 text-center text-gray-500">No upcoming events</div>
           )}
           
-          <div className="p-3 border-none border-gray-200 text-center">
+          <div className="p-3 border-none order-blbg-black text-center">
             <button 
               onClick={() => navigate('/events')}
               className={cn(
@@ -1069,14 +1069,14 @@ export default function Feed() {
         <div className="space-y-2">
           <button
             onClick={() => navigate('/settings')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white hover:text-black transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-3xl text-white hover:bg-white hover:text-black transition-colors"
           >
             <Settings className="w-5 h-5" />
             <span>Settings</span>
           </button>
           <button
             onClick={() => {/* handle logout */}}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-black text-white hover:bg-red-700 transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-3xl bg-black text-white hover:bg-red-700 transition-colors"
           >
             <LogOut className="w-5 h-5" />
             <span>Logout</span>
@@ -1156,7 +1156,7 @@ export default function Feed() {
                   {/* Company Avatar */}
                   <div className="flex-shrink-0">
                     <div className={cn(
-                      'w-12 h-12 rounded-lg flex items-center justify-center font-bold text-white text-base',
+                      'w-12 h-12 rounded-3xl flex items-center justify-center font-bold text-white text-base',
                       'bg-gradient-to-br from-border-gray-900 to-purple-600'
                     )}>
                       {job.company?.charAt(0) || '💼'}
@@ -1441,7 +1441,7 @@ export default function Feed() {
 
                       {/* Media Content - Shows original media for retweets */}
                       {(post.is_retweet ? post.original_post?.media : post.media) && (
-                        <div className="grid grid-cols-1 border-gray-800 border rounded-3xl gap-2 mb-3">
+                        <div className="grid grid-cols-1 border-blbg-black divide-blbg-black border rounded-3xl gap-2 mb-3">
                           {(post.is_retweet ? post.original_post?.media : post.media)?.map((media, index) => (
                             <div key={index} className="relative">
                               {media.type === 'image' ? (
@@ -1590,13 +1590,13 @@ export default function Feed() {
       {!isMobile && (
         <aside className={cn(
           'hidden xl:block scrollbar-hide w-[400px] border-l sticky top-0 h-screen mr-0 overflow-y-auto',
-          isDark ? 'border-blbg-black' : 'border-gray-200'
+          isDark ? 'border-blbg-black' : 'order-blbg-black'
         )}>
           <div className="p-4 space-y-6">
             {/* Search Field with @ Support */}
             <div className="relative">
               <div className={cn(
-                'flex items-center gap-2 px-3 py-2 rounded-lg border transition-all',
+                'flex items-center gap-2 px-3 py-2 rounded-3xl border transition-all',
                 showSearchDropdown
                   ? isDark
                     ? 'bg-gray-900/50 border-gray-900'
@@ -1688,10 +1688,10 @@ export default function Feed() {
                 <div
                   ref={searchDropdownRef}
                   className={cn(
-                    'absolute top-full left-0 right-0 mt-2 rounded-lg shadow-lg border z-50',
+                    'absolute top-full left-0 right-0 mt-2 rounded-3xl shadow-lg border z-50',
                     isDark
                       ? 'bg-black border-gray-700'
-                      : 'bg-white border-gray-200'
+                      : 'bg-white order-blbg-black'
                   )}
                 >
                   {searchLoading ? (
@@ -1783,8 +1783,8 @@ export default function Feed() {
 
             {/* Job Recommendations */}
             <div className={cn(
-              'rounded-xl p-4 border',
-              isDark ? 'bg-black border-blbg-black' : 'bg-white border-gray-200'
+              'rounded-3xl p-4 border',
+              isDark ? 'bg-black border-blbg-black' : 'bg-white order-blbg-black'
             )}>
               <h3 className="font-bold text-2xl font-serif mb-4 flex items-center">
                 <Bookmark className="h-5 w-5 mr-2" />
@@ -1798,7 +1798,7 @@ export default function Feed() {
                     <div
                       key={company.id || index}
                       className={cn(
-                        'p-3 rounded-xl hover:bg-black/30 cursor-pointer transition-colors',
+                        'p-3 rounded-3xl hover:bg-black/30 cursor-pointer transition-colors',
                         isDark ? 'bg-gray-700/25 hover:bg-gray-900/50' : 'bg-gray-100 hover:bg-gray-200'
                       )}
                       onClick={() => navigate(`/company/${company.id}`)}
@@ -1809,11 +1809,11 @@ export default function Feed() {
                           <img
                             src={company.logo_url}
                             alt={company.name}
-                            className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+                            className="w-10 h-10 rounded-3xl object-cover flex-shrink-0"
                           />
                         ) : (
                           <div className={cn(
-                            'w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 font-bold text-sm text-white',
+                            'w-10 h-10 rounded-3xl flex items-center justify-center flex-shrink-0 font-bold text-sm text-white',
                             'bg-gradient-to-br from-border-gray-900 to-purple-600'
                           )}>
                             {company.name?.charAt(0) || '🏢'}
@@ -1865,7 +1865,7 @@ export default function Feed() {
                 </Button>
                 {/* <Button
                   className={cn(
-                    'w-full font-semibold py-2 rounded-lg transition-colors',
+                    'w-full font-semibold py-2 rounded-3xl transition-colors',
                     isDark 
                       ? 'bg-blue-600 text-white hover:bg-blue-700' 
                       : 'bg-blue-600 text-white hover:bg-blue-700'
@@ -1880,8 +1880,8 @@ export default function Feed() {
 
             {/* Who to Follow */}
             <div className={cn(
-              'rounded-xl p-4 border',
-              isDark ? 'bg-black border-blbg-black' : 'bg-black border-gray-200'
+              'rounded-3xl p-4 border',
+              isDark ? 'bg-black border-blbg-black' : 'bg-black order-blbg-black'
             )}>
               <h3 className="font-serif text-lg mb-4 flex items-center text-white">
                 <Users className="h-5 w-5 mr-2" />
@@ -1922,8 +1922,8 @@ export default function Feed() {
 
             {/* Recent Activity */}
             <div className={cn(
-              'rounded-xl p-4 border',
-              isDark ? 'bg-black border-blbg-black' : 'bg-[#800020] border-gray-200'
+              'rounded-3xl p-4 border',
+              isDark ? 'bg-black border-blbg-black' : 'bg-[#800020] order-blbg-black'
             )}>
               <h3 className="font-bold text-lg mb-4 text-white">recomended vacansies</h3>
               <div className="space-y-3 text-white">
@@ -2093,8 +2093,8 @@ export default function Feed() {
               ${isFabOpen 
                 ? 'bg-black text-white rotate-45 scale-110 ' 
                 : isFabPressed 
-                  ? 'bg-[#CCFE00] text-black scale-125 shadow-[#BCE953]/40 ring-4 ring-[#BCE953]/30'
-                  : 'bg-[#CCFE00] text-black hover:scale-105 active:scale-95'
+                  ? 'bg-black text-white scale-125 shadow-[#ffffff]/40 ring-4 ring-[#ffffff]/30'
+                  : 'bg-black text-white hover:scale-105 active:scale-95'
               }
               text-black font-bold z-50
             `}
@@ -2116,7 +2116,7 @@ export default function Feed() {
       {/* Post Creation Modal */}
       {showPostModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white dark:bg-black rounded-lg shadow-lg w-full max-w-lg mx-4 p-6 relative">
+          <div className="bg-white dark:bg-black rounded-3xl shadow-lg w-full max-w-lg mx-4 p-6 relative">
             <button
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               onClick={() => setShowPostModal(false)}
@@ -2128,7 +2128,7 @@ export default function Feed() {
               <Avatar src={user?.profile.avatar_url} alt={user?.profile.full_name} size="lg" />
               <div className="flex-1">
                 <textarea
-                  className="w-full p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="w-full p-2 border border-gray-300 rounded-3xl dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   rows={4}
                   placeholder="What's on your mind?"
                   value={newPost.content}
@@ -2137,9 +2137,9 @@ export default function Feed() {
                 {mediaPreview && (
                   <div className="relative mt-4">
                     {newPost.media_type === 'image' ? (
-                      <img src={mediaPreview} alt="Selected media" className="w-full h-auto rounded-lg" />
+                      <img src={mediaPreview} alt="Selected media" className="w-full h-auto rounded-3xl" />
                     ) : (
-                      <video src={mediaPreview} controls className="w-full h-auto rounded-lg" />
+                      <video src={mediaPreview} controls className="w-full h-auto rounded-3xl" />
                     )}
                     <button
                       className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-1"
