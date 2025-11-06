@@ -429,7 +429,7 @@ export default function ExplorePage() {
 
           {/* Who to Follow - Full Width */}
           <div className={cn(
-            'rounded-3xl p-4 lg:p-6',
+            'rounded-3xl p-4 lg:p-6 ',
             isDark ? 'bg-black border border-gray-800' : 'bg-white border border-gray-200'
           )}>
             <div className="flex items-center justify-between mb-4 sm:mb-6">
