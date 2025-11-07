@@ -1,0 +1,25 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="256" fill="#8C1D40"/>
+  
+  <!-- Handshake Icon -->
+  <g transform="translate(128, 180)">
+    <!-- Left Hand -->
+    <path d="M20 80 L20 120 L40 120 L40 100 L60 100 L60 80 L80 80 L80 60 L100 60 L100 40 L120 40 L120 60 L140 60 L140 80 L120 80 L120 100 L100 100 L100 120 L80 120 L80 140 L60 140 L60 160 L40 160 L40 140 L20 140 Z" 
+          fill="#FFC627" 
+          stroke="#FFFFFF" 
+          stroke-width="2"/>
+    
+    <!-- Right Hand -->
+    <path d="M140 80 L140 60 L160 60 L160 40 L180 40 L180 60 L200 60 L200 80 L220 80 L220 100 L240 100 L240 120 L236 120 L236 140 L220 140 L220 160 L200 160 L200 140 L180 140 L180 120 L160 120 L160 100 L140 100 Z" 
+          fill="#FFC627" 
+          stroke="#FFFFFF" 
+          stroke-width="2"/>
+    
+    <!-- Connection Point -->
+    <circle cx="130" cy="90" r="12" fill="#FFFFFF"/>
+  </g>
+  
+  <!-- Letter H -->
+  <text x="256" y="360" font-family="Inter, sans-serif" font-size="120" font-weight="700" fill="#FFC627" text-anchor="middle">H</text>
+</svg>

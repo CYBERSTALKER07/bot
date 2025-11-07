@@ -13,14 +13,15 @@ export function Skeleton({
   variant = 'rectangular',
   width,
   height,
-  animation = 'pulse'
+  animation = 'wave' // Changed default from 'pulse' to 'wave'
 }: SkeletonProps) {
   return (
     <div
       className={cn(
+        'relative overflow-hidden',
         'bg-gray-200 dark:bg-gray-800',
         animation === 'pulse' && 'animate-pulse',
-        animation === 'wave' && 'animate-shimmer',
+        animation === 'wave' && 'skeleton-wave',
         variant === 'circular' && 'rounded-full',
         variant === 'text' && 'rounded',
         variant === 'rectangular' && 'rounded-lg',

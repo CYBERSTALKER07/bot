@@ -8,7 +8,7 @@ import {
   Building2,
   Briefcase,
   Calendar,
-  BookOpen,
+  BookOpen,z
   Users,
   Heart,
   MessageCircle,
@@ -25,15 +25,25 @@ import {
 } from 'lucide-react';
 import { useJobs } from '../../hooks/useJobs';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
+import { 
+  useRecommendedUsers,
+  useMostLikedPosts,
+  useBookmarks,
+  useFollowUser,
+  useUnfollowUser
+} from '../../hooks/useOptimizedQuery';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 import { Card } from '../ui/Card';
 import PageLayout from '../ui/PageLayout';
 import { cn } from '../../lib/cva';
+import { supabase } from '../../lib/supabase';
 
 export default function StudentDashboard() {
   const { jobs, loading, error } = useJobs();
   const { isDark } = useTheme();
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
@@ -41,6 +51,94 @@ export default function StudentDashboard() {
     suggestions: false,
     actions: false
   });
+
+  // Fetch real data from Supabase
+  const { data: recommendedUsers = [], isLoading: usersLoading } = useRecommendedUsers(user?.id, 5);
+  const { data: trendingPosts = [], isLoading: postsLoading } = useMostLikedPosts(5, user?.id);
+  const { data: bookmarksData = [], isLoading: bookmarksLoading } = useBookmarks(user?.id);
+  const followUserMutation = useFollowUser();
+  const unfollowUserMutation = useUnfollowUser();
+
+  // Applications statistics (fetch from Supabase)
+  const [applicationsStats, setApplicationsStats] = useState({
+    applied: 0,
+    interviews: 0,
+    saved: 0
+  });
+
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    // Fetch applications count
+    const fetchApplicationsStats = async () => {
+      try {
+        const { count: appliedCount } = await supabase
+          .from('applications')
+          .select('*', { count: 'exact', head: true })
+          .eq('student_id', user.id);
+
+        const { count: interviewsCount } = await supabase
+          .from('applications')
+          .select('*', { count: 'exact', head: true })
+          .eq('student_id', user.id)
+          .eq('status', 'interview');
+
+        const savedCount = bookmarksData?.filter((b: any) => b.jobs)?.length || 0;
+
+        setApplicationsStats({
+          applied: appliedCount || 0,
+          interviews: interviewsCount || 0,
+          saved: savedCount
+        });
+      } catch (error) {
+        console.error('Error fetching application stats:', error);
+      }
+    };
+
+    // Fetch recent activity
+    const fetchRecentActivity = async () => {
+      try {
+        // Get recent applications
+        const { data: applications } = await supabase
+          .from('applications')
+          .select('id, job_id, applied_date, status, jobs(title, company)')
+          .eq('student_id', user.id)
+          .order('applied_date', { ascending: false })
+          .limit(3);
+
+        if (applications) {
+          const activity = applications.map((app: any) => {
+            const now = new Date();
+            const appliedDate = new Date(app.applied_date);
+            const diffTime = Math.abs(now.getTime() - appliedDate.getTime());
+            const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            let timeString = '';
+            if (diffHours < 1) timeString = 'now';
+            else if (diffHours < 24) timeString = `${diffHours}h`;
+            else timeString = `${diffDays}d`;
+
+            return {
+              type: 'application',
+              company: app.jobs?.company || 'Unknown Company',
+              position: app.jobs?.title || 'Unknown Position',
+              time: timeString
+            };
+          });
+
+          setRecentActivity(activity);
+        }
+      } catch (error) {
+        console.error('Error fetching recent activity:', error);
+      }
+    };
+
+    fetchApplicationsStats();
+    fetchRecentActivity();
+  }, [user?.id, bookmarksData]);
 
   const filteredJobs = jobs
     .filter(job => {
@@ -50,26 +148,29 @@ export default function StudentDashboard() {
     })
     .slice(0, 6);
 
-  // Mock trending topics and suggestions
-  const trendingTopics = [
-    { tag: '#TechJobs', posts: '45.2K posts' },
-    { tag: '#RemoteWork', posts: '32.1K posts' },
-    { tag: '#Internships', posts: '28.5K posts' },
-    { tag: '#CareerTips', posts: '19.8K posts' },
-    { tag: '#Networking', posts: '15.3K posts' }
-  ];
+  // Extract trending topics from most liked posts
+  const trendingTopics = trendingPosts.map((post: any, index: number) => {
+    const content = post.content || '';
+    const hashtags = content.match(/#\w+/g) || [];
+    const mainHashtag = hashtags[0] || `#Post${index + 1}`;
+    
+    return {
+      tag: mainHashtag,
+      posts: `${post.likes_count || 0} likes`,
+      author: post.author?.name || 'Unknown'
+    };
+  }).slice(0, 5);
 
-  const suggestedUsers = [
-    { name: 'Career Coach Pro', handle: '@careercoach', verified: true },
-    { name: 'Tech Recruiter', handle: '@techrecruiter', verified: false },
-    { name: 'Industry Insider', handle: '@industryexpert', verified: true }
-  ];
-
-  const recentActivity = [
-    { type: 'application', company: 'Google', position: 'Software Engineer', time: '2h' },
-    { type: 'saved', company: 'Microsoft', position: 'Product Manager', time: '5h' },
-    { type: 'viewed', company: 'Apple', position: 'UX Designer', time: '1d' }
-  ];
+  // Transform recommended users for suggestions
+  const suggestedUsers = recommendedUsers.map((user: any) => ({
+    id: user.id,
+    name: user.full_name || 'Unknown User',
+    handle: user.username ? `@${user.username}` : '@user',
+    verified: user.verified || false,
+    avatar_url: user.avatar_url,
+    bio: user.bio,
+    is_following: false // Will be checked via follow status
+  }));
 
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections(prev => ({
@@ -213,7 +314,7 @@ export default function StudentDashboard() {
                       className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors ios-nav-item"
                       onClick={() => setShowMobileSidebar(false)}
                     >
-                      <Briefcase className="h-5 w-5 text-blue-500" />
+                      <Briefcase className={cn('h-5 w-5', isDark ? 'text-white' : 'text-black')} />
                       <span>View Applications</span>
                     </Link>
                     <Link 
@@ -221,7 +322,7 @@ export default function StudentDashboard() {
                       className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors ios-nav-item"
                       onClick={() => setShowMobileSidebar(false)}
                     >
-                      <Calendar className="h-5 w-5 text-green-500" />
+                      <Calendar className={cn('h-5 w-5', isDark ? 'text-white' : 'text-black')} />
                       <span>Career Events</span>
                     </Link>
                     <Link 
@@ -229,7 +330,7 @@ export default function StudentDashboard() {
                       className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors ios-nav-item"
                       onClick={() => setShowMobileSidebar(false)}
                     >
-                      <Building2 className="h-5 w-5 text-purple-500" />
+                      <Building2 className={cn('h-5 w-5', isDark ? 'text-white' : 'text-black')} />
                       <span>Browse Companies</span>
                     </Link>
                     <Link 
@@ -237,7 +338,7 @@ export default function StudentDashboard() {
                       className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors ios-nav-item"
                       onClick={() => setShowMobileSidebar(false)}
                     >
-                      <BookOpen className="h-5 w-5 text-yellow-500" />
+                      <BookOpen className={cn('h-5 w-5', isDark ? 'text-white' : 'text-black')} />
                       <span>Career Resources</span>
                     </Link>
                   </div>
@@ -262,24 +363,32 @@ export default function StudentDashboard() {
                 </button>
                 {expandedSections.trending && (
                   <div className="space-y-3">
-                    {trendingTopics.slice(0, 3).map((topic, index) => (
-                      <div key={index} className="p-2 rounded-lg hover:bg-gray-500/10 cursor-pointer transition-colors">
-                        <p className="font-bold text-sm">{topic.tag}</p>
-                        <p className={cn(
-                          'text-xs',
-                          isDark ? 'text-gray-400' : 'text-gray-600'
-                        )}>
-                          {topic.posts}
-                        </p>
-                      </div>
-                    ))}
-                    <Button 
-                      variant="ghost" 
-                      className="w-full text-blue-500 justify-start p-2 text-sm"
-                      onClick={() => setShowMobileSidebar(false)}
-                    >
-                      Show more trending
-                    </Button>
+                    {postsLoading ? (
+                      <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>Loading...</p>
+                    ) : trendingTopics.length > 0 ? (
+                      trendingTopics.slice(0, 3).map((topic: any, index: number) => (
+                        <div key={index} className="p-2 rounded-lg hover:bg-gray-500/10 cursor-pointer transition-colors">
+                          <p className="font-bold text-sm">{topic.tag}</p>
+                          <p className={cn(
+                            'text-xs',
+                            isDark ? 'text-gray-400' : 'text-gray-600'
+                          )}>
+                            {topic.posts}
+                          </p>
+                        </div>
+                      ))
+                    ) : (
+                      <p className={cn('text-xs', isDark ? 'text-gray-500' : 'text-gray-500')}>No trending topics yet</p>
+                    )}
+                    <Link to="/explore">
+                      <Button 
+                        variant="ghost" 
+                        className={cn('w-full justify-start p-2 text-sm', isDark ? 'text-white' : 'text-black')}
+                        onClick={() => setShowMobileSidebar(false)}
+                      >
+                        Show more trending
+                      </Button>
+                    </Link>
                   </div>
                 )}
               </div>
@@ -302,47 +411,75 @@ export default function StudentDashboard() {
                 </button>
                 {expandedSections.suggestions && (
                   <div className="space-y-3">
-                    {suggestedUsers.slice(0, 2).map((user, index) => (
-                      <div key={index} className="flex items-center justify-between p-2">
-                        <div className="flex items-center space-x-3 flex-1">
-                          <div className={cn(
-                            'w-8 h-8 rounded-full flex items-center justify-center',
-                            isDark ? 'bg-gray-800' : 'bg-gray-200'
-                          )}>
-                            <span className="text-sm">👤</span>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center space-x-1">
-                              <p className="font-bold text-sm truncate">{user.name}</p>
-                              {user.verified && (
-                                <div className="w-3 h-3 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                                  <span className="text-white text-xs">✓</span>
-                                </div>
-                              )}
+                    {usersLoading ? (
+                      <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>Loading...</p>
+                    ) : suggestedUsers.length > 0 ? (
+                      suggestedUsers.slice(0, 2).map((suggestedUser: any, index: number) => (
+                        <div key={index} className="flex items-center justify-between p-2">
+                          <div className="flex items-center space-x-3 flex-1">
+                            {suggestedUser.avatar_url ? (
+                              <img 
+                                src={suggestedUser.avatar_url} 
+                                alt={suggestedUser.name}
+                                className="w-8 h-8 rounded-full object-cover grayscale"
+                              />
+                            ) : (
+                              <div className={cn(
+                                'w-8 h-8 rounded-full flex items-center justify-center font-bold',
+                                isDark ? 'bg-white text-black' : 'bg-black text-white'
+                              )}>
+                                {suggestedUser.name.charAt(0)}
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center space-x-1">
+                                <p className="font-bold text-sm truncate">{suggestedUser.name}</p>
+                                {suggestedUser.verified && (
+                                  <div className={cn(
+                                    'w-3 h-3 rounded-full flex items-center justify-center',
+                                    isDark ? 'bg-white' : 'bg-black'
+                                  )}>
+                                    <span className={cn('text-xs font-bold', isDark ? 'text-black' : 'text-white')}>✓</span>
+                                  </div>
+                                )}
+                              </div>
+                              <p className={cn(
+                                'text-xs truncate',
+                                isDark ? 'text-gray-400' : 'text-gray-600'
+                              )}>
+                                {suggestedUser.handle}
+                              </p>
                             </div>
-                            <p className={cn(
-                              'text-xs truncate',
-                              isDark ? 'text-gray-400' : 'text-gray-600'
-                            )}>
-                              {user.handle}
-                            </p>
                           </div>
+                          <Button 
+                            size="sm"
+                            onClick={() => {
+                              followUserMutation.mutate({ 
+                                followerId: user?.id || '', 
+                                followingId: suggestedUser.id 
+                              });
+                            }}
+                            className={cn(
+                              'rounded-full px-3 py-1 text-xs font-bold ml-2',
+                              isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-900'
+                            )}
+                          >
+                            Follow
+                          </Button>
                         </div>
-                        <Button 
-                          size="sm"
-                          className="bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 rounded-full px-3 py-1 text-xs font-bold ml-2"
-                        >
-                          Follow
-                        </Button>
-                      </div>
-                    ))}
-                    <Button 
-                      variant="ghost" 
-                      className="w-full text-blue-500 justify-start p-2 text-sm"
-                      onClick={() => setShowMobileSidebar(false)}
-                    >
-                      Show more suggestions
-                    </Button>
+                      ))
+                    ) : (
+                      <p className={cn('text-xs', isDark ? 'text-gray-500' : 'text-gray-500')}>No suggestions available</p>
+                    )}
+                    <Link to="/people">
+                      <Button 
+                        variant="ghost" 
+                        className={cn('w-full justify-start p-2 text-sm', isDark ? 'text-white' : 'text-black')}
+                        onClick={() => setShowMobileSidebar(false)}
+                      >
+                        Show more suggestions
+                      </Button>
+                    </Link>
                   </div>
                 )}
               </div>
@@ -384,6 +521,7 @@ export default function StudentDashboard() {
               jobs={jobs}
               filteredJobs={filteredJobs}
               recentActivity={recentActivity}
+              applicationsStats={applicationsStats}
             />
           </div>
         </div>
@@ -395,6 +533,7 @@ export default function StudentDashboard() {
             jobs={jobs}
             filteredJobs={filteredJobs}
             recentActivity={recentActivity}
+            applicationsStats={applicationsStats}
           />
         </div>
 
@@ -406,6 +545,10 @@ export default function StudentDashboard() {
             setSearchTerm={setSearchTerm}
             trendingTopics={trendingTopics}
             suggestedUsers={suggestedUsers}
+            postsLoading={postsLoading}
+            usersLoading={usersLoading}
+            user={user}
+            followUserMutation={followUserMutation}
           />
         </div>
       </div>
@@ -414,11 +557,12 @@ export default function StudentDashboard() {
 }
 
 // Extracted Main Content Component for reusability
-const MainContent = ({ isDark, jobs, filteredJobs, recentActivity }: {
+const MainContent = ({ isDark, jobs, filteredJobs, recentActivity, applicationsStats }: {
   isDark: boolean;
   jobs: any[];
   filteredJobs: any[];
   recentActivity: any[];
+  applicationsStats: { applied: number; interviews: number; saved: number };
 }) => (
   <>
     {/* Quick Stats */}
@@ -431,7 +575,9 @@ const MainContent = ({ isDark, jobs, filteredJobs, recentActivity }: {
           'text-center p-3 sm:p-4 rounded-lg hover:bg-gray-50/5 transition-colors ios-touch-target',
           'min-h-[70px] sm:min-h-[80px] flex flex-col justify-center'
         )}>
-          <div className="text-lg sm:text-2xl font-bold text-blue-500 mb-1">{jobs.length}</div>
+          <div className={cn('text-lg sm:text-2xl font-bold mb-1', isDark ? 'text-white' : 'text-black')}>
+            {jobs.length}
+          </div>
           <div className={cn(
             'text-xs sm:text-sm',
             isDark ? 'text-gray-400' : 'text-gray-600'
@@ -443,7 +589,9 @@ const MainContent = ({ isDark, jobs, filteredJobs, recentActivity }: {
           'text-center p-3 sm:p-4 rounded-lg hover:bg-gray-50/5 transition-colors ios-touch-target',
           'min-h-[70px] sm:min-h-[80px] flex flex-col justify-center'
         )}>
-          <div className="text-lg sm:text-2xl font-bold text-green-500 mb-1">7</div>
+          <div className={cn('text-lg sm:text-2xl font-bold mb-1', isDark ? 'text-white' : 'text-black')}>
+            {applicationsStats.applied}
+          </div>
           <div className={cn(
             'text-xs sm:text-sm',
             isDark ? 'text-gray-400' : 'text-gray-600'
@@ -455,7 +603,9 @@ const MainContent = ({ isDark, jobs, filteredJobs, recentActivity }: {
           'text-center p-3 sm:p-4 rounded-lg hover:bg-gray-50/5 transition-colors ios-touch-target',
           'min-h-[70px] sm:min-h-[80px] flex flex-col justify-center'
         )}>
-          <div className="text-lg sm:text-2xl font-bold text-yellow-500 mb-1">3</div>
+          <div className={cn('text-lg sm:text-2xl font-bold mb-1', isDark ? 'text-white' : 'text-black')}>
+            {applicationsStats.interviews}
+          </div>
           <div className={cn(
             'text-xs sm:text-sm',
             isDark ? 'text-gray-400' : 'text-gray-600'
@@ -467,7 +617,9 @@ const MainContent = ({ isDark, jobs, filteredJobs, recentActivity }: {
           'text-center p-3 sm:p-4 rounded-lg hover:bg-gray-50/5 transition-colors ios-touch-target',
           'min-h-[70px] sm:min-h-[80px] flex flex-col justify-center'
         )}>
-          <div className="text-lg sm:text-2xl font-bold text-red-500 mb-1">12</div>
+          <div className={cn('text-lg sm:text-2xl font-bold mb-1', isDark ? 'text-white' : 'text-black')}>
+            {applicationsStats.saved}
+          </div>
           <div className={cn(
             'text-xs sm:text-sm',
             isDark ? 'text-gray-400' : 'text-gray-600'
@@ -486,38 +638,44 @@ const MainContent = ({ isDark, jobs, filteredJobs, recentActivity }: {
       <div className="p-4 sm:p-6 ">
         <h2 className="font-bold  text-lg sm:text-xl mb-4">Recent Activity</h2>
         <div className="space-y-3 sm:space-y-4">
-          {recentActivity.map((activity, index) => (
-            <div 
-              key={index} 
-              className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50/5 transition-colors cursor-pointer"
-            >
-              <div className="flex items-center space-x-3 flex-1 min-w-0">
-                <div className={cn(
-                  'w-2 h-2 rounded-full flex-shrink-0',
-                  activity.type === 'application' ? 'bg-blue-500' :
-                  activity.type === 'saved' ? 'bg-green-500' : 'bg-gray-500'
-                )} />
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm sm:text-base truncate">
-                    {activity.position} at {activity.company}
-                  </p>
-                  <p className={cn(
-                    'text-xs sm:text-sm',
-                    isDark ? 'text-gray-400' : 'text-gray-600'
-                  )}>
-                    {activity.type === 'application' ? 'Applied' :
-                     activity.type === 'saved' ? 'Saved job' : 'Viewed'}
-                  </p>
+          {recentActivity.length > 0 ? (
+            recentActivity.map((activity, index) => (
+              <div 
+                key={index} 
+                className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50/5 transition-colors cursor-pointer"
+              >
+                <div className="flex items-center space-x-3 flex-1 min-w-0">
+                  <div className={cn(
+                    'w-2 h-2 rounded-full flex-shrink-0',
+                    activity.type === 'application' ? isDark ? 'bg-white' : 'bg-black' :
+                    activity.type === 'saved' ? isDark ? 'bg-white' : 'bg-black' : 'bg-gray-500'
+                  )} />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm sm:text-base truncate">
+                      {activity.position} at {activity.company}
+                    </p>
+                    <p className={cn(
+                      'text-xs sm:text-sm',
+                      isDark ? 'text-gray-400' : 'text-gray-600'
+                    )}>
+                      {activity.type === 'application' ? 'Applied' :
+                       activity.type === 'saved' ? 'Saved job' : 'Viewed'}
+                    </p>
+                  </div>
                 </div>
+                <span className={cn(
+                  'text-xs sm:text-sm flex-shrink-0',
+                  isDark ? 'text-gray-400' : 'text-gray-600'
+                )}>
+                  {activity.time}
+                </span>
               </div>
-              <span className={cn(
-                'text-xs sm:text-sm flex-shrink-0',
-                isDark ? 'text-gray-400' : 'text-gray-600'
-              )}>
-                {activity.time}
-              </span>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p className={cn('text-sm text-center py-4', isDark ? 'text-gray-500' : 'text-gray-500')}>
+              No recent activity yet
+            </p>
+          )}
         </div>
       </div>
     </div>
@@ -529,7 +687,7 @@ const MainContent = ({ isDark, jobs, filteredJobs, recentActivity }: {
           <h2 className="font-bold text-lg sm:text-xl">Recommended for You</h2>
           <Link 
             to="/jobs"  
-            className="text-blue-500 hover:underline text-sm ios-touch-target"
+            className={cn('hover:underline text-sm ios-touch-target', isDark ? 'text-white' : 'text-black')}
           >
             View all
           </Link>
@@ -547,7 +705,9 @@ const MainContent = ({ isDark, jobs, filteredJobs, recentActivity }: {
               <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 space-y-3 sm:space-y-0">
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-base sm:text-lg mb-1 truncate">{job.title}</h3>
-                  <p className="text-blue-500 font-medium mb-2 text-sm sm:text-base">{job.company}</p>
+                  <p className={cn('font-medium mb-2 text-sm sm:text-base', isDark ? 'text-white' : 'text-black')}>
+                    {job.company}
+                  </p>
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm text-gray-500 mb-3">
                     <div className="flex items-center space-x-1">
                       <MapPin className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -581,14 +741,20 @@ const MainContent = ({ isDark, jobs, filteredJobs, recentActivity }: {
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="flex items-center space-x-2 p-2 text-gray-500 hover:text-red-500 hover:bg-red-500/10 rounded-full ios-touch-target"
+                    className={cn(
+                      'flex items-center space-x-2 p-2 rounded-full ios-touch-target',
+                      isDark ? 'text-gray-400 hover:text-white hover:bg-gray-900' : 'text-gray-600 hover:text-black hover:bg-gray-100'
+                    )}
                   >
                     <Heart className="h-4 w-4" />
                   </Button>
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="flex items-center space-x-2 p-2 text-gray-500 hover:text-blue-500 hover:bg-blue-500/10 rounded-full ios-touch-target"
+                    className={cn(
+                      'flex items-center space-x-2 p-2 rounded-full ios-touch-target',
+                      isDark ? 'text-gray-400 hover:text-white hover:bg-gray-900' : 'text-gray-600 hover:text-black hover:bg-gray-100'
+                    )}
                   >
                     <Share className="h-4 w-4" />
                   </Button>
@@ -598,15 +764,23 @@ const MainContent = ({ isDark, jobs, filteredJobs, recentActivity }: {
                   <Button 
                     variant="outlined" 
                     size="sm" 
-                    className="rounded-full border-gray-300 hover:bg-gray-100 flex-1 sm:flex-none ios-touch-target"
+                    className={cn(
+                      'rounded-full flex-1 sm:flex-none ios-touch-target border',
+                      isDark ? 'border-gray-700 hover:bg-gray-900' : 'border-gray-300 hover:bg-gray-100'
+                    )}
                   >
                     Save
                   </Button>
-                  <Button 
-                    className="bg-blue-500 text-white hover:bg-blue-600 rounded-full px-4 sm:px-6 flex-1 sm:flex-none ios-touch-target"
-                  >
-                    Apply
-                  </Button>
+                  <Link to={`/job/${job.id}`} className="flex-1 sm:flex-none">
+                    <Button 
+                      className={cn(
+                        'w-full rounded-full px-4 sm:px-6 ios-touch-target font-bold',
+                        isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-900'
+                      )}
+                    >
+                      Apply
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </Card>
@@ -618,12 +792,16 @@ const MainContent = ({ isDark, jobs, filteredJobs, recentActivity }: {
 );
 
 // Extracted Desktop Sidebar Component
-const DesktopSidebar = ({ isDark, searchTerm, setSearchTerm, trendingTopics, suggestedUsers }: {
+const DesktopSidebar = ({ isDark, searchTerm, setSearchTerm, trendingTopics, suggestedUsers, postsLoading, usersLoading, user, followUserMutation }: {
   isDark: boolean;
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   trendingTopics: any[];
   suggestedUsers: any[];
+  postsLoading: boolean;
+  usersLoading: boolean;
+  user: any;
+  followUserMutation: any;
 }) => (
   <>
     {/* Search */}
@@ -656,24 +834,32 @@ const DesktopSidebar = ({ isDark, searchTerm, setSearchTerm, trendingTopics, sug
     )}>
       <h2 className="text-xl font-bold mb-4">What's trending</h2>
       <div className="space-y-3">
-        {trendingTopics.map((topic, index) => (
-          <div key={index} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-500/10 cursor-pointer transition-colors">
-            <div className="flex-1">
-              <p className="font-bold">{topic.tag}</p>
-              <p className={cn(
-                'text-sm',
-                isDark ? 'text-gray-400' : 'text-gray-600'
-              )}>
-                {topic.posts}
-              </p>
+        {postsLoading ? (
+          <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>Loading...</p>
+        ) : trendingTopics.length > 0 ? (
+          trendingTopics.map((topic: any, index: number) => (
+            <div key={index} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-500/10 cursor-pointer transition-colors">
+              <div className="flex-1">
+                <p className="font-bold">{topic.tag}</p>
+                <p className={cn(
+                  'text-sm',
+                  isDark ? 'text-gray-400' : 'text-gray-600'
+                )}>
+                  {topic.posts}
+                </p>
+              </div>
+              <MoreHorizontal className="h-4 w-4 text-gray-500" />
             </div>
-            <MoreHorizontal className="h-4 w-4 text-gray-500" />
-          </div>
-        ))}
+          ))
+        ) : (
+          <p className={cn('text-sm', isDark ? 'text-gray-500' : 'text-gray-500')}>No trending topics yet</p>
+        )}
       </div>
-      <Button variant="ghost" className="w-full mt-3 text-blue-500 justify-start p-2">
-        Show more
-      </Button>
+      <Link to="/explore">
+        <Button variant="ghost" className={cn('w-full mt-3 justify-start p-2', isDark ? 'text-white' : 'text-black')}>
+          Show more
+        </Button>
+      </Link>
     </div>
 
     {/* Who to follow */}
@@ -683,41 +869,71 @@ const DesktopSidebar = ({ isDark, searchTerm, setSearchTerm, trendingTopics, sug
     )}>
       <h2 className="text-xl font-bold mb-4">Who to follow</h2>
       <div className="space-y-3">
-        {suggestedUsers.map((user, index) => (
-          <div key={index} className="flex items-center justify-between">
-            <div className="flex items-center space-x-3 flex-1 min-w-0">
-              <div className={cn(
-                'w-10 h-10 rounded-full flex items-center justify-center',
-                isDark ? 'bg-gray-800' : 'bg-gray-200'
-              )}>
-                <span className="text-lg">👤</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center space-x-1">
-                  <p className="font-bold text-sm truncate">{user.name}</p>
-                  {user.verified && (
-                    <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs">✓</span>
-                    </div>
-                  )}
+        {usersLoading ? (
+          <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>Loading...</p>
+        ) : suggestedUsers.length > 0 ? (
+          suggestedUsers.map((suggestedUser: any, index: number) => (
+            <div key={index} className="flex items-center justify-between">
+              <div className="flex items-center space-x-3 flex-1 min-w-0">
+                {suggestedUser.avatar_url ? (
+                  <img 
+                    src={suggestedUser.avatar_url} 
+                    alt={suggestedUser.name}
+                    className="w-10 h-10 rounded-full object-cover grayscale"
+                  />
+                ) : (
+                  <div className={cn(
+                    'w-10 h-10 rounded-full flex items-center justify-center font-bold',
+                    isDark ? 'bg-white text-black' : 'bg-black text-white'
+                  )}>
+                    {suggestedUser.name.charAt(0)}
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center space-x-1">
+                    <p className="font-bold text-sm truncate">{suggestedUser.name}</p>
+                    {suggestedUser.verified && (
+                      <div className={cn(
+                        'w-4 h-4 rounded-full flex items-center justify-center',
+                        isDark ? 'bg-white' : 'bg-black'
+                      )}>
+                        <span className={cn('text-xs font-bold', isDark ? 'text-black' : 'text-white')}>✓</span>
+                      </div>
+                    )}
+                  </div>
+                  <p className={cn(
+                    'text-sm truncate',
+                    isDark ? 'text-gray-400' : 'text-gray-600'
+                  )}>
+                    {suggestedUser.handle}
+                  </p>
                 </div>
-                <p className={cn(
-                  'text-sm truncate',
-                  isDark ? 'text-gray-400' : 'text-gray-600'
-                )}>
-                  {user.handle}
-                </p>
               </div>
+              <Button 
+                onClick={() => {
+                  followUserMutation.mutate({ 
+                    followerId: user?.id || '', 
+                    followingId: suggestedUser.id 
+                  });
+                }}
+                className={cn(
+                  'rounded-full px-4 py-1 text-sm font-bold',
+                  isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-900'
+                )}
+              >
+                Follow
+              </Button>
             </div>
-            <Button className="bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 rounded-full px-4 py-1 text-sm font-bold">
-              Follow
-            </Button>
-          </div>
-        ))}
+          ))
+        ) : (
+          <p className={cn('text-sm', isDark ? 'text-gray-500' : 'text-gray-500')}>No suggestions available</p>
+        )}
       </div>
-      <Button variant="ghost" className="w-full mt-3 text-blue-500 justify-start p-2">
-        Show more
-      </Button>
+      <Link to="/people">
+        <Button variant="ghost" className={cn('w-full mt-3 justify-start p-2', isDark ? 'text-white' : 'text-black')}>
+          Show more
+        </Button>
+      </Link>
     </div>
 
     {/* Quick Actions */}
@@ -728,19 +944,19 @@ const DesktopSidebar = ({ isDark, searchTerm, setSearchTerm, trendingTopics, sug
       <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
       <div className="space-y-2">
         <Link to="/applications" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors">
-          <Briefcase className="h-5 w-5 text-blue-500" />
+          <Briefcase className={cn('h-5 w-5', isDark ? 'text-white' : 'text-black')} />
           <span>View Applications</span>
         </Link>
         <Link to="/events" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors">
-          <Calendar className="h-5 w-5 text-green-500" />
+          <Calendar className={cn('h-5 w-5', isDark ? 'text-white' : 'text-black')} />
           <span>Career Events</span>
         </Link>
         <Link to="/companies" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors">
-          <Building2 className="h-5 w-5 text-purple-500" />
+          <Building2 className={cn('h-5 w-5', isDark ? 'text-white' : 'text-black')} />
           <span>Browse Companies</span>
         </Link>
         <Link to="/resources" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors">
-          <BookOpen className="h-5 w-5 text-yellow-500" />
+          <BookOpen className={cn('h-5 w-5', isDark ? 'text-white' : 'text-black')} />
           <span>Career Resources</span>
         </Link>
       </div>
