@@ -114,8 +114,8 @@ export default function JobDetails() {
             className={cn(
               'inline-flex items-center space-x-2 transition-colors',
               isDark
-                ? 'text-blue-400 hover:text-blue-300'
-                : 'text-blue-600 hover:text-blue-700'
+                ? 'text-info-400 hover:text-info-300'
+                : 'text-info-600 hover:text-info-700'
             )}
           >
             <ArrowLeft className="h-5 w-5" />
@@ -137,8 +137,8 @@ export default function JobDetails() {
             <span className={cn(
               'px-4 py-2 rounded-full text-sm font-semibold inline-flex items-center space-x-2',
               isDark
-                ? 'bg-blue-900/30 text-blue-300 border border-blue-700'
-                : 'bg-blue-50 text-blue-700 border border-blue-200'
+                ? 'bg-info-900/30 text-info-300 border border-info-700'
+                : 'bg-info-50 text-info-700 border border-info-200'
             )}>
               <Briefcase className="h-4 w-4" />
               <span>{job.type || 'Full-time'}</span>
@@ -219,7 +219,7 @@ export default function JobDetails() {
             )}>
               <Clock className={cn(
                 'h-6 w-6 flex-shrink-0 mt-1',
-                isDark ? 'text-blue-400' : 'text-blue-500'
+                isDark ? 'text-info-400' : 'text-info-500'
               )} />
               <div>
                 <p className={cn('text-sm mb-1', isDark ? 'text-gray-400' : 'text-gray-600')}>Type</p>
@@ -269,8 +269,8 @@ export default function JobDetails() {
               className={cn(
                 'w-full px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 transform hover:scale-105',
                 isDark
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
+                  ? 'bg-info-600 text-white hover:bg-info-700'
+                  : 'bg-info-600 text-white hover:bg-info-700'
               )}
             >
               Apply Now 🚀
@@ -417,14 +417,14 @@ export default function JobDetails() {
                     <img 
                       src={job.employer.avatar_url}
                       alt={job.employer.name}
-                      className="w-16 h-16 rounded-full object-cover mb-4 border-4 border-blue-400"
+                      className="w-16 h-16 rounded-full object-cover mb-4 border-4 border-info-400"
                     />
                   ) : (
                     <div className={cn(
                       'w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mb-4 border-4',
                       isDark
-                        ? 'bg-gradient-to-br from-blue-600 to-purple-600 text-white border-blue-500'
-                        : 'bg-gradient-to-br from-blue-400 to-purple-500 text-white border-blue-400'
+                        ? 'bg-gradient-to-br from-info-600 to-purple-600 text-white border-info-500'
+                        : 'bg-gradient-to-br from-blue-400 to-purple-500 text-white border-info-400'
                     )}>
                       {job.employer.name?.charAt(0).toUpperCase()}
                     </div>
@@ -443,7 +443,7 @@ export default function JobDetails() {
                     {job.employer.company_name}
                   </p>
                   {job.employer.verified && (
-                    <div className="mt-2 flex items-center space-x-1 text-blue-500">
+                    <div className="mt-2 flex items-center space-x-1 text-info-500">
                       <CheckCircle className="h-4 w-4" />
                       <span className="text-xs font-semibold">Verified</span>
                     </div>
@@ -454,7 +454,7 @@ export default function JobDetails() {
                   <div className="flex items-center gap-2">
                     <Users className={cn(
                       'h-5 w-5',
-                      isDark ? 'text-blue-400' : 'text-blue-600'
+                      isDark ? 'text-info-400' : 'text-info-600'
                     )} />
                     <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>
                       View employer profile
@@ -463,7 +463,7 @@ export default function JobDetails() {
                   <div className="flex items-center gap-2">
                     <Building2 className={cn(
                       'h-5 w-5',
-                      isDark ? 'text-blue-400' : 'text-blue-600'
+                      isDark ? 'text-info-400' : 'text-info-600'
                     )} />
                     <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>
                       {job.location}
@@ -474,8 +474,8 @@ export default function JobDetails() {
                 <button className={cn(
                   'w-full px-4 py-2 rounded-lg font-semibold transition-all',
                   isDark
-                    ? 'bg-blue-900/20 text-blue-400 hover:bg-blue-900/30'
-                    : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                    ? 'bg-info-900/20 text-info-400 hover:bg-info-900/30'
+                    : 'bg-info-50 text-info-600 hover:bg-info-100'
                 )}>
                   View Employer Profile
                 </button>
@@ -502,8 +502,8 @@ export default function JobDetails() {
                 className={cn(
                   'w-full px-6 py-3 rounded-lg font-semibold transition-all',
                   isDark
-                    ? 'bg-blue-600 text-white hover:bg-blue-700'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                    ? 'bg-info-600 text-white hover:bg-info-700'
+                    : 'bg-info-600 text-white hover:bg-info-700'
                 )}
               >
                 Start Application
@@ -572,7 +572,7 @@ export default function JobDetails() {
                   value={coverLetter}
                   onChange={(e) => setCoverLetter(e.target.value)}
                   className={cn(
-                    'w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none',
+                    'w-full p-3 border rounded-lg focus:ring-2 focus:ring-info-500 focus:border-transparent outline-none',
                     isDark
                       ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
@@ -600,8 +600,8 @@ export default function JobDetails() {
                   className={cn(
                     'flex-1 px-6 py-3 rounded-lg font-medium text-white transition-all',
                     isDark
-                      ? 'bg-blue-600 hover:bg-blue-700'
-                      : 'bg-blue-600 hover:bg-blue-700'
+                      ? 'bg-info-600 hover:bg-info-700'
+                      : 'bg-info-600 hover:bg-info-700'
                   )}
                 >
                   Submit Application

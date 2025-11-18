@@ -381,7 +381,7 @@ export default function ResumeBuilder() {
               onClick={() => setIsPreviewMode(false)}
               className={cn(
                 "hover:bg-opacity-10",
-                isDark ? 'text-blue-400 hover:text-blue-300 hover:bg-blue-400' : 'text-blue-500 hover:text-blue-700 hover:bg-blue-500'
+                isDark ? 'text-info-400 hover:text-info-300 hover:bg-info-400' : 'text-info-500 hover:text-info-700 hover:bg-info-500'
               )}
             >
               ← Back to Editor
@@ -389,7 +389,7 @@ export default function ResumeBuilder() {
             <Button
               onClick={generatePDF}
               disabled={isGenerating}
-              className="bg-blue-500 text-white rounded-full px-6 flex items-center gap-2 hover:bg-blue-600"
+              className="bg-info-500 text-white rounded-full px-6 flex items-center gap-2 hover:bg-info-600"
             >
               <Download className="h-4 w-4" />
               {isGenerating ? 'Generating...' : 'Download PDF'}
@@ -476,7 +476,7 @@ export default function ResumeBuilder() {
                   onClick={() => setIsPreviewMode(true)}
                   className={cn(
                     "flex items-center gap-2",
-                    isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-500 hover:text-blue-700'
+                    isDark ? 'text-info-400 hover:text-info-300' : 'text-info-500 hover:text-info-700'
                   )}
                 >
                   <Eye className="h-4 w-4" />
@@ -487,7 +487,7 @@ export default function ResumeBuilder() {
               <Button
                 onClick={generatePDF}
                 disabled={isGenerating}
-                className="bg-blue-500 text-white rounded-full px-6 flex items-center gap-2 hover:bg-blue-600"
+                className="bg-info-500 text-white rounded-full px-6 flex items-center gap-2 hover:bg-info-600"
               >
                 <Download className="h-4 w-4" />
                 {isGenerating ? 'Generating...' : 'Download PDF'}
@@ -503,8 +503,8 @@ export default function ResumeBuilder() {
               onClick={() => {/* Stay on current page - Traditional Builder */}}
               className={cn(
                 "px-6 py-3 text-sm font-medium transition-all duration-200 border-b-2 flex items-center gap-2",
-                "border-blue-500 text-blue-500", // Always active since we're on this tab
-                isDark ? 'text-blue-400 border-blue-400' : 'text-blue-600 border-blue-600'
+                "border-info-500 text-info-500", // Always active since we're on this tab
+                isDark ? 'text-info-400 border-info-400' : 'text-info-600 border-info-600'
               )}
             >
               <Edit3 className="w-4 h-4" />
@@ -547,7 +547,7 @@ export default function ResumeBuilder() {
                       className={cn(
                         "p-3 rounded-xl text-sm font-medium transition-all duration-200 flex flex-col items-center gap-1 border",
                         activeSection === section.id
-                          ? 'bg-blue-500 text-white shadow-lg border-blue-500'
+                          ? 'bg-info-500 text-white shadow-lg border-info-500'
                           : isDark 
                             ? 'text-white hover:bg-gray-800 border-gray-800' 
                             : 'text-black hover:bg-gray-100 border-gray-200'
@@ -601,7 +601,7 @@ export default function ResumeBuilder() {
               )}>
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-br from-purple-500 to-blue-600 rounded-xl">
+                    <div className="p-2 bg-gradient-to-br from-purple-500 to-info-600 rounded-xl">
                       <Sparkles className="h-5 w-5 text-white" />
                     </div>
                     <div>
@@ -617,7 +617,7 @@ export default function ResumeBuilder() {
                   </div>
                   <Button
                     onClick={() => setShowAIBuilder(true)}
-                    className="bg-gradient-to-r from-purple-500 to-blue-600 text-white px-6 py-3 rounded-xl font-medium flex items-center gap-2 hover:from-purple-600 hover:to-blue-700 transition-all duration-200"
+                    className="bg-gradient-to-r from-purple-500 to-info-600 text-white px-6 py-3 rounded-xl font-medium flex items-center gap-2 hover:from-purple-600 hover:to-blue-700 transition-all duration-200"
                   >
                     <Wand2 className="h-4 w-4" />
                     Generate with AI
@@ -717,7 +717,7 @@ export default function ResumeBuilder() {
                       }
                     }}
                     disabled={isSaving}
-                    className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 flex items-center gap-2"
+                    className="bg-info-500 text-white px-6 py-2 rounded-lg hover:bg-info-600 flex items-center gap-2"
                   >
                     {isSaving ? (
                       <>
@@ -773,8 +773,8 @@ export default function ResumeBuilder() {
                               variant="text"
                               size="small"
                               className={cn(
-                                "p-2 hover:bg-blue-500 hover:text-white",
-                                isDark ? 'text-blue-400' : 'text-blue-500'
+                                "p-2 hover:bg-info-500 hover:text-white",
+                                isDark ? 'text-info-400' : 'text-info-500'
                               )}
                               title="Load Resume"
                             >
@@ -815,12 +815,12 @@ export default function ResumeBuilder() {
               {/* Cloud Sync Status */}
               <div className={cn(
                 "flex items-center justify-between p-4 rounded-lg border",
-                isDark ? 'bg-gray-900 border-gray-700' : 'bg-blue-50 border-blue-200'
+                isDark ? 'bg-gray-900 border-gray-700' : 'bg-info-50 border-info-200'
               )}>
                 <div className="flex items-center gap-3">
                   <Cloud className={cn(
                     "h-5 w-5",
-                    isDark ? 'text-blue-400' : 'text-blue-500'
+                    isDark ? 'text-info-400' : 'text-info-500'
                   )} />
                   <div>
                     <h4 className="font-medium">Cloud Sync</h4>

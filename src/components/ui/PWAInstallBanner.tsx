@@ -124,13 +124,13 @@ const PWAInstallBanner: React.FC<PWAInstallBannerProps> = ({ onClose }) => {
                 Install this app on your iPhone:
               </p>
               <div className="flex items-center space-x-2 text-sm">
-                <Share className="h-4 w-4 text-blue-500" />
+                <Share className="h-4 w-4 text-info-500" />
                 <span className={isDark ? 'text-dark-text' : 'text-gray-700'}>
                   Tap the share button
                 </span>
               </div>
               <div className="flex items-center space-x-2 text-sm">
-                <Plus className="h-4 w-4 text-blue-500" />
+                <Plus className="h-4 w-4 text-info-500" />
                 <span className={isDark ? 'text-dark-text' : 'text-gray-700'}>
                   Then "Add to Home Screen"
                 </span>

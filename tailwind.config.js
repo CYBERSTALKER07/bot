@@ -45,27 +45,27 @@ export default {
         },
 
         // Neutral Palette (Enhanced)
-        border: '#E4E4E7',
+        border: '#787A7A',
         input: '#E4E4E7',
         ring: '#8C1D40',
         background: '#FFFFFF',
         foreground: '#18181B',
-        
+
         muted: {
           DEFAULT: '#F4F4F5',
           foreground: '#71717A',
         },
-        
+
         accent: {
           DEFAULT: '#F4F4F5',
           foreground: '#18181B',
         },
-        
+
         popover: {
           DEFAULT: '#FFFFFF',
           foreground: '#18181B',
         },
-        
+
         card: {
           DEFAULT: '#FFFFFF',
           foreground: '#18181B',
@@ -91,7 +91,7 @@ export default {
           DEFAULT: '#EF4444',
           foreground: '#FFFFFF',
         },
-        
+
         success: {
           50: '#f0fdf4',
           100: '#dcfce7',
@@ -135,24 +135,24 @@ export default {
         },
 
         info: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
-          DEFAULT: '#3b82f6',
+          50: '#fff7ed',
+          100: '#ffedd5',
+          200: '#fed7aa',
+          300: '#fdba74',
+          400: '#fb923c',
+          500: '#FA4617', // New Brand Color
+          600: '#ea580c',
+          700: '#c2410c',
+          800: '#9a3412',
+          900: '#7c2d12',
+          DEFAULT: '#FA4617',
         },
 
         // Dark theme colors
         dark: {
           bg: '#0A0A0A',
           surface: '#111111',
-          border: '#27272A',
+          border: '#787A7A',
           text: '#F4F4F5',
           muted: '#71717A',
         },
@@ -220,7 +220,7 @@ export default {
         '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
         'inner': 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
         'none': 'none',
-        
+
         // Material Design elevation
         'elevation-1': '0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 1px 2px 0 rgba(0, 0, 0, 0.24)',
         'elevation-2': '0 3px 6px 0 rgba(0, 0, 0, 0.16), 0 3px 6px 0 rgba(0, 0, 0, 0.23)',

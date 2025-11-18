@@ -177,7 +177,7 @@ export default function ProfileEditor() {
         isDark ? 'bg-black' : 'bg-gray-50'
       }`}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-info-500 mx-auto mb-4"></div>
           <p>Loading profile...</p>
         </div>
       </div>
@@ -210,7 +210,7 @@ export default function ProfileEditor() {
           <Button
             onClick={handleSave}
             disabled={saving}
-            className="bg-blue-500 hover:bg-blue-600 text-white"
+            className="bg-info-500 hover:bg-info-600 text-white"
           >
             {saving ? (
               <>
@@ -570,7 +570,7 @@ export default function ProfileEditor() {
             <Button
               onClick={handleSave}
               disabled={saving}
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3"
+              className="w-full bg-info-500 hover:bg-info-600 text-white py-3"
               size="large"
             >
               {saving ? (

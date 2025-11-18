@@ -263,7 +263,7 @@ export default function ForStudentsPage() {
       label: 'Students & Alumni',
       description: 'Connected worldwide',
       icon: <Users className="h-8 w-8" />,
-      color: 'from-blue-500 to-cyan-500'
+      color: 'from-info-500 to-cyan-500'
     },
     {
       number: '1M+',
@@ -300,14 +300,14 @@ export default function ForStudentsPage() {
       icon: <Target className="h-16 w-16" />,
       title: "Personalized", 
       description: "Built specifically for you with AI-powered recommendations from your school, industry experts, and 1M+ companies.",
-      gradient: "from-blue-500 via-indigo-500 to-purple-500",
+      gradient: "from-info-500 via-indigo-500 to-purple-500",
       benefits: ['Custom job matches', 'School-specific content', 'Industry insights']
     },
     {
       icon: <Rocket className="h-16 w-16" />,
       title: "Future-Ready",
       description: "The career platform designed for tomorrow with exclusive opportunities you won't find anywhere else.",
-      gradient: "from-green-500 via-teal-500 to-blue-500",
+      gradient: "from-green-500 via-teal-500 to-info-500",
       benefits: ['Exclusive job postings', 'Emerging industry roles', 'Future skill development']
     }
   ];
@@ -363,7 +363,7 @@ export default function ForStudentsPage() {
       title: 'Resume Builder',
       description: 'Create professional resumes with industry-specific templates',
       icon: <FileText className="h-12 w-12" />,
-      color: 'from-blue-500 to-cyan-500',
+      color: 'from-info-500 to-cyan-500',
       features: ['ATS-optimized templates', 'Real-time feedback', 'Industry examples']
     },
     {

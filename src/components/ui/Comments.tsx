@@ -455,7 +455,7 @@ export default function Comments({ postId, className }: CommentsProps) {
             <div className="flex items-center space-x-2 mb-1">
               <span className="font-bold text-sm">{comment.author.name}</span>
               {comment.author.verified && (
-                <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                <div className="w-4 h-4 bg-info-500 rounded-full flex items-center justify-center">
                   <span className="text-white text-xs">✓</span>
                 </div>
               )}
@@ -545,8 +545,8 @@ export default function Comments({ postId, className }: CommentsProps) {
                 className={cn(
                   'flex items-center space-x-1 px-0 py-1 text-sm transition-colors',
                   isDark 
-                    ? 'text-gray-400 hover:text-blue-400' 
-                    : 'text-gray-600 hover:text-blue-600'
+                    ? 'text-gray-400 hover:text-info-400' 
+                    : 'text-gray-600 hover:text-info-600'
                 )}
               >
                 <Reply className="w-5 h-5" />

@@ -205,7 +205,7 @@ export default function Comments({ postId, currentUserId }: CommentsProps) {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold">
+            <div className="w-full h-full bg-gradient-to-br from-blue-400 to-info-600 flex items-center justify-center text-white font-semibold">
               {comment.profiles.full_name?.charAt(0).toUpperCase()}
             </div>
           )}
@@ -220,7 +220,7 @@ export default function Comments({ postId, currentUserId }: CommentsProps) {
             {comment.profiles.full_name}
           </h4>
           {comment.profiles.verified && (
-            <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center" title="Verified">
+            <div className="w-4 h-4 bg-info-500 rounded-full flex items-center justify-center" title="Verified">
               <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
@@ -246,9 +246,9 @@ export default function Comments({ postId, currentUserId }: CommentsProps) {
           <button
             onClick={() => setReplyTo(replyTo === comment.id ? null : comment.id)}
             aria-label={`Reply to comment`}
-            className="flex items-center space-x-2 text-gray-500 hover:text-blue-600 transition-colors group"
+            className="flex items-center space-x-2 text-gray-500 hover:text-info-600 transition-colors group"
           >
-            <div className="p-2 rounded-full group-hover:bg-blue-50 transition-colors">
+            <div className="p-2 rounded-full group-hover:bg-info-50 transition-colors">
               <MessageCircle className="w-4 h-4" />
             </div>
             {comment.reply_count > 0 && (
@@ -302,7 +302,7 @@ export default function Comments({ postId, currentUserId }: CommentsProps) {
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
                   placeholder={`Reply to @${comment.profiles.username}`}
-                  className="w-full p-3 border border-gray-200 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full p-3 border border-gray-200 rounded-lg resize-none focus:ring-2 focus:ring-info-500 focus:border-transparent"
                   rows={2}
                 />
                 <div className="flex justify-end space-x-2 mt-2">
@@ -316,7 +316,7 @@ export default function Comments({ postId, currentUserId }: CommentsProps) {
                   <button
                     type="submit"
                     disabled={!replyText.trim() || submitting}
-                    className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-full hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-4 py-2 bg-info-600 text-white text-sm font-medium rounded-full hover:bg-info-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     Reply
                   </button>
@@ -378,7 +378,7 @@ export default function Comments({ postId, currentUserId }: CommentsProps) {
                 <button
                   type="submit"
                   disabled={!newComment.trim() || submitting}
-                  className="px-6 py-2 bg-blue-600 text-white font-medium rounded-full hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-6 py-2 bg-info-600 text-white font-medium rounded-full hover:bg-info-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {submitting ? 'Posting...' : 'Reply'}
                 </button>

@@ -87,19 +87,19 @@ export default function SearchDemoPage() {
           isDark ? 'text-gray-300' : 'text-gray-600'
         }`}>
           <div className="flex items-center gap-3">
-            <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">1</div>
+            <div className="w-6 h-6 bg-info-500 text-white rounded-full flex items-center justify-center text-xs font-bold">1</div>
             <span>Click on the crimson circle to activate the search input</span>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">2</div>
+            <div className="w-6 h-6 bg-info-500 text-white rounded-full flex items-center justify-center text-xs font-bold">2</div>
             <span>Watch the smooth expansion animation as the input field appears</span>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">3</div>
+            <div className="w-6 h-6 bg-info-500 text-white rounded-full flex items-center justify-center text-xs font-bold">3</div>
             <span>Type your search query and press Enter to search</span>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">4</div>
+            <div className="w-6 h-6 bg-info-500 text-white rounded-full flex items-center justify-center text-xs font-bold">4</div>
             <span>The search icon transforms into a close button (X) when focused</span>
           </div>
         </div>
@@ -145,7 +145,7 @@ export default function SearchDemoPage() {
           isDark ? 'bg-lime/20' : 'bg-red-500/20'
         } animate-pulse`} />
         <div className={`absolute top-1/3 right-20 w-6 h-6 rounded-full ${
-          isDark ? 'bg-blue-400/20' : 'bg-blue-500/20'
+          isDark ? 'bg-info-400/20' : 'bg-info-500/20'
         } animate-bounce`} />
         <div className={`absolute bottom-1/4 left-1/4 w-3 h-3 rounded-full ${
           isDark ? 'bg-purple-400/20' : 'bg-purple-500/20'

@@ -73,7 +73,7 @@ export class ErrorBoundary extends Component<Props, State> {
             
             <button
               onClick={this.handleReset}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-info-600 hover:bg-info-700 text-white rounded-md transition-colors"
             >
               <RefreshCw className="w-4 h-4" />
               Try Again

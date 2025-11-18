@@ -308,8 +308,8 @@ export default function PostEventForm({ onClose, onSuccess }: PostEventFormProps
             className={cn(
               'w-full px-4 py-3 rounded-lg border-[0.7px] rounded-2xl transition-colors',
               isDark
-                ? 'bg-black border-slate-600 text-white placeholder-slate-400 focus:border-blue-500'
-                : 'bg-white border-slate-200 text-slate-900 placeholder-slate-500 focus:border-blue-500'
+                ? 'bg-black border-slate-600 text-white placeholder-slate-400 focus:border-info-500'
+                : 'bg-white border-slate-200 text-slate-900 placeholder-slate-500 focus:border-info-500'
             )}
           />
           <p className="text-xs mt-1 text-gray-500">{formData.title.length}/255</p>
@@ -331,8 +331,8 @@ export default function PostEventForm({ onClose, onSuccess }: PostEventFormProps
             className={cn(
               'w-full px-4 py-3 rounded-lg border-[0.7px] rounded-2xl transition-colors resize-none',
               isDark
-                ? 'bg-black border-slate-600 text-white placeholder-slate-400 focus:border-blue-500'
-                : 'bg-white border-slate-200 text-slate-900 placeholder-slate-500 focus:border-blue-500'
+                ? 'bg-black border-slate-600 text-white placeholder-slate-400 focus:border-info-500'
+                : 'bg-white border-slate-200 text-slate-900 placeholder-slate-500 focus:border-info-500'
             )}
           />
           <p className="text-xs mt-1 text-gray-500">{formData.description.length}/2000</p>
@@ -346,8 +346,8 @@ export default function PostEventForm({ onClose, onSuccess }: PostEventFormProps
             className={cn(
               'border-[0.7px] rounded-2xl border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors',
               isDark
-                ? 'border-slate-600 hover:border-blue-500 hover:bg-black/50'
-                : 'border-slate-300 hover:border-blue-500 hover:bg-blue-50'
+                ? 'border-slate-600 hover:border-info-500 hover:bg-black/50'
+                : 'border-slate-300 hover:border-info-500 hover:bg-info-50'
             )}
           >
             <input
@@ -403,8 +403,8 @@ export default function PostEventForm({ onClose, onSuccess }: PostEventFormProps
               className={cn(
                 'w-full px-4 py-3 rounded-lg border-[0.7px] rounded-2xl transition-colors',
                 isDark
-                  ? 'bg-black border-slate-600 text-white focus:border-blue-500'
-                  : 'bg-white border-slate-200 text-slate-900 focus:border-blue-500'
+                  ? 'bg-black border-slate-600 text-white focus:border-info-500'
+                  : 'bg-white border-slate-200 text-slate-900 focus:border-info-500'
               )}
             />
           </div>
@@ -421,8 +421,8 @@ export default function PostEventForm({ onClose, onSuccess }: PostEventFormProps
               className={cn(
                 'w-full px-4 py-3 rounded-lg border-[0.7px] rounded-2xl transition-colors',
                 isDark
-                  ? 'bg-black border-slate-600 text-white focus:border-blue-500'
-                  : 'bg-white border-slate-200 text-slate-900 focus:border-blue-500'
+                  ? 'bg-black border-slate-600 text-white focus:border-info-500'
+                  : 'bg-white border-slate-200 text-slate-900 focus:border-info-500'
               )}
             />
           </div>
@@ -443,8 +443,8 @@ export default function PostEventForm({ onClose, onSuccess }: PostEventFormProps
               className={cn(
                 'w-full px-4 py-3 rounded-lg border-[0.7px] rounded-2xl transition-colors',
                 isDark
-                  ? 'bg-black border-slate-600 text-white focus:border-blue-500'
-                  : 'bg-white border-slate-200 text-slate-900 focus:border-blue-500'
+                  ? 'bg-black border-slate-600 text-white focus:border-info-500'
+                  : 'bg-white border-slate-200 text-slate-900 focus:border-info-500'
               )}
             />
           </div>
@@ -461,8 +461,8 @@ export default function PostEventForm({ onClose, onSuccess }: PostEventFormProps
               className={cn(
                 'w-full px-4 py-3 rounded-lg border-[0.7px] rounded-2xl transition-colors',
                 isDark
-                  ? 'bg-black border-slate-600 text-white focus:border-blue-500'
-                  : 'bg-white border-slate-200 text-slate-900 focus:border-blue-500'
+                  ? 'bg-black border-slate-600 text-white focus:border-info-500'
+                  : 'bg-white border-slate-200 text-slate-900 focus:border-info-500'
               )}
             />
           </div>
@@ -498,8 +498,8 @@ export default function PostEventForm({ onClose, onSuccess }: PostEventFormProps
                 className={cn(
                   'w-full px-4 py-3 rounded-lg border-[0.7px] rounded-2xl transition-colors',
                   isDark
-                    ? 'bg-black border-slate-600 text-white placeholder-slate-400 focus:border-blue-500'
-                    : 'bg-white border-slate-200 text-slate-900 placeholder-slate-500 focus:border-blue-500'
+                    ? 'bg-black border-slate-600 text-white placeholder-slate-400 focus:border-info-500'
+                    : 'bg-white border-slate-200 text-slate-900 placeholder-slate-500 focus:border-info-500'
                 )}
               />
             </div>
@@ -518,8 +518,8 @@ export default function PostEventForm({ onClose, onSuccess }: PostEventFormProps
                 className={cn(
                   'w-full px-4 py-3 rounded-lg border-[0.7px] rounded-2xl transition-colors',
                   isDark
-                    ? 'bg-black border-slate-600 text-white placeholder-slate-400 focus:border-blue-500'
-                    : 'bg-white border-slate-200 text-slate-900 placeholder-slate-500 focus:border-blue-500'
+                    ? 'bg-black border-slate-600 text-white placeholder-slate-400 focus:border-info-500'
+                    : 'bg-white border-slate-200 text-slate-900 placeholder-slate-500 focus:border-info-500'
                 )}
               />
             </div>
@@ -542,8 +542,8 @@ export default function PostEventForm({ onClose, onSuccess }: PostEventFormProps
             className={cn(
               'w-full px-4 py-3 rounded-lg border-[0.7px] rounded-2xl transition-colors',
               isDark
-                ? 'bg-black border-slate-600 text-white placeholder-slate-400 focus:border-blue-500'
-                : 'bg-white border-slate-200 text-slate-900 placeholder-slate-500 focus:border-blue-500'
+                ? 'bg-black border-slate-600 text-white placeholder-slate-400 focus:border-info-500'
+                : 'bg-white border-slate-200 text-slate-900 placeholder-slate-500 focus:border-info-500'
             )}
           />
         </div>
@@ -563,8 +563,8 @@ export default function PostEventForm({ onClose, onSuccess }: PostEventFormProps
               className={cn(
                 'flex-1 px-4 py-3 rounded-lg border-[0.7px] rounded-2xl transition-colors',
                 isDark
-                  ? 'bg-black border-slate-600 text-white placeholder-slate-400 focus:border-blue-500'
-                  : 'bg-white border-slate-200 text-slate-900 placeholder-slate-500 focus:border-blue-500'
+                  ? 'bg-black border-slate-600 text-white placeholder-slate-400 focus:border-info-500'
+                  : 'bg-white border-slate-200 text-slate-900 placeholder-slate-500 focus:border-info-500'
               )}
             />
             <button
@@ -573,8 +573,8 @@ export default function PostEventForm({ onClose, onSuccess }: PostEventFormProps
               className={cn(
                 'px-4 py-3 rounded-lg font-medium transition-colors',
                 isDark
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                  : 'bg-blue-500 hover:bg-blue-600 text-white'
+                  ? 'bg-info-600 hover:bg-info-700 text-white'
+                  : 'bg-info-500 hover:bg-info-600 text-white'
               )}
             >
               Add
@@ -605,7 +605,7 @@ export default function PostEventForm({ onClose, onSuccess }: PostEventFormProps
         </div>
 
         {/* Featured Checkbox */}
-        <div className="flex items-center space-x-2 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+        <div className="flex items-center space-x-2 p-3 rounded-lg bg-info-500/10 border border-info-500/20">
           <input
             id="is_featured"
             type="checkbox"
@@ -638,8 +638,8 @@ export default function PostEventForm({ onClose, onSuccess }: PostEventFormProps
             className={cn(
               'rounded-lg font-semibold flex items-center gap-2',
               isDark
-                ? 'bg-white hover:bg-blue-700 text-black disabled:bg-black'
-                : 'bg-black hover:bg-blue-600 text-white disabled:bg-slate-300'
+                ? 'bg-white hover:bg-info-700 text-black disabled:bg-black'
+                : 'bg-black hover:bg-info-600 text-white disabled:bg-slate-300'
             )}
           > 
             {isSubmitting && <Loader className="h-4 w-4 animate-spin" />}

@@ -109,7 +109,7 @@ export default function SignupPage() {
         {/* Header */}
         <div className="text-center">
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center">
+            <div className="w-16 h-16 bg-info-600 rounded-2xl flex items-center justify-center">
               <GraduationCap className="w-8 h-8 text-white" />
             </div>
           </div>
@@ -149,7 +149,7 @@ export default function SignupPage() {
                   disabled={loading}
                   value={formData.fullName}
                   onChange={handleChange}
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors disabled:bg-gray-50 disabled:cursor-not-allowed"
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-info-500 focus:border-transparent transition-colors disabled:bg-gray-50 disabled:cursor-not-allowed"
                   placeholder="Enter your full name"
                 />
               </div>
@@ -172,7 +172,7 @@ export default function SignupPage() {
                   disabled={loading}
                   value={formData.username}
                   onChange={handleChange}
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors disabled:bg-gray-50 disabled:cursor-not-allowed"
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-info-500 focus:border-transparent transition-colors disabled:bg-gray-50 disabled:cursor-not-allowed"
                   placeholder="Choose a username"
                 />
               </div>
@@ -198,7 +198,7 @@ export default function SignupPage() {
                   disabled={loading}
                   value={formData.email}
                   onChange={handleChange}
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors disabled:bg-gray-50 disabled:cursor-not-allowed"
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-info-500 focus:border-transparent transition-colors disabled:bg-gray-50 disabled:cursor-not-allowed"
                   placeholder="Enter your email"
                 />
               </div>
@@ -221,7 +221,7 @@ export default function SignupPage() {
                   disabled={loading}
                   value={formData.password}
                   onChange={handleChange}
-                  className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors disabled:bg-gray-50 disabled:cursor-not-allowed"
+                  className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-info-500 focus:border-transparent transition-colors disabled:bg-gray-50 disabled:cursor-not-allowed"
                   placeholder="Create a password"
                 />
                 <button
@@ -259,7 +259,7 @@ export default function SignupPage() {
                   disabled={loading}
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors disabled:bg-gray-50 disabled:cursor-not-allowed"
+                  className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-info-500 focus:border-transparent transition-colors disabled:bg-gray-50 disabled:cursor-not-allowed"
                   placeholder="Confirm your password"
                 />
                 <button
@@ -284,15 +284,15 @@ export default function SignupPage() {
                 type="checkbox"
                 required
                 disabled={loading}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1 disabled:cursor-not-allowed"
+                className="h-4 w-4 text-info-600 focus:ring-info-500 border-gray-300 rounded mt-1 disabled:cursor-not-allowed"
               />
               <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
                 I agree to the{' '}
-                <Link to="/terms" className={`text-blue-600 hover:text-blue-500 font-medium ${loading ? 'pointer-events-none' : ''}`}>
+                <Link to="/terms" className={`text-info-600 hover:text-info-500 font-medium ${loading ? 'pointer-events-none' : ''}`}>
                   Terms of Service
                 </Link>{' '}
                 and{' '}
-                <Link to="/privacy" className={`text-blue-600 hover:text-blue-500 font-medium ${loading ? 'pointer-events-none' : ''}`}>
+                <Link to="/privacy" className={`text-info-600 hover:text-info-500 font-medium ${loading ? 'pointer-events-none' : ''}`}>
                   Privacy Policy
                 </Link>
               </label>
@@ -302,7 +302,7 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600 transition-colors"
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-info-600 hover:bg-info-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-info-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-info-600 transition-colors"
             >
               {loading ? (
                 <div className="flex items-center">
@@ -321,7 +321,7 @@ export default function SignupPage() {
               Already have an account?{' '}
               <Link
                 to="/login"
-                className={`font-medium text-blue-600 hover:text-blue-500 ${loading ? 'pointer-events-none' : ''}`}
+                className={`font-medium text-info-600 hover:text-info-500 ${loading ? 'pointer-events-none' : ''}`}
               >
                 Sign in
               </Link>

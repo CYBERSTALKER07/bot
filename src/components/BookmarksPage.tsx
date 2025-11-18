@@ -130,7 +130,7 @@ export default function BookmarksPage() {
 
   const getTypeColor = (type: SavedItem['type']) => {
     switch (type) {
-      case 'job': return 'bg-blue-100 text-blue-800';
+      case 'job': return 'bg-info-100 text-info-800';
       case 'company': return 'bg-green-100 text-green-800';
       case 'event': return 'bg-purple-100 text-purple-800';
       case 'resource': return 'bg-orange-100 text-orange-800';
@@ -334,7 +334,7 @@ export default function BookmarksPage() {
               className={cn(
                 'transition-all duration-200 hover:shadow-md',
                 viewMode === 'grid' ? 'p-4' : 'p-6',
-                selectedItems.has(item.id) && 'ring-2 ring-blue-500'
+                selectedItems.has(item.id) && 'ring-2 ring-info-500'
               )}
             >
               {viewMode === 'grid' ? (
@@ -372,7 +372,7 @@ export default function BookmarksPage() {
                       {item.title}
                     </Typography>
                     {item.company && (
-                      <Typography variant="body2" className="text-blue-600 mb-1">
+                      <Typography variant="body2" className="text-info-600 mb-1">
                         {item.company}
                       </Typography>
                     )}
@@ -446,7 +446,7 @@ export default function BookmarksPage() {
                           </Typography>
                         </Link>
                         {item.company && (
-                          <Typography variant="body1" className="text-blue-600 mb-1">
+                          <Typography variant="body1" className="text-info-600 mb-1">
                             {item.company}
                           </Typography>
                         )}

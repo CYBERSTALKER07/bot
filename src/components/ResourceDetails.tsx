@@ -267,7 +267,7 @@ export default function ResourceDetails() {
   const getResourceTypeColor = (type: string) => {
     switch (type) {
       case 'article':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-info-100 text-info-800';
       case 'video':
         return 'bg-red-100 text-red-800';
       case 'template':

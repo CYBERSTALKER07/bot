@@ -233,8 +233,8 @@ export default function LinkedInJobManager() {
       <PageLayout className={isDark ? 'bg-black text-white' : 'bg-white text-black'} maxWidth="4xl">
         <div className="flex items-center justify-center min-h-96">
           <Card className="p-8 text-center max-w-md">
-            <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-              <Linkedin className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+            <div className="w-16 h-16 mx-auto mb-4 bg-info-100 dark:bg-info-900 rounded-full flex items-center justify-center">
+              <Linkedin className="h-8 w-8 text-info-600 dark:text-info-400" />
             </div>
             <h2 className="text-2xl font-bold mb-4">Connect to LinkedIn</h2>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -242,7 +242,7 @@ export default function LinkedInJobManager() {
             </p>
             <Button
               onClick={handleLinkedInConnect}
-              className="bg-blue-600 text-white hover:bg-blue-700 w-full flex items-center justify-center space-x-2"
+              className="bg-info-600 text-white hover:bg-info-700 w-full flex items-center justify-center space-x-2"
             >
               <Linkedin className="h-5 w-5" />
               <span>Connect LinkedIn Account</span>
@@ -262,7 +262,7 @@ export default function LinkedInJobManager() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="p-2 rounded-lg bg-blue-600">
+              <div className="p-2 rounded-lg bg-info-600">
                 <Linkedin className="h-6 w-6 text-white" />
               </div>
               <div>
@@ -300,9 +300,9 @@ export default function LinkedInJobManager() {
           
           {/* User Profile Banner */}
           {userProfile && (
-            <div className="mt-4 flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <div className="mt-4 flex items-center justify-between p-3 bg-info-50 dark:bg-info-900/20 rounded-lg">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold">
+                <div className="w-10 h-10 bg-info-600 text-white rounded-full flex items-center justify-center font-semibold">
                   {userProfile.firstName?.charAt(0)}{userProfile.lastName?.charAt(0)}
                 </div>
                 <div>
@@ -352,7 +352,7 @@ export default function LinkedInJobManager() {
                 className={cn(
                   'flex items-center space-x-2 px-4 py-2 rounded-md transition-all duration-200',
                   activeTab === tab.key
-                    ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                    ? 'bg-white dark:bg-gray-700 text-info-600 dark:text-info-400 shadow-sm'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                 )}
               >
@@ -411,7 +411,7 @@ export default function LinkedInJobManager() {
                 <Button
                   onClick={handleBulkImport}
                   disabled={isImporting || filteredJobs.length === 0}
-                  className="bg-blue-600 text-white hover:bg-blue-700"
+                  className="bg-info-600 text-white hover:bg-info-700"
                 >
                   {isImporting ? 'Importing...' : 'Import All Visible'}
                 </Button>
@@ -424,9 +424,9 @@ export default function LinkedInJobManager() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">Total Jobs</p>
-                    <p className="text-2xl font-bold text-blue-600">{linkedinJobs.length}</p>
+                    <p className="text-2xl font-bold text-info-600">{linkedinJobs.length}</p>
                   </div>
-                  <Briefcase className="h-8 w-8 text-blue-500" />
+                  <Briefcase className="h-8 w-8 text-info-500" />
                 </div>
               </Card>
               
@@ -465,7 +465,7 @@ export default function LinkedInJobManager() {
             <div className="space-y-4">
               {isLoading ? (
                 <div className="flex justify-center py-12">
-                  <RefreshCw className="h-8 w-8 animate-spin text-blue-600" />
+                  <RefreshCw className="h-8 w-8 animate-spin text-info-600" />
                 </div>
               ) : filteredJobs.length === 0 ? (
                 <Card className="p-12 text-center">
@@ -581,7 +581,7 @@ const LinkedInJobCard: React.FC<{
   const getEmploymentTypeColor = (type: string) => {
     switch (type) {
       case 'FULL_TIME': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      case 'PART_TIME': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+      case 'PART_TIME': return 'bg-info-100 text-info-800 dark:bg-info-900 dark:text-info-200';
       case 'CONTRACT': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
       case 'INTERNSHIP': return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
       default: return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
@@ -591,7 +591,7 @@ const LinkedInJobCard: React.FC<{
   return (
     <Card className={cn(
       'p-6 transition-all duration-200',
-      isSelected ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/20' : ''
+      isSelected ? 'ring-2 ring-info-500 bg-info-50 dark:bg-info-900/20' : ''
     )}>
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-start space-x-4">
@@ -599,7 +599,7 @@ const LinkedInJobCard: React.FC<{
             type="checkbox"
             checked={isSelected}
             onChange={(e) => onSelect(e.target.checked)}
-            className="mt-2 h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+            className="mt-2 h-4 w-4 text-info-600 rounded border-gray-300 focus:ring-info-500"
           />
           
           <div className="flex-1">
@@ -647,7 +647,7 @@ const LinkedInJobCard: React.FC<{
                 {job.skills.slice(0, 6).map((skill, index) => (
                   <span
                     key={index}
-                    className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-xs"
+                    className="px-2 py-1 bg-info-100 dark:bg-info-900 text-info-800 dark:text-info-200 rounded text-xs"
                   >
                     {skill}
                   </span>

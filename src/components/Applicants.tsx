@@ -150,7 +150,7 @@ export default function Applicants() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return isDark ? 'bg-yellow-500/10 text-yellow-400' : 'bg-yellow-50 text-yellow-600';
-      case 'reviewed': return isDark ? 'bg-blue-500/10 text-blue-400' : 'bg-blue-50 text-blue-600';
+      case 'reviewed': return isDark ? 'bg-info-500/10 text-info-400' : 'bg-info-50 text-info-600';
       case 'shortlisted': return isDark ? 'bg-purple-500/10 text-purple-400' : 'bg-purple-50 text-purple-600';
       case 'rejected': return isDark ? 'bg-red-500/10 text-red-400' : 'bg-red-50 text-red-600';
       case 'hired': return isDark ? 'bg-green-500/10 text-green-400' : 'bg-green-50 text-green-600';
@@ -217,7 +217,7 @@ export default function Applicants() {
             key={status}
             className={`p-4 text-center hover:shadow-lg transition-all duration-200 cursor-pointer border-b ${
               statusFilter === status 
-                ? (isDark ? 'bg-blue-900 border-blue-700' : 'bg-blue-50 border-blue-200')
+                ? (isDark ? 'bg-info-900 border-info-700' : 'bg-info-50 border-info-200')
                 : (isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200')
             }`}
             onClick={() => setStatusFilter(status)}
@@ -289,7 +289,7 @@ export default function Applicants() {
                 onClick={() => setViewMode('grid')}
                 className={`px-4 py-3 transition-colors ${
                   viewMode === 'grid' 
-                    ? (isDark ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white')
+                    ? (isDark ? 'bg-info-600 text-white' : 'bg-info-500 text-white')
                     : (isDark ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')
                 }`}
               >
@@ -304,7 +304,7 @@ export default function Applicants() {
                 onClick={() => setViewMode('list')}
                 className={`px-4 py-3 transition-colors ${
                   viewMode === 'list' 
-                    ? (isDark ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white')
+                    ? (isDark ? 'bg-info-600 text-white' : 'bg-info-500 text-white')
                     : (isDark ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')
                 }`}
               >
@@ -373,7 +373,7 @@ export default function Applicants() {
               {/* Job Info */}
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-blue-500 font-medium text-sm">{applicant.job_title}</span>
+                  <span className="text-info-500 font-medium text-sm">{applicant.job_title}</span>
                   <span className={cn(
                     "px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1",
                     getStatusColor(applicant.status)
@@ -631,7 +631,7 @@ export default function Applicants() {
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold">{selectedApplicant.name}</h2>
-                  <p className="text-blue-500 font-medium">{selectedApplicant.job_title}</p>
+                  <p className="text-info-500 font-medium">{selectedApplicant.job_title}</p>
                   <div className="flex items-center space-x-4 mt-1">
                     <div className="flex items-center space-x-1">
                       {[...Array(5)].map((_, i) => (
@@ -694,7 +694,7 @@ export default function Applicants() {
                         <span
                           key={index}
                           className={`px-3 py-1 rounded-full text-sm font-medium ${
-                            isDark ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'
+                            isDark ? 'bg-info-900 text-info-200' : 'bg-info-100 text-info-800'
                           }`}
                         >
                           {skill}
@@ -735,14 +735,14 @@ export default function Applicants() {
                     <div className="space-y-2">
                       <div className="flex items-center space-x-2 text-sm">
                         <Mail className="h-4 w-4 text-gray-400" />
-                        <a href={`mailto:${selectedApplicant.email}`} className="text-blue-500 hover:underline">
+                        <a href={`mailto:${selectedApplicant.email}`} className="text-info-500 hover:underline">
                           {selectedApplicant.email}
                         </a>
                       </div>
                       {selectedApplicant.phone && (
                         <div className="flex items-center space-x-2 text-sm">
                           <Phone className="h-4 w-4 text-gray-400" />
-                          <a href={`tel:${selectedApplicant.phone}`} className="text-blue-500 hover:underline">
+                          <a href={`tel:${selectedApplicant.phone}`} className="text-info-500 hover:underline">
                             {selectedApplicant.phone}
                           </a>
                         </div>

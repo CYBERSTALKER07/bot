@@ -23,7 +23,7 @@ export function EducationForm({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="text-xl font-bold">Education</h3>
-        <Button onClick={addEducation} size="small" className="flex items-center gap-2 bg-blue-500 text-white rounded-full px-4">
+        <Button onClick={addEducation} size="small" className="flex items-center gap-2 bg-info-500 text-white rounded-full px-4">
           <Plus className="h-4 w-4" />
           Add Education
         </Button>
@@ -41,7 +41,7 @@ export function EducationForm({
                 value={edu.institution}
                 onChange={(e) => updateEducation(edu.id, 'institution', e.target.value)}
                 className={cn(
-                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
                   isDark 
                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -53,7 +53,7 @@ export function EducationForm({
                 value={edu.degree}
                 onChange={(e) => updateEducation(edu.id, 'degree', e.target.value)}
                 className={cn(
-                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
                   isDark 
                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -65,7 +65,7 @@ export function EducationForm({
                 value={edu.field}
                 onChange={(e) => updateEducation(edu.id, 'field', e.target.value)}
                 className={cn(
-                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
                   isDark 
                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -77,7 +77,7 @@ export function EducationForm({
                 value={edu.gpa}
                 onChange={(e) => updateEducation(edu.id, 'gpa', e.target.value)}
                 className={cn(
-                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
                   isDark 
                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -89,7 +89,7 @@ export function EducationForm({
                 value={edu.startDate}
                 onChange={(e) => updateEducation(edu.id, 'startDate', e.target.value)}
                 className={cn(
-                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
                   isDark 
                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -101,7 +101,7 @@ export function EducationForm({
                 value={edu.endDate}
                 onChange={(e) => updateEducation(edu.id, 'endDate', e.target.value)}
                 className={cn(
-                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
                   isDark 
                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'

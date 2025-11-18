@@ -111,8 +111,8 @@ const EnhancedActionButton: React.FC<{
       ? 'text-gray-500 hover:text-red-500 hover:bg-red-500/10' 
       : 'text-gray-500 hover:text-red-600 hover:bg-red-100/60',
     blue: isDark 
-      ? 'text-gray-500 hover:text-blue-500 hover:bg-blue-500/10' 
-      : 'text-gray-500 hover:text-blue-600 hover:bg-blue-100/60',
+      ? 'text-gray-500 hover:text-info-500 hover:bg-info-500/10' 
+      : 'text-gray-500 hover:text-info-600 hover:bg-info-100/60',
     green: isDark 
       ? 'text-gray-500 hover:text-green-500 hover:bg-green-500/10' 
       : 'text-gray-500 hover:text-green-600 hover:bg-green-100/60',
@@ -123,7 +123,7 @@ const EnhancedActionButton: React.FC<{
 
   const activeColorMap = {
     red: isDark ? 'text-red-500 bg-red-500/15' : 'text-red-600 bg-red-100/80',
-    blue: isDark ? 'text-blue-500 bg-blue-500/15' : 'text-blue-600 bg-blue-100/80',
+    blue: isDark ? 'text-info-500 bg-info-500/15' : 'text-info-600 bg-info-100/80',
     green: isDark ? 'text-green-500 bg-green-500/15' : 'text-green-600 bg-green-100/80',
     yellow: isDark ? 'text-orange-500 bg-orange-500/15' : 'text-orange-600 bg-orange-100/80',
   };

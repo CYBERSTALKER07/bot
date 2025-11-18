@@ -108,8 +108,8 @@ export const TrendingTopics: React.FC<TrendingTopicsProps> = ({
                       'font-medium truncate transition-colors',
                       hoveredTopic === topic.id
                         ? isDark
-                          ? 'text-blue-400'
-                          : 'text-blue-600'
+                          ? 'text-info-400'
+                          : 'text-info-600'
                         : isDark
                           ? 'text-white'
                           : 'text-gray-900'
@@ -136,8 +136,8 @@ export const TrendingTopics: React.FC<TrendingTopicsProps> = ({
                     'ml-2 px-2 py-1 rounded-full text-xs font-bold flex-shrink-0 flex items-center gap-1',
                     hoveredTopic === topic.id
                       ? isDark
-                        ? 'bg-blue-500/20 text-blue-400'
-                        : 'bg-blue-500/20 text-blue-600'
+                        ? 'bg-info-500/20 text-info-400'
+                        : 'bg-info-500/20 text-info-600'
                       : isDark
                         ? 'bg-gray-800 text-gray-400'
                         : 'bg-gray-100 text-gray-600'

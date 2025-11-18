@@ -188,7 +188,7 @@ export default function QuoteRetweetModal({
                     {post.author.name}
                   </span>
                   {post.author.verified && (
-                    <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                    <div className="w-4 h-4 bg-info-500 rounded-full flex items-center justify-center">
                       <span className="text-white text-xs">✓</span>
                     </div>
                   )}
@@ -218,8 +218,8 @@ export default function QuoteRetweetModal({
                 className={cn(
                   'p-2 rounded-full transition-colors',
                   isDark
-                    ? 'text-blue-400 hover:bg-blue-500/10'
-                    : 'text-blue-600 hover:bg-blue-500/10'
+                    ? 'text-info-400 hover:bg-info-500/10'
+                    : 'text-info-600 hover:bg-info-500/10'
                 )}
               >
                 <ImageIcon className="w-5 h-5" />
@@ -229,8 +229,8 @@ export default function QuoteRetweetModal({
                 className={cn(
                   'p-2 rounded-full transition-colors',
                   isDark
-                    ? 'text-blue-400 hover:bg-blue-500/10'
-                    : 'text-blue-600 hover:bg-blue-500/10'
+                    ? 'text-info-400 hover:bg-info-500/10'
+                    : 'text-info-600 hover:bg-info-500/10'
                 )}
               >
                 <Video className="w-5 h-5" />
@@ -240,8 +240,8 @@ export default function QuoteRetweetModal({
                 className={cn(
                   'p-2 rounded-full transition-colors',
                   isDark
-                    ? 'text-blue-400 hover:bg-blue-500/10'
-                    : 'text-blue-600 hover:bg-blue-500/10'
+                    ? 'text-info-400 hover:bg-info-500/10'
+                    : 'text-info-600 hover:bg-info-500/10'
                 )}
               >
                 <Smile className="w-5 h-5" />

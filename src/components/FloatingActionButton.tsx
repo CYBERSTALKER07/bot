@@ -66,7 +66,7 @@ export function FloatingActionButton({ onAddEntry }: FloatingActionButtonProps) 
       id: 'add-portfolio-entry',
       label: 'Add Activity',
       icon: FolderOpenIcon,
-      color: 'bg-blue-500',
+      color: 'bg-info-500',
       description: 'Add portfolio entry',
       entryType: 'academic'
     },

@@ -53,7 +53,7 @@ const Typography: React.FC<TypographyProps> = ({
       textSecondary: isDark ? 'text-dark-muted' : 'text-gray-600',
       error: 'text-red-500',
       warning: 'text-amber-500',
-      info: 'text-blue-500',
+      info: 'text-info-500',
       success: 'text-green-500'
     };
     return colors[color];

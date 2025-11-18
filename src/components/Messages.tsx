@@ -160,7 +160,7 @@ export default function Messages() {
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'student': return 'bg-blue-500';
+      case 'student': return 'bg-info-500';
       case 'employer': return 'bg-green-500';
       default: return 'bg-gray-500';
     }
@@ -236,7 +236,7 @@ export default function Messages() {
                 onClick={() => setSelectedConversation(conversation)}
                 className={`p-4 border-b cursor-pointer hover:bg-gray-50/5 transition-colors ${
                   selectedConversation?.id === conversation.id 
-                    ? (isDark ? 'bg-gray-900' : 'bg-blue-50') 
+                    ? (isDark ? 'bg-gray-900' : 'bg-info-50') 
                     : ''
                 } ${isDark ? 'border-gray-800' : 'border-gray-200'}`}
               >
@@ -269,7 +269,7 @@ export default function Messages() {
                     {conversation.unread_count > 0 && (
                       <div className="flex justify-between items-center mt-2">
                         <div></div>
-                        <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center">
+                        <span className="bg-info-500 text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center">
                           {conversation.unread_count}
                         </span>
                       </div>
@@ -344,13 +344,13 @@ export default function Messages() {
                     >
                       <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                         message.sender_id === user?.id
-                          ? 'bg-blue-500 text-white'
+                          ? 'bg-info-500 text-white'
                           : (isDark ? 'bg-gray-800' : 'bg-gray-100')
                       }`}>
                         <p className="break-words">{message.content}</p>
                         <p className={`text-xs mt-1 ${
                           message.sender_id === user?.id
-                            ? 'text-blue-100'
+                            ? 'text-info-100'
                             : (isDark ? 'text-gray-400' : 'text-gray-600')
                         }`}>
                           {formatTime(message.timestamp)}
@@ -388,7 +388,7 @@ export default function Messages() {
                     disabled={!newMessage.trim()}
                     className={`rounded-full p-2 ${
                       newMessage.trim() 
-                        ? 'bg-blue-500 text-white hover:bg-blue-600' 
+                        ? 'bg-info-500 text-white hover:bg-info-600' 
                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
                   >

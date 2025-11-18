@@ -57,7 +57,7 @@ function EditableText({
         onChange={(e) => setTempValue(e.target.value)}
         onBlur={handleSave}
         onKeyDown={handleKeyDown}
-        className={`${className} border-2 border-blue-500 bg-blue-50 focus:outline-none resize-none`}
+        className={`${className} border-2 border-info-500 bg-info-50 focus:outline-none resize-none`}
         style={style}
         autoFocus
         rows={3}
@@ -69,7 +69,7 @@ function EditableText({
         onChange={(e) => setTempValue(e.target.value)}
         onBlur={handleSave}
         onKeyDown={handleKeyDown}
-        className={`${className} border-2 border-blue-500 bg-blue-50 focus:outline-none`}
+        className={`${className} border-2 border-info-500 bg-info-50 focus:outline-none`}
         style={style}
         autoFocus
       />
@@ -78,7 +78,7 @@ function EditableText({
 
   return (
     <div
-      className={`${className} ${onEdit ? 'cursor-pointer hover:bg-blue-50 hover:ring-1 hover:ring-blue-300 rounded transition-all' : ''} relative group`}
+      className={`${className} ${onEdit ? 'cursor-pointer hover:bg-info-50 hover:ring-1 hover:ring-blue-300 rounded transition-all' : ''} relative group`}
       style={style}
       onClick={() => onEdit && onEdit(elementType, elementId, field, value)}
       onMouseEnter={() => setIsHovered(true)}
@@ -86,7 +86,7 @@ function EditableText({
     >
       {value || (onEdit ? 'Click to edit...' : '')}
       {onEdit && isHovered && (
-        <Edit3 className="absolute -top-2 -right-2 h-4 w-4 text-blue-500 bg-white rounded-full p-0.5 shadow-sm" />
+        <Edit3 className="absolute -top-2 -right-2 h-4 w-4 text-info-500 bg-white rounded-full p-0.5 shadow-sm" />
       )}
     </div>
   );

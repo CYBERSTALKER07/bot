@@ -308,8 +308,8 @@ export default function InteractiveDashboardDemo({ onClose }: InteractiveDashboa
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex gap-2">
-                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">React</span>
-                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Python</span>
+                    <span className="bg-info-100 text-info-800 px-2 py-1 rounded text-xs">React</span>
+                    <span className="bg-info-100 text-info-800 px-2 py-1 rounded text-xs">Python</span>
                   </div>
                   <button className={`px-4 py-2 rounded-lg text-white text-sm transition-all duration-200 hover:scale-105 ${isDark ? 'bg-lime hover:bg-lime/90' : 'bg-asu-maroon hover:bg-asu-maroon/90'}`}>
                     Quick Apply
@@ -319,7 +319,7 @@ export default function InteractiveDashboardDemo({ onClose }: InteractiveDashboa
             ))}
           </div>
           {waitingForClick && currentTargetElement === '.dashboard-jobs' && (
-            <div className="absolute inset-0 bg-blue-500/10 border-2 border-blue-500 rounded-xl animate-pulse pointer-events-none" />
+            <div className="absolute inset-0 bg-info-500/10 border-2 border-info-500 rounded-xl animate-pulse pointer-events-none" />
           )}
         </div>
 
@@ -336,7 +336,7 @@ export default function InteractiveDashboardDemo({ onClose }: InteractiveDashboa
               Complete Profile
             </button>
             {waitingForClick && currentTargetElement === '.profile-completion' && (
-              <div className="absolute inset-0 bg-blue-500/10 border-2 border-blue-500 rounded-xl animate-pulse pointer-events-none" />
+              <div className="absolute inset-0 bg-info-500/10 border-2 border-info-500 rounded-xl animate-pulse pointer-events-none" />
             )}
           </div>
 
@@ -440,7 +440,7 @@ export default function InteractiveDashboardDemo({ onClose }: InteractiveDashboa
                 </div>
               </div>
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                i === 1 ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
+                i === 1 ? 'bg-green-100 text-green-800' : 'bg-info-100 text-info-800'
               }`}>
                 {i === 1 ? '96% Match' : `${95 - i}% Match`}
               </span>
@@ -454,9 +454,9 @@ export default function InteractiveDashboardDemo({ onClose }: InteractiveDashboa
             </p>
             
             <div className="flex flex-wrap gap-2 mb-4">
-              <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Swift</span>
-              <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">iOS</span>
-              <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">React Native</span>
+              <span className="bg-info-100 text-info-800 px-2 py-1 rounded text-xs">Swift</span>
+              <span className="bg-info-100 text-info-800 px-2 py-1 rounded text-xs">iOS</span>
+              <span className="bg-info-100 text-info-800 px-2 py-1 rounded text-xs">React Native</span>
             </div>
             
             <div className="flex items-center justify-between">
@@ -514,7 +514,7 @@ export default function InteractiveDashboardDemo({ onClose }: InteractiveDashboa
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                 app.color === 'green' ? 'bg-green-100 text-green-800' :
                 app.color === 'yellow' ? 'bg-yellow-100 text-yellow-800' :
-                app.color === 'blue' ? 'bg-blue-100 text-blue-800' :
+                app.color === 'blue' ? 'bg-info-100 text-info-800' :
                 'bg-red-100 text-red-800'
               }`}>
                 {app.status}
@@ -526,7 +526,7 @@ export default function InteractiveDashboardDemo({ onClose }: InteractiveDashboa
                 <div className={`h-2 rounded-full ${
                   app.color === 'green' ? 'bg-green-500' :
                   app.color === 'yellow' ? 'bg-yellow-500' :
-                  app.color === 'blue' ? 'bg-blue-500' :
+                  app.color === 'blue' ? 'bg-info-500' :
                   'bg-red-500'
                 }`} style={{ 
                   width: app.color === 'green' ? '75%' : 
@@ -704,7 +704,7 @@ export default function InteractiveDashboardDemo({ onClose }: InteractiveDashboa
                 <div className="flex items-center gap-2 mb-2">
                   <span className={`px-2 py-1 rounded text-xs font-medium ${
                     event.type === 'Career Fair' ? 'bg-green-100 text-green-800' :
-                    event.type === 'Workshop' ? 'bg-blue-100 text-blue-800' :
+                    event.type === 'Workshop' ? 'bg-info-100 text-info-800' :
                     'bg-purple-100 text-purple-800'
                   }`}>
                     {event.type}
@@ -889,7 +889,7 @@ export default function InteractiveDashboardDemo({ onClose }: InteractiveDashboa
               </button>
             </div>
             {waitingForClick && currentTargetElement === '.download-button' && (
-              <div className="absolute inset-0 bg-blue-500/10 border-2 border-blue-500 rounded-xl animate-pulse pointer-events-none" />
+              <div className="absolute inset-0 bg-info-500/10 border-2 border-info-500 rounded-xl animate-pulse pointer-events-none" />
             )}
           </div>
         </div>
@@ -1022,7 +1022,7 @@ export default function InteractiveDashboardDemo({ onClose }: InteractiveDashboa
           <span className={`font-bold text-xl ${isDark ? 'text-dark-text' : 'text-gray-900'}`}>
             AUT Handshake
           </span>
-          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
+          <span className="bg-info-100 text-info-800 px-2 py-1 rounded text-xs font-medium">
             DEMO
           </span>
         </div>

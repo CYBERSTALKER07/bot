@@ -716,7 +716,7 @@ export default function VisualResumeEditor() {
           <p className="text-gray-500 mb-4">No resume data available. Please go back to the Resume Builder.</p>
           <Button
             onClick={() => navigate('/resume-builder')}
-            className="bg-blue-500 text-white"
+            className="bg-info-500 text-white"
           >
             Go to Resume Builder
           </Button>
@@ -768,7 +768,7 @@ export default function VisualResumeEditor() {
               </Button>
               <Button
                 onClick={downloadPDF}
-                className="bg-blue-500 text-white hover:bg-blue-600 flex items-center gap-2"
+                className="bg-info-500 text-white hover:bg-info-600 flex items-center gap-2"
               >
                 <Download className="w-4 h-4" />
                 Download PDF
@@ -801,7 +801,7 @@ export default function VisualResumeEditor() {
                     className={cn(
                       "p-3 rounded-lg border transition-all duration-200 flex flex-col items-center gap-1",
                       tool === id
-                        ? 'bg-blue-500 text-white border-blue-500'
+                        ? 'bg-info-500 text-white border-info-500'
                         : isDark
                           ? 'bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700'
                           : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
@@ -1017,7 +1017,7 @@ export default function VisualResumeEditor() {
                               onClick={() => updateElement(selectedElementData.id, { color })}
                               className={cn(
                                 "w-6 h-6 rounded border-2",
-                                selectedElementData.color === color ? 'border-blue-500' : 'border-gray-300'
+                                selectedElementData.color === color ? 'border-info-500' : 'border-gray-300'
                               )}
                               style={{ backgroundColor: color }}
                               title={`Select color ${color}`}
@@ -1039,7 +1039,7 @@ export default function VisualResumeEditor() {
                               onClick={() => updateElement(selectedElementData.id, { backgroundColor: color })}
                               className={cn(
                                 "w-6 h-6 rounded border-2",
-                                selectedElementData.backgroundColor === color ? 'border-blue-500' : 'border-gray-300'
+                                selectedElementData.backgroundColor === color ? 'border-info-500' : 'border-gray-300'
                               )}
                               style={{ backgroundColor: color }}
                               title={`Select background color ${color}`}
@@ -1056,7 +1056,7 @@ export default function VisualResumeEditor() {
                               onClick={() => updateElement(selectedElementData.id, { borderColor: color })}
                               className={cn(
                                 "w-6 h-6 rounded border-2",
-                                selectedElementData.borderColor === color ? 'border-blue-500' : 'border-gray-300'
+                                selectedElementData.borderColor === color ? 'border-info-500' : 'border-gray-300'
                               )}
                               style={{ backgroundColor: color }}
                               title={`Select border color ${color}`}
@@ -1170,7 +1170,7 @@ export default function VisualResumeEditor() {
             {/* Instructions */}
             <div className={cn(
               "p-4 rounded-lg border",
-              isDark ? 'bg-gray-800 border-gray-600' : 'bg-blue-50 border-blue-200'
+              isDark ? 'bg-gray-800 border-gray-600' : 'bg-info-50 border-info-200'
             )}>
               <h4 className="font-semibold mb-2">How to Use</h4>
               <ul className="text-sm space-y-1">

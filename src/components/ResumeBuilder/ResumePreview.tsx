@@ -60,7 +60,7 @@ export function ResumePreview({
     <div 
       ref={resumeRef}
       className={`bg-white w-full max-w-[210mm] mx-auto shadow-lg ${
-        isVisualEditMode ? 'ring-2 ring-blue-500 ring-opacity-50' : ''
+        isVisualEditMode ? 'ring-2 ring-info-500 ring-opacity-50' : ''
       }`}
       style={{ 
         minHeight: '297mm',
@@ -69,7 +69,7 @@ export function ResumePreview({
       }}
     >
       {isVisualEditMode && (
-        <div className="absolute top-2 right-2 z-10 bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+        <div className="absolute top-2 right-2 z-10 bg-info-500 text-white px-3 py-1 rounded-full text-xs font-medium">
           Visual Edit Mode
         </div>
       )}

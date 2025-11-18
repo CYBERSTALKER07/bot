@@ -57,7 +57,7 @@ export default function CompanyCard({
             className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
           />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600" />
+          <div className="absolute inset-0 bg-gradient-to-r from-info-500 to-purple-600" />
         )}
         
         {/* Dark overlay for better text readability */}
@@ -80,7 +80,7 @@ export default function CompanyCard({
                 </div>
               )}
               {is_verified && (
-                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center border border-white">
+                <div className="w-6 h-6 bg-info-500 rounded-full flex items-center justify-center border border-white">
                   <span className="text-white text-xs font-bold">✓</span>
                 </div>
               )}
@@ -144,7 +144,7 @@ export default function CompanyCard({
                 </span>
               )}
               {recent_jobs_count > 0 && (
-                <span className="bg-blue-500/90 text-white text-xs px-2 py-1 rounded-full font-semibold">
+                <span className="bg-info-500/90 text-white text-xs px-2 py-1 rounded-full font-semibold">
                   {recent_jobs_count} jobs
                 </span>
               )}

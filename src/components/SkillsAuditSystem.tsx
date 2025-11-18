@@ -236,7 +236,7 @@ export default function SkillsAuditSystem() {
     const colors = {
       beginner: isDark ? 'text-red-400 bg-red-900/20' : 'text-red-600 bg-red-50',
       developing: isDark ? 'text-yellow-400 bg-yellow-900/20' : 'text-yellow-600 bg-yellow-50',
-      proficient: isDark ? 'text-blue-400 bg-blue-900/20' : 'text-blue-600 bg-blue-50',
+      proficient: isDark ? 'text-info-400 bg-info-900/20' : 'text-info-600 bg-info-50',
       advanced: isDark ? 'text-green-400 bg-green-900/20' : 'text-green-600 bg-green-50',
       expert: isDark ? 'text-purple-400 bg-purple-900/20' : 'text-purple-600 bg-purple-50'
     };
@@ -349,9 +349,9 @@ export default function SkillsAuditSystem() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20">
+          <div className="flex items-center justify-between p-4 rounded-lg bg-info-50 dark:bg-info-900/20">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-info-500 rounded-full flex items-center justify-center">
                 <Users className="h-4 w-4 text-white" />
               </div>
               <div>
@@ -361,7 +361,7 @@ export default function SkillsAuditSystem() {
                 </div>
               </div>
             </div>
-            <div className="text-blue-600 dark:text-blue-400 font-semibold">
+            <div className="text-info-600 dark:text-info-400 font-semibold">
               +8%
             </div>
           </div>
@@ -477,7 +477,7 @@ export default function SkillsAuditSystem() {
                   {skill.evidence.map((evidence, evidenceIndex) => (
                     <span 
                       key={evidenceIndex}
-                      className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 rounded-full text-sm"
+                      className="px-3 py-1 bg-info-100 dark:bg-info-900/30 text-info-800 dark:text-info-400 rounded-full text-sm"
                     >
                       {evidence}
                     </span>

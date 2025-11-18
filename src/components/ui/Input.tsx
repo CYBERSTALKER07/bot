@@ -170,7 +170,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="hover:opacity-70 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded"
+          className="hover:opacity-70 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-info-500 rounded"
         >
           {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
         </button>

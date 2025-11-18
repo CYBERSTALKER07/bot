@@ -67,7 +67,7 @@ export const AnimatedSearchDropdown: React.FC<AnimatedSearchDropdownProps> = ({
       case 'trending':
         return <TrendingUp className="w-4 h-4" />;
       case 'user':
-        return <div className="w-4 h-4 rounded-full bg-blue-500" />;
+        return <div className="w-4 h-4 rounded-full bg-info-500" />;
       case 'hashtag':
         return <span className="text-sm font-bold">#</span>;
       default:
@@ -82,7 +82,7 @@ export const AnimatedSearchDropdown: React.FC<AnimatedSearchDropdownProps> = ({
       case 'trending':
         return isDark ? 'text-red-400' : 'text-red-600';
       case 'user':
-        return isDark ? 'text-blue-400' : 'text-blue-600';
+        return isDark ? 'text-info-400' : 'text-info-600';
       case 'hashtag':
         return isDark ? 'text-purple-400' : 'text-purple-600';
       default:
@@ -118,8 +118,8 @@ export const AnimatedSearchDropdown: React.FC<AnimatedSearchDropdownProps> = ({
                 className={cn(
                   'w-6 h-6 border-2 border-transparent rounded-full',
                   isDark
-                    ? 'border-t-blue-500 border-r-blue-500'
-                    : 'border-t-blue-600 border-r-blue-600'
+                    ? 'border-t-info-500 border-r-info-500'
+                    : 'border-t-info-600 border-r-info-600'
                 )}
               />
             </div>
@@ -184,8 +184,8 @@ export const AnimatedSearchDropdown: React.FC<AnimatedSearchDropdownProps> = ({
                           : 'bg-red-500/10 text-red-600'
                         : suggestion.type === 'user'
                           ? isDark
-                            ? 'bg-blue-500/20 text-blue-400'
-                            : 'bg-blue-500/10 text-blue-600'
+                            ? 'bg-info-500/20 text-info-400'
+                            : 'bg-info-500/10 text-info-600'
                           : suggestion.type === 'hashtag'
                             ? isDark
                               ? 'bg-purple-500/20 text-purple-400'

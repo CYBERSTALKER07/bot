@@ -330,7 +330,7 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 			<div ref={firstRowRef} className="relative overflow-hidden mb-8">
 				<div className="carousel-container flex space-x-6 items-center">
 					{[...firstRowCompanies, ...firstRowCompanies].map((company, index) => (
-						<div key={`first-${index}`} className={`hiring-card group relative rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 border min-w-[320px] flex-shrink-0 bg-white hover:border-blue-300 ${
+						<div key={`first-${index}`} className={`hiring-card group relative rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 border min-w-[320px] flex-shrink-0 bg-white hover:border-info-300 ${
 							isDark
 								? 'border-gray-200'
 								: 'border-gray-200'
@@ -343,7 +343,7 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 											alt={company.name}
 											className="w-16 h-16 object-contain filter drop-shadow-md group-hover:scale-110 transition-transform duration-300"
 										/>
-										<div className="absolute -top-2 -right-2 text-blue-500 group-hover:scale-125 transition-transform duration-300">
+										<div className="absolute -top-2 -right-2 text-info-500 group-hover:scale-125 transition-transform duration-300">
 											{company.icon}
 										</div>
 									</div>
@@ -352,14 +352,14 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 									<h3 className="text-xl font-bold mb-2 transition-colors duration-300 text-gray-900">
 										{company.name}
 									</h3>
-									<p className="font-semibold text-sm mb-2 text-blue-600">
+									<p className="font-semibold text-sm mb-2 text-info-600">
 										{company.announcement}
 									</p>
 									<p className="text-sm transition-colors duration-300 text-gray-600">
 										{company.positions}
 									</p>
 									<div className="mt-3 flex items-center space-x-2">
-										<span className="hiring-badge inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+										<span className="hiring-badge inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-info-100 text-info-800">
 											HIRING NOW
 										</span>
 										<span className="text-xs text-gray-500">• Remote OK</span>
@@ -375,7 +375,7 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 			<div ref={secondRowRef} className="relative overflow-hidden">
 				<div className="carousel-container flex space-x-6 items-center">
 					{[...secondRowCompanies, ...secondRowCompanies].map((company, index) => (
-						<div key={`second-${index}`} className={`hiring-card group relative rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 border min-w-[320px] flex-shrink-0 bg-white hover:border-blue-300 ${
+						<div key={`second-${index}`} className={`hiring-card group relative rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 border min-w-[320px] flex-shrink-0 bg-white hover:border-info-300 ${
 							isDark
 								? 'border-gray-200'
 								: 'border-gray-200'
@@ -388,7 +388,7 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 											alt={company.name}
 											className="w-16 h-16 object-contain filter drop-shadow-md group-hover:scale-110 transition-transform duration-300"
 										/>
-										<div className="absolute -top-2 -right-2 text-blue-500 group-hover:scale-125 transition-transform duration-300">
+										<div className="absolute -top-2 -right-2 text-info-500 group-hover:scale-125 transition-transform duration-300">
 											{company.icon}
 										</div>
 									</div>
@@ -397,14 +397,14 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 									<h3 className="text-xl font-bold mb-2 transition-colors duration-300 text-gray-900">
 										{company.name}
 									</h3>
-									<p className="font-semibold text-sm mb-2 text-blue-600">
+									<p className="font-semibold text-sm mb-2 text-info-600">
 										{company.announcement}
 									</p>
 									<p className="text-sm transition-colors duration-300 text-gray-600">
 										{company.positions}
 									</p>
 									<div className="mt-3 flex items-center space-x-2">
-										<span className="hiring-badge inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+										<span className="hiring-badge inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-info-100 text-info-800">
 											HIRING NOW
 										</span>
 										<span className="text-xs text-gray-500">• Remote OK</span>

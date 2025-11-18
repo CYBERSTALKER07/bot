@@ -141,7 +141,7 @@ export function FloatingActionMenu({
       icon: Edit3,
       label: 'Create Post',
       description: 'Create a new post',
-      color: 'bg-blue-500 hover:bg-blue-600',
+      color: 'bg-info-500 hover:bg-info-600',
       action: () => navigate('/create-post')
     },
     {

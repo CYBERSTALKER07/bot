@@ -69,7 +69,7 @@ export default function CommentModal({ isOpen, onClose, post, currentUserId }: C
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold">
+                    <div className="w-full h-full bg-gradient-to-br from-blue-400 to-info-600 flex items-center justify-center text-white font-semibold">
                       {post.profiles.full_name?.charAt(0).toUpperCase()}
                     </div>
                   )}
@@ -84,7 +84,7 @@ export default function CommentModal({ isOpen, onClose, post, currentUserId }: C
                     {post.profiles.full_name}
                   </h3>
                   {post.profiles.is_verified && (
-                    <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                    <div className="w-5 h-5 bg-info-500 rounded-full flex items-center justify-center">
                       <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>

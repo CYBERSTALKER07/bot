@@ -258,7 +258,7 @@ export default function CareerTipsPage() {
       label: 'Career Articles',
       description: 'Expert insights',
       icon: <BookOpen className="h-8 w-8" />,
-      color: 'from-blue-500 to-cyan-500'
+      color: 'from-info-500 to-cyan-500'
     },
     {
       number: '2M+',
@@ -335,7 +335,7 @@ export default function CareerTipsPage() {
   ];
 
   const categories = [
-    { name: 'Interview Tips', count: 45, icon: MessageSquare, color: 'bg-blue-100 text-blue-800', gradient: 'from-blue-500 to-cyan-500' },
+    { name: 'Interview Tips', count: 45, icon: MessageSquare, color: 'bg-info-100 text-info-800', gradient: 'from-info-500 to-cyan-500' },
     { name: 'Resume Writing', count: 38, icon: FileText, color: 'bg-green-100 text-green-800', gradient: 'from-green-500 to-emerald-500' },
     { name: 'Career Development', count: 52, icon: TrendingUp, color: 'bg-purple-100 text-purple-800', gradient: 'from-purple-500 to-pink-500' },
     { name: 'Networking', count: 29, icon: Users2, color: 'bg-orange-100 text-orange-800', gradient: 'from-orange-500 to-red-500' },
@@ -343,7 +343,7 @@ export default function CareerTipsPage() {
     { name: 'Remote Work', count: 33, icon: Globe, color: 'bg-teal-100 text-teal-800', gradient: 'from-teal-500 to-cyan-500' },
     { name: 'Salary & Benefits', count: 27, icon: Target, color: 'bg-pink-100 text-pink-800', gradient: 'from-pink-500 to-rose-500' },
     { name: 'Personal Branding', count: 24, icon: Star, color: 'bg-yellow-100 text-yellow-800', gradient: 'from-yellow-500 to-orange-500' },
-    { name: 'Industry Insights', count: 36, icon: BarChart3, color: 'bg-cyan-100 text-cyan-800', gradient: 'from-cyan-500 to-blue-500' },
+    { name: 'Industry Insights', count: 36, icon: BarChart3, color: 'bg-cyan-100 text-cyan-800', gradient: 'from-cyan-500 to-info-500' },
     { name: 'Skill Development', count: 42, icon: PenTool, color: 'bg-lime-100 text-lime-800', gradient: 'from-lime-500 to-green-500' },
     { name: 'Work-Life Balance', count: 19, icon: Heart, color: 'bg-rose-100 text-rose-800', gradient: 'from-rose-500 to-pink-500' },
     { name: 'Leadership', count: 31, icon: Award, color: 'bg-amber-100 text-amber-800', gradient: 'from-amber-500 to-yellow-500' }

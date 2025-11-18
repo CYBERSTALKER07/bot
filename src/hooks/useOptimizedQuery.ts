@@ -1,23 +1,25 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 
 // Optimized column selection - only fetch what's needed
-const PROFILE_COLUMNS = 'id,full_name,avatar_url,username,bio,verified,role,company_name,location,website,created_at,cover_image_url';
+const PROFILE_COLUMNS = 'id,full_name,avatar_url,username,bio,verified,role,company_name,location,website,created_at,cover_image_url,title';
 const POST_COLUMNS = 'id,content,user_id,created_at,likes_count,comments_count,shares_count,media_type,image_url,video_url';
-const COMPANY_COLUMNS = 'id,name,logo_url,description,website,industry,size';
 
-// Hook for fetching posts with optimized caching
+// Hook for fetching posts with optimized caching and infinite scroll
 export function usePosts(limit = 20, currentUserId?: string) {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ['posts', limit, currentUserId],
-    queryFn: async () => {
+    queryFn: async ({ pageParam = 0 }) => {
       try {
+        const from = pageParam * limit;
+        const to = from + limit - 1;
+
         // STEP 1: Fetch posts WITH retweet data
         const { data: postsData, error: postsError } = await supabase
           .from('posts')
           .select('id,content,user_id,created_at,likes_count,comments_count,shares_count,retweets_count,media_type,image_url,video_url,visibility')
           .order('created_at', { ascending: false })
-          .limit(limit);
+          .range(from, to);
 
         if (postsError) {
           console.error('Error fetching posts:', postsError);
@@ -33,7 +35,7 @@ export function usePosts(limit = 20, currentUserId?: string) {
           .from('post_retweets')
           .select('id,post_id,user_id,is_quote_retweet,quote_content,created_at')
           .order('created_at', { ascending: false })
-          .limit(limit);
+          .range(from, to);
 
         if (retweetsError) {
           console.warn('Error fetching retweets:', retweetsError);
@@ -43,7 +45,7 @@ export function usePosts(limit = 20, currentUserId?: string) {
         const postUserIds = postsData.map(post => post.user_id);
         const retweetUserIds = retweetsData?.map(rt => rt.user_id) || [];
         const userIds = [...new Set([...postUserIds, ...retweetUserIds])];
-        
+
         const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
           .select('id,full_name,avatar_url,username,verified')
@@ -60,7 +62,7 @@ export function usePosts(limit = 20, currentUserId?: string) {
         // STEP 4: Fetch likes separately if we have a current user
         let likesMap = new Map<string, boolean>();
         let userRetweetsMap = new Map<string, any>();
-        
+
         if (currentUserId) {
           try {
             const { data: likesData } = await supabase
@@ -188,16 +190,26 @@ export function usePosts(limit = 20, currentUserId?: string) {
         }
 
         // STEP 7: Sort combined feed by date
-        feedItems.sort((a, b) => 
+        feedItems.sort((a, b) =>
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
 
-        return feedItems.slice(0, limit);
+        return feedItems;
       } catch (error) {
         console.error('usePosts error:', error);
         return [];
       }
     },
+    getNextPageParam: (lastPage, allPages) => {
+      try {
+        if (!lastPage || !allPages || !Array.isArray(allPages) || allPages.length === 0) return undefined;
+        return lastPage.length === limit ? allPages.length : undefined;
+      } catch (e) {
+        console.error('Error in getNextPageParam:', e);
+        return undefined;
+      }
+    },
+    initialPageParam: 0,
     staleTime: 5 * 60 * 1000, // Reduced from 10 to 5 minutes for fresher data
     gcTime: 15 * 60 * 1000, // Reduced from 30 to 15 minutes
   });
@@ -209,7 +221,7 @@ export function useProfile(userId: string | undefined) {
     queryKey: ['profile', userId],
     queryFn: async () => {
       if (!userId) throw new Error('User ID required');
-      
+
       // Only select necessary columns
       const { data, error } = await supabase
         .from('profiles')
@@ -279,13 +291,13 @@ export function useMatchedJobs(userId?: string, limit = 5) {
         const userMajor = userProfile?.major?.toLowerCase() || '';
         const userUniversity = userProfile?.university?.toLowerCase() || '';
         const userLocation = userProfile?.location?.toLowerCase() || '';
-        
+
         // Combine all user preferences into searchable keywords
         const userKeywords = [
           ...userSkills.map(s => s.toLowerCase()),
-          ...userTitle.split(/\s+/).filter(w => w.length > 2),
-          ...userBio.split(/\s+/).filter(w => w.length > 3),
-          ...userMajor.split(/\s+/).filter(w => w.length > 3),
+          ...userTitle.split(/\s+/).filter((w: string) => w.length > 2),
+          ...userBio.split(/\s+/).filter((w: string) => w.length > 3),
+          ...userMajor.split(/\s+/).filter((w: string) => w.length > 3),
           userRole
         ].filter((v, i, a) => a.indexOf(v) === i); // Remove duplicates
 
@@ -496,7 +508,7 @@ export function useMostLikedPosts(limit = 5, currentUserId?: string) {
 
         // STEP 2: Get unique user IDs and fetch all profiles in parallel
         const userIds = [...new Set(postsData.map(post => post.user_id))];
-        
+
         const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
           .select('id,full_name,avatar_url,username,verified')
@@ -583,7 +595,7 @@ export function useApplicants(jobId?: string) {
         }
 
         const { data: applications, error: appError } = await query;
-        
+
         if (appError) {
           console.error('Error fetching applications:', appError);
           throw appError;
@@ -631,7 +643,7 @@ export function useNotifications(userId: string | undefined) {
     queryKey: ['notifications', userId],
     queryFn: async () => {
       if (!userId) throw new Error('User ID required');
-      
+
       const { data, error } = await supabase
         .from('notifications')
         .select('id,user_id,type,content,read,created_at,related_user_id')
@@ -654,7 +666,7 @@ export function useConversations(userId: string | undefined) {
     queryKey: ['conversations', userId],
     queryFn: async () => {
       if (!userId) throw new Error('User ID required');
-      
+
       const { data, error } = await supabase
         .from('conversations')
         .select(`
@@ -689,7 +701,7 @@ export function useBookmarks(userId: string | undefined) {
     queryKey: ['bookmarks', userId],
     queryFn: async () => {
       if (!userId) throw new Error('User ID required');
-      
+
       const { data, error } = await supabase
         .from('bookmarks')
         .select(`
@@ -761,7 +773,7 @@ export function useCompany(companyId: string | undefined) {
     queryKey: ['company', companyId],
     queryFn: async () => {
       if (!companyId) throw new Error('Company ID required');
-      
+
       try {
         const { data, error } = await supabase
           .from('companies')
@@ -809,7 +821,7 @@ export function useCompanyJobs(companyId: string | undefined) {
     queryKey: ['companyJobs', companyId],
     queryFn: async () => {
       if (!companyId) throw new Error('Company ID required');
-      
+
       const { data, error } = await supabase
         .from('jobs')
         .select('id,title,description,location,type,salary_range,status,posted_at')
@@ -831,57 +843,118 @@ export function useSearch(query: string, filters?: any) {
   return useQuery({
     queryKey: ['search', query, filters],
     queryFn: async () => {
-      if (!query || query.length < 2) return { jobs: [], users: [], posts: [], companies: [] };
+      if (!query || query.length < 2) return { jobs: [], users: [], posts: [], companies: [], hashtags: [] };
 
+      let jobs: any[] = [];
+      let users: any[] = [];
+      let posts: any[] = [];
+      let companies: any[] = [];
+
+      // Search jobs with error handling
       try {
-        // Search jobs - only needed columns
-        const { data: jobs } = await supabase
+        const { data: jobsData, error: jobsError } = await supabase
           .from('jobs')
-          .select('id,title,company,location,type,salary_range,created_at')
-          .or(`title.ilike.%${query}%,company.ilike.%${query}%`)
+          .select('id,title,company_name,location,type,salary_range,created_at')
+          .or(`title.ilike.%${query}%,company_name.ilike.%${query}%`)
           .limit(10);
 
-        // Search users/profiles - only needed columns
-        const { data: users } = await supabase
+        if (!jobsError && jobsData) {
+          jobs = jobsData.map(job => ({
+            ...job,
+            company: job.company_name // Map company_name to company for frontend compatibility
+          }));
+        }
+      } catch (error) {
+        console.warn('Jobs search failed:', error);
+      }
+
+      // Search users/profiles with error handling
+      try {
+        const { data: usersData, error: usersError } = await supabase
           .from('profiles')
           .select('id, full_name, username, avatar_url, bio, verified')
           .or(`full_name.ilike.%${query}%,username.ilike.%${query}%`)
           .limit(10);
 
-        // Search posts - only needed columns
-        const { data: posts } = await supabase
+        if (!usersError && usersData) {
+          users = usersData;
+        }
+      } catch (error) {
+        console.warn('Users search failed:', error);
+      }
+
+      // Search posts with error handling
+      try {
+        // 1. Fetch posts matching content
+        const { data: postsData, error: postsError } = await supabase
           .from('posts')
-          .select('id,content,created_at,user_id,profiles!posts_user_id_fkey(full_name, username, avatar_url)')
+          .select('id,content,created_at,user_id')
           .ilike('content', `%${query}%`)
           .limit(10);
 
-        // Search companies - only needed columns (with error handling)
-        let companies: any[] = [];
-        try {
-          const { data: companiesData, error: companiesError } = await supabase
-            .from('companies')
-            .select('id,name,logo_url,description,website')
-            .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
-            .limit(10);
+        if (!postsError && postsData && postsData.length > 0) {
+          // 2. Fetch authors for these posts
+          const userIds = [...new Set(postsData.map(p => p.user_id))];
+          const { data: profilesData } = await supabase
+            .from('profiles')
+            .select('id, full_name, username, avatar_url')
+            .in('id', userIds);
 
-          if (!companiesError) {
-            companies = companiesData || [];
-          }
-        } catch (error) {
-          console.warn('Companies search failed:', error);
-          companies = [];
+          const profilesMap = new Map(profilesData?.map(p => [p.id, p]) || []);
+
+          // 3. Combine data
+          posts = postsData.map(post => ({
+            ...post,
+            profiles: profilesMap.get(post.user_id) || {
+              full_name: 'Unknown User',
+              username: 'unknown',
+              avatar_url: null
+            }
+          }));
         }
-
-        return {
-          jobs: jobs || [],
-          users: users || [],
-          posts: posts || [],
-          companies: companies
-        };
       } catch (error) {
-        console.error('Search query failed:', error);
-        return { jobs: [], users: [], posts: [], companies: [] };
+        console.warn('Posts search failed:', error);
       }
+
+      // Search companies with error handling
+      try {
+        const { data: companiesData, error: companiesError } = await supabase
+          .from('companies')
+          .select('id,name,logo_url,description,website')
+          .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
+          .limit(10);
+
+        if (!companiesError && companiesData) {
+          companies = companiesData;
+        }
+      } catch (error) {
+        console.warn('Companies search failed:', error);
+      }
+
+      // Search hashtags with error handling
+      let hashtags: any[] = [];
+      try {
+        const { data: hashtagsData, error: hashtagsError } = await supabase
+          .from('hashtags')
+          .select('id,name,usage_count,trending_score')
+          .ilike('name', `%${query}%`)
+          .order('usage_count', { ascending: false })
+          .limit(10);
+
+        if (!hashtagsError && hashtagsData) {
+          hashtags = hashtagsData;
+        }
+      } catch (error) {
+        console.warn('Hashtags search failed:', error);
+      }
+
+      return {
+        jobs,
+        users,
+        posts,
+        companies,
+        hashtags
+      };
     },
     enabled: query.length >= 2,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -895,7 +968,7 @@ export function useEmployerStats(employerId: string | undefined) {
     queryKey: ['employerStats', employerId],
     queryFn: async () => {
       if (!employerId) throw new Error('Employer ID required');
-      
+
       // Get jobs count
       const { count: jobsCount } = await supabase
         .from('jobs')
@@ -909,7 +982,7 @@ export function useEmployerStats(employerId: string | undefined) {
         .eq('employer_id', employerId);
 
       const jobIds = jobs?.map(j => j.id) || [];
-      
+
       const { count: applicationsCount } = await supabase
         .from('applications')
         .select('*', { count: 'exact', head: true })
@@ -1090,7 +1163,7 @@ export function useFollowStatus(currentUserId: string | undefined, targetUserId:
           console.error('Follow status check error:', error);
           throw error;
         }
-        
+
         // Return true if a follow record exists, false otherwise
         return !!data;
       } catch (error) {
@@ -1121,8 +1194,8 @@ export function useFollowUser() {
     },
     onSuccess: (data, variables) => {
       // Invalidate specific follow status for this user pair
-      queryClient.invalidateQueries({ 
-        queryKey: ['followStatus', variables.followerId, variables.followingId] 
+      queryClient.invalidateQueries({
+        queryKey: ['followStatus', variables.followerId, variables.followingId]
       });
       // Also invalidate all follow-related queries
       queryClient.invalidateQueries({ queryKey: ['followStatus'] });
@@ -1152,8 +1225,8 @@ export function useUnfollowUser() {
     },
     onSuccess: (data, variables) => {
       // Invalidate specific follow status for this user pair
-      queryClient.invalidateQueries({ 
-        queryKey: ['followStatus', variables.followerId, variables.followingId] 
+      queryClient.invalidateQueries({
+        queryKey: ['followStatus', variables.followerId, variables.followingId]
       });
       // Also invalidate all follow-related queries
       queryClient.invalidateQueries({ queryKey: ['followStatus'] });
@@ -1173,97 +1246,38 @@ export function useMostFollowedUsers(limit = 5) {
     queryKey: ['mostFollowedUsers', limit],
     queryFn: async () => {
       try {
-        // Use a single efficient query with SQL to get follower counts
-        const { data: mostFollowedData, error } = await supabase
+        console.log('🔍 Fetching most followed users...');
+
+        // Fetch users sorted by followers count
+        const { data: users, error } = await supabase
           .from('profiles')
-          .select(`
-            id,
-            full_name,
-            username,
-            avatar_url,
-            bio,
-            verified,
-            role,
-            company_name,
-            location,
-            follower_count:follows!following_id(count)
-          `)
-          .not('id', 'is', null)
-          .order('created_at', { ascending: false })
-          .limit(limit * 10); // Fetch more to sort by follower count
+          .select('id, full_name, username, avatar_url, bio, verified, followers_count')
+          .not('avatar_url', 'is', null)
+          .order('followers_count', { ascending: false })
+          .limit(limit);
 
         if (error) {
-          console.error('Error fetching most followed users:', error);
-          throw error;
+          console.error('❌ Error fetching most followed users:', error);
+          return []; // Return empty array instead of throwing
         }
 
-        if (!mostFollowedData || mostFollowedData.length === 0) {
-          return [];
-        }
+        console.log('✅ Fetched users:', users?.length || 0);
 
-        // Transform the data to include proper follower count
-        const usersWithCounts = mostFollowedData.map(user => ({
-          id: user.id,
-          full_name: user.full_name,
-          username: user.username,
-          avatar_url: user.avatar_url,
-          bio: user.bio,
-          verified: user.verified,
-          role: user.role,
-          company_name: user.company_name,
-          location: user.location,
-          followerCount: Array.isArray(user.follower_count) ? user.follower_count.length : 0
+        return (users || []).map(user => ({
+          ...user,
+          followerCount: user.followers_count || 0
         }));
 
-        // Sort by follower count descending and take the top users
-        return usersWithCounts
-          .sort((a, b) => b.followerCount - a.followerCount)
-          .slice(0, limit);
-
       } catch (error) {
-        console.error('Error in useMostFollowedUsers:', error);
-        
-        // Fallback: Return recent users if the optimized query fails
-        try {
-          const { data: fallbackUsers, error: fallbackError } = await supabase
-            .from('profiles')
-            .select(`
-              id,
-              full_name,
-              username,
-              avatar_url,
-              bio,
-              verified,
-              role,
-              company_name,
-              location
-            `)
-            .not('avatar_url', 'is', null) // Prioritize users with avatars
-            .eq('verified', true) // Show verified users first
-            .order('created_at', { ascending: false })
-            .limit(limit);
-
-          if (fallbackError) throw fallbackError;
-
-          return (fallbackUsers || []).map(user => ({
-            ...user,
-            followerCount: 0 // Unknown follower count in fallback
-          }));
-        } catch (fallbackError) {
-          console.error('Fallback query also failed:', fallbackError);
-          return [];
-        }
+        console.error('❌ Exception in useMostFollowedUsers:', error);
+        return []; // Always return empty array on error
       }
     },
-    staleTime: 30 * 60 * 1000, // 30 minutes
-    gcTime: 60 * 60 * 1000, // 1 hour cache
-    retry: (failureCount, error: any) => {
-      if (failureCount < 2) {
-        console.log(`Retrying useMostFollowedUsers (attempt ${failureCount + 1})`);
-        return true;
-      }
-      return false;
-    }
+    staleTime: 30 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
+    retry: false, // Don't retry on error
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    refetchOnMount: false // Don't refetch on component mount if data exists
   });
 }
 
@@ -1369,7 +1383,7 @@ export function useEmployerEvents(limit = 12, status = 'upcoming') {
 
         // Now fetch employer profiles separately
         const employerIds = [...new Set(events.map(e => e.employer_id))];
-        
+
         const { data: employers, error: employerError } = await supabase
           .from('profiles')
           .select('id, full_name, avatar_url, username, company_name, verified')
@@ -1582,7 +1596,7 @@ export function useRegisterForEvent() {
         .single();
 
       if (error) throw error;
-      
+
       // Update attendees count
       await supabase
         .from('employer_events')
@@ -1676,7 +1690,7 @@ export function useEventRegistrationStatus(eventId: string | undefined, userId: 
         .single();
 
       if (error && error.code !== 'PGRST116') throw error;
-      
+
       return data ? { isRegistered: true, status: data.status } : { isRegistered: false, status: null };
     },
     enabled: !!eventId && !!userId,
@@ -1948,4 +1962,249 @@ export function useJobDetail(jobId: string | undefined) {
     staleTime: 5 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
   });
+}
+
+// Hook for bookmarking a post
+export function useBookmarkPost() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ postId, userId }: { postId: string; userId: string }) => {
+      try {
+        // Check if already bookmarked
+        const { data: existingBookmark } = await supabase
+          .from('bookmarks')
+          .select('id')
+          .eq('post_id', postId)
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        if (existingBookmark) {
+          // Remove bookmark
+          const { error } = await supabase
+            .from('bookmarks')
+            .delete()
+            .eq('id', existingBookmark.id);
+
+          if (error) throw error;
+          return { bookmarked: false };
+        } else {
+          // Add bookmark
+          const { error } = await supabase
+            .from('bookmarks')
+            .insert([{ post_id: postId, user_id: userId }]);
+
+          if (error) throw error;
+          return { bookmarked: true };
+        }
+      } catch (error: any) {
+        console.error('Failed to toggle bookmark:', error);
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      // Invalidate queries to refresh UI
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
+      queryClient.invalidateQueries({ queryKey: ['postDetail'] });
+    },
+  });
+}
+
+// Hook for fetching trending news (highly engaged posts from last 7 days)
+export function useTrendingNews(limit = 10) {
+  return useQuery({
+    queryKey: ['trendingNews', limit],
+    queryFn: async () => {
+      try {
+        // Calculate date 7 days ago
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        // Fetch posts with highest engagement from last 7 days
+        const { data: postsData, error: postsError } = await supabase
+          .from('posts')
+          .select('id,content,user_id,created_at,likes_count,comments_count,shares_count,tags,media_type,image_url')
+          .eq('visibility', 'public')
+          .gte('created_at', sevenDaysAgo.toISOString())
+          .order('created_at', { ascending: false })
+          .limit(limit * 3); // Fetch more to sort by engagement
+
+        if (postsError) {
+          console.error('Error fetching trending news:', postsError);
+          throw postsError;
+        }
+
+        if (!postsData || postsData.length === 0) {
+          return [];
+        }
+
+        // Sort by total engagement
+        const sortedPosts = postsData
+          .map(post => ({
+            ...post,
+            totalEngagement: (post.likes_count || 0) + (post.comments_count || 0) + (post.shares_count || 0)
+          }))
+          .sort((a, b) => b.totalEngagement - a.totalEngagement)
+          .slice(0, limit);
+
+        // Get unique user IDs
+        const userIds = [...new Set(sortedPosts.map(post => post.user_id))];
+
+        // Fetch author profiles
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id,full_name,avatar_url,username,verified')
+          .in('id', userIds);
+
+        if (profilesError) {
+          console.warn('Error fetching profiles:', profilesError);
+        }
+
+        const profilesMap = new Map(
+          profilesData?.map(p => [p.id, p]) || []
+        );
+
+        // Format as news items
+        return sortedPosts.map((post: any) => {
+          const profile = profilesMap.get(post.user_id);
+          const timeAgo = getTimeAgo(post.created_at);
+          const category = post.tags?.[0] || 'News';
+
+          return {
+            id: post.id,
+            title: post.content?.substring(0, 100) || 'Untitled post',
+            category: category,
+            time: timeAgo,
+            posts: formatEngagementCount(post.totalEngagement),
+            sources: profile ? [{
+              name: profile.full_name || profile.username,
+              avatar: profile.avatar_url
+            }] : []
+          };
+        });
+      } catch (error) {
+        console.error('useTrendingNews error:', error);
+        return [];
+      }
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 15 * 60 * 1000, // 15 minutes cache
+  });
+}
+
+// Hook for fetching trending topics (hashtags from popular posts)
+export function useTrendingTopics(limit = 10) {
+  return useQuery({
+    queryKey: ['trendingTopics', limit],
+    queryFn: async () => {
+      try {
+        // Calculate date 3 days ago for trending topics
+        const threeDaysAgo = new Date();
+        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
+        // Fetch recent posts with engagement
+        const { data: postsData, error: postsError } = await supabase
+          .from('posts')
+          .select('id,content,tags,likes_count,comments_count,shares_count')
+          .eq('visibility', 'public')
+          .gte('created_at', threeDaysAgo.toISOString())
+          .gte('likes_count', 1); // At least 1 like
+
+        if (postsError) {
+          console.error('Error fetching posts for trending topics:', postsError);
+          throw postsError;
+        }
+
+        if (!postsData || postsData.length === 0) {
+          return [];
+        }
+
+        // Extract hashtags and count occurrences
+        const topicCounts = new Map<string, { count: number; category: string; totalEngagement: number }>();
+
+        postsData.forEach((post: any) => {
+          const engagement = (post.likes_count || 0) + (post.comments_count || 0) + (post.shares_count || 0);
+
+          // Extract hashtags from content
+          const hashtagRegex = /#(\w+)/g;
+          const hashtags = post.content?.match(hashtagRegex) || [];
+
+          hashtags.forEach((hashtag: string) => {
+            const existing = topicCounts.get(hashtag) || { count: 0, category: 'Trending', totalEngagement: 0 };
+            topicCounts.set(hashtag, {
+              count: existing.count + 1,
+              category: post.tags?.[0] || 'Trending',
+              totalEngagement: existing.totalEngagement + engagement
+            });
+          });
+
+          // Also use tags as topics
+          if (post.tags && Array.isArray(post.tags)) {
+            post.tags.forEach((tag: string) => {
+              const topicName = tag.startsWith('#') ? tag : `#${tag}`;
+              const existing = topicCounts.get(topicName) || { count: 0, category: 'Trending', totalEngagement: 0 };
+              topicCounts.set(topicName, {
+                count: existing.count + 1,
+                category: tag,
+                totalEngagement: existing.totalEngagement + engagement
+              });
+            });
+          }
+        });
+
+        // Convert to array and sort by engagement and count
+        const topics = Array.from(topicCounts.entries())
+          .map(([name, data]) => ({
+            id: name,
+            name: name,
+            category: data.category,
+            posts: formatEngagementCount(data.count),
+            label: data.totalEngagement > 100 ? 'Trending' : undefined
+          }))
+          .sort((a, b) => {
+            const aCount = parseInt(a.posts.replace(/[^0-9]/g, '')) || 0;
+            const bCount = parseInt(b.posts.replace(/[^0-9]/g, '')) || 0;
+            return bCount - aCount;
+          })
+          .slice(0, limit);
+
+        return topics;
+      } catch (error) {
+        console.error('useTrendingTopics error:', error);
+        return [];
+      }
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 15 * 60 * 1000, // 15 minutes cache
+  });
+}
+
+// Helper function to format time ago
+function getTimeAgo(dateString: string): string {
+  const now = new Date();
+  const past = new Date(dateString);
+  const diffMs = now.getTime() - past.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 60) {
+    return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
+  } else if (diffHours < 24) {
+    return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+  } else {
+    return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+  }
+}
+
+// Helper function to format engagement count (e.g., 1234 -> "1.2K")
+function formatEngagementCount(count: number): string {
+  if (count >= 1000000) {
+    return `${(count / 1000000).toFixed(1)}M`;
+  } else if (count >= 1000) {
+    return `${(count / 1000).toFixed(1)}K`;
+  } else {
+    return count.toString();
+  }
 }

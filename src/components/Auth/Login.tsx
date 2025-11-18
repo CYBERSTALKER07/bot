@@ -212,9 +212,9 @@ export default function Login() {
                 isDark ? 'text-neutral-500' : 'text-neutral-600'
               )}>
                 By signing up, you agree to the{' '}
-                <a href="#" className="text-blue-500 hover:underline">Terms of Service</a>
+                <a href="#" className="text-info-500 hover:underline">Terms of Service</a>
                 {' '}and{' '}
-                <a href="#" className="text-blue-500 hover:underline">Privacy Policy</a>
+                <a href="#" className="text-info-500 hover:underline">Privacy Policy</a>
               </p>
 
               <div className="pt-8">
@@ -229,8 +229,8 @@ export default function Login() {
                   className={cn(
                     'w-full rounded-full py-3 font-bold text-base border transition-colors',
                     isDark
-                      ? 'border-neutral-700 text-blue-500 hover:bg-blue-500/10'
-                      : 'border-neutral-300 text-blue-500 hover:bg-blue-50'
+                      ? 'border-neutral-700 text-info-500 hover:bg-info-500/10'
+                      : 'border-neutral-300 text-info-500 hover:bg-info-50'
                   )}
                 >
                   Sign in
@@ -320,14 +320,14 @@ export default function Login() {
                   className={cn(
                     'peer w-full px-4 pt-6 pb-2 text-base border rounded outline-none transition-all',
                     isDark
-                      ? 'bg-black border-neutral-700 text-white focus:border-blue-500'
-                      : 'bg-white border-neutral-300 text-black focus:border-blue-500'
+                      ? 'bg-black border-neutral-700 text-white focus:border-info-500'
+                      : 'bg-white border-neutral-300 text-black focus:border-info-500'
                   )}
                 />
                 <label
                   className={cn(
                     'absolute left-4 top-4 text-base transition-all pointer-events-none',
-                    'peer-focus:top-2 peer-focus:text-xs peer-focus:text-blue-500',
+                    'peer-focus:top-2 peer-focus:text-xs peer-focus:text-info-500',
                     'peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs',
                     isDark ? 'text-neutral-500' : 'text-neutral-600'
                   )}
@@ -346,14 +346,14 @@ export default function Login() {
                   className={cn(
                     'peer w-full px-4 pt-6 pb-2 text-base border rounded outline-none transition-all pr-12',
                     isDark
-                      ? 'bg-black border-neutral-700 text-white focus:border-blue-500'
-                      : 'bg-white border-neutral-300 text-black focus:border-blue-500'
+                      ? 'bg-black border-neutral-700 text-white focus:border-info-500'
+                      : 'bg-white border-neutral-300 text-black focus:border-info-500'
                   )}
                 />
                 <label
                   className={cn(
                     'absolute left-4 top-4 text-base transition-all pointer-events-none',
-                    'peer-focus:top-2 peer-focus:text-xs peer-focus:text-blue-500',
+                    'peer-focus:top-2 peer-focus:text-xs peer-focus:text-info-500',
                     'peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs',
                     isDark ? 'text-neutral-500' : 'text-neutral-600'
                   )}
@@ -422,7 +422,7 @@ export default function Login() {
             Don't have an account?{' '}
             <button
               onClick={() => setStep('signup')}
-              className="text-blue-500 hover:underline"
+              className="text-info-500 hover:underline"
             >
               Sign up
             </button>
@@ -509,14 +509,14 @@ export default function Login() {
                   className={cn(
                     'peer w-full px-4 pt-6 pb-2 text-base border rounded outline-none transition-all',
                     isDark
-                      ? 'bg-black border-neutral-700 text-white focus:border-blue-500'
-                      : 'bg-white border-neutral-300 text-black focus:border-blue-500'
+                      ? 'bg-black border-neutral-700 text-white focus:border-info-500'
+                      : 'bg-white border-neutral-300 text-black focus:border-info-500'
                   )}
                 />
                 <label
                   className={cn(
                     'absolute left-4 top-4 text-base transition-all pointer-events-none',
-                    'peer-focus:top-2 peer-focus:text-xs peer-focus:text-blue-500',
+                    'peer-focus:top-2 peer-focus:text-xs peer-focus:text-info-500',
                     'peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs',
                     isDark ? 'text-neutral-500' : 'text-neutral-600'
                   )}
@@ -535,14 +535,14 @@ export default function Login() {
                   className={cn(
                     'peer w-full px-4 pt-6 pb-2 text-base border rounded outline-none transition-all',
                     isDark
-                      ? 'bg-black border-neutral-700 text-white focus:border-blue-500'
-                      : 'bg-white border-neutral-300 text-black focus:border-blue-500'
+                      ? 'bg-black border-neutral-700 text-white focus:border-info-500'
+                      : 'bg-white border-neutral-300 text-black focus:border-info-500'
                   )}
                 />
                 <label
                   className={cn(
                     'absolute left-4 top-4 text-base transition-all pointer-events-none',
-                    'peer-focus:top-2 peer-focus:text-xs peer-focus:text-blue-500',
+                    'peer-focus:top-2 peer-focus:text-xs peer-focus:text-info-500',
                     'peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs',
                     isDark ? 'text-neutral-500' : 'text-neutral-600'
                   )}
@@ -562,14 +562,14 @@ export default function Login() {
                 className={cn(
                   'peer w-full px-4 pt-6 pb-2 text-base border rounded outline-none transition-all',
                   isDark
-                    ? 'bg-black border-neutral-700 text-white focus:border-blue-500'
-                    : 'bg-white border-neutral-300 text-black focus:border-blue-500'
+                    ? 'bg-black border-neutral-700 text-white focus:border-info-500'
+                    : 'bg-white border-neutral-300 text-black focus:border-info-500'
                 )}
               />
               <label
                 className={cn(
                   'absolute left-4 top-4 text-base transition-all pointer-events-none',
-                  'peer-focus:top-2 peer-focus:text-xs peer-focus:text-blue-500',
+                  'peer-focus:top-2 peer-focus:text-xs peer-focus:text-info-500',
                   'peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs',
                   isDark ? 'text-neutral-500' : 'text-neutral-600'
                 )}
@@ -588,14 +588,14 @@ export default function Login() {
                 className={cn(
                   'peer w-full px-4 pt-6 pb-2 text-base border rounded outline-none transition-all pr-12',
                   isDark
-                    ? 'bg-black border-neutral-700 text-white focus:border-blue-500'
-                    : 'bg-white border-neutral-300 text-black focus:border-blue-500'
+                    ? 'bg-black border-neutral-700 text-white focus:border-info-500'
+                    : 'bg-white border-neutral-300 text-black focus:border-info-500'
                 )}
               />
               <label
                 className={cn(
                   'absolute left-4 top-4 text-base transition-all pointer-events-none',
-                  'peer-focus:top-2 peer-focus:text-xs peer-focus:text-blue-500',
+                  'peer-focus:top-2 peer-focus:text-xs peer-focus:text-info-500',
                   'peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs',
                   isDark ? 'text-neutral-500' : 'text-neutral-600'
                 )}
@@ -652,7 +652,7 @@ export default function Login() {
           Already have an account?{' '}
           <button
             onClick={() => setStep('signin')}
-            className="text-blue-500 hover:underline"
+            className="text-info-500 hover:underline"
           >
             Sign in
           </button>

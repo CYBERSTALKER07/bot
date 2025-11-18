@@ -1,6 +1,6 @@
-import { useEffect, useState, useRef } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import {
   Home,
   Search,
   Bell,
@@ -10,16 +10,10 @@ import {
   FileText,
   Calendar,
   BarChart3,
-  Settings,
   Users,
   LogOut,
   Feather,
-  MoreHorizontal,
-  X as XIcon,
-  Brain,
-  Linkedin,
-  X,
-  Plus
+  X as XIcon
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -28,6 +22,7 @@ import Button from './ui/Button';
 import { cn } from '../lib/cva';
 import { FloatingActionMenu } from './FloatingActionMenu';
 import PostEventForm from './PostEventForm';
+import Dock from './Dock';
 
 // Helper component for thin icons
 const ThinIcon = ({ Icon, ...props }: any) => <Icon strokeWidth={1.5} {...props} />;
@@ -37,7 +32,7 @@ interface NavigationItem {
   label: string;
   path: string;
   badge?: number;
-  font: 'serif' | 'sans-serif';
+  font?: 'serif' | 'sans-serif';
 }
 
 // X-Style Navigation
@@ -47,11 +42,9 @@ export default function Navigation() {
   const location = useLocation();
   const navigate = useNavigate();
   const { isVisible: isBottomNavVisible } = useScrollDirection({ threshold: 3 });
-  
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isUserCardOpen, setIsUserCardOpen] = useState(false);
   const [showPostEventModal, setShowPostEventModal] = useState(false);
 
   useEffect(() => {
@@ -101,7 +94,7 @@ export default function Navigation() {
         ...baseItems,
         { icon: BarChart3, label: 'Admin', path: '/admin' },
         { icon: Users, label: 'Users', path: '/users' },
-        { icon: Settings, label: 'Settings', path: '/settings' },
+        // { icon: Settings, label: 'Settings', path: '/settings' },
         { icon: User, label: 'Profile', path: '/profile' }
       ];
     }
@@ -119,29 +112,23 @@ export default function Navigation() {
     }
   };
 
-  const handleUserClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsUserCardOpen(true);
-  };
-
   // OnPress handler for navigation items with haptic feedback
   const handleNavItemPress = (path: string, item: NavigationItem) => {
     // Haptic feedback for mobile devices
     if (navigator.vibrate) {
       navigator.vibrate(10);
     }
-    
+
     // Handle Post Event modal separately
     if (path === '/post-event') {
       setShowPostEventModal(true);
       setIsMobileMenuOpen(false);
       return;
     }
-    
+
     // Visual feedback - could add press state here
     console.log(`Navigating to: ${item.label} (${path})`);
-    
+
     // Navigate to the selected path
     navigate(path);
   };
@@ -152,15 +139,14 @@ export default function Navigation() {
   if (isMobile) {
     return (
       <>
-        {/* Mobile Top Bar */} 
-        
-        <header className={`fixed top-0 left-0 right-0 z-50 border-none ${
-          isDark ? 'bg-black/95 backdrop-blur-xl border-gray-800' : 'bg-white/95 backdrop-blur-xl border-gray-200'
-        }`}>
+        {/* Mobile Top Bar */}
+
+        <header className={`fixed top-0 left-0 right-0 z-50 border-none ${isDark ? 'bg-black/95 backdrop-blur-xl border-gray-800' : 'bg-white/95 backdrop-blur-xl border-gray-200'
+          }`}>
           {/* iOS Status Bar Safe Area */}
           {/* <div className="h-5 bg-black ios-only" />
           <div className="h-5 bg-black ios-only" /> */}
-          
+
           <div className="flex items-center justify-between px-4 py-3">
             {/* <div className="flex items-center space-x-3">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
@@ -172,10 +158,10 @@ export default function Navigation() {
                 AUT Handshake
               </span>
             </div> */}
-            
+
             <Button
               variant="ghost"
-              size="sm"
+              size="small"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className={cn(
                 "p-2 rounded-full transition-colors duration-200",
@@ -191,12 +177,12 @@ export default function Navigation() {
                   {user?.profile?.avatar_url ? (
                     <img
                       src={user.profile.avatar_url}
-                      alt={user?.full_name || 'User'}
+                      alt={user?.profile?.full_name || 'User'}
                       className="w-full h-full object-cover"
                     />
                   ) : (
                     <span className="text-gray-700 dark:text-gray-200 font-semibold">
-                      {user?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
+                      {user?.profile?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
                     </span>
                   )}
                 </div>
@@ -232,9 +218,8 @@ export default function Navigation() {
             isDark ? 'border-gray-800' : 'border-gray-200'
           )}>
             <div className="flex items-center space-x-3">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                isDark ? 'bg-white' : 'bg-[#800002]'
-              }`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isDark ? 'bg-white' : 'bg-[#800002]'
+                }`}>
                 <ThinIcon Icon={Feather} className={`h-4 w-4 ${isDark ? 'text-black' : 'text-white'}`} />
               </div>
               <span className={`font-light text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -243,7 +228,7 @@ export default function Navigation() {
             </div>
             <Button
               variant="ghost"
-              size="icon"
+              size="small"
               onClick={() => setIsMobileMenuOpen(false)}
               className={isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'}
             >
@@ -257,7 +242,7 @@ export default function Navigation() {
               {navigationItems.map((item, index) => {
                 const Icon = item.icon;
                 const isActive = isCurrentPath(item.path);
-                
+
                 return (
                   <button
                     key={index}
@@ -275,8 +260,8 @@ export default function Navigation() {
                       "flex items-center justify-between px-3 py-3 rounded-xl transition-all duration-200 w-full text-left",
                       "active:scale-95 active:bg-gray-100/20 transform-gpu",
                       isActive
-                        ? isDark 
-                          ? 'bg-white/10 text-white' 
+                        ? isDark
+                          ? 'bg-white/10 text-white'
                           : 'bg-gray-100 text-gray-900'
                         : isDark
                           ? 'text-gray-300 hover:bg-gray-800 hover:text-white'
@@ -320,15 +305,15 @@ export default function Navigation() {
           'fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl border-t transition-all duration-300 ios-bottom-nav rounded-tl-3xl rounded-tr-3xl',
           isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200',
           // Apply scroll-based visibility with smooth animation
-          isBottomNavVisible 
-            ? 'translate-y-0 opacity-100' 
+          isBottomNavVisible
+            ? 'translate-y-0 opacity-100'
             : 'translate-y-full opacity-0'
         )}>
           <div className="grid grid-cols-5 h-16 ios-home-indicator-safe">
             {navigationItems.slice(0, 5).map((item, index) => {
               const Icon = item.icon;
               const isActive = isCurrentPath(item.path);
-              
+
               return (
                 <button
                   key={index}
@@ -346,7 +331,7 @@ export default function Navigation() {
                   className={cn(
                     'flex flex-col items-center justify-center py-2 transition-all duration-200 relative ios-touch-target',
                     'active:scale-95 active:bg-gray-100/20 transform-gpu',
-                    isActive 
+                    isActive
                       ? 'text-white'
                       : 'text-white/70 hover:text-white'
                   )}
@@ -361,7 +346,7 @@ export default function Navigation() {
                     )}
                   </div>
                   <span className="text-xs mt-1 truncate font-normal">{item.label}</span>
-                  
+
                   {/* Active indicator */}
                   {isActive && (
                     <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 rounded-full bg-white" />
@@ -392,261 +377,35 @@ export default function Navigation() {
   // Desktop Navigation
   return (
     <>
-      {/* Desktop Sidebar */}
-      <aside className={cn(
-        "fixed left-0 top-0 h-full z-40 transition-all duration-300",
-        "border-r backdrop-blur-xl",
-        isDark ? 'bg-black/95 border-gray-800' : 'bg-white/95 border-gray-200',
-        isExpanded ? 'w-64' : 'w-20'
-      )}
-      onMouseEnter={() => setIsExpanded(true)}
-      onMouseLeave={() => setIsExpanded(false)}
-      >
-        {/* Logo/Brand */}
-        <div className="p-4 border-b border-gray-200 dark:border-gray-800">
-          <div className="flex items-center justify-center">
-          <div className="ml-3 overflow-hidden">
-                <h2 className={cn(
-                  "font-serif text-2xl  tracking-tight transition-all duration-200",
-                  isDark ? 'text-white' : 'text-black'
-                )}>
-                  X
-                </h2>
-              </div>
-            {isExpanded && (
-              <div className="ml-3 overflow-hidden">
-                <h2 className={cn(
-                  "font-black text-xl tracking-tight transition-all duration-200",
-                  isDark ? 'text-white' : 'text-black'
-                )}>
-                  WorkX
-                </h2>
-              </div>
-            )}
-          </div>
+      {/* Desktop Sidebar - Replaced with Dock */}
+      <div className="fixed left-0 top-0 h-full z-40 flex flex-col items-center justify-center pointer-events-none">
+        <div className="pointer-events-auto">
+          <Dock
+            items={[
+              ...navigationItems.map(item => ({
+                icon: <item.icon size={24} strokeWidth={1.5} />,
+                label: item.label,
+                onClick: () => handleNavItemPress(item.path, item),
+                isActive: isCurrentPath(item.path),
+              })),
+              // Add Logout item at the bottom
+              {
+                icon: <LogOut size={24} strokeWidth={1.5} />,
+                label: 'Logout',
+                onClick: handleLogout
+              }
+            ]}
+            panelWidth={68}
+            distance={100}
+            magnification={70}
+          />
         </div>
-
-        {/* Navigation Items */}
-        <nav className="flex flex-col flex-1 p-4 space-y-2">
-          {navigationItems.map((item, index) => {
-            const Icon = item.icon;
-            const isActive = isCurrentPath(item.path);
-            
-            return (
-              <button
-                key={index}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavItemPress(item.path, item);
-                }}
-                onMouseDown={(e) => {
-                  // Add subtle click feedback for desktop
-                  e.currentTarget.style.transform = 'scale(0.98)';
-                }}
-                onMouseUp={(e) => {
-                  // Reset scale after click
-                  e.currentTarget.style.transform = 'scale(1)';
-                }}
-                onMouseLeave={(e) => {
-                  // Ensure scale is reset if mouse leaves during press
-                  e.currentTarget.style.transform = 'scale(1)';
-                }}
-                className={cn(
-                  "flex items-center px-3 py-3 rounded-xl transition-all duration-200 group relative",
-                  "active:scale-98 transform-gpu cursor-pointer text-left w-full",
-                  isExpanded ? 'space-x-3' : 'justify-center',
-                  isActive
-                    ? isDark 
-                      ? 'bg-white text-black' 
-                      : 'bg-lime text-black'
-                    : isDark
-                      ? 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-                )}
-                aria-label={`Navigate to ${item.label}`}
-              >
-                <div className="relative">
-                  <ThinIcon Icon={Icon} className="h-6 w-6" />
-                  {item.badge && item.badge > 0 && !isExpanded && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                      {item.badge > 9 ? '9+' : item.badge}
-                    </span>
-                  )}
-                </div>
-                
-                {isExpanded && (
-                  <>
-                    <span className="font-normal text-xl">{item.label}</span>
-                    {item.badge && item.badge > 0 && (
-                      <span className="ml-auto bg-red-500 text-white text-sm px-2 py-1 rounded-full min-w-[20px] text-center">
-                        {item.badge > 9 ? '9+' : item.badge}
-                      </span>
-                    )}
-                  </>
-                )}
-
-                {/* Tooltip for collapsed state */}
-                {!isExpanded && (
-                  <div className={cn(
-                    "absolute left-full ml-4 px-3 py-2 rounded-lg text-sm font-normal",
-                    "opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50",
-                    "whitespace-nowrap shadow-lg",
-                    isDark ? 'bg-gray-800 text-white' : 'bg-white text-gray-900 border'
-                  )}>
-                    {item.label}
-                    {item.badge && item.badge > 0 && (
-                      <span className="ml-2 bg-red-500 text-white text-xs px-1 py-0.5 rounded-full">
-                        {item.badge}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* Post Button */}
-        <div className="p-4">
-          <Button
-            className={cn(
-              "w-full rounded-full font-bold transition-all duration-200",
-              isDark ? 'bg-black text-white hover:bg-white hover:text-black border-gray-800 border rounded-3xl' : 'bg-black text-black hover:bg-black-text-white',
-              isExpanded ? 'justify-center' : 'justify-center px-0'
-            )}
-          >
-            {isExpanded ? 'Post' : <ThinIcon Icon={Plus} className="h-5 w-5" />}
-          </Button>
-        </div>
-
-        {/* User Profile */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-800 relative">
-          <div className={cn(
-            "flex items-center space-x-3 w-full",
-            !isExpanded && 'justify-center'
-          )}>
-            <button
-              onClick={() => setIsUserCardOpen(!isUserCardOpen)}
-              className={cn(
-                "flex items-center rounded-full transition-all duration-200",
-                isExpanded ? 'space-x-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800' : 'p-2'
-              )}
-            >
-              <div className={cn(
-                "rounded-full flex items-center justify-center text-lg font-normal relative overflow-hidden border border-gray-300 dark:border-gray-600",
-                isDark ? 'bg-gray-700 text-white' : 'bg-gray-300 text-gray-800',
-                isExpanded ? 'w-10 h-10' : 'w-8 h-8'
-              )}>
-                {user?.profile?.avatar_url ? (
-                  <img
-                    src={user.profile.avatar_url}
-                    alt={user?.full_name || 'User'}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-gray-700 dark:text-gray-200 font-semibold">
-                    {user?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
-                  </span>
-                )}
-              </div>
-              {isExpanded && (
-                <>
-                  <div>
-                    <p className={cn(
-                      "font-normal text-sm truncate",
-                      isDark ? 'text-white' : 'text-gray-900'
-                    )}>
-                      {user?.full_name || 'User'}
-                    </p>
-                    <p className={cn(
-                      "text-sm truncate",
-                      isDark ? 'text-gray-400' : 'text-gray-600'
-                    )}>
-                      @{user?.email?.split('@')[0]}
-                    </p>
-                  </div>
-                  <ThinIcon Icon={MoreHorizontal} className={cn(
-                    "h-5 w-5 flex-shrink-0",
-                    isDark ? 'text-gray-400' : 'text-gray-600'
-                  )} />
-                </>
-              )}
-            </button>
-
-            {/* Desktop Dropdown Menu */}
-            {isUserCardOpen && (
-              <>
-                <div 
-                  className="fixed inset-0 z-40 animate-in fade-in duration-150"
-                  onClick={() => setIsUserCardOpen(false)}
-                />
-                <div className={cn(
-                  "absolute bottom-full mb-2 w-64 rounded-2xl shadow-2xl border py-2 z-50",
-                  "transform transition-all duration-300 ease-out",
-                  "animate-in slide-in-from-bottom-2 fade-in zoom-in-95",
-                  "will-change-transform origin-bottom",
-                  isExpanded ? "left-0" : "left-full ml-4",
-                  isDark ? 'bg-black border-gray-600 shadow-gray-900/50' : 'bg-white border-gray-300 shadow-gray-900/20'
-                )}
-                style={{
-                  animationDelay: '0ms',
-                  animationFillMode: 'both',
-                  backfaceVisibility: 'hidden',
-                  transform: 'translateZ(0)',
-                }}
-                >
-                  {/* Settings */}
-                  <Link
-                    to="/settings"
-                    onClick={() => setIsUserCardOpen(false)}
-                    className={cn(
-                      "flex items-center px-4 py-3 transition-all duration-200 w-full",
-                      "hover:translate-x-1 transform will-change-transform",
-                      isDark ? 'hover:bg-gray-900 text-white' : 'hover:bg-gray-50 text-gray-900'
-                    )}
-                  >
-                    <ThinIcon Icon={Settings} className="h-5 w-5 mr-3 transition-transform duration-200 group-hover:rotate-12" />
-                    <span className="font-normal text-sm">
-                      Settings and privacy
-                    </span>
-                  </Link>
-
-                  {/* Logout */}
-                  <button
-                    onClick={() => {
-                      setIsUserCardOpen(false);
-                      handleLogout();
-                    }}
-                    className={cn(
-                      "w-full flex items-center px-4 py-3 transition-all duration-200 text-left",
-                      "hover:translate-x-1 transform will-change-transform group",
-                      isDark ? 'hover:bg-gray-900 text-white' : 'hover:bg-gray-50 text-gray-900'
-                    )}
-                  >
-                    <ThinIcon Icon={LogOut} className="h-5 w-5 mr-3 transition-transform duration-200 group-hover:-rotate-12" />
-                    <span className="font-normal text-sm">
-                      Log out @{user?.email?.split('@')[0]}
-                    </span>
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      </aside>
-
-      {/* Backdrop for expanded sidebar */}
-      {isExpanded && (
-        <div 
-          className="fixed inset-0 bg-black/10 backdrop-blur-sm z-30 transition-all duration-300"
-          onClick={() => setIsExpanded(false)}
-        />
-      )}
+      </div>
 
       {/* Main Content Spacer */}
       <div className={cn(
         "transition-all duration-300",
-        isExpanded ? "ml-64" : "ml-20"
+        "ml-24" // Fixed margin for Dock
       )}>
         {/* Content goes here */}
       </div>

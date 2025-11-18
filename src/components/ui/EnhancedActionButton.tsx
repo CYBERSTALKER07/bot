@@ -75,9 +75,9 @@ export const EnhancedActionButton: React.FC<EnhancedActionButtonProps> = ({
         };
       case 'share':
         return {
-          default: isDark ? 'text-gray-400 hover:text-blue-500' : 'text-gray-600 hover:text-blue-600',
-          active: 'text-blue-500',
-          hoverBg: isDark ? 'hover:bg-blue-500/10' : 'hover:bg-blue-500/10',
+          default: isDark ? 'text-gray-400 hover:text-info-500' : 'text-gray-600 hover:text-info-600',
+          active: 'text-info-500',
+          hoverBg: isDark ? 'hover:bg-info-500/10' : 'hover:bg-info-500/10',
         };
       case 'bookmark':
         return {
@@ -88,9 +88,9 @@ export const EnhancedActionButton: React.FC<EnhancedActionButtonProps> = ({
       case 'reply':
       default:
         return {
-          default: isDark ? 'text-gray-400 hover:text-blue-500' : 'text-gray-600 hover:text-blue-600',
-          active: 'text-blue-500',
-          hoverBg: isDark ? 'hover:bg-blue-500/10' : 'hover:bg-blue-500/10',
+          default: isDark ? 'text-gray-400 hover:text-info-500' : 'text-gray-600 hover:text-info-600',
+          active: 'text-info-500',
+          hoverBg: isDark ? 'hover:bg-info-500/10' : 'hover:bg-info-500/10',
         };
     }
   };

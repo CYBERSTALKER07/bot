@@ -207,7 +207,7 @@ export default function UserSearch({ onClose, isOpen = true, minimalMode = false
                           {user.full_name}
                         </p>
                         {user.verified && (
-                          <Verified className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                          <Verified className="w-4 h-4 text-info-500 flex-shrink-0" />
                         )}
                       </div>
                       <p className={cn('text-xs truncate', isDark ? 'text-gray-500' : 'text-gray-600')}>
@@ -251,8 +251,8 @@ export default function UserSearch({ onClose, isOpen = true, minimalMode = false
             'flex items-center gap-3 px-4 py-2 rounded-full border transition-all duration-200',
             isSearchFocused
               ? isDark
-                ? 'bg-black border-blue-500'
-                : 'bg-white border-blue-500'
+                ? 'bg-black border-info-500'
+                : 'bg-white border-info-500'
               : isDark
                 ? 'bg-black border-gray-700'
                 : 'bg-gray-100 border-gray-300'
@@ -373,7 +373,7 @@ export default function UserSearch({ onClose, isOpen = true, minimalMode = false
                         {user.full_name}
                       </p>
                       {user.verified && (
-                        <Verified className="w-5 h-5 md:w-4 md:h-4 text-blue-500 flex-shrink-0" />
+                        <Verified className="w-5 h-5 md:w-4 md:h-4 text-info-500 flex-shrink-0" />
                       )}
                     </div>
                     <p className={cn('text-sm md:text-xs truncate', isDark ? 'text-gray-500' : 'text-gray-600')}>

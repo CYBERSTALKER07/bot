@@ -80,7 +80,7 @@ export default function QuoteTweetCard({ post, isDark, onClick }: QuoteTweetCard
               {post.author.name}
             </Link>
             {post.author.verified && (
-              <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-4 h-4 bg-info-500 rounded-full flex items-center justify-center flex-shrink-0">
                 <span className="text-white text-[10px]">✓</span>
               </div>
             )}

@@ -23,7 +23,7 @@ export function ExperienceForm({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="text-xl font-bold">Work Experience</h3>
-        <Button onClick={addExperience} size="small" className="flex items-center gap-2 bg-blue-500 text-white rounded-full px-4">
+        <Button onClick={addExperience} size="small" className="flex items-center gap-2 bg-info-500 text-white rounded-full px-4">
           <Plus className="h-4 w-4" />
           Add Experience
         </Button>
@@ -91,7 +91,7 @@ export function ExperienceForm({
                     type="checkbox"
                     checked={exp.current}
                     onChange={(e) => updateExperience(exp.id, 'current', e.target.checked)}
-                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
+                    className="w-4 h-4 text-info-600 bg-gray-100 border-gray-300 rounded"
                   />
                   Current
                 </label>

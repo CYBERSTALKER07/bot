@@ -97,7 +97,7 @@ export default function EventDetails() {
         <div className="text-center">
           <div className={cn(
             'animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4',
-            isDark ? 'border-blue-500' : 'border-blue-600'
+            isDark ? 'border-info-500' : 'border-info-600'
           )}></div>
           <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>Loading event details...</p>
         </div>
@@ -145,8 +145,8 @@ export default function EventDetails() {
             className={cn(
               'inline-flex items-center space-x-2 transition-colors',
               isDark 
-                ? 'text-blue-400 hover:text-blue-300' 
-                : 'text-blue-600 hover:text-blue-700'
+                ? 'text-info-400 hover:text-info-300' 
+                : 'text-info-600 hover:text-info-700'
             )}
           >
             <ArrowLeft className="h-5 w-5" />
@@ -168,7 +168,7 @@ export default function EventDetails() {
             <span className={cn(
               'px-4 py-2 rounded-full text-sm font-semibold inline-flex items-center space-x-2',
               isDark 
-                ? 'bg-blue-900/30 text-blue-300 border border-blue-700' 
+                ? 'bg-info-900/30 text-info-300 border border-info-700' 
                 : 'bg-white/20 text-gray-900 border border-gray-300'
             )}>
               <span>{event.event_type || 'Event'}</span>
@@ -320,8 +320,8 @@ export default function EventDetails() {
                 className={cn(
                   'w-full px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100',
                   isDark
-                    ? 'bg-blue-600 text-white hover:bg-blue-700'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                    ? 'bg-info-600 text-white hover:bg-info-700'
+                    : 'bg-info-600 text-white hover:bg-info-700'
                 )}
               >
                 {event.capacity && event.attendees_count >= event.capacity ? 'Event Full' : 'Register Now 🎯'}
@@ -401,8 +401,8 @@ export default function EventDetails() {
                   className={cn(
                     'inline-flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all',
                     isDark
-                      ? 'bg-blue-900/20 text-blue-400 hover:bg-blue-900/30'
-                      : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                      ? 'bg-info-900/20 text-info-400 hover:bg-info-900/30'
+                      : 'bg-info-50 text-info-600 hover:bg-info-100'
                   )}
                 >
                   <span>Join Meeting</span>
@@ -437,8 +437,8 @@ export default function EventDetails() {
                     <div className={cn(
                       'w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold mb-4 border-4',
                       isDark
-                        ? 'bg-gradient-to-br from-blue-600 to-purple-600 text-white border-blue-500'
-                        : 'bg-gradient-to-br from-blue-400 to-purple-500 text-white border-blue-400'
+                        ? 'bg-gradient-to-br from-info-600 to-purple-600 text-white border-info-500'
+                        : 'bg-gradient-to-br from-blue-400 to-purple-500 text-white border-info-400'
                     )}>
                       {event.employer.name?.charAt(0).toUpperCase()}
                     </div>
@@ -457,7 +457,7 @@ export default function EventDetails() {
                     {event.employer.company_name}
                   </p>
                   {event.employer.verified && (
-                    <div className="mt-2 flex items-center space-x-1 text-blue-500">
+                    <div className="mt-2 flex items-center space-x-1 text-info-500">
                       <CheckCircle className="h-4 w-4" />
                       <span className="text-xs font-semibold">Verified</span>
                     </div>
@@ -470,8 +470,8 @@ export default function EventDetails() {
                   className={cn(
                     'block w-full text-center px-4 py-2 rounded-lg font-semibold transition-all',
                     isDark
-                      ? 'bg-blue-900/20 text-blue-400 hover:bg-blue-900/30'
-                      : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                      ? 'bg-info-900/20 text-info-400 hover:bg-info-900/30'
+                      : 'bg-info-50 text-info-600 hover:bg-info-100'
                   )}
                 >
                   View Employer Profile
@@ -518,7 +518,7 @@ export default function EventDetails() {
                         <div className={cn(
                           'w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold',
                           isDark
-                            ? 'bg-gradient-to-br from-blue-600 to-purple-600 text-white'
+                            ? 'bg-gradient-to-br from-info-600 to-purple-600 text-white'
                             : 'bg-gradient-to-br from-blue-400 to-purple-500 text-white'
                         )}>
                           {attendee.profiles?.full_name?.charAt(0).toUpperCase()}
@@ -594,7 +594,7 @@ export default function EventDetails() {
                   value={registrationData.dietary_restrictions}
                   onChange={(e) => setRegistrationData(prev => ({ ...prev, dietary_restrictions: e.target.value }))}
                   className={cn(
-                    'w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none',
+                    'w-full p-3 border rounded-lg focus:ring-2 focus:ring-info-500 focus:border-transparent outline-none',
                     isDark
                       ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
                       : 'bg-white border-gray-300 text-blbg-black placeholder-gray-400'
@@ -615,7 +615,7 @@ export default function EventDetails() {
                   value={registrationData.accessibility_needs}
                   onChange={(e) => setRegistrationData(prev => ({ ...prev, accessibility_needs: e.target.value }))}
                   className={cn(
-                    'w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none',
+                    'w-full p-3 border rounded-lg focus:ring-2 focus:ring-info-500 focus:border-transparent outline-none',
                     isDark
                       ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
                       : 'bg-white border-gray-300 text-blbg-black placeholder-gray-400'
@@ -644,8 +644,8 @@ export default function EventDetails() {
                   className={cn(
                     'flex-1 px-6 py-3 rounded-lg font-medium text-white transition-all disabled:opacity-50',
                     isDark
-                      ? 'bg-blue-600 hover:bg-blue-700'
-                      : 'bg-blue-600 hover:bg-blue-700'
+                      ? 'bg-info-600 hover:bg-info-700'
+                      : 'bg-info-600 hover:bg-info-700'
                   )}
                 >
                   {registerMutation.isPending ? 'Registering...' : 'Register'}

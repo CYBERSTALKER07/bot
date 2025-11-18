@@ -110,8 +110,8 @@ export default function JobsPage() {
                 className={cn(
                   'w-full pl-12 pr-4 py-3 rounded-xl border-2 transition-all duration-200 text-base',
                   isDark
-                    ? 'bg-black border-gray-700 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none'
-                    : 'bg-gray-50 border-gray-200 text-black placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20'
+                    ? 'bg-black border-gray-700 text-white placeholder-gray-500 focus:border-info-500 focus:outline-none'
+                    : 'bg-gray-50 border-gray-200 text-black placeholder-gray-500 focus:border-info-500 focus:outline-none focus:ring-2 focus:ring-info-500/20'
                 )}
               />
             </div>
@@ -132,8 +132,8 @@ export default function JobsPage() {
                     'px-4 py-2.5 rounded-full text-sm font-semibold transition-all duration-200',
                     typeFilter === value
                       ? isDark 
-                        ? 'bg-black text-white shadow-lg shadow-blue-600/100' 
-                        : 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                        ? 'bg-black text-white shadow-lg shadow-info-600/100' 
+                        : 'bg-info-600 text-white shadow-lg shadow-info-600/30'
                       : isDark
                         ? 'bg-black text-gray-300 hover:bg-gray-700'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -204,7 +204,7 @@ export default function JobsPage() {
                 isDark ? 'text-gray-400' : 'text-gray-600'
               )}>
                 <p className="text-sm font-medium">
-                  Showing <span className="font-bold text-blue-500">{filteredJobs.length}</span> of <span className="font-bold">{jobsData.length}</span> jobs
+                  Showing <span className="font-bold text-info-500">{filteredJobs.length}</span> of <span className="font-bold">{jobsData.length}</span> jobs
                 </p>
               </div>
             </>

@@ -465,7 +465,7 @@ export default function Register() {
           <div className={`absolute inset-0 ${
             isDark 
               ? 'bg-gradient-to-br from-gray-900 via-black to-gray-900' 
-              : 'bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600'
+              : 'bg-gradient-to-br from-info-600 via-purple-600 to-indigo-600'
           }`}>
             <div className="absolute inset-0 bg-gradient-to-br from-[#BCE953]/20 to-transparent"></div>
           </div>

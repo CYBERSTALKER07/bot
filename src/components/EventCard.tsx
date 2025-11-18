@@ -61,7 +61,7 @@ export default function EventCard({
 
   const getEventTypeColor = (type: string) => {
     const colors: Record<string, { bg: string; text: string; badge: string }> = {
-      recruiting: { bg: 'from-blue-600 to-teal-400', text: 'text-blue-500', badge: 'bg-blue-500/10 text-blue-600' },
+      recruiting: { bg: 'from-info-600 to-teal-400', text: 'text-info-500', badge: 'bg-info-500/10 text-info-600' },
       webinar: { bg: 'from-purple-600 to-purple-400', text: 'text-purple-500', badge: 'bg-purple-500/10 text-purple-600' },
       networking: { bg: 'from-pink-600 to-pink-400', text: 'text-pink-500', badge: 'bg-pink-500/10 text-pink-600' },
       workshop: { bg: 'from-green-600 to-green-400', text: 'text-green-500', badge: 'bg-green-500/10 text-green-600' },
@@ -182,7 +182,7 @@ export default function EventCard({
           {/* Title */}
           <h3 className={cn(
             'font-sans text-base sm:text-lg mb-2 line-clamp-2 transition-colors',
-            isDark ? 'text-white group-hover:text-teal-400' : 'text-gray-900 group-hover:text-blue-600'
+            isDark ? 'text-white group-hover:text-teal-400' : 'text-gray-900 group-hover:text-info-600'
           )}>
             {title}
           </h3>

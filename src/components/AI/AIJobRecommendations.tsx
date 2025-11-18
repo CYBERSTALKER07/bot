@@ -225,7 +225,7 @@ export default function AIJobRecommendations() {
 
   const getRecommendationTypeColor = (type: string) => {
     switch (type) {
-      case 'skills_match': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+      case 'skills_match': return 'bg-info-100 text-info-800 dark:bg-info-900 dark:text-info-200';
       case 'experience_match': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
       case 'location_match': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
       case 'trending': return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
@@ -238,7 +238,7 @@ export default function AIJobRecommendations() {
       <PageLayout className={isDark ? 'bg-black text-white' : 'bg-white text-black'} maxWidth="4xl">
         <div className="flex items-center justify-center min-h-96">
           <div className="text-center space-y-4">
-            <Brain className="h-12 w-12 animate-pulse mx-auto text-blue-500" />
+            <Brain className="h-12 w-12 animate-pulse mx-auto text-info-500" />
             <div>
               <h3 className="text-lg font-semibold">AI is analyzing your profile...</h3>
               <p className="text-gray-600 dark:text-gray-400">Finding the perfect job matches for you</p>
@@ -258,7 +258,7 @@ export default function AIJobRecommendations() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600">
+              <div className="p-2 rounded-lg bg-gradient-to-r from-info-500 to-purple-600">
                 <Sparkles className="h-6 w-6 text-white" />
               </div>
               <div>
@@ -317,7 +317,7 @@ export default function AIJobRecommendations() {
             {/* Filters */}
             <Card className="p-6">
               <div className="flex items-center space-x-2 mb-4">
-                <Filter className="h-5 w-5 text-blue-500" />
+                <Filter className="h-5 w-5 text-info-500" />
                 <h2 className="text-lg font-semibold">Filters</h2>
               </div>
               <div className="space-y-4">
@@ -392,9 +392,9 @@ export default function AIJobRecommendations() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">Total Matches</p>
-                    <p className="text-2xl font-bold text-blue-600">{recommendations.length}</p>
+                    <p className="text-2xl font-bold text-info-600">{recommendations.length}</p>
                   </div>
-                  <Briefcase className="h-8 w-8 text-blue-500" />
+                  <Briefcase className="h-8 w-8 text-info-500" />
                 </div>
               </Card>
               
@@ -494,7 +494,7 @@ const JobRecommendationCard: React.FC<{
 
   const getRecommendationTypeColor = (type: string) => {
     switch (type) {
-      case 'skills_match': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+      case 'skills_match': return 'bg-info-100 text-info-800 dark:bg-info-900 dark:text-info-200';
       case 'experience_match': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
       case 'location_match': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
       case 'trending': return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
@@ -507,7 +507,7 @@ const JobRecommendationCard: React.FC<{
       className={cn(
         'p-6 transition-all duration-200 cursor-pointer hover:shadow-lg border-l-4',
         match_score > 0.8 ? 'border-l-green-500' : 
-        match_score > 0.6 ? 'border-l-blue-500' : 'border-l-gray-400'
+        match_score > 0.6 ? 'border-l-info-500' : 'border-l-gray-400'
       )}
       onClick={handleCardClick}
     >
@@ -517,7 +517,7 @@ const JobRecommendationCard: React.FC<{
           <div className="flex items-center space-x-3 mb-2">
             <Link 
               to={`/jobs/${job.id}`}
-              className="text-xl font-bold hover:text-blue-600 dark:hover:text-blue-400"
+              className="text-xl font-bold hover:text-info-600 dark:hover:text-info-400"
               onClick={(e) => e.stopPropagation()}
             >
               {job.title}
@@ -561,7 +561,7 @@ const JobRecommendationCard: React.FC<{
           {match_reasons.slice(0, 3).map((reason, index) => (
             <span
               key={index}
-              className="px-3 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-full text-xs"
+              className="px-3 py-1 bg-info-50 dark:bg-info-900/20 text-info-700 dark:text-info-300 rounded-full text-xs"
             >
               {reason}
             </span>
@@ -596,7 +596,7 @@ const JobRecommendationCard: React.FC<{
       {/* Personalization Factors */}
       <div className="grid grid-cols-3 gap-4 mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <div className="text-center">
-          <div className="text-lg font-semibold text-blue-600">
+          <div className="text-lg font-semibold text-info-600">
             {(personalization_factors.skills_alignment * 100).toFixed(0)}%
           </div>
           <div className="text-xs text-gray-600 dark:text-gray-400">Skills</div>
@@ -646,7 +646,7 @@ const JobRecommendationCard: React.FC<{
           <Button
             size="sm"
             onClick={handleApply}
-            className="bg-blue-600 text-white hover:bg-blue-700"
+            className="bg-info-600 text-white hover:bg-info-700"
           >
             Apply Now
           </Button>

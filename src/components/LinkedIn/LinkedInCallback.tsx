@@ -71,9 +71,9 @@ export default function LinkedInCallback() {
     <PageLayout className={isDark ? 'bg-black text-white' : 'bg-white text-black'} maxWidth="2xl">
       <div className="flex items-center justify-center min-h-96">
         <Card className="p-8 text-center max-w-md w-full">
-          <div className="w-16 h-16 mx-auto mb-6 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+          <div className="w-16 h-16 mx-auto mb-6 bg-info-100 dark:bg-info-900 rounded-full flex items-center justify-center">
             {status === 'loading' && (
-              <Loader2 className="h-8 w-8 text-blue-600 dark:text-blue-400 animate-spin" />
+              <Loader2 className="h-8 w-8 text-info-600 dark:text-info-400 animate-spin" />
             )}
             {status === 'success' && (
               <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
@@ -134,7 +134,7 @@ export default function LinkedInCallback() {
               <div className="space-y-3">
                 <Button
                   onClick={handleRetry}
-                  className="bg-blue-600 text-white hover:bg-blue-700 w-full flex items-center justify-center space-x-2"
+                  className="bg-info-600 text-white hover:bg-info-700 w-full flex items-center justify-center space-x-2"
                 >
                   <Linkedin className="h-4 w-4" />
                   <span>Try Again</span>

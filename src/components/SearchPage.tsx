@@ -1,11 +1,12 @@
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { 
+import {
   Search as SearchIcon,
   X as XIcon,
   ArrowLeft,
   AtSign,
-  Users as UsersIcon
+  Users as UsersIcon,
+  Hash
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { cn } from '../lib/cva';
@@ -18,7 +19,7 @@ import { SearchResultsListSkeleton, SearchPageSidebarSkeleton } from './ui/Skele
 
 interface SearchResult {
   id: string;
-  type: 'user' | 'job' | 'post' | 'company';
+  type: 'user' | 'job' | 'post' | 'company' | 'hashtag';
   title: string;
   subtitle?: string;
   description: string;
@@ -35,6 +36,7 @@ interface SearchResultData {
   posts?: Array<{ id: string; content: string; profiles?: Array<{ full_name: string; username: string; avatar_url?: string }> }>;
   jobs?: Array<{ id: string; title: string; company: string; location: string; type?: string }>;
   companies?: Array<{ id: string; name: string; industry?: string; description?: string; logo_url?: string }>;
+  hashtags?: Array<{ id: string; name: string; usage_count: number; trending_score: number }>;
 }
 
 const styles = `
@@ -95,28 +97,30 @@ export default function SearchPage() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [hoveredFollowId, setHoveredFollowId] = useState<string | null>(null);
   const [processingFollowId, setProcessingFollowId] = useState<string | null>(null);
-  
+
   // Parse search input to detect @ symbol
   const isUsernameSearch = searchInput.startsWith('@');
   const cleanSearchQuery = searchInput.startsWith('@') ? searchInput.slice(1) : searchInput;
-  
+
   const debouncedQuery = useDebounce(cleanSearchQuery, 300);
   const { data: searchResults, isLoading: loading } = useSearch(debouncedQuery);
-  
+
   // Fetch most followed users for sidebar
-  const { data: mostFollowedUsers = [] } = useMostFollowedUsers(5);
+  const { data: mostFollowedUsers = [], isLoading: isLoadingMostFollowed } = useMostFollowedUsers(5);
   const followUserMutation = useFollowUser();
   const unfollowUserMutation = useUnfollowUser();
 
+
   // Filter and sort results based on search type
-  const userResults: SearchResult[] = useMemo(() => {
+  const allResults: SearchResult[] = useMemo(() => {
     const typedResults = searchResults as SearchResultData | undefined;
     if (!typedResults) return [];
-    
-    const users: SearchResult[] = [];
 
+    const results: SearchResult[] = [];
+
+    // Add users
     (typedResults.users || []).forEach((user) => {
-      users.push({
+      results.push({
         id: user.id,
         type: 'user',
         title: user.full_name,
@@ -127,26 +131,78 @@ export default function SearchPage() {
       });
     });
 
-    // If searching by username (@), prioritize exact username matches
+    // Add posts
+    (typedResults.posts || []).forEach((post: any) => {
+      const profile = post.profiles;
+      results.push({
+        id: post.id,
+        type: 'post',
+        title: post.content.substring(0, 100) + (post.content.length > 100 ? '...' : ''),
+        subtitle: `by @${profile?.username || 'user'}`,
+        description: post.content,
+        avatar: profile?.avatar_url,
+      });
+    });
+
+    // Add jobs
+    (typedResults.jobs || []).forEach((job: any) => {
+      results.push({
+        id: job.id,
+        type: 'job',
+        title: job.title,
+        subtitle: job.company,
+        description: `${job.location} • ${job.type || 'Full-time'}`,
+      });
+    });
+
+    // Add companies
+    (typedResults.companies || []).forEach((company: any) => {
+      results.push({
+        id: company.id,
+        type: 'company',
+        title: company.name,
+        subtitle: company.description || '',
+        description: company.website || '',
+        avatar: company.logo_url,
+      });
+    });
+
+    // Add hashtags
+    (typedResults.hashtags || []).forEach((hashtag: any) => {
+      results.push({
+        id: hashtag.id,
+        type: 'hashtag',
+        title: `#${hashtag.name}`,
+        subtitle: `${hashtag.usage_count || 0} posts`,
+        description: 'Trending hashtag',
+      });
+    });
+
+    // If searching by username (@), prioritize exact username matches for users
     if (isUsernameSearch && cleanSearchQuery) {
-      users.sort((a, b) => {
+      const userResults = results.filter(r => r.type === 'user');
+      const otherResults = results.filter(r => r.type !== 'user');
+
+      userResults.sort((a, b) => {
         const aUsername = a.subtitle?.slice(1) || '';
         const bUsername = b.subtitle?.slice(1) || '';
-        
+
         // Exact match first
         if (aUsername.toLowerCase() === cleanSearchQuery.toLowerCase()) return -1;
         if (bUsername.toLowerCase() === cleanSearchQuery.toLowerCase()) return 1;
-        
+
         // Starts with query
         if (aUsername.toLowerCase().startsWith(cleanSearchQuery.toLowerCase())) return -1;
         if (bUsername.toLowerCase().startsWith(cleanSearchQuery.toLowerCase())) return 1;
-        
+
         // Default order
         return 0;
       });
+
+      return [...userResults, ...otherResults];
     }
 
-    return users;
+    return results;
   }, [searchResults, isUsernameSearch, cleanSearchQuery]);
 
   const handleClearSearch = () => {
@@ -165,12 +221,12 @@ export default function SearchPage() {
 
   const handleFollow = async (userId: string) => {
     if (!user?.id) return;
-    
+
     setProcessingFollowId(userId);
     try {
-      await followUserMutation.mutateAsync({ 
-        followerId: user.id, 
-        followingId: userId 
+      await followUserMutation.mutateAsync({
+        followerId: user.id,
+        followingId: userId
       });
     } catch (error) {
       console.error('Error following user:', error);
@@ -181,12 +237,12 @@ export default function SearchPage() {
 
   const handleUnfollow = async (userId: string) => {
     if (!user?.id) return;
-    
+
     setProcessingFollowId(userId);
     try {
-      await unfollowUserMutation.mutateAsync({ 
-        followerId: user.id, 
-        followingId: userId 
+      await unfollowUserMutation.mutateAsync({
+        followerId: user.id,
+        followingId: userId
       });
     } catch (error) {
       console.error('Error unfollowing user:', error);
@@ -232,7 +288,7 @@ export default function SearchPage() {
                     : 'bg-gray-100 border border-gray-300'
               )}>
                 {/* Mobile Back Button */}
-                <button 
+                <button
                   onClick={() => navigate(-1)}
                   className="sm:hidden p-1 hover:bg-gray-700/50 rounded-full transition-colors"
                   title="Go back"
@@ -242,11 +298,11 @@ export default function SearchPage() {
 
                 <SearchIcon className={cn(
                   'w-5 h-5 flex-shrink-0 transition-colors',
-                  isSearchFocused 
-                    ? 'text-white' 
+                  isSearchFocused
+                    ? 'text-white'
                     : isDark ? 'text-gray-600' : 'text-gray-500'
                 )} />
-                
+
                 <input
                   ref={inputRef}
                   type="text"
@@ -269,14 +325,14 @@ export default function SearchPage() {
                     className={cn(
                       'p-2 rounded-full transition-all',
                       isDark
-                        ? 'text-gray-500 hover:text-blue-400 hover:bg-blue-500/10'
-                        : 'text-gray-500 hover:text-blue-600 hover:bg-blue-500/10'
+                        ? 'text-gray-500 hover:text-info-400 hover:bg-info-500/10'
+                        : 'text-gray-500 hover:text-info-600 hover:bg-info-500/10'
                     )}
                   >
                     <AtSign className="w-5 h-5" />
                   </button>
                 )}
-                
+
                 {searchInput && (
                   <button
                     onClick={handleClearSearch}
@@ -298,7 +354,7 @@ export default function SearchPage() {
                 <div className={cn(
                   'mt-2 px-4 text-xs font-medium flex items-center gap-2',
                   isUsernameSearch
-                    ? isDark ? 'text-blue-400' : 'text-blue-600'
+                    ? isDark ? 'text-info-400' : 'text-info-600'
                     : isDark ? 'text-gray-500' : 'text-gray-600'
                 )}>
                   {isUsernameSearch ? (
@@ -323,10 +379,10 @@ export default function SearchPage() {
                   <SearchIcon className="w-16 h-16 text-gray-600 mx-auto mb-4 opacity-50" />
                 </div>
                 <h1 className="text-3xl font-serif mb-2">Search</h1>
-              
-                
+
+
                 {/* Search Tips */}
-          
+
               </div>
             ) : searchInput && loading ? (
               // Loading State
@@ -336,18 +392,18 @@ export default function SearchPage() {
             ) : (
               // Results List
               <div className="max-w-2xl mx-auto w-full">
-                {userResults.length === 0 && searchInput ? (
+                {allResults.length === 0 && searchInput ? (
                   <div className="flex flex-col items-center justify-center h-64 px-4 py-12 text-center">
                     <SearchIcon className="w-16 h-16 text-gray-500 mb-4 opacity-50" />
                     <h2 className="text-xl font-bold mb-2">
                       No results for "{searchInput}"
                     </h2>
                     <p className={cn('text-sm mb-4', isDark ? 'text-gray-500' : 'text-gray-600')}>
-                      {isUsernameSearch 
-                        ? 'Try searching for a different username' 
+                      {isUsernameSearch
+                        ? 'Try searching for a different username'
                         : 'Try searching for a different name'}
                     </p>
-                    
+
                     {isUsernameSearch && (
                       <button
                         onClick={() => setSearchInput('')}
@@ -367,7 +423,7 @@ export default function SearchPage() {
                     'divide-y',
                     isDark ? 'divide-gray-800' : 'divide-gray-200'
                   )}>
-                    {userResults.map((result) => (
+                    {allResults.map((result: SearchResult) => (
                       <button
                         key={result.id}
                         onClick={() => handleResultClick(result)}
@@ -387,9 +443,14 @@ export default function SearchPage() {
                           ) : (
                             <div className={cn(
                               'w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 text-lg font-bold',
-                              isDark ? 'bg-black' : 'bg-gray-200'
+                              isDark ? 'bg-black' : 'bg-gray-200',
+                              result.type === 'hashtag' && (isDark ? 'text-info-400' : 'text-info-600')
                             )}>
-                              {result.title.charAt(0).toUpperCase()}
+                              {result.type === 'hashtag' ? (
+                                <Hash className="w-6 h-6" />
+                              ) : (
+                                result.title.charAt(0).toUpperCase()
+                              )}
                             </div>
                           )}
 
@@ -398,21 +459,21 @@ export default function SearchPage() {
                             <div className="flex items-center gap-2 mb-1">
                               <h3 className="font-bold text-base truncate">{result.title}</h3>
                               {result.verified && (
-                                <svg className="w-4 h-4 text-blue-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                                <svg className="w-4 h-4 text-info-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
                                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
                                 </svg>
                               )}
                             </div>
-                            
+
                             <p className={cn(
                               'text-sm truncate mb-1.5 font-medium',
                               isUsernameSearch
-                                ? isDark ? 'text-blue-400' : 'text-blue-600'
+                                ? isDark ? 'text-info-400' : 'text-info-600'
                                 : isDark ? 'text-gray-500' : 'text-gray-600'
                             )}>
                               {result.subtitle}
                             </p>
-                            
+
                             {result.description && (
                               <p className={cn(
                                 'text-sm line-clamp-2',
@@ -450,12 +511,14 @@ export default function SearchPage() {
                 <UsersIcon className="w-5 h-5" />
                 <h2 className="font-serif text-lg">Most Followed</h2>
               </div>
-              
+
               <div className={cn(
                 'divide-y',
                 isDark ? 'divide-gray-800' : 'divide-gray-200'
               )}>
-                {mostFollowedUsers && mostFollowedUsers.length > 0 ? (
+                {isLoadingMostFollowed ? (
+                  <SearchPageSidebarSkeleton />
+                ) : mostFollowedUsers && mostFollowedUsers.length > 0 ? (
                   mostFollowedUsers.map((user) => (
                     <WhoToFollowItem
                       key={user.id}
@@ -467,11 +530,13 @@ export default function SearchPage() {
                         verified: user.verified,
                         bio: `${user.followerCount || 0} followers`
                       }}
-                      onNavigate={() => {}}
+                      onNavigate={() => { }}
                     />
                   ))
                 ) : (
-                  <SearchPageSidebarSkeleton />
+                  <div className={cn('p-4 text-center text-sm', isDark ? 'text-gray-500' : 'text-gray-400')}>
+                    No users found
+                  </div>
                 )}
               </div>
             </div>

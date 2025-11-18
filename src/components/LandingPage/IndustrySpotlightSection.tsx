@@ -49,7 +49,7 @@ export default function IndustrySpotlightSection({ industryRef }: IndustrySpotli
       icon: <Computer className="h-8 w-8" />,
       companies: ["Google", "Microsoft", "Apple", "Meta"],
       openings: "1,200+",
-      color: "from-blue-500 to-purple-600",
+      color: "from-info-500 to-purple-600",
       description: "Software engineering, data science, AI/ML, cybersecurity"
     },
     {
@@ -89,7 +89,7 @@ export default function IndustrySpotlightSection({ industryRef }: IndustrySpotli
       icon: <Lightbulb className="h-8 w-8" />,
       companies: ["McKinsey", "BCG", "Deloitte", "Accenture"],
       openings: "190+",
-      color: "from-indigo-500 to-blue-600",
+      color: "from-indigo-500 to-info-600",
       description: "Management consulting, strategy, operations"
     }
   ];

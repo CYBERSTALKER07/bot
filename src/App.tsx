@@ -46,7 +46,7 @@ const EventDetails = lazy(() => import('./components/EventDetails'));
 const ResourceCenter = lazy(() => import('./components/ResourceCenter'));
 const ResourceDetails = lazy(() => import('./components/ResourceDetails'));
 const JobDetails = lazy(() => import('./components/JobDetails'));
-const MobileAppPage = lazy(() => import('./components/MobileAppPage')); 
+const MobileAppPage = lazy(() => import('./components/MobileAppPage'));
 const ForStudentsPage = lazy(() => import('./components/ForStudentsPage'));
 const ForEmployersPage = lazy(() => import('./components/ForEmployersPage'));
 const CareerTipsPage = lazy(() => import('./components/CareerTipsPage'));
@@ -70,7 +70,8 @@ const EmployerJobsManagement = lazy(() => import('./components/EmployerJobsManag
 const NotificationsPage = lazy(() => import('./components/NotificationsPage'));
 const JobsPage = lazy(() => import('./components/JobsPage'));
 const BookmarksPage = lazy(() => import('./components/BookmarksPage'));
-const CreatePost = lazy(() => import('./components/CreatePost'));
+const CreatePostPage = lazy(() => import('./pages/CreatePostPage'));
+const HashtagDetailPage = lazy(() => import('./components/HashtagDetailPage'));
 const SearchDemoPage = lazy(() => import('./components/SearchDemoPage'));
 const SearchPage = lazy(() => import('./components/SearchPage'));
 const ExplorePage = lazy(() => import('./components/ExplorePage'));
@@ -149,6 +150,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     '/settings',
     '/post/',
     '/create-post',
+    '/hashtag/',
     '/notifications',
     '/jobs',
     '/bookmarks',
@@ -189,7 +191,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 // Dashboard Router component
 function DashboardRouter() {
   const { user } = useAuth();
-  
+
   if (!user) {
     return <Navigate to="/login" replace />;
   }
@@ -204,17 +206,17 @@ function DashboardRouter() {
 // Component to handle smart routing based on PWA vs Web
 function SmartHomeRoute() {
   const { user, loading } = useAuth();
-  
+
   // If still loading, show loading screen
   if (loading) {
     return <LoadingFallback message="Loading application..." />;
   }
-  
+
   // If user is authenticated, go to feed
   if (user) {
     return <Navigate to="/feed" replace />;
   }
-  
+
   // If not authenticated, redirect to login
   return <Navigate to="/login" replace />;
 }
@@ -224,7 +226,7 @@ function AppContent() {
   const [showSplash, setShowSplash] = useState(() => {
     return false;
   });
-  
+
   const [forceLoadingOff, setForceLoadingOff] = useState(false);
 
   const handleSplashComplete = () => {
@@ -234,7 +236,7 @@ function AppContent() {
 
   // Remove service worker cleanup that was causing issues
   // Service workers were being unregistered on every mount, causing endless reloading
-  
+
   // Force loading timeout protection
   useEffect(() => {
     if (loading) {
@@ -242,7 +244,7 @@ function AppContent() {
         console.warn('Forcing loading state off after 15 seconds');
         setForceLoadingOff(true);
       }, 15000);
-      
+
       return () => clearTimeout(timeout);
     }
   }, [loading]);
@@ -264,7 +266,7 @@ function AppContent() {
       <ScrollToTop />
       {/* X-Style Navigation - only show when user is authenticated */}
       {user && <Navigation />}
-      
+
       <main className="min-h-screen">
         <Routes>
           {/* Public routes with lazy loading */}
@@ -499,7 +501,14 @@ function AppContent() {
           <Route path="/create-post" element={
             <ProtectedRoute>
               <Suspense fallback={<LoadingFallback message="Loading post creator..." />}>
-                <CreatePost />
+                <CreatePostPage />
+              </Suspense>
+            </ProtectedRoute>
+          } />
+          <Route path="/hashtag/:hashtagName" element={
+            <ProtectedRoute>
+              <Suspense fallback={<LoadingFallback message="Loading hashtag..." />}>
+                <HashtagDetailPage />
               </Suspense>
             </ProtectedRoute>
           } />

@@ -222,8 +222,8 @@ export default function LinkedInJobImport() {
       <PageLayout className={isDark ? 'bg-black text-white' : 'bg-white text-black'} maxWidth="4xl">
         <div className="text-center space-y-8 py-12">
           <div className="flex justify-center">
-            <div className="p-4 rounded-full bg-blue-100 dark:bg-blue-900/20">
-              <Linkedin className="h-16 w-16 text-blue-600" />
+            <div className="p-4 rounded-full bg-info-100 dark:bg-info-900/20">
+              <Linkedin className="h-16 w-16 text-info-600" />
             </div>
           </div>
           
@@ -238,7 +238,7 @@ export default function LinkedInJobImport() {
           <div className="space-y-4">
             <Button
               onClick={connectToLinkedIn}
-              className="bg-blue-600 text-white hover:bg-blue-700 px-8 py-3 text-lg"
+              className="bg-info-600 text-white hover:bg-info-700 px-8 py-3 text-lg"
             >
               <Linkedin className="h-5 w-5 mr-2" />
               Connect LinkedIn Account
@@ -246,7 +246,7 @@ export default function LinkedInJobImport() {
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-12">
               <Card className="p-6 text-center">
-                <Download className="h-8 w-8 mx-auto mb-4 text-blue-500" />
+                <Download className="h-8 w-8 mx-auto mb-4 text-info-500" />
                 <h3 className="font-semibold mb-2">Import Jobs</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   Automatically import job postings from LinkedIn with advanced filtering
@@ -284,7 +284,7 @@ export default function LinkedInJobImport() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="p-2 rounded-lg bg-blue-600">
+              <div className="p-2 rounded-lg bg-info-600">
                 <Linkedin className="h-6 w-6 text-white" />
               </div>
               <div>
@@ -491,7 +491,7 @@ export default function LinkedInJobImport() {
                   </div>
                   <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                     <div 
-                      className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                      className="bg-info-500 h-2 rounded-full transition-all duration-300"
                       style={{ 
                         width: `${(importProgress.current / importProgress.total) * 100}%` 
                       }}
@@ -626,7 +626,7 @@ const LinkedInJobCard: React.FC<{
   return (
     <Card className={cn(
       'p-6 transition-all duration-200 border-l-4',
-      isSelected ? 'border-l-blue-500 bg-blue-50 dark:bg-blue-900/10' : 'border-l-gray-200 dark:border-l-gray-700'
+      isSelected ? 'border-l-info-500 bg-info-50 dark:bg-info-900/10' : 'border-l-gray-200 dark:border-l-gray-700'
     )}>
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-start space-x-4 flex-1">
@@ -729,7 +729,7 @@ const LinkedInJobCard: React.FC<{
           <Button
             size="sm"
             onClick={onApply}
-            className="bg-blue-600 text-white hover:bg-blue-700"
+            className="bg-info-600 text-white hover:bg-info-700"
           >
             <Send className="h-4 w-4 mr-1" />
             Apply on Platform

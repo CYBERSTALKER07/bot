@@ -124,8 +124,8 @@ export default function RetweetButton({
               isDark ? 'border-gray-700' : 'border-gray-100'
             )}
           >
-            <div className="p-2 rounded-full bg-blue-100 dark:bg-blue-900/30 group-hover/option:bg-blue-200 dark:group-hover/option:bg-blue-900/50 transition-colors">
-              <Edit3 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <div className="p-2 rounded-full bg-info-100 dark:bg-info-900/30 group-hover/option:bg-info-200 dark:group-hover/option:bg-info-900/50 transition-colors">
+              <Edit3 className="h-4 w-4 text-info-600 dark:text-info-400" />
             </div>
             <div>
               <div className={cn('font-semibold text-sm', isDark ? 'text-white' : 'text-black')}>

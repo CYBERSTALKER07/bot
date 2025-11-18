@@ -47,7 +47,7 @@ export default function LoginPage() {
         {/* Header */}
         <div className="text-center">
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center">
+            <div className="w-16 h-16 bg-info-600 rounded-2xl flex items-center justify-center">
               <GraduationCap className="w-8 h-8 text-white" />
             </div>
           </div>
@@ -80,7 +80,7 @@ export default function LoginPage() {
                   disabled={loading}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors disabled:bg-gray-50 disabled:cursor-not-allowed"
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-info-500 focus:border-transparent transition-colors disabled:bg-gray-50 disabled:cursor-not-allowed"
                   placeholder="Enter your email"
                 />
               </div>
@@ -102,7 +102,7 @@ export default function LoginPage() {
                   disabled={loading}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors disabled:bg-gray-50 disabled:cursor-not-allowed"
+                  className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-info-500 focus:border-transparent transition-colors disabled:bg-gray-50 disabled:cursor-not-allowed"
                   placeholder="Enter your password"
                 />
                 <button
@@ -127,7 +127,7 @@ export default function LoginPage() {
                   id="remember-me"
                   type="checkbox"
                   disabled={loading}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded disabled:cursor-not-allowed"
+                  className="h-4 w-4 text-info-600 focus:ring-info-500 border-gray-300 rounded disabled:cursor-not-allowed"
                 />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
                   Remember me
@@ -135,7 +135,7 @@ export default function LoginPage() {
               </div>
               <Link
                 to="/forgot-password"
-                className={`text-sm text-blue-600 hover:text-blue-500 font-medium ${loading ? 'pointer-events-none opacity-50' : ''}`}
+                className={`text-sm text-info-600 hover:text-info-500 font-medium ${loading ? 'pointer-events-none opacity-50' : ''}`}
               >
                 Forgot password?
               </Link>
@@ -145,7 +145,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600 transition-colors"
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-info-600 hover:bg-info-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-info-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-info-600 transition-colors"
             >
               {loading ? (
                 <div className="flex items-center">
@@ -164,7 +164,7 @@ export default function LoginPage() {
               Don't have an account?{' '}
               <Link
                 to="/signup"
-                className={`font-medium text-blue-600 hover:text-blue-500 ${loading ? 'pointer-events-none' : ''}`}
+                className={`font-medium text-info-600 hover:text-info-500 ${loading ? 'pointer-events-none' : ''}`}
               >
                 Sign up for free
               </Link>

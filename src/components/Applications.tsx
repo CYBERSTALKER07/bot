@@ -102,7 +102,7 @@ export default function Applications() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return isDark ? 'bg-yellow-500/10 text-yellow-400' : 'bg-yellow-50 text-yellow-600';
-      case 'reviewed': return isDark ? 'bg-blue-500/10 text-blue-400' : 'bg-blue-50 text-blue-600';
+      case 'reviewed': return isDark ? 'bg-info-500/10 text-info-400' : 'bg-info-50 text-info-600';
       case 'interview': return isDark ? 'bg-purple-500/10 text-purple-400' : 'bg-purple-50 text-purple-600';
       case 'accepted': return isDark ? 'bg-green-500/10 text-green-400' : 'bg-green-50 text-green-600';
       case 'rejected': return isDark ? 'bg-red-500/10 text-red-400' : 'bg-red-50 text-red-600';
@@ -250,12 +250,12 @@ export default function Applications() {
                 <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
                   isDark ? 'bg-gray-800' : 'bg-gray-100'
                 }`}>
-                  <Building2 className="h-6 w-6 text-blue-500" />
+                  <Building2 className="h-6 w-6 text-info-500" />
                 </div>
                 
                 <div className="flex-1">
                   <h3 className="text-xl font-semibold mb-1">{application.job_title}</h3>
-                  <p className="text-blue-500 font-medium mb-2">{application.company_name}</p>
+                  <p className="text-info-500 font-medium mb-2">{application.company_name}</p>
                   
                   <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
                     <div className="flex items-center gap-1">

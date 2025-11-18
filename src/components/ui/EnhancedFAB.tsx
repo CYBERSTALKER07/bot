@@ -229,8 +229,8 @@ export const EnhancedFAB: React.FC<EnhancedFABProps> = ({
           'flex items-center justify-center',
           'transition-all duration-200 cursor-pointer',
           isDark
-            ? 'bg-blue-600 hover:bg-blue-700 text-white'
-            : 'bg-blue-500 hover:bg-blue-600 text-white',
+            ? 'bg-info-600 hover:bg-info-700 text-white'
+            : 'bg-info-500 hover:bg-info-600 text-white',
           'active:scale-95',
           isDragging && 'opacity-75'
         )}

@@ -3,7 +3,7 @@ import { LucideIcon } from 'lucide-react';
 import { CircularProgress } from '@mui/material';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'filled' | 'outlined' | 'text' | 'elevated' | 'tonal' | 'fab';
+  variant?: 'filled' | 'outlined' | 'text' | 'elevated' | 'tonal' | 'fab' | 'ghost';
   size?: 'small' | 'medium' | 'large';
   startIcon?: LucideIcon | React.ComponentType<React.SVGProps<SVGSVGElement>> | React.ReactElement;
   endIcon?: LucideIcon | React.ComponentType<React.SVGProps<SVGSVGElement>> | React.ReactElement;
@@ -30,7 +30,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   disabled,
   ...props
 }, ref) => {
-  
+
   const baseClasses = `
     relative inline-flex items-center justify-center font-medium
     transition-all duration-200 ease-material-standard
@@ -47,12 +47,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   };
 
   const widthClasses = fullWidth ? 'w-full' : '';
-  
-  const fabClasses = variant === 'fab' 
-    ? size === 'small' 
-      ? 'w-10 h-10 p-0' 
-      : size === 'large' 
-        ? 'w-14 h-14 p-0' 
+
+  const fabClasses = variant === 'fab'
+    ? size === 'small'
+      ? 'w-10 h-10 p-0'
+      : size === 'large'
+        ? 'w-14 h-14 p-0'
         : 'w-12 h-12 p-0'
     : '';
 
@@ -69,18 +69,18 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
 
   const renderIcon = (Icon: typeof StartIcon, iconClassName: string) => {
     if (!Icon) return null;
-    
+
     if (React.isValidElement(Icon)) {
-      return React.cloneElement(Icon as React.ReactElement<{className?: string}>, { 
-        className: iconClassName 
+      return React.cloneElement(Icon as React.ReactElement<{ className?: string }>, {
+        className: iconClassName
       });
     }
-    
+
     if (typeof Icon === 'function' || typeof Icon === 'object') {
-      const IconComponent = Icon as React.ComponentType<{className?: string; style?: React.CSSProperties}>;
+      const IconComponent = Icon as React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
       return <IconComponent className={iconClassName} style={{ fontSize: iconSize }} />;
     }
-    
+
     return null;
   };
 
@@ -99,16 +99,16 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
       {/* Content */}
       <span className="relative z-10 flex items-center justify-center gap-inherit">
         {loading ? (
-          <CircularProgress 
-            size={loadingSize} 
+          <CircularProgress
+            size={loadingSize}
             className="text-current"
           />
         ) : StartIcon && (
           renderIcon(StartIcon, '')
         )}
-        
+
         {variant !== 'fab' && children}
-        
+
         {!loading && EndIcon && (
           renderIcon(EndIcon, '')
         )}

@@ -204,7 +204,7 @@ export default function EmployerDashboard() {
     return (
       <PageLayout className={`min-h-screen flex items-center justify-center ${isDark ? 'bg-black' : 'bg-gray-50'}`}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-info-500 mx-auto mb-4"></div>
           <p>Loading dashboard...</p>
         </div>
       </PageLayout>
@@ -271,7 +271,7 @@ export default function EmployerDashboard() {
               <Button 
                 className={cn(
                   'rounded-full px-6 py-2 font-thin',
-                  isDark ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-500 text-white hover:bg-blue-600'
+                  isDark ? 'bg-info-600 text-white hover:bg-info-700' : 'bg-info-500 text-white hover:bg-info-600'
                 )}
                 onClick={() => setShowPostEventModal(true)}
               >
@@ -319,7 +319,7 @@ export default function EmployerDashboard() {
             )}>
               <div className="flex items-center justify-between mb-4 sm:mb-6">
                 <h2 className="text-lg sm:text-xl font-thin">Your Posted Jobs</h2>
-                <Link to="/posted-jobs" className="text-blue-500 hover:underline text-xs sm:text-sm whitespace-nowrap">
+                <Link to="/posted-jobs" className="text-info-500 hover:underline text-xs sm:text-sm whitespace-nowrap">
                   View all
                 </Link>
               </div>
@@ -367,7 +367,7 @@ export default function EmployerDashboard() {
                       No jobs posted yet
                     </p>
                     <Button
-                      className="mt-3 text-blue-500 text-sm"
+                      className="mt-3 text-info-500 text-sm"
                       onClick={() => setShowPostJobModal(true)}
                     >
                       Post your first job
@@ -384,7 +384,7 @@ export default function EmployerDashboard() {
             )}>
               <div className="flex items-center justify-between mb-4 sm:mb-6">
                 <h2 className="text-lg sm:text-xl font-thin">Your Events</h2>
-                <Link to="/events" className="text-blue-500 hover:underline text-xs sm:text-sm whitespace-nowrap">
+                <Link to="/events" className="text-info-500 hover:underline text-xs sm:text-sm whitespace-nowrap">
                   View all
                 </Link>
               </div>
@@ -413,7 +413,7 @@ export default function EmployerDashboard() {
                         </div>
                         <span className={cn(
                           'text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0',
-                          event.status === 'upcoming' ? (isDark ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800') :
+                          event.status === 'upcoming' ? (isDark ? 'bg-info-900 text-info-200' : 'bg-info-100 text-info-800') :
                           event.status === 'ongoing' ? (isDark ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800') :
                           isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-200 text-gray-800'
                         )}>
@@ -439,7 +439,7 @@ export default function EmployerDashboard() {
                       No events posted yet
                     </p>
                     <Button
-                      className="mt-3 text-blue-500 text-sm"
+                      className="mt-3 text-info-500 text-sm"
                       onClick={() => setShowPostEventModal(true)}
                     >
                       Create your first event
@@ -459,7 +459,7 @@ export default function EmployerDashboard() {
             )}>
               <div className="flex items-center justify-between mb-4 sm:mb-6">
                 <h2 className="text-lg sm:text-xl font-thin">Recent Applicants</h2>
-                <Link to="/applicants" className="text-blue-500 hover:underline text-xs sm:text-sm whitespace-nowrap">
+                <Link to="/applicants" className="text-info-500 hover:underline text-xs sm:text-sm whitespace-nowrap">
                   View all
                 </Link>
               </div>
@@ -471,7 +471,7 @@ export default function EmployerDashboard() {
                       isDark ? 'hover:bg-black border-[0.7px] border-slate-50' : 'hover:bg-gray-50'
                     )}>
                       <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-lg sm:text-xl flex-shrink-0 bg-gradient-to-br from-green-400 to-blue-500">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-lg sm:text-xl flex-shrink-0 bg-gradient-to-br from-green-400 to-info-500">
                           👤
                         </div>
                         <div className="flex-1 min-w-0">
@@ -494,7 +494,7 @@ export default function EmployerDashboard() {
                         <Button 
                           className={cn(
                             'rounded-lg text-xs px-2 sm:px-3 py-1 sm:py-2',
-                            isDark ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600',
+                            isDark ? 'bg-info-600 hover:bg-info-700' : 'bg-info-500 hover:bg-info-600',
                             'text-white'
                           )}
                         >
@@ -520,7 +520,7 @@ export default function EmployerDashboard() {
             )}>
               <div className="flex items-center justify-between mb-4 sm:mb-6">
                 <h2 className="text-lg sm:text-xl font-thin">Followers</h2>
-                <Link to="/followers" className="text-blue-500 hover:underline text-xs sm:text-sm whitespace-nowrap">
+                <Link to="/followers" className="text-info-500 hover:underline text-xs sm:text-sm whitespace-nowrap">
                   View all
                 </Link>
               </div>

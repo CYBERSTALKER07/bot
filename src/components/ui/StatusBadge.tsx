@@ -36,8 +36,8 @@ const statusConfig = {
     label: 'Reviewed',
     emoji: '👀',
     icon: Eye,
-    colors: 'bg-blue-100 text-blue-800 border-blue-200',
-    darkColors: 'bg-blue-500 text-white'
+    colors: 'bg-info-100 text-info-800 border-info-200',
+    darkColors: 'bg-info-500 text-white'
   },
   interview: {
     label: 'Interview',

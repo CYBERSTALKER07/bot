@@ -9,7 +9,8 @@ import {
   Minimize,
   Settings,
   AlertCircle,
-  RefreshCw,
+  SkipBack,
+  SkipForward,
 } from 'lucide-react';
 import { cn } from '../../lib/cva';
 import { isSafari, transformUrlForSafari } from '../../lib/mediaService';
@@ -71,14 +72,14 @@ export const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
   const [isHoveringProgressBar, setIsHoveringProgressBar] = useState(false);
   const [hoverProgress, setHoverProgress] = useState(0);
   const [hoverTime, setHoverTime] = useState(0);
-  
+
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isSafariBrowser = isSafari();
 
   // Auto-hide controls
   useEffect(() => {
     if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
-    
+
     if (!isPlaying || !showControlsUI) return;
 
     controlsTimeoutRef.current = setTimeout(() => {
@@ -155,7 +156,7 @@ export const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     if (isNaN(time)) return '0:00';
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    return `${minutes}:${seconds.toString().padStart(2, '0')} `;
   };
 
   return (
@@ -174,7 +175,7 @@ export const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
         src={src}
         className="w-full h-full object-cover"
         autoPlay={autoPlay}
-        muted={muted}
+        muted={isMuted}
         loop={loop}
         onClick={handlePlayPause}
         onTimeUpdate={handleTimeUpdate}
@@ -372,7 +373,7 @@ export const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
                     'text-white'
                   )}
                 >
-                  <Maximize2 className="w-5 h-5" />
+                  <Maximize className="w-5 h-5" />
                 </motion.button>
               </div>
             </div>

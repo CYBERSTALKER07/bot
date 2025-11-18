@@ -241,7 +241,7 @@ export default function ImageUpload({
           isUploading 
             ? 'bg-black/60 opacity-100' 
             : 'bg-black/50 opacity-0 group-hover:opacity-100',
-          dragActive && 'opacity-100 bg-blue-500/50'
+          dragActive && 'opacity-100 bg-info-500/50'
         )}>
           {isUploading ? (
             <Loader2 className={cn(iconSizeClasses[size], 'text-white animate-spin')} />
@@ -292,10 +292,10 @@ export default function ImageUpload({
 
       {/* Drag overlay for cover */}
       {dragActive && (
-        <div className="absolute inset-0 bg-blue-500/20 border-2 border-blue-500 border-dashed rounded-lg flex items-center justify-center pointer-events-none">
+        <div className="absolute inset-0 bg-info-500/20 border-2 border-info-500 border-dashed rounded-lg flex items-center justify-center pointer-events-none">
           <div className="text-center">
-            <Upload className="w-8 h-8 text-blue-500 mx-auto mb-2" />
-            <p className="text-sm font-medium text-blue-500">Drop image here</p>
+            <Upload className="w-8 h-8 text-info-500 mx-auto mb-2" />
+            <p className="text-sm font-medium text-info-500">Drop image here</p>
           </div>
         </div>
       )}

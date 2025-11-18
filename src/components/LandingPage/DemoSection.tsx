@@ -160,9 +160,9 @@ export default function DemoSection({ demoRef }: DemoSectionProps) {
                         </span>
                       </div>
                       <div className="flex flex-wrap gap-2 mb-4">
-                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">React</span>
-                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Python</span>
-                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Machine Learning</span>
+                        <span className="bg-info-100 text-info-800 px-2 py-1 rounded text-xs">React</span>
+                        <span className="bg-info-100 text-info-800 px-2 py-1 rounded text-xs">Python</span>
+                        <span className="bg-info-100 text-info-800 px-2 py-1 rounded text-xs">Machine Learning</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className={`text-sm ${
@@ -194,7 +194,7 @@ export default function DemoSection({ demoRef }: DemoSectionProps) {
                             isDark ? 'text-dark-muted' : 'text-gray-600'
                           }`}>Redmond, WA</p>
                         </div>
-                        <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                        <span className="bg-info-100 text-info-800 px-3 py-1 rounded-full text-sm font-medium">
                           92% Match
                         </span>
                       </div>

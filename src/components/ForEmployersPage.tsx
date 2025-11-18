@@ -270,7 +270,7 @@ export default function ForEmployersPage() {
       title: "AI-Powered Matching",
       description: "Our advanced algorithms match your job requirements with the most qualified AUT students and recent graduates.",
       image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=500&h=350&fit=crop",
-      color: "from-blue-600 to-indigo-700",
+      color: "from-info-600 to-indigo-700",
       benefits: ["99% match accuracy", "Save 70% recruiting time", "Quality over quantity"]
     },
     {

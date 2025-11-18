@@ -332,8 +332,8 @@ export default function DigitalLearningPassport() {
               </div>
             </div>
             
-            <div className="flex items-center space-x-4 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20">
-              <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+            <div className="flex items-center space-x-4 p-4 rounded-lg bg-info-50 dark:bg-info-900/20">
+              <div className="w-10 h-10 bg-info-500 rounded-full flex items-center justify-center">
                 <Award className="h-5 w-5 text-white" />
               </div>
               <div className="flex-1">
@@ -470,8 +470,8 @@ export default function DigitalLearningPassport() {
 
           <div className="stats-card">
             <Card className="p-6 text-center" elevation={1}>
-              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                <BarChart3 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-info-100 dark:bg-info-900/30 flex items-center justify-center">
+                <BarChart3 className="h-6 w-6 text-info-600 dark:text-info-400" />
               </div>
               <Typography variant="h4" className="font-bold mb-1">
                 {passportStats.skillsAssessed}

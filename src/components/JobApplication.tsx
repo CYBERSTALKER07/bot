@@ -245,7 +245,7 @@ export default function JobApplication() {
     return (
       <PageLayout className={isDark ? 'bg-black text-white' : 'bg-white text-black'} maxWidth="4xl">
         <div className="flex items-center justify-center min-h-96">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-info-600" />
         </div>
       </PageLayout>
     );
@@ -380,7 +380,7 @@ export default function JobApplication() {
                       {job.skills.slice(0, 6).map((skill, index) => (
                         <span
                           key={index}
-                          className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-xs"
+                          className="px-2 py-1 bg-info-100 dark:bg-info-900 text-info-800 dark:text-info-200 rounded text-xs"
                         >
                           {skill}
                         </span>
@@ -599,7 +599,7 @@ export default function JobApplication() {
                   <Button
                     onClick={handleSubmitApplication}
                     disabled={isSubmitting || !applicationData.coverLetter.trim()}
-                    className="bg-blue-600 text-white hover:bg-blue-700 flex items-center justify-center space-x-2 flex-1"
+                    className="bg-info-600 text-white hover:bg-info-700 flex items-center justify-center space-x-2 flex-1"
                   >
                     {isSubmitting ? (
                       <Loader2 className="h-4 w-4 animate-spin" />

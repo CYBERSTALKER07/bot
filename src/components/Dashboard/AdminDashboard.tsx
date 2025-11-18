@@ -299,7 +299,7 @@ export default function AdminDashboard() {
           </div>
           <div className="grid grid-cols-2 gap-3 sm:gap-4">
             {[
-              { icon: Users, label: "Manage Users", color: isDark ? "text-blue-400" : "text-blue-600" },
+              { icon: Users, label: "Manage Users", color: isDark ? "text-info-400" : "text-info-600" },
               { icon: Briefcase, label: "Review Jobs", color: isDark ? "text-green-400" : "text-green-600" },
               { icon: Calendar, label: "Create Event", color: isDark ? "text-lime" : "text-asu-maroon" },
               { icon: MessageSquare, label: "Send Announcement", color: isDark ? "text-yellow-400" : "text-yellow-600" }
@@ -369,7 +369,7 @@ export default function AdminDashboard() {
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className={`${isDark ? 'text-gray-500 hover:text-blue-400' : 'text-gray-500 hover:text-blue-600'}`}
+                    className={`${isDark ? 'text-gray-500 hover:text-info-400' : 'text-gray-500 hover:text-info-600'}`}
                   >
                     <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
                   </Button>

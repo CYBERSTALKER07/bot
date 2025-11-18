@@ -161,8 +161,8 @@ export default function QuoteTweetModal({
                 className={cn(
                   'p-2 rounded-full transition-colors',
                   isDark 
-                    ? 'hover:bg-gray-900 text-blue-500' 
-                    : 'hover:bg-gray-100 text-blue-500'
+                    ? 'hover:bg-gray-900 text-info-500' 
+                    : 'hover:bg-gray-100 text-info-500'
                 )}
               >
                 <ImageIcon className="h-5 w-5" />
@@ -172,8 +172,8 @@ export default function QuoteTweetModal({
                 className={cn(
                   'p-2 rounded-full transition-colors',
                   isDark 
-                    ? 'hover:bg-gray-900 text-blue-500' 
-                    : 'hover:bg-gray-100 text-blue-500'
+                    ? 'hover:bg-gray-900 text-info-500' 
+                    : 'hover:bg-gray-100 text-info-500'
                 )}
               >
                 <Smile className="h-5 w-5" />
@@ -205,7 +205,7 @@ export default function QuoteTweetModal({
                           ? 'stroke-red-500' 
                           : isNearLimit 
                             ? 'stroke-yellow-500' 
-                            : 'stroke-blue-500'
+                            : 'stroke-info-500'
                       )}
                       strokeWidth="2"
                       strokeDasharray={`${(content.length / maxCharacters) * 100} 100`}
@@ -233,9 +233,9 @@ export default function QuoteTweetModal({
                   'rounded-full px-6 py-2 font-bold text-sm transition-all',
                   !content.trim() || isOverLimit || isSubmitting
                     ? isDark
-                      ? 'bg-blue-500/50 text-white/50 cursor-not-allowed'
-                      : 'bg-blue-400/50 text-white/70 cursor-not-allowed'
-                    : 'bg-blue-500 hover:bg-blue-600 text-white'
+                      ? 'bg-info-500/50 text-white/50 cursor-not-allowed'
+                      : 'bg-info-400/50 text-white/70 cursor-not-allowed'
+                    : 'bg-info-500 hover:bg-info-600 text-white'
                 )}
               >
                 {isSubmitting ? 'Posting...' : 'Quote'}

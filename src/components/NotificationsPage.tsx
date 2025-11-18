@@ -62,7 +62,7 @@ export default function NotificationsPage() {
 
   const getNotificationIcon = (type: Notification['type']) => {
     switch (type) {
-      case 'job_match': return <Briefcase className="h-5 w-5 text-blue-500" />;
+      case 'job_match': return <Briefcase className="h-5 w-5 text-info-500" />;
       case 'application_update': return <Clock className="h-5 w-5 text-orange-500" />;
       case 'message': return <MessageCircle className="h-5 w-5 text-green-500" />;
       case 'event': return <Calendar className="h-5 w-5 text-purple-500" />;
@@ -250,7 +250,7 @@ export default function NotificationsPage() {
                 "ios-touch-target ios-nav-item", // iOS-friendly interactions
                 !notification.isRead && (isDark 
                   ? 'bg-lime/5 border-lime/20 shadow-lime/5' 
-                  : 'bg-blue-50 border-blue-200 shadow-blue/5'
+                  : 'bg-info-50 border-info-200 shadow-blue/5'
                 ),
                 isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
               )}
@@ -281,7 +281,7 @@ export default function NotificationsPage() {
                     )}
                     {/* Unread indicator */}
                     {!notification.isRead && (
-                      <div className="absolute w-2 h-2 bg-blue-500 rounded-full -mt-1 -ml-1 ring-2 ring-white dark:ring-gray-900"></div>
+                      <div className="absolute w-2 h-2 bg-info-500 rounded-full -mt-1 -ml-1 ring-2 ring-white dark:ring-gray-900"></div>
                     )}
                   </div>
 

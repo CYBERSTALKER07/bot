@@ -298,7 +298,7 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
               icon ? 'pl-10' : '',
               errors[field]
                 ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                : 'border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-500',
+                : 'border-gray-300 dark:border-gray-600 focus:border-info-500 focus:ring-info-500',
               'bg-white dark:bg-gray-900 text-gray-900 dark:text-white',
               'focus:outline-none focus:ring-2'
             )}
@@ -316,7 +316,7 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
               icon ? 'pl-10' : '',
               errors[field]
                 ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                : 'border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-500',
+                : 'border-gray-300 dark:border-gray-600 focus:border-info-500 focus:ring-info-500',
               'bg-white dark:bg-gray-900 text-gray-900 dark:text-white',
               'focus:outline-none focus:ring-2'
             )}
@@ -343,7 +343,7 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
         isDark ? 'bg-black' : 'bg-white'
       )}>
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-500" />
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-info-500" />
           <p className="text-gray-500">Loading profile...</p>
         </div>
       </div>
@@ -434,7 +434,7 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
                     className="w-20 h-20 rounded-full object-cover border-4 border-white dark:border-gray-800"
                   />
                 ) : (
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-2xl border-4 border-white dark:border-gray-800">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-info-500 to-purple-600 flex items-center justify-center text-white font-bold text-2xl border-4 border-white dark:border-gray-800">
                     {(profileData.full_name || 'U').charAt(0)}
                   </div>
                 )}
@@ -529,7 +529,7 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
                     placeholder="e.g., JavaScript, React, Python, SQL (comma-separated)"
                     className={cn(
                       'w-full px-3 py-2 pl-10 border rounded-lg resize-none transition-colors',
-                      'border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-500',
+                      'border-gray-300 dark:border-gray-600 focus:border-info-500 focus:ring-info-500',
                       'bg-white dark:bg-gray-900 text-gray-900 dark:text-white',
                       'focus:outline-none focus:ring-2'
                     )}
@@ -559,7 +559,7 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
                     placeholder="e.g., Artificial Intelligence, Web Development, Data Science (comma-separated)"
                     className={cn(
                       'w-full px-3 py-2 pl-10 border rounded-lg resize-none transition-colors',
-                      'border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-500',
+                      'border-gray-300 dark:border-gray-600 focus:border-info-500 focus:ring-info-500',
                       'bg-white dark:bg-gray-900 text-gray-900 dark:text-white',
                       'focus:outline-none focus:ring-2'
                     )}

@@ -77,8 +77,8 @@ export default function TilesContentSection() {
           {/* Top-Left: File Management (Vertical Rectangle - 2 rows) */}
           <div className={`md:col-span-1 lg:row-span-2 rounded-2xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl hover:scale-105 ${
             isDark 
-              ? 'bg-gradient-to-br from-blue-900/40 to-purple-900/40 border border-blue-800/50' 
-              : 'bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-200'
+              ? 'bg-gradient-to-br from-blue-900/40 to-purple-900/40 border border-info-800/50' 
+              : 'bg-gradient-to-br from-blue-50 to-purple-50 border border-info-200'
           }`}>
             <div className="h-full p-8 flex flex-col justify-between">
               <div>
@@ -130,10 +130,10 @@ export default function TilesContentSection() {
               <div className="space-y-4">
                 <div className={`flex items-center rounded-xl px-4 py-3 transition-all duration-300 ${
                   isDark 
-                    ? 'bg-dark-surface border border-dark-accent/30 focus-within:border-blue-500' 
-                    : 'bg-white border border-gray-300 focus-within:border-blue-500'
+                    ? 'bg-dark-surface border border-dark-accent/30 focus-within:border-info-500' 
+                    : 'bg-white border border-gray-300 focus-within:border-info-500'
                 }`}>
-                  <SearchIcon className={`mr-3 ${isDark ? 'text-blue-400' : 'text-blue-600'}`} />
+                  <SearchIcon className={`mr-3 ${isDark ? 'text-info-400' : 'text-info-600'}`} />
                   <input
                     type="text"
                     placeholder="Search files..."
@@ -178,10 +178,10 @@ export default function TilesContentSection() {
               {/* 3D-Style Globe with Glowing Effect */}
               <div className="relative w-32 h-32 flex items-center justify-center">
                 {/* Outer glow */}
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 blur-2xl opacity-40 animate-pulse" />
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500 via-info-500 to-purple-500 blur-2xl opacity-40 animate-pulse" />
                 
                 {/* Globe sphere */}
-                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 shadow-2xl" 
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-400 via-info-500 to-purple-600 shadow-2xl" 
                   style={{
                     boxShadow: '0 0 30px rgba(34, 211, 238, 0.8), inset -10px -10px 30px rgba(0, 0, 0, 0.5)'
                   }} />
@@ -264,8 +264,8 @@ export default function TilesContentSection() {
                           ? ''
                           : isCurrentMonth && day === today.getDate()
                           ? isDark
-                            ? 'bg-blue-600 text-white shadow-lg'
-                            : 'bg-blue-500 text-white shadow-lg'
+                            ? 'bg-info-600 text-white shadow-lg'
+                            : 'bg-info-500 text-white shadow-lg'
                           : isDark
                           ? 'bg-dark-surface/50 text-dark-text hover:bg-dark-surface/80'
                           : 'bg-gray-100 text-gray-900 hover:bg-gray-200'

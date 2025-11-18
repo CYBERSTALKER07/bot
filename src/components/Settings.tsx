@@ -175,7 +175,7 @@ export default function SettingsPage() {
         <Button
           onClick={handleSave}
           disabled={!hasChanges || isLoading}
-          className="bg-blue-500 text-white hover:bg-blue-600"
+          className="bg-info-500 text-white hover:bg-info-600"
         >
           <Save className="h-4 w-4 mr-2" />
           {isLoading ? 'Saving...' : 'Save Changes'}
@@ -193,7 +193,7 @@ export default function SettingsPage() {
             </div>
             <Button
               size="sm"
-              className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full p-0 bg-blue-500 text-white hover:bg-blue-600"
+              className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full p-0 bg-info-500 text-white hover:bg-info-600"
             >
               <Camera className="h-4 w-4" />
             </Button>
@@ -296,9 +296,9 @@ export default function SettingsPage() {
             rows={4}
             className={`w-full px-4 py-3 border rounded-lg resize-none ${
               isDark 
-                ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500' 
-                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500'
-            } focus:ring-2 focus:ring-blue-500/20 outline-none transition-colors`}
+                ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-info-500' 
+                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-info-500'
+            } focus:ring-2 focus:ring-info-500/20 outline-none transition-colors`}
           />
         </div>
       </Card>
@@ -334,8 +334,8 @@ export default function SettingsPage() {
               className={cn(
                 'p-4 border-2 rounded-xl transition-colors',
                 !isDark 
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
-                  : 'border-gray-300 dark:border-gray-600 hover:border-blue-400'
+                  ? 'border-info-500 bg-info-50 dark:bg-info-900/20' 
+                  : 'border-gray-300 dark:border-gray-600 hover:border-info-400'
               )}
             >
               <div className="flex flex-col items-center space-y-2">
@@ -349,18 +349,18 @@ export default function SettingsPage() {
               className={cn(
                 'p-4 border-2 rounded-xl transition-colors',
                 isDark 
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
-                  : 'border-gray-300 dark:border-gray-600 hover:border-blue-400'
+                  ? 'border-info-500 bg-info-50 dark:bg-info-900/20' 
+                  : 'border-gray-300 dark:border-gray-600 hover:border-info-400'
               )}
             >
               <div className="flex flex-col items-center space-y-2">
-                <Moon className="h-8 w-8 text-blue-400" />
+                <Moon className="h-8 w-8 text-info-400" />
                 <span className="text-sm font-medium">Dark</span>
               </div>
             </button>
             
             <button
-              className="p-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl hover:border-blue-400 transition-colors opacity-50 cursor-not-allowed"
+              className="p-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl hover:border-info-400 transition-colors opacity-50 cursor-not-allowed"
               disabled
             >
               <div className="flex flex-col items-center space-y-2">
@@ -412,7 +412,7 @@ export default function SettingsPage() {
                 className={cn(
                   'w-12 h-6 rounded-full transition-colors',
                   notifications[key as keyof NotificationSettings]
-                    ? 'bg-blue-500 text-white'
+                    ? 'bg-info-500 text-white'
                     : 'bg-gray-300 dark:bg-gray-600'
                 )}
               >

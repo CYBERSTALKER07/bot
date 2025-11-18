@@ -77,7 +77,7 @@ export const ProfileHoverCard: React.FC<ProfileHoverCardProps> = ({
             onClick={(e) => e.stopPropagation()}
           >
             {/* Cover Photo */}
-            <div className="h-20 bg-gradient-to-r from-blue-500/30 to-purple-500/30" />
+            <div className="h-20 bg-gradient-to-r from-info-500/30 to-purple-500/30" />
 
             {/* Content */}
             <div className="p-4 pt-2">
@@ -117,7 +117,7 @@ export const ProfileHoverCard: React.FC<ProfileHoverCardProps> = ({
                         ? isDark
                           ? 'bg-gray-800 text-white border border-gray-700 hover:bg-gray-700'
                           : 'bg-gray-100 text-gray-900 border border-gray-300 hover:bg-gray-200'
-                        : 'bg-blue-500 text-white hover:bg-blue-600'
+                        : 'bg-info-500 text-white hover:bg-info-600'
                     )}
                   >
                     {isFollowing ? 'Following' : 'Follow'}
@@ -139,7 +139,7 @@ export const ProfileHoverCard: React.FC<ProfileHoverCardProps> = ({
                     {user.name}
                   </h3>
                   {user.verified && (
-                    <span className="inline-flex items-center justify-center w-4 h-4 bg-blue-500 rounded-full">
+                    <span className="inline-flex items-center justify-center w-4 h-4 bg-info-500 rounded-full">
                       <span className="text-xs text-white font-bold">✓</span>
                     </span>
                   )}
@@ -191,7 +191,7 @@ export const ProfileHoverCard: React.FC<ProfileHoverCardProps> = ({
                   transition={{ delay: 0.2 }}
                   className={cn(
                     'flex items-center gap-1 text-xs mt-1',
-                    isDark ? 'text-blue-400' : 'text-blue-600'
+                    isDark ? 'text-info-400' : 'text-info-600'
                   )}
                 >
                   <LinkIcon className="w-3 h-3" />

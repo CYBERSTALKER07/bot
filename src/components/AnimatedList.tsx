@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, ReactNode, MouseEventHandler, UIEvent } from 'react';
-import { motion, useInView } from 'motion/react';
+import { motion, useInView } from 'framer-motion';
 
 interface AnimatedItemProps {
   children: ReactNode;
@@ -119,11 +119,10 @@ const AnimatedList: React.FC<AnimatedListProps> = ({
     <div className={`relative ${width} ${className}`} style={{ width }}>
       <div
         ref={listRef}
-        className={`overflow-y-auto p-4 ${
-          displayScrollbar
+        className={`overflow-y-auto p-4 ${displayScrollbar
             ? '[&::-webkit-scrollbar]:w-[8px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-[4px]'
             : 'scrollbar-hide'
-        }`}
+          }`}
         onScroll={handleScroll}
         style={{
           maxHeight,

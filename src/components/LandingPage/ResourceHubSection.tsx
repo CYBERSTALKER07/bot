@@ -50,7 +50,7 @@ export default function ResourceHubSection({ resourcesRef }: ResourceHubSectionP
       icon: <Assignment className="h-8 w-8" />,
       type: "Templates",
       downloads: "12k+",
-      color: "from-blue-500 to-indigo-600"
+      color: "from-info-500 to-indigo-600"
     },
     {
       title: "Interview Prep Videos",

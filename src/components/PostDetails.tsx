@@ -268,7 +268,7 @@ export default function PostDetails() {
                       {post.author.full_name}
                     </Link>
                     {post.author.verified && (
-                      <CheckCircle className="w-5 h-5 text-blue-500" />
+                      <CheckCircle className="w-5 h-5 text-info-500" />
                     )}
                     <span className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>
                       @{post.author.full_name.toLowerCase().replace(/\s+/g, '')}
@@ -291,8 +291,8 @@ export default function PostDetails() {
                           className={cn(
                             'text-sm px-2 py-1 rounded-full border cursor-pointer hover:bg-opacity-80',
                             isDark 
-                              ? 'text-blue-400 border-blue-400/30 hover:bg-blue-400/10' 
-                              : 'text-blue-600 border-blue-600/30 hover:bg-blue-600/10'
+                              ? 'text-info-400 border-info-400/30 hover:bg-info-400/10' 
+                              : 'text-info-600 border-info-600/30 hover:bg-info-600/10'
                           )}
                         >
                           #{tag}
@@ -388,8 +388,8 @@ export default function PostDetails() {
                       className={cn(
                         'flex items-center space-x-2 px-4 py-2 rounded-full transition-colors',
                         isDark 
-                          ? 'text-gray-400 hover:text-blue-400 hover:bg-blue-500/10' 
-                          : 'text-gray-600 hover:text-blue-600 hover:bg-blue-500/10'
+                          ? 'text-gray-400 hover:text-info-400 hover:bg-info-500/10' 
+                          : 'text-gray-600 hover:text-info-600 hover:bg-info-500/10'
                       )}
                     >
                       <MessageCircle className="w-5 h-5" />
@@ -429,10 +429,10 @@ export default function PostDetails() {
                       className={cn(
                         'flex items-center space-x-2 px-4 py-2 rounded-full transition-colors',
                         post.has_bookmarked
-                          ? 'text-blue-500 hover:text-blue-400'
+                          ? 'text-info-500 hover:text-info-400'
                           : isDark 
-                            ? 'text-gray-400 hover:text-blue-400 hover:bg-blue-500/10'
-                            : 'text-gray-600 hover:text-blue-600 hover:bg-blue-500/10'
+                            ? 'text-gray-400 hover:text-info-400 hover:bg-info-500/10'
+                            : 'text-gray-600 hover:text-info-600 hover:bg-info-500/10'
                       )}
                     >
                       <Bookmark className={cn('w-5 h-5', post.has_bookmarked && 'fill-current')} />

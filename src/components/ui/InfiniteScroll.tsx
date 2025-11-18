@@ -162,8 +162,8 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
                   'w-6 h-6 transition-colors duration-200',
                   isPulling || isRefreshing
                     ? isDark
-                      ? 'text-blue-400'
-                      : 'text-blue-600'
+                      ? 'text-info-400'
+                      : 'text-info-600'
                     : isDark
                       ? 'text-gray-400'
                       : 'text-gray-600'
@@ -199,8 +199,8 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
               className={cn(
                 'w-8 h-8 border-4 border-transparent rounded-full',
                 isDark
-                  ? 'border-t-blue-500 border-r-blue-500'
-                  : 'border-t-blue-600 border-r-blue-600'
+                  ? 'border-t-info-500 border-r-info-500'
+                  : 'border-t-info-600 border-r-info-600'
               )}
             />
           </motion.div>

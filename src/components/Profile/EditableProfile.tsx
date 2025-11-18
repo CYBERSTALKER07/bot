@@ -284,7 +284,7 @@ export default function EditableProfile() {
     )}>
       {/* Cover Image */}
       <div 
-        className="relative h-48 bg-gradient-to-r from-blue-500 to-purple-600"
+        className="relative h-48 bg-gradient-to-r from-info-500 to-purple-600"
         style={{ backgroundColor: profile.banner_color }}
       >
         {profile.cover_image_url && (
@@ -323,7 +323,7 @@ export default function EditableProfile() {
                 onUploadSuccess={(url) => handleImageUpload('avatar_url', url)}
                 onUploadError={(error) => setError(error)}
                 size="sm"
-                className="bg-blue-500 hover:bg-blue-600 text-white rounded-full p-1"
+                className="bg-info-500 hover:bg-info-600 text-white rounded-full p-1"
               />
             </div>
           </div>

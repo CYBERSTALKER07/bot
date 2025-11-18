@@ -199,7 +199,7 @@ export default function MobileAppPage() {
       icon: <Search className="h-8 w-8" />,
       title: "Smart Job Search",
       description: "AI-powered job matching that learns your preferences and suggests the perfect opportunities for your career path.",
-      color: "from-blue-500 to-purple-600"
+      color: "from-info-500 to-purple-600"
     },
     {
       icon: <Bell className="h-8 w-8" />,
@@ -223,7 +223,7 @@ export default function MobileAppPage() {
       icon: <TrendingUp className="h-8 w-8" />,
       title: "Career Analytics",
       description: "Track your application progress and get insights on your career journey with detailed analytics.",
-      color: "from-indigo-500 to-blue-600"
+      color: "from-indigo-500 to-info-600"
     },
     {
       icon: <Shield className="h-8 w-8" />,

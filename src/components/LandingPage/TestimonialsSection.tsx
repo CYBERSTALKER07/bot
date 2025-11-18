@@ -419,7 +419,7 @@ export default function TestimonialsSection({ testimonialsRef }: TestimonialsSec
 
   const getCategoryColor = (category: string) => {
     const colors = {
-      internship: 'bg-blue-100 text-blue-800',
+      internship: 'bg-info-100 text-info-800',
       job: 'bg-green-100 text-green-800',
       networking: 'bg-purple-100 text-purple-800',
       mentorship: 'bg-orange-100 text-orange-800',

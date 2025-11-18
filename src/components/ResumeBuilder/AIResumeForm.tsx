@@ -365,7 +365,7 @@ export function AIResumeForm({ onGenerateResume }: AIResumeFormProps) {
         <Button
           onClick={generateResumeWithAI}
           disabled={isGenerating || !formData.jobTitle || !formData.industry}
-          className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white py-3 flex items-center justify-center gap-2"
+          className="w-full bg-gradient-to-r from-purple-500 to-info-500 hover:from-purple-600 hover:to-info-600 text-white py-3 flex items-center justify-center gap-2"
         >
           {isGenerating ? (
             <>

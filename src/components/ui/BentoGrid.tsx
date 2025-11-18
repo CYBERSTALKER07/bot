@@ -38,8 +38,8 @@ export function BentoCard({
       <div className="relative z-10">
         <div className="flex items-start justify-between mb-4">
           {Icon && (
-            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center">
-              <Icon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-info-500/20 to-purple-500/20 flex items-center justify-center">
+              <Icon className="w-6 h-6 text-info-600 dark:text-info-400" />
             </div>
           )}
         </div>
@@ -54,7 +54,7 @@ export function BentoCard({
         {cta && href && (
           <a
             href={href}
-            className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-2"
+            className="text-sm font-medium text-info-600 dark:text-info-400 hover:underline inline-flex items-center gap-2"
           >
             {cta} →
           </a>

@@ -790,7 +790,7 @@ export default function Profile() {
                 className="absolute inset-0 w-full h-full object-cover rounded-2xl"
               />
             ) : (
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl" />
+              <div className="absolute inset-0 bg-gradient-to-r from-info-500 to-purple-600 rounded-2xl" />
             )}
             
             {/* Dark overlay for better text readability */}
@@ -1058,7 +1058,7 @@ export default function Profile() {
                   {profileData.full_name || user?.name || 'User'}
                 </h1>
                 {user?.profile?.verified && (
-                  <Verified className="w-5 h-5 text-blue-500" />
+                  <Verified className="w-5 h-5 text-info-500" />
                 )}
               </div>
               <p className={cn("text-base mb-3", isDark ? "text-gray-400" : "text-gray-600")}>
@@ -1252,13 +1252,13 @@ export default function Profile() {
                       
                       <div className={cn("flex items-center justify-between max-w-md", isDark ? "text-gray-400" : "text-gray-600")}>
                         <button 
-                          className={cn("flex items-center gap-2 transition-colors group", isDark ? "hover:text-blue-400" : "hover:text-blue-500")}
+                          className={cn("flex items-center gap-2 transition-colors group", isDark ? "hover:text-info-400" : "hover:text-info-500")}
                           onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/post/${post.id}`);
                           }}
                         >
-                          <div className={cn("p-2 rounded-full", isDark ? "group-hover:bg-blue-500/10" : "group-hover:bg-blue-50")}>
+                          <div className={cn("p-2 rounded-full", isDark ? "group-hover:bg-info-500/10" : "group-hover:bg-info-50")}>
                             <MessageCircle className="w-4 h-4" />
                           </div>
                           <span className="text-sm">{post.comments_count || 0}</span>
@@ -1275,13 +1275,13 @@ export default function Profile() {
                           </div>
                           <span className="text-sm">{post.likes_count || 0}</span>
                         </button>
-                        <button className={cn("flex items-center gap-2 transition-colors group", isDark ? "hover:text-blue-400" : "hover:text-blue-500")}>
-                          <div className={cn("p-2 rounded-full", isDark ? "group-hover:bg-blue-500/10" : "group-hover:bg-blue-50")}>
+                        <button className={cn("flex items-center gap-2 transition-colors group", isDark ? "hover:text-info-400" : "hover:text-info-500")}>
+                          <div className={cn("p-2 rounded-full", isDark ? "group-hover:bg-info-500/10" : "group-hover:bg-info-50")}>
                             <BarChart3 className="w-4 h-4" />
                           </div>
                         </button>
-                        <button className={cn("transition-colors group", isDark ? "hover:text-blue-400" : "hover:text-blue-500")}>
-                          <div className={cn("p-2 rounded-full", isDark ? "group-hover:bg-blue-500/10" : "group-hover:bg-blue-50")}>
+                        <button className={cn("transition-colors group", isDark ? "hover:text-info-400" : "hover:text-info-500")}>
+                          <div className={cn("p-2 rounded-full", isDark ? "group-hover:bg-info-500/10" : "group-hover:bg-info-50")}>
                             <Share className="w-4 h-4" />
                           </div>
                         </button>
@@ -1454,7 +1454,7 @@ export default function Profile() {
                             ? 'bg-green-100/20 text-green-400' 
                             : job.matchPercentage >= 50
                               ? 'bg-yellow-100/20 text-yellow-400'
-                              : 'bg-blue-100/20 text-blue-400'
+                              : 'bg-info-100/20 text-info-400'
                         )}>
                           {job.matchPercentage}% match
                         </div>
@@ -1470,8 +1470,8 @@ export default function Profile() {
                             className={cn(
                               'text-xs px-2 py-0.5 rounded-full',
                               isDark 
-                                ? 'bg-blue-900/30 text-blue-300' 
-                                : 'bg-blue-50 text-blue-600'
+                                ? 'bg-info-900/30 text-info-300' 
+                                : 'bg-info-50 text-info-600'
                             )}
                           >
                             ✓ {reason}

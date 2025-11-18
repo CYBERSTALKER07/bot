@@ -370,7 +370,7 @@ export default function LinkedInJobImport() {
                 </div>
                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                   <div 
-                    className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                    className="bg-info-500 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${importProgress}%` }}
                   />
                 </div>
@@ -418,7 +418,7 @@ export default function LinkedInJobImport() {
                     <h3 className="font-semibold text-lg">{job.title}</h3>
                     <span className={cn(
                       'px-2 py-1 rounded text-xs font-medium',
-                      'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                      'bg-info-100 text-info-800 dark:bg-info-900 dark:text-info-200'
                     )}>
                       {job.type}
                     </span>

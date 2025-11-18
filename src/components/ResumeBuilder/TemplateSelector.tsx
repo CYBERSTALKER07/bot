@@ -123,7 +123,7 @@ export function TemplateSelector({
                     className={cn(
                       "w-full p-2 rounded-lg text-left transition-all duration-200 text-xs border",
                       selectedTemplate === template.id
-                        ? 'text-white shadow-md border-blue-500 bg-blue-500'
+                        ? 'text-white shadow-md border-info-500 bg-info-500'
                         : isDark 
                           ? 'bg-gray-900 border-gray-700 text-white hover:bg-gray-800'
                           : 'bg-gray-50 border-gray-300 text-black hover:bg-gray-100'
@@ -133,7 +133,7 @@ export function TemplateSelector({
                     <div className={cn(
                       "text-xs mt-1 opacity-80",
                       selectedTemplate === template.id 
-                        ? 'text-blue-100' 
+                        ? 'text-info-100' 
                         : isDark ? 'text-gray-400' : 'text-gray-500'
                     )}>
                       {template.description}
@@ -160,7 +160,7 @@ export function TemplateSelector({
                     className={cn(
                       "p-2 rounded-lg text-left transition-all duration-200 border",
                       selectedTheme === index
-                        ? 'border-2 shadow-md border-blue-500'
+                        ? 'border-2 shadow-md border-info-500'
                         : isDark 
                           ? 'bg-gray-900 border-gray-700 hover:bg-gray-800'
                           : 'bg-gray-50 border-gray-300 hover:bg-gray-100'

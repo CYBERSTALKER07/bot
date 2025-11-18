@@ -38,8 +38,8 @@ const quickActions: QuickAction[] = [
     id: 'portfolio-entry',
     label: 'Add Activity',
     icon: FolderOpenIcon,
-    color: 'bg-blue-500',
-    hoverColor: 'hover:bg-blue-600',
+    color: 'bg-info-500',
+    hoverColor: 'hover:bg-info-600',
     description: 'Add portfolio entry',
     entryType: 'academic'
   },
@@ -279,8 +279,8 @@ export function FloatingActionMenu({
             relative w-16 h-16 rounded-full flex items-center justify-center
             shadow-2xl transition-all duration-300 ease-out focus:outline-none focus:ring-4 focus:ring-blue-300
             ${isOpen 
-              ? 'bg-blue-700 text-white rotate-45 scale-110 shadow-blue-400/30' 
-              : 'bg-blue-600 text-white hover:bg-blue-700 hover:scale-105 hover:shadow-blue-400/20'
+              ? 'bg-info-700 text-white rotate-45 scale-110 shadow-blue-400/30' 
+              : 'bg-info-600 text-white hover:bg-info-700 hover:scale-105 hover:shadow-blue-400/20'
             }
           `}
           onClick={() => setIsOpen((v) => !v)}
@@ -292,7 +292,7 @@ export function FloatingActionMenu({
           
           {/* FAB glow effect */}
           <div className={`
-            absolute inset-0 rounded-full bg-blue-400 transition-all duration-300 pointer-events-none
+            absolute inset-0 rounded-full bg-info-400 transition-all duration-300 pointer-events-none
             ${isOpen ? 'opacity-20 scale-150' : 'opacity-0 scale-100'}
           `} />
         </button>

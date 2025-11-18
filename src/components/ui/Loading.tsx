@@ -23,7 +23,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   };
 
   const variantClasses = {
-    primary: 'text-blue-600',
+    primary: 'text-info-600',
     secondary: 'text-gray-500',
     white: 'text-white',
   };

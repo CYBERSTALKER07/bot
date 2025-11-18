@@ -14,9 +14,9 @@ export const designTokens = {
       success: '#22C55E',
       warning: '#F59E0B',
       error: '#EF4444',
-      info: '#3B82F6',
+      info: '#FA4617',
     },
-    
+
     // Neutral Colors (Enhanced for better contrast)
     neutral: {
       0: '#FFFFFF',
@@ -32,7 +32,7 @@ export const designTokens = {
       900: '#18181B',
       950: '#09090B',
     },
-    
+
     // Semantic Colors
     semantic: {
       background: {
@@ -49,7 +49,7 @@ export const designTokens = {
       },
     },
   },
-  
+
   // Typography Scale
   typography: {
     fontFamily: {
@@ -74,7 +74,7 @@ export const designTokens = {
       bold: '700',
     },
   },
-  
+
   // Spacing Scale (8px grid system)
   spacing: {
     px: '1px',
@@ -99,7 +99,7 @@ export const designTokens = {
     24: '6rem',      // 96px
     32: '8rem',      // 128px
   },
-  
+
   // Border Radius
   borderRadius: {
     none: '0',
@@ -112,7 +112,7 @@ export const designTokens = {
     '3xl': '1.5rem', // 24px
     full: '9999px',
   },
-  
+
   // Shadows (Professional elevation system)
   shadows: {
     xs: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
@@ -124,7 +124,7 @@ export const designTokens = {
     '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
     inner: 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
   },
-  
+
   // Animation & Transitions
   animation: {
     duration: {
@@ -140,7 +140,7 @@ export const designTokens = {
       easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
     },
   },
-  
+
   // Z-Index Scale
   zIndex: {
     hide: -1,
@@ -175,7 +175,7 @@ export const componentVariants = {
       ghost: 'bg-transparent hover:bg-neutral-100',
     },
   },
-  
+
   // Card variants
   card: {
     variant: {
@@ -195,14 +195,14 @@ export const componentVariants = {
 export const getColorValue = (colorPath: string) => {
   const keys = colorPath.split('.');
   let value: typeof designTokens.colors | string | undefined = designTokens.colors;
-  
+
   for (const key of keys) {
     if (typeof value === 'object' && value !== null) {
       value = (value as any)[key];
     }
     if (value === undefined) return null;
   }
-  
+
   return value;
 };
 

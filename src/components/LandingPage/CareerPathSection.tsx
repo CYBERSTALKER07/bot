@@ -266,7 +266,7 @@ export default function CareerPathSection() {
                       : 'bg-white border-gray-200'
                   }`}>
                     <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                      <div className="w-8 h-8 bg-info-500 rounded-full flex items-center justify-center">
                         <Briefcase className="h-5 w-5 text-white" />
                       </div>
                       <div>

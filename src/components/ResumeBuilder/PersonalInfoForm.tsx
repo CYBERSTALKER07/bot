@@ -22,7 +22,7 @@ export function PersonalInfoForm({ resumeData, updatePersonalInfo }: PersonalInf
           value={resumeData.personalInfo.fullName}
           onChange={(e) => updatePersonalInfo('fullName', e.target.value)}
           className={cn(
-            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500",
+            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
             isDark 
               ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400' 
               : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -34,7 +34,7 @@ export function PersonalInfoForm({ resumeData, updatePersonalInfo }: PersonalInf
           value={resumeData.personalInfo.email}
           onChange={(e) => updatePersonalInfo('email', e.target.value)}
           className={cn(
-            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500",
+            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
             isDark 
               ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400' 
               : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -46,7 +46,7 @@ export function PersonalInfoForm({ resumeData, updatePersonalInfo }: PersonalInf
           value={resumeData.personalInfo.phone}
           onChange={(e) => updatePersonalInfo('phone', e.target.value)}
           className={cn(
-            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500",
+            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
             isDark 
               ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400' 
               : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -58,7 +58,7 @@ export function PersonalInfoForm({ resumeData, updatePersonalInfo }: PersonalInf
           value={resumeData.personalInfo.location}
           onChange={(e) => updatePersonalInfo('location', e.target.value)}
           className={cn(
-            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500",
+            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
             isDark 
               ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400' 
               : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -70,7 +70,7 @@ export function PersonalInfoForm({ resumeData, updatePersonalInfo }: PersonalInf
           value={resumeData.personalInfo.website}
           onChange={(e) => updatePersonalInfo('website', e.target.value)}
           className={cn(
-            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500",
+            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
             isDark 
               ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400' 
               : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -82,7 +82,7 @@ export function PersonalInfoForm({ resumeData, updatePersonalInfo }: PersonalInf
           value={resumeData.personalInfo.linkedin}
           onChange={(e) => updatePersonalInfo('linkedin', e.target.value)}
           className={cn(
-            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500",
+            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
             isDark 
               ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400' 
               : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -95,7 +95,7 @@ export function PersonalInfoForm({ resumeData, updatePersonalInfo }: PersonalInf
         onChange={(e) => updatePersonalInfo('summary', e.target.value)}
         rows={4}
         className={cn(
-          "w-full px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none",
+          "w-full px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500 resize-none",
           isDark 
             ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400' 
             : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
