@@ -12,10 +12,10 @@ export function usePosts(limit = 20, currentUserId?: string) {
     queryKey: ['posts', limit, currentUserId],
     queryFn: async () => {
       try {
-        // STEP 1: Fetch posts WITHOUT the likes subquery join (much faster)
+        // STEP 1: Fetch posts WITH retweet data
         const { data: postsData, error: postsError } = await supabase
           .from('posts')
-          .select('id,content,user_id,created_at,likes_count,comments_count,shares_count,media_type,image_url,video_url,visibility')
+          .select('id,content,user_id,created_at,likes_count,comments_count,shares_count,retweets_count,media_type,image_url,video_url,visibility')
           .order('created_at', { ascending: false })
           .limit(limit);
 
@@ -28,8 +28,21 @@ export function usePosts(limit = 20, currentUserId?: string) {
           return [];
         }
 
-        // STEP 2: Get unique user IDs and fetch all profiles in parallel
-        const userIds = [...new Set(postsData.map(post => post.user_id))];
+        // STEP 2: Fetch retweets data separately
+        const { data: retweetsData, error: retweetsError } = await supabase
+          .from('post_retweets')
+          .select('id,post_id,user_id,is_quote_retweet,quote_content,created_at')
+          .order('created_at', { ascending: false })
+          .limit(limit);
+
+        if (retweetsError) {
+          console.warn('Error fetching retweets:', retweetsError);
+        }
+
+        // STEP 3: Get all unique user IDs (post authors + retweeters)
+        const postUserIds = postsData.map(post => post.user_id);
+        const retweetUserIds = retweetsData?.map(rt => rt.user_id) || [];
+        const userIds = [...new Set([...postUserIds, ...retweetUserIds])];
         
         const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
@@ -44,33 +57,51 @@ export function usePosts(limit = 20, currentUserId?: string) {
           profilesData?.map(p => [p.id, p]) || []
         );
 
-        // STEP 3: Fetch likes separately if we have a current user (for faster post loading)
+        // STEP 4: Fetch likes separately if we have a current user
         let likesMap = new Map<string, boolean>();
+        let userRetweetsMap = new Map<string, any>();
+        
         if (currentUserId) {
           try {
-            const { data: likesData, error: likesError } = await supabase
+            const { data: likesData } = await supabase
               .from('likes')
               .select('post_id,user_id')
               .eq('user_id', currentUserId)
               .in('post_id', postsData.map(p => p.id));
 
-            if (!likesError && likesData) {
+            if (likesData) {
               likesMap = new Map(likesData.map(like => [like.post_id, true]));
             }
+
+            // Check which posts current user has retweeted
+            const { data: userRetweets } = await supabase
+              .from('post_retweets')
+              .select('post_id,is_quote_retweet')
+              .eq('user_id', currentUserId)
+              .in('post_id', postsData.map(p => p.id));
+
+            if (userRetweets) {
+              userRetweetsMap = new Map(userRetweets.map(rt => [rt.post_id, rt]));
+            }
           } catch (error) {
-            console.warn('Error fetching likes:', error);
-            // Continue without likes data - not critical
+            console.warn('Error fetching user interactions:', error);
           }
         }
 
-        // STEP 4: Transform and return posts with minimal processing
-        return postsData.map((post: any) => {
+        // STEP 5: Create a map of original posts for retweets
+        const postsMap = new Map(postsData.map(p => [p.id, p]));
+
+        // STEP 6: Build combined feed (original posts + retweets)
+        const feedItems: any[] = [];
+
+        // Add original posts
+        postsData.forEach((post: any) => {
           const profile = profilesMap.get(post.user_id);
-          return {
-            id: post.id.toString(),
+          feedItems.push({
+            id: post.id,
             content: post.content || '',
             author: {
-              id: post.user_id.toString(),
+              id: post.user_id,
               name: profile?.full_name || 'User',
               username: profile?.username || `user${post.user_id}`,
               avatar_url: profile?.avatar_url,
@@ -78,19 +109,90 @@ export function usePosts(limit = 20, currentUserId?: string) {
             },
             created_at: post.created_at,
             likes_count: post.likes_count || 0,
-            retweets_count: post.shares_count || 0,
+            retweets_count: post.retweets_count || 0,
             replies_count: post.comments_count || 0,
             has_liked: likesMap.has(post.id),
-            has_retweeted: false,
+            has_retweeted: userRetweetsMap.has(post.id),
             has_bookmarked: false,
             media: post.image_url || post.video_url ? [{
               type: (post.media_type === 'video' || post.video_url) ? 'video' : 'image',
               url: post.image_url || post.video_url || '',
               alt: 'Post media'
             }] : undefined,
-            visibility: post.visibility
-          };
+            visibility: post.visibility,
+            is_retweet: false,
+            is_quote_retweet: false
+          });
         });
+
+        // Add retweets to the feed
+        if (retweetsData && retweetsData.length > 0) {
+          retweetsData.forEach((retweet: any) => {
+            const originalPost = postsMap.get(retweet.post_id);
+            if (!originalPost) return;
+
+            const originalProfile = profilesMap.get(originalPost.user_id);
+            const retweeterProfile = profilesMap.get(retweet.user_id);
+
+            feedItems.push({
+              id: `retweet_${retweet.id}`,
+              content: retweet.quote_content || originalPost.content,
+              author: {
+                id: originalPost.user_id,
+                name: originalProfile?.full_name || 'User',
+                username: originalProfile?.username || `user${originalPost.user_id}`,
+                avatar_url: originalProfile?.avatar_url,
+                verified: originalProfile?.verified || false
+              },
+              created_at: retweet.created_at,
+              likes_count: originalPost.likes_count || 0,
+              retweets_count: originalPost.retweets_count || 0,
+              replies_count: originalPost.comments_count || 0,
+              has_liked: likesMap.has(originalPost.id),
+              has_retweeted: userRetweetsMap.has(originalPost.id),
+              has_bookmarked: false,
+              media: originalPost.image_url || originalPost.video_url ? [{
+                type: (originalPost.media_type === 'video' || originalPost.video_url) ? 'video' : 'image',
+                url: originalPost.image_url || originalPost.video_url || '',
+                alt: 'Post media'
+              }] : undefined,
+              visibility: originalPost.visibility,
+              is_retweet: true,
+              is_quote_retweet: retweet.is_quote_retweet || false,
+              quote_content: retweet.quote_content,
+              original_post: {
+                id: originalPost.id,
+                content: originalPost.content || '',
+                author: {
+                  id: originalPost.user_id,
+                  name: originalProfile?.full_name || 'User',
+                  username: originalProfile?.username || `user${originalPost.user_id}`,
+                  avatar_url: originalProfile?.avatar_url,
+                  verified: originalProfile?.verified || false
+                },
+                created_at: originalPost.created_at,
+                media: originalPost.image_url || originalPost.video_url ? [{
+                  type: (originalPost.media_type === 'video' || originalPost.video_url) ? 'video' : 'image',
+                  url: originalPost.image_url || originalPost.video_url || '',
+                  alt: 'Post media'
+                }] : undefined
+              },
+              retweeted_by: {
+                id: retweet.user_id,
+                name: retweeterProfile?.full_name || 'User',
+                username: retweeterProfile?.username || `user${retweet.user_id}`,
+                avatar_url: retweeterProfile?.avatar_url
+              }
+            });
+          });
+        }
+
+        // STEP 7: Sort combined feed by date
+        feedItems.sort((a, b) => 
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+
+        return feedItems.slice(0, limit);
       } catch (error) {
         console.error('usePosts error:', error);
         return [];
@@ -1618,50 +1720,13 @@ export function useLikePost() {
         throw error;
       }
     },
-    // OPTIMISTIC UPDATE: Update UI immediately before database confirms
-    onMutate: async ({ postId, userId }) => {
-      // Cancel any outgoing refetches so they don't overwrite our optimistic update
-      await queryClient.cancelQueries({ queryKey: ['posts'] });
-
-      // Snapshot the previous value
-      const previousPosts = queryClient.getQueryData(['posts']);
-
-      // Optimistically update the cache
-      queryClient.setQueryData(['posts'], (old: any) => {
-        if (!old) return old;
-
-        return old.map((post: any) => {
-          if (post.id === postId) {
-            return {
-              ...post,
-              has_liked: true,
-              likes_count: (post.likes_count || 0) + 1
-            };
-          }
-          return post;
-        });
-      });
-
-      // Return context with previous data for rollback on error
-      return { previousPosts };
-    },
     onSuccess: (data) => {
       console.log('✅ Post liked successfully');
-    },
-    // If mutation fails, rollback to previous state
-    onError: (error: any, variables, context: any) => {
-      console.error('Like mutation error:', error?.message || error);
-      
-      // Rollback to previous state
-      if (context?.previousPosts) {
-        queryClient.setQueryData(['posts'], context.previousPosts);
-      }
-    },
-    // Always refetch after error or success to sync with server
-    onSettled: () => {
+      // Refetch posts to get updated like counts
       queryClient.invalidateQueries({ queryKey: ['posts'] });
-      queryClient.invalidateQueries({ queryKey: ['postDetail'] });
-      queryClient.invalidateQueries({ queryKey: ['mostLikedPosts'] });
+    },
+    onError: (error: any) => {
+      console.error('Like mutation error:', error?.message || error);
     }
   });
 }
@@ -1692,50 +1757,13 @@ export function useUnlikePost() {
         throw error;
       }
     },
-    // OPTIMISTIC UPDATE: Update UI immediately before database confirms
-    onMutate: async ({ postId, userId }) => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['posts'] });
-
-      // Snapshot the previous value
-      const previousPosts = queryClient.getQueryData(['posts']);
-
-      // Optimistically update the cache
-      queryClient.setQueryData(['posts'], (old: any) => {
-        if (!old) return old;
-
-        return old.map((post: any) => {
-          if (post.id === postId) {
-            return {
-              ...post,
-              has_liked: false,
-              likes_count: Math.max(0, (post.likes_count || 0) - 1) // Prevent negative counts
-            };
-          }
-          return post;
-        });
-      });
-
-      // Return context with previous data for rollback on error
-      return { previousPosts };
-    },
     onSuccess: () => {
       console.log('✅ Post unliked successfully');
-    },
-    // If mutation fails, rollback to previous state
-    onError: (error: any, variables, context: any) => {
-      console.error('Unlike mutation error:', error?.message || error);
-      
-      // Rollback to previous state
-      if (context?.previousPosts) {
-        queryClient.setQueryData(['posts'], context.previousPosts);
-      }
-    },
-    // Always refetch after error or success to sync with server
-    onSettled: () => {
+      // Refetch posts to get updated like counts
       queryClient.invalidateQueries({ queryKey: ['posts'] });
-      queryClient.invalidateQueries({ queryKey: ['postDetail'] });
-      queryClient.invalidateQueries({ queryKey: ['mostLikedPosts'] });
+    },
+    onError: (error: any) => {
+      console.error('Unlike mutation error:', error?.message || error);
     }
   });
 }

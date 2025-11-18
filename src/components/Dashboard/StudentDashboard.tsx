@@ -8,7 +8,7 @@ import {
   Building2,
   Briefcase,
   Calendar,
-  BookOpen,z
+  BookOpen,
   Users,
   Heart,
   MessageCircle,

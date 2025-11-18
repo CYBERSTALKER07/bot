@@ -40,6 +40,13 @@ import { useCreateRetweet, useRemoveRetweet } from '../hooks/useRetweet';
 import { Skeleton, PostCardSkeleton, RightSidebarSearchSkeleton, RightSidebarJobsSkeleton, RightSidebarWhoToFollowSkeleton, LeftSidebarSkeleton, RightSidebarSkeleton } from './ui/Skeleton';
 import WhoToFollowItem from './WhoToFollowItem';
 import AnimatedList from './AnimatedList';
+import RetweetHeader from './RetweetHeader';
+import QuoteTweetCard from './QuoteTweetCard';
+import EnhancedPostCardInteractions from './ui/EnhancedPostCardInteractions';
+import EnhancedVideoPlayer from './ui/EnhancedVideoPlayer';
+import ImageLightbox from './ui/ImageLightbox';
+import EnhancedFAB from './ui/EnhancedFAB';
+import { useInfiniteScroll, usePullToRefresh, useScrollDirection } from '../hooks/useScrollOptimizations';
 
 interface Post {
   id: string;
@@ -60,8 +67,10 @@ interface Post {
   has_bookmarked: boolean;
   media?: { type: 'image' | 'video'; url: string; alt?: string }[];
   reply_to?: { id: string; author: { name: string; username: string } };
-  // New fields for retweets
+  // Retweet fields
   is_retweet?: boolean;
+  is_quote_retweet?: boolean;
+  quote_content?: string;
   original_post?: {
     id: string;
     content: string;
@@ -319,6 +328,32 @@ export default function Feed() {
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
 
   const timelineRef = useRef<HTMLDivElement>(null);
+  
+  // Lightbox state for image viewing
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxImages, setLightboxImages] = useState<{ src: string; alt?: string; caption?: string }[]>([]);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  
+  // Scroll optimization hooks - mounted for their side effects
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { sentinelRef: infiniteScrollRef } = useInfiniteScroll(async () => {
+    // Fetch more posts - adjust based on your API
+    console.log('Loading more posts...');
+  });
+  
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { 
+    containerRef: _pullToRefreshRef, 
+    isPulling: _isPulling, 
+    pullDistance: _pullDistance, 
+    isRefreshing: _isRefreshing 
+  } = usePullToRefresh(async () => {
+    // Refresh feed
+    console.log('Refreshing feed...');
+  }, true);
+  
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _scrollDirection = useScrollDirection();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
 
@@ -667,7 +702,7 @@ export default function Feed() {
           'flex-1',
           isMobile 
             ? 'pt-16 p-0' 
-            : 'lg:ml-5 max-w-2xl mx-auto'
+            : 'lg:ml-5 max-w-3xl mx-auto'
         )}>
           {/* Header Skeleton */}
           <div className={cn(
@@ -735,20 +770,20 @@ export default function Feed() {
         isDark ? 'bg-black border-blbg-black' : 'bg-white order-blbg-black'
       )}>
         {/* User Profile Quick View */}
-        <div className="relative rounded-2xl p-4 text-white overflow-hidden">
+        <div className="relative rounded-3xl p-4 text-white overflow-hidden">
           {/* Cover Photo Background */}
           {profileData.cover_image_url ? (
             <img
               src={profileData.cover_image_url}
               alt="Cover"
-              className="absolute inset-0 w-full h-full object-cover rounded-2xl"
+              className="absolute inset-0 w-full h-full object-cover rounded-3xl"
             />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-r from-border-gray-900 to-purple-600 rounded-2xl" />
+            <div className="absolute inset-0 bg-gradient-to-r from-border-gray-900 to-purple-600 rounded-3xl" />
           )}
           
           {/* Dark overlay for better text readability */}
-          <div className="absolute inset-0 bg-black/40 rounded-2xl" />
+          <div className="absolute inset-0 bg-black/40 rounded-3xl" />
           
           {/* Content */}
           <div className="relative z-10">
@@ -805,7 +840,7 @@ export default function Feed() {
      
 
         {/* Industry Insights */}
-        <div className={cn("bg-white rounded-2xl border  overflow-hidden", isDark ? 'bg-transparent text-white border-blbg-black' : 'bg-white order-blbg-black')}>
+        <div className={cn("bg-white rounded-3xl border  overflow-hidden", isDark ? 'bg-transparent text-white border-blbg-black' : 'bg-white order-blbg-black')}>
           <div className="p-4 border-b order-blbg-black">
             <h3 className="font-serif ">TrendingUp</h3>
           </div>
@@ -828,7 +863,7 @@ export default function Feed() {
         </div>
 
         {/* Mentorship Marketplace */}
-        {/* <div className="bg-blue-950 rounded-2xl p-4 text-white">
+        {/* <div className="bg-blue-950 rounded-3xl p-4 text-white">
           <div className="flex items-center gap-2 mb-3">
             <Users className="w-5 h-5" />
             <h3 className="font-bold">Find a Mentor</h3>
@@ -852,7 +887,7 @@ export default function Feed() {
         </div> */}
 
         {/* Career Opportunities Scanner */}
-        <div className={cn("bg-white rounded-2xl border order-blbg-black overflow-hidden", isDark ? 'bg-transparent text-white border-blbg-black' : 'bg-white order-blbg-black')}>
+        <div className={cn("bg-white rounded-3xl border order-blbg-black overflow-hidden", isDark ? 'bg-transparent text-white border-blbg-black' : 'bg-white order-blbg-black')}>
           <div className="p-4 border-b order-blbg-black">
             <div className="flex items-center gap-2">
               <h3 className="font-bold ">Jobs That Match Your Profile</h3>
@@ -930,7 +965,6 @@ export default function Feed() {
             ) : (
               <div className="text-center py-4 text-gray-500">
                 <p className="text-sm mb-2">No matched jobs yet</p>
-                <p className="text-xs text-gray-400">Complete your profile to get personalized recommendations</p>
               </div>
             )}
           </div>
@@ -959,7 +993,7 @@ export default function Feed() {
         </Button> */}
 
         {/* Recent Connections */}
-        <div className={cn("bg-white rounded-2xl border order-blbg-black overflow-hidden", isDark ? 'bg-transparent text-white border-[0.7px] border-b border-blbg-black bg-black' : 'bg-white order-blbg-black')}>
+        <div className={cn("bg-white rounded-3xl border order-blbg-black overflow-hidden", isDark ? 'bg-transparent text-white border-[0.7px] border-b border-blbg-black bg-black' : 'bg-white order-blbg-black')}>
           <div className="p-4 border-b border-gray-900">
             <h3 className={cn("font-serif ",isDark ?  'text-white' : 'text-asu-maroon' )}>Upcoming Events</h3>
           </div>
@@ -995,7 +1029,7 @@ export default function Feed() {
                         <img 
                           src={event.employer.avatar_url} 
                           alt={event.employer.name}
-                          className="w-16 h-16 rounded-2xl object-cover flex-shrink-0 border border-none"
+                          className="w-16 h-16 rounded-3xl object-cover flex-shrink-0 border border-none"
                           onError={(e) => {
                             // Fallback if image fails to load
                             const img = e.target as HTMLImageElement;
@@ -1114,7 +1148,7 @@ export default function Feed() {
         'flex-1',
         isMobile 
           ? 'pt-16 p-0' 
-          : 'lg:ml-5 max-w-2xl mx-auto'
+          : 'lg:ml-5 max-w-3xl mx-auto'
       )}>
         {/* Mobile/Desktop Header with Tab Switcher */}
         <div className={cn(
@@ -1380,235 +1414,221 @@ export default function Feed() {
               'border-[0.5px] divide-y rounded-3xl',
               isDark ? 'border-blbg-black divide-blbg-black' : 'divide-gray-200'
             )}>
-              {posts.map((post) => (
-                <div 
-                  key={post.id} 
-                  className={cn(
-                    'transition-colors cursor-pointer',
-                    isDark ? 'hover:bg-gray-950/50' : 'hover:bg-gray-50/50',
-                    isMobile ? 'p-3' : 'p-4'
-                  )}
-                  onClick={() => navigate(`/post/${post.original_post?.id || post.id}`)}
-                >
-                  {/* Retweet Header - Shows when this is a retweet */}
-                  {post.is_retweet && post.retweeted_by && (
-                    <div className={cn(
-                      'flex items-center space-x-2 mb-3 text-gray-500',
-                      isMobile ? 'text-xs' : 'text-sm'
-                    )}>
-                      <Repeat2 className={cn(isMobile ? 'h-3 w-3' : 'h-4 w-4')} />
-                      <Link 
-                        to={`/profile/${post.retweeted_by.id}`}
-                        onClick={(e) => e.stopPropagation()}
-                        className="hover:underline font-medium"
-                      >
-                        {post.retweeted_by.name} retweeted
-                      </Link>
-                    </div>
-                  )}
-
-                  <div className={cn('flex space-x-3', isMobile ? 'space-x-2' : 'space-x-3')}>
-                    {/* Display original author avatar for retweets, otherwise current author */}
-                    <Link 
-                      to={`/profile/${post.is_retweet ? post.original_post?.author.id : post.author.id}`} 
-                      onClick={(e) => e.stopPropagation()}
-                      className="flex-shrink-0 hover:opacity-80 transition-opacity"
-                    >
-                      <Avatar
-                        src={post.is_retweet ? post.original_post?.author.avatar_url : post.author.avatar_url}
-                        alt={post.is_retweet ? post.original_post?.author.name : post.author.name}
-                        name={post.is_retweet ? post.original_post?.author.name : post.author.name}
-                        size={isMobile ? 'sm' : 'md'}
-                        className="cursor-pointer"
+              {posts.map((post) => {
+                // Determine if this is a simple retweet or quote retweet
+                const isSimpleRetweet = post.is_retweet && !post.is_quote_retweet;
+                const isQuoteRetweet = post.is_retweet && post.is_quote_retweet;
+                
+                // For simple retweets: show original author as main
+                // For quote retweets: show retweeter as main, original in container
+                const displayAuthor = isQuoteRetweet ? post.retweeted_by : (isSimpleRetweet ? post.original_post?.author : post.author);
+                const displayContent = isQuoteRetweet ? post.quote_content : (isSimpleRetweet ? post.original_post?.content : post.content);
+                const displayMedia = isSimpleRetweet ? post.original_post?.media : post.media;
+                const displayCreatedAt = isSimpleRetweet ? post.original_post?.created_at : post.created_at;
+                
+                return (
+                  <div 
+                    key={post.id} 
+                    className={cn(
+                      'transition-colors cursor-pointer',
+                      isDark ? 'hover:bg-gray-950/50' : 'hover:bg-gray-50/50',
+                      isMobile ? 'p-3' : 'p-4'
+                    )}
+                    onClick={() => navigate(`/post/${post.original_post?.id || post.id}`)}
+                  >
+                    {/* Retweet Header - Shows for simple retweets only */}
+                    {isSimpleRetweet && post.retweeted_by && (
+                      <RetweetHeader
+                        retweetedByName={post.retweeted_by.name}
+                        retweetedById={post.retweeted_by.id}
+                        isMobile={isMobile}
                       />
-                    </Link>
-                    
-                    <div className="flex-1 min-w-0">
-                      {/* Author Info - Shows original author for retweets */}
-                      <div className={cn(
-                        'flex items-center mb-1',
-                        isMobile ? 'flex-col items-start space-y-1' : 'space-x-2'
-                      )}>
-                        <div className="flex items-center space-x-2">
-                          <Link 
-                            to={`/profile/${post.is_retweet ? post.original_post?.author.id : post.author.id}`}
-                            onClick={(e) => e.stopPropagation()}
-                            className={cn(
-                              'font-bold hover:underline cursor-pointer',
-                              isMobile ? 'text-sm' : 'text-base'
-                            )}
-                          >
-                            {post.is_retweet ? post.original_post?.author.name : post.author.name}
-                          </Link>
-                          {(post.is_retweet ? post.original_post?.author.verified : post.author.verified) && (
-                            <div className="w-4 h-4 bg-border-gray-900 rounded-full flex items-center justify-center">
-                              <span className="text-white text-xs">✓</span>
-                            </div>
-                          )}
-                        </div>
-                        <div className={cn(
-                          'flex items-center space-x-1 text-gray-500',
-                          isMobile ? 'text-xs' : 'text-sm'
-                        )}>
-                          <span>@{post.is_retweet ? post.original_post?.author.username : post.author.username}</span>
-                          <span>·</span>
-                          <span>{formatTime(post.is_retweet ? post.original_post?.created_at || post.created_at : post.created_at)}</span>
-                        </div>
-                      </div>
-                      
-                      {/* Post Content - Shows original content for retweets */}
-                      <p className={cn(
-                        'leading-normal mb-3 whitespace-pre-wrap',
-                        isMobile ? 'text-sm' : 'text-base'
-                      )}>
-                        {post.is_retweet ? post.original_post?.content : post.content}
-                      </p>
+                    )}
 
-                      {/* Media Content - Shows original media for retweets */}
-                      {(post.is_retweet ? post.original_post?.media : post.media) && (
-                        <div className="grid grid-cols-1 border-blbg-black divide-blbg-black border rounded-3xl gap-2 mb-3">
-                          {(post.is_retweet ? post.original_post?.media : post.media)?.map((media, index) => (
-                            <div key={index} className="relative">
-                              {media.type === 'image' ? (
-                                <img
-                                  src={media.url}
-                                  alt={media.alt || ''}
-                                  className="rounded-3xl object-cover w-full"
-                                />
-                              ) : (
-                                <VideoPlayer
-                                  src={media.url}
-                                  className="rounded-3xl h-[600px] w-full"
-                                />
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      
-                      {/* Post Actions - Enhanced with dropdown for retweet options */}
-                      <div className={cn(
-                        'flex items-center justify-between',
-                        isMobile ? 'max-w-full' : 'max-w-md'
-                      )}>
-                        {/* Reply Button */}
-                        <Button
-                          variant="ghost" 
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/post/${post.original_post?.id || post.id}`);
-                          }}
-                          className={cn(
-                            'flex items-center space-x-2 rounded-full group transition-colors',
-                            isDark 
-                              ? 'text-gray-400 hover:text-border-gray-900 hover:bg-border-gray-900/10' 
-                              : 'text-gray-600 hover:text-blue-600 hover:bg-border-gray-900/10',
-                            isMobile ? 'p-1' : 'p-2'
-                          )}
-                        >
-                          <MessageCircle className={cn(isMobile ? 'h-4 w-4' : 'h-5 w-5')} />
-                          <span className={cn(isMobile ? 'text-xs' : 'text-sm')}>{post.replies_count}</span>
-                        </Button>
-                        
-                        {/* Retweet Button with Dropdown */}
-                        <RetweetButton
-                          postId={post.id}
-                          hasRetweeted={post.has_retweeted}
-                          retweetsCount={post.retweets_count}
-                          onRetweet={() => handleRetweet(post.id)}
-                          onQuoteRetweet={() => handleRetweet(post.id, true)}
-                          isMobile={isMobile}
-                          isDark={isDark}
+                    <div className={cn('flex gap-3', isMobile ? 'gap-2' : 'gap-3')}>
+                      {/* Avatar - Show appropriate author */}
+                      <Link 
+                        to={`/profile/${displayAuthor?.id}`} 
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex-shrink-0 hover:opacity-80 transition-opacity"
+                      >
+                        <Avatar
+                          src={displayAuthor?.avatar_url}
+                          alt={displayAuthor?.name}
+                          name={displayAuthor?.name}
+                          size={isMobile ? 'sm' : 'md'}
+                          className="cursor-pointer"
                         />
+                      </Link>
+                      
+                      <div className="flex-1 min-w-0">
+                        {/* Author Info */}
+                        <div className={cn(
+                          'flex items-center mb-1',
+                          isMobile ? 'flex-col items-start gap-1' : 'gap-2 flex-wrap'
+                        )}>
+                          <div className="flex items-center gap-2">
+                            <Link 
+                              to={`/profile/${displayAuthor?.id}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className={cn(
+                                'font-bold hover:underline cursor-pointer',
+                                isMobile ? 'text-sm' : 'text-base'
+                              )}
+                            >
+                              {displayAuthor?.name}
+                            </Link>
+                            {displayAuthor?.verified && (
+                              <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                                <span className="text-white text-xs">✓</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className={cn(
+                            'flex items-center gap-1 text-gray-500',
+                            isMobile ? 'text-xs' : 'text-sm'
+                          )}>
+                            <span>@{displayAuthor?.username}</span>
+                            <span>·</span>
+                            <span>{formatTime(displayCreatedAt || post.created_at)}</span>
+                          </div>
+                        </div>
                         
-                        {/* Like Button */}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleLike(post.original_post?.id || post.id);
+                        {/* Post Content */}
+                        {displayContent && (
+                          <p className={cn(
+                            'leading-normal mb-3 whitespace-pre-wrap',
+                            isMobile ? 'text-sm' : 'text-base'
+                          )}>
+                            {displayContent}
+                          </p>
+                        )}
+
+                        {/* Quote Retweet: Show original post in container */}
+                        {isQuoteRetweet && post.original_post && (
+                          <QuoteTweetCard
+                            post={post.original_post}
+                            isDark={isDark}
+                            onClick={() => navigate(`/post/${post.original_post?.id}`)}
+                          />
+                        )}
+
+                        {/* Media Content - Only for non-quote retweets */}
+                        {!isQuoteRetweet && displayMedia && displayMedia.length > 0 && (
+                          <div className="grid grid-cols-1 border rounded-3xl overflow-hidden gap-2 mb-3">
+                            {displayMedia.map((media, index) => (
+                              <div 
+                                key={index} 
+                                className="relative cursor-pointer"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (media.type === 'image') {
+                                    setLightboxImages(displayMedia.filter(m => m.type === 'image'));
+                                    setSelectedImageIndex(displayMedia.filter(m => m.type === 'image').findIndex(m => m.url === media.url));
+                                    setLightboxOpen(true);
+                                  }
+                                }}
+                              >
+                                {media.type === 'image' ? (
+                                  <img
+                                    src={media.url}
+                                    alt={media.alt || ''}
+                                    className="w-full object-cover hover:opacity-90 transition-opacity"
+                                  />
+                                ) : (
+                                  <EnhancedVideoPlayer
+                                    src={media.url}
+                                    width="100%"
+                                    height={600}
+                                  />
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        
+                        {/* Post Actions - Enhanced Version */}
+                        <EnhancedPostCardInteractions
+                          postId={post.original_post?.id || post.id}
+                          initialLikes={post.likes_count}
+                          initialRetweets={post.retweets_count}
+                          initialReplies={post.replies_count}
+                          isLiked={post.has_liked}
+                          isRetweeted={post.has_retweeted}
+                          isBookmarked={post.has_bookmarked}
+                          onLike={async (postId) => {
+                            handleLike(postId);
                           }}
-                          className={cn(
-                            'flex items-center space-x-2 rounded-full group transition-colors',
-                            post.has_liked
-                              ? 'text-red-500 hover:text-red-400'
-                              : isDark 
-                                ? 'text-gray-400 hover:text-red-400 hover:bg-red-500/10'
-                                : 'text-gray-600 hover:text-red-600 hover:bg-red-500/10',
-                            isMobile ? 'p-1' : 'p-2'
-                          )}
-                        >
-                          <Heart className={cn(
-                            post.has_liked ? 'fill-current' : '',
-                            isMobile ? 'h-4 w-4' : 'h-5 w-5'
-                          )} />
-                          <span className={cn(isMobile ? 'text-xs' : 'text-sm')}>{post.likes_count}</span>
-                        </Button>
-                        
-                        {/* Share Button */}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
+                          onRetweet={async (postId) => {
+                            handleRetweet(postId);
+                          }}
+                          onReply={(postId) => {
+                            navigate(`/post/${postId}`);
+                          }}
+                          onShare={(postId) => {
                             handleShare(post.original_post || post);
                           }}
-                          className={cn(
-                            'flex items-center space-x-2 rounded-full group transition-colors',
-                            isDark 
-                              ? 'text-gray-400 hover:text-border-gray-900 hover:bg-border-gray-900/10' 
-                              : 'text-gray-600 hover:text-blue-600 hover:bg-border-gray-900/10',
-                            isMobile ? 'p-1' : 'p-2'
-                          )}
-                        >
-                          <Share className={cn(isMobile ? 'h-4 w-4' : 'h-5 w-5')} />
-                        </Button>
-                        
-                        {/* Bookmark Button */}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleBookmark(post.original_post?.id || post.id);
+                          onBookmark={async (postId) => {
+                            handleBookmark(postId);
                           }}
-                          className={cn(
-                            'flex items-center space-x-2 rounded-full group transition-colors',
-                            post.has_bookmarked
-                              ? 'text-yellow-500 hover:text-yellow-400'
-                              : isDark 
-                                ? 'text-gray-400 hover:text-yellow-400 hover:bg-yellow-500/10'
-                                : 'text-gray-600 hover:text-yellow-600 hover:bg-yellow-500/10',
-                            isMobile ? 'p-1' : 'p-2'
-                          )}
-                        >
-                          <Bookmark className={cn(
-                            post.has_bookmarked ? 'fill-current' : '',
-                            isMobile ? 'h-4 w-4' : 'h-5 w-5'
-                          )} />
-                        </Button>
+                        />
                       </div>
                     </div>
-                    
-                   
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </>
         ) : null}
 
-        {/* Loading More */}
-        <div className={cn('text-center', isMobile ? 'p-4' : 'p-8')}>
+        {/* Loading More / Infinite Scroll Sentinel */}
+        <div ref={infiniteScrollRef} className={cn('text-center', isMobile ? 'p-4' : 'p-8')}>
           <Button
             variant="ghost"
             className="text-border-gray-900 hover:bg-border-gray-900/10"
           >
-            Show more posts
+            {loading ? 'Loading...' : 'Show more posts'}
           </Button>
         </div>
+        
+        {/* Image Lightbox Modal */}
+        <ImageLightbox
+          images={lightboxImages}
+          isOpen={lightboxOpen}
+          onClose={() => setLightboxOpen(false)}
+          onImageChange={setSelectedImageIndex}
+          initialIndex={selectedImageIndex}
+          allowDownload
+          allowZoom
+          showThumbnails
+        />
+        
+        {/* Enhanced Floating Action Button */}
+        <EnhancedFAB
+          actions={[
+            {
+              id: 'compose',
+              label: 'Compose Post',
+              icon: <Edit3 className="h-6 w-6" />,
+              color: '#FFC627',
+              onClick: () => setShowPostModal(true),
+            },
+            {
+              id: 'search',
+              label: 'Search',
+              icon: <Search className="h-6 w-6" />,
+              onClick: () => navigate('/search'),
+            },
+            {
+              id: 'messages',
+              label: 'Messages',
+              icon: <MessageSquare className="h-6 w-6" />,
+              onClick: () => navigate('/messages'),
+            },
+          ]}
+          position="bottom-right"
+          hapticFeedback
+        />
       </main>
 
       {/* Right Sidebar - Desktop Only */}
@@ -1811,7 +1831,7 @@ export default function Feed() {
               'rounded-3xl p-4 border',
               isDark ? 'bg-black border-blbg-black' : 'bg-white order-blbg-black'
             )}>
-              <h3 className="font-bold text-2xl font-serif mb-4 flex items-center">
+              <h3 className="font-bold text-3xl font-serif mb-4 flex items-center">
                 <Bookmark className="h-5 w-5 mr-2" />
                 Jobs For You
               </h3>
@@ -2079,7 +2099,7 @@ export default function Feed() {
                     touch-manipulation select-none transform-gpu
                     ${isFabOpen ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-0 pointer-events-none'}
                     ${isPressed || isDraggedOver
-                      ? 'scale-150 shadow-2xl ring-4 ring-white/30 border-white/40' 
+                      ? 'scale-150 shadow-3xl ring-4 ring-white/30 border-white/40' 
                       : isHovered 
                         ? 'scale-125 shadow-xl border-white/30' 
                         : 'scale-100 hover:scale-110 active:scale-95'
@@ -2112,7 +2132,7 @@ export default function Feed() {
               }
             }}
             className={`
-              relative w-16 h-16 rounded-full shadow-2xl flex items-center justify-center
+              relative w-16 h-16 rounded-full shadow-3xl flex items-center justify-center
               transition-all duration-300 ease-out border-2 border-white/20
               touch-manipulation select-none transform-gpu
               ${isFabOpen 

@@ -24,12 +24,12 @@ export default function RetweetHeader({
   return (
     <div
       className={cn(
-        'flex items-center space-x-2 mb-3',
+        'flex items-center gap-2 mb-2',
         isDark ? 'text-gray-500' : 'text-gray-600',
-        isMobile ? 'text-xs px-3' : 'text-sm px-4'
+        isMobile ? 'text-xs pl-3' : 'text-sm pl-12'
       )}
     >
-      <Repeat2 className={cn(isMobile ? 'h-3 w-3' : 'h-4 w-4')} />
+      <Repeat2 className={cn(isMobile ? 'h-3.5 w-3.5' : 'h-4 w-4')} />
       <Link
         to={`/profile/${retweetedById}`}
         onClick={(e) => e.stopPropagation()}

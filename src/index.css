@@ -603,6 +603,43 @@
     );
   }
 
+  /* Video player progress bar */
+  .progress-bar {
+    background: linear-gradient(
+      to right,
+      white 0%,
+      white var(--progress-percent, 0%),
+      rgba(255, 255, 255, 0.3) var(--progress-percent, 0%),
+      rgba(255, 255, 255, 0.3) 100%
+    );
+  }
+
+  .progress-bar[data-progress="0"] { --progress-percent: 0%; }
+  .progress-bar[data-progress="1"] { --progress-percent: 1%; }
+  .progress-bar[data-progress="2"] { --progress-percent: 2%; }
+  .progress-bar[data-progress="3"] { --progress-percent: 3%; }
+  .progress-bar[data-progress="4"] { --progress-percent: 4%; }
+  .progress-bar[data-progress="5"] { --progress-percent: 5%; }
+  .progress-bar[data-progress="10"] { --progress-percent: 10%; }
+  .progress-bar[data-progress="15"] { --progress-percent: 15%; }
+  .progress-bar[data-progress="20"] { --progress-percent: 20%; }
+  .progress-bar[data-progress="25"] { --progress-percent: 25%; }
+  .progress-bar[data-progress="30"] { --progress-percent: 30%; }
+  .progress-bar[data-progress="35"] { --progress-percent: 35%; }
+  .progress-bar[data-progress="40"] { --progress-percent: 40%; }
+  .progress-bar[data-progress="45"] { --progress-percent: 45%; }
+  .progress-bar[data-progress="50"] { --progress-percent: 50%; }
+  .progress-bar[data-progress="55"] { --progress-percent: 55%; }
+  .progress-bar[data-progress="60"] { --progress-percent: 60%; }
+  .progress-bar[data-progress="65"] { --progress-percent: 65%; }
+  .progress-bar[data-progress="70"] { --progress-percent: 70%; }
+  .progress-bar[data-progress="75"] { --progress-percent: 75%; }
+  .progress-bar[data-progress="80"] { --progress-percent: 80%; }
+  .progress-bar[data-progress="85"] { --progress-percent: 85%; }
+  .progress-bar[data-progress="90"] { --progress-percent: 90%; }
+  .progress-bar[data-progress="95"] { --progress-percent: 95%; }
+  .progress-bar[data-progress="100"] { --progress-percent: 100%; }
+
   /* Lazy load image fade-in */
   .lazy-image {
     opacity: 0;
