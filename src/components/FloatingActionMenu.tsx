@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Plus, MessageSquare, Share2, Bookmark, Edit3 } from 'lucide-react';
+import { MessageSquare, Share2, Bookmark, Edit3, X } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -16,7 +16,21 @@ interface QuickAction {
   action: () => void;
 }
 
-export function FloatingActionMenu({ 
+const GrokIcon = ({ className }: { className?: string }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="square"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M17 3L7 21" />
+  </svg>
+);
+
+export function FloatingActionMenu({
   className = ''
 }: FloatingActionMenuProps) {
   const { isDark } = useTheme();
@@ -27,17 +41,17 @@ export function FloatingActionMenu({
   const [isFabPressed, setIsFabPressed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
-  
+
   // Enhanced state for slide gesture functionality
   const [isDragging, setIsDragging] = useState(false);
   const [draggedOverItem, setDraggedOverItem] = useState<string | null>(null);
   const [startTouchPosition, setStartTouchPosition] = useState<{ x: number; y: number } | null>(null);
-  
+
   // iPad gesture states
   const [isSwipeGestureActive, setIsSwipeGestureActive] = useState(false);
   const [swipeStartPosition, setSwipeStartPosition] = useState<{ x: number; y: number } | null>(null);
   const [showCenterMenu, setShowCenterMenu] = useState(false);
-  
+
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
   const swipeGestureRef = useRef<HTMLDivElement>(null);
 
@@ -47,20 +61,20 @@ export function FloatingActionMenu({
       const width = window.innerWidth;
       const height = window.innerHeight;
       const isLandscape = width > height;
-      
+
       setIsMobile(width < 768);
       setIsTablet(width >= 768 && width < 1024);
-      
+
       // iPad specific detection
       const isIPad = /iPad|Macintosh/.test(navigator.userAgent) && 'ontouchend' in document;
       if (isIPad) {
         setIsTablet(true);
       }
     };
-    
+
     checkDeviceType();
     window.addEventListener('resize', checkDeviceType);
-    
+
     return () => window.removeEventListener('resize', checkDeviceType);
   }, []);
 
@@ -77,7 +91,7 @@ export function FloatingActionMenu({
         const centerX = (touch1.clientX + touch2.clientX) / 2;
         const centerY = (touch1.clientY + touch2.clientY) / 2;
         setSwipeStartPosition({ x: centerX, y: centerY });
-        
+
         if (navigator.vibrate) {
           navigator.vibrate(10);
         }
@@ -91,16 +105,16 @@ export function FloatingActionMenu({
         const touch2 = e.touches[1];
         const centerX = (touch1.clientX + touch2.clientX) / 2;
         const centerY = (touch1.clientY + touch2.clientY) / 2;
-        
+
         const deltaX = centerX - swipeStartPosition.x;
         const deltaY = centerY - swipeStartPosition.y;
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        
+
         // Check if swipe is towards top-right (positive X, negative Y)
         if (distance > 50 && deltaX > 30 && deltaY < -30) {
           setShowCenterMenu(true);
           setIsSwipeGestureActive(false);
-          
+
           if (navigator.vibrate) {
             navigator.vibrate([15, 50, 15]);
           }
@@ -141,7 +155,7 @@ export function FloatingActionMenu({
       icon: Edit3,
       label: 'Create Post',
       description: 'Create a new post',
-      color: 'bg-info-500 hover:bg-info-600',
+      color: 'bg-blue-500 hover:bg-blue-600',
       action: () => navigate('/create-post')
     },
     {
@@ -185,10 +199,10 @@ export function FloatingActionMenu({
     const radius = 120;
     const angleStep = (2 * Math.PI) / total;
     const angle = index * angleStep - Math.PI / 2; // Start from top
-    
+
     const x = Math.cos(angle) * radius;
     const y = Math.sin(angle) * radius;
-    
+
     return {
       transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
       transitionDelay: `${index * 100}ms`,
@@ -202,24 +216,24 @@ export function FloatingActionMenu({
     const baseRadius = 100;
     const radiusAdjustment = Math.min(15, total * 3);
     const radius = baseRadius + radiusAdjustment;
-    
+
     const maxAngleSpread = 135;
     const minAngleSpread = 50;
     const angleSpread = Math.max(minAngleSpread, Math.min(maxAngleSpread, total * 18));
-    
+
     const centerAngle = 225;
     const startAngle = centerAngle - (angleSpread / 2);
-    
+
     const step = total > 1 ? angleSpread / (total - 1) : 0;
     const angle = startAngle + (index * step);
     const rad = (angle * Math.PI) / 180;
-    
+
     const x = Math.cos(rad) * radius;
     const y = Math.sin(rad) * radius;
-    
+
     const curveOffset = Math.sin((index / Math.max(total - 1, 1)) * Math.PI) * 8;
     const adjustedY = y + curveOffset;
-    
+
     return {
       transform: `translate(calc(-50% + ${x}px), calc(-50% + ${adjustedY}px))`,
       transitionDelay: `${index * 50}ms`,
@@ -231,7 +245,7 @@ export function FloatingActionMenu({
   // Enhanced touch event handlers for 0.5s press and hold with slide navigation
   const handleFabPressStart = (e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault();
-    
+
     if ('touches' in e) {
       // Mobile touch - only open on long press
       setIsFabPressed(true);
@@ -239,16 +253,16 @@ export function FloatingActionMenu({
       const clientX = e.touches[0].clientX;
       const clientY = e.touches[0].clientY;
       setStartTouchPosition({ x: clientX, y: clientY });
-      
+
       if (navigator.vibrate) {
         navigator.vibrate(15);
       }
-      
+
       // Clear any existing timer
       if (longPressTimerRef.current) {
         clearTimeout(longPressTimerRef.current);
       }
-      
+
       // Set 0.5 second timer for long press
       longPressTimerRef.current = setTimeout(() => {
         setIsOpen(true);
@@ -268,13 +282,13 @@ export function FloatingActionMenu({
     if (e) {
       e.preventDefault();
     }
-    
+
     // Clear the long press timer
     if (longPressTimerRef.current) {
       clearTimeout(longPressTimerRef.current);
       longPressTimerRef.current = null;
     }
-    
+
     // Handle slide gesture completion
     if (isDragging && draggedOverItem) {
       const action = quickActions.find((action) => action.id === draggedOverItem);
@@ -286,7 +300,7 @@ export function FloatingActionMenu({
         return;
       }
     }
-    
+
     // Reset states
     setIsFabPressed(false);
     setIsDragging(false);
@@ -297,29 +311,29 @@ export function FloatingActionMenu({
 
   const handleFabTouchMove = (e: React.TouchEvent) => {
     e.preventDefault();
-    
+
     if (isFabPressed && startTouchPosition) {
       const touch = e.touches[0];
       const deltaX = touch.clientX - startTouchPosition.x;
       const deltaY = touch.clientY - startTouchPosition.y;
       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-      
+
       // Start dragging if moved more than 20px
       if (distance > 20) {
         setIsDragging(true);
-        
+
         // If menu is open, detect which action button is under finger
         if (isOpen) {
           const elementFromPoint = document.elementFromPoint(touch.clientX, touch.clientY);
           const actionButton = elementFromPoint?.closest('button[data-action-id]');
-          
+
           if (actionButton) {
             const actionId = actionButton.getAttribute('data-action-id');
-            
+
             if (actionId && actionId !== draggedOverItem) {
               setDraggedOverItem(actionId);
               setHoveredItem(actionId);
-              
+
               if (navigator.vibrate) {
                 navigator.vibrate(5); // Light haptic for hover
               }
@@ -336,7 +350,7 @@ export function FloatingActionMenu({
           }
           setIsOpen(true);
           setIsFabPressed(false);
-          
+
           if (navigator.vibrate) {
             navigator.vibrate([10, 50, 10]);
           }
@@ -348,7 +362,7 @@ export function FloatingActionMenu({
   // Handle click - only for desktop
   const handleFabClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    
+
     // Only allow click on desktop, mobile uses touch events
     if (!isMobile) {
       setIsOpen(!isOpen);
@@ -382,7 +396,7 @@ export function FloatingActionMenu({
     <>
       {/* Backdrop for both mobile FAB and center menu */}
       {(isOpen || showCenterMenu) && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-all duration-300 ease-out"
           onClick={() => {
             setIsOpen(false);
@@ -399,10 +413,10 @@ export function FloatingActionMenu({
             {/* Center close button */}
             <button
               onClick={() => setShowCenterMenu(false)}
-              className="w-16 h-16 rounded-full bg-red-500 text-white shadow-2xl flex items-center justify-center border-2 border-white/20 transform transition-all duration-300 hover:scale-110"
+              className="w-16 h-16 rounded-full bg-black text-white shadow-2xl shadow-white/20 flex items-center justify-center border border-gray-800 transform transition-all duration-300 hover:scale-110"
               aria-label="Close menu"
             >
-              <Plus className="h-8 w-8 rotate-45" />
+              <X className="h-8 w-8" />
             </button>
 
             {/* Circle menu items */}
@@ -410,7 +424,7 @@ export function FloatingActionMenu({
               const Icon = action.icon;
               const isHovered = hoveredItem === action.id;
               const isPressed = pressedItem === action.id;
-              
+
               return (
                 <button
                   key={action.id}
@@ -442,9 +456,9 @@ export function FloatingActionMenu({
                     touch-manipulation select-none transform-gpu
                     opacity-100 scale-100 pointer-events-auto
                     ${isPressed
-                      ? 'scale-125 shadow-2xl ring-4 ring-white/30 border-white/40' 
-                      : isHovered 
-                        ? 'scale-110 shadow-xl border-white/30' 
+                      ? 'scale-125 shadow-2xl ring-4 ring-white/30 border-white/40'
+                      : isHovered
+                        ? 'scale-110 shadow-xl border-white/30'
                         : 'scale-100 hover:scale-105 active:scale-95'
                     }
                     ${action.color}
@@ -452,9 +466,8 @@ export function FloatingActionMenu({
                   style={getCircleMenuPosition(index, quickActions.length)}
                   aria-label={action.description}
                 >
-                  <Icon className={`transition-all duration-200 ${
-                    isPressed || isHovered ? 'h-8 w-8' : 'h-6 w-6'
-                  }`} />
+                  <Icon className={`transition-all duration-200 ${isPressed || isHovered ? 'h-8 w-8' : 'h-6 w-6'
+                    }`} />
                 </button>
               );
             })}
@@ -463,15 +476,15 @@ export function FloatingActionMenu({
             {quickActions.map((action, index) => {
               const isHovered = hoveredItem === action.id;
               const position = getCircleMenuPosition(index, quickActions.length);
-              
+
               return (
                 <div
                   key={`label-${action.id}`}
                   className={`
                     absolute text-sm font-medium px-3 py-2 rounded-lg shadow-lg border pointer-events-none
                     transition-all duration-400 ease-out
-                    ${isDark 
-                      ? 'bg-gray-800 text-white border-gray-700' 
+                    ${isDark
+                      ? 'bg-gray-800 text-white border-gray-700'
                       : 'bg-white text-gray-900 border-gray-200'
                     }
                     ${isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}
@@ -490,15 +503,15 @@ export function FloatingActionMenu({
         </div>
       )}
 
-      {/* Mobile FAB Menu */}
-      <div className={`fixed bottom-20 right-6 z-50 lg:hidden floating-action-menu ${className}`}>
+      {/* FAB Menu */}
+      <div className={`fixed bottom-6 right-6 z-50 floating-action-menu ${className}`}>
         <div className="relative">
           {quickActions.map((action, index) => {
             const Icon = action.icon;
             const isHovered = hoveredItem === action.id;
             const isPressed = pressedItem === action.id;
             const isDraggedOver = draggedOverItem === action.id;
-            
+
             const touchProps = isMobile ? {
               onTouchStart: (e: React.TouchEvent) => {
                 e.preventDefault();
@@ -538,11 +551,11 @@ export function FloatingActionMenu({
               }
             } : {};
 
-            const buttonStyle = isOpen ? getFabMenuPosition(index, quickActions.length) : { 
+            const buttonStyle = isOpen ? getFabMenuPosition(index, quickActions.length) : {
               transform: 'translate(-50%, -50%) scale(0)',
               opacity: 0
             };
-            
+
             return (
               <button
                 key={action.id}
@@ -561,9 +574,9 @@ export function FloatingActionMenu({
                   touch-manipulation select-none transform-gpu
                   ${isOpen ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-0 pointer-events-none'}
                   ${isPressed || isDraggedOver
-                    ? 'scale-150 shadow-2xl ring-4 ring-white/30 border-white/40' 
-                    : isHovered 
-                      ? 'scale-125 shadow-xl border-white/30' 
+                    ? 'scale-150 shadow-2xl ring-4 ring-white/30 border-white/40'
+                    : isHovered
+                      ? 'scale-125 shadow-xl border-white/30'
                       : 'scale-100 hover:scale-110 active:scale-95'
                   }
                   ${action.color}
@@ -571,9 +584,8 @@ export function FloatingActionMenu({
                 style={buttonStyle}
                 aria-label={action.description}
               >
-                <Icon className={`transition-all duration-200 ${
-                  isPressed || isDraggedOver || isHovered ? 'h-8 w-8' : 'h-6 w-6'
-                }`} />
+                <Icon className={`transition-all duration-200 ${isPressed || isDraggedOver || isHovered ? 'h-8 w-8' : 'h-6 w-6'
+                  }`} />
               </button>
             );
           })}
@@ -588,28 +600,25 @@ export function FloatingActionMenu({
           onMouseUp={!isMobile ? handleFabPressEnd : undefined}
           onClick={handleFabClick}
           className={`
-            relative w-16 h-16 rounded-full shadow-2xl flex items-center justify-center
-            transition-all duration-300 ease-out border-2 border-white/20
+            relative w-16 h-16 rounded-full flex items-center justify-center
+            transition-all duration-300 ease-out border border-gray-900
             touch-manipulation select-none transform-gpu
-            ${isOpen 
-              ? 'bg-red-500 rotate-45 scale-110 shadow-red-500/30' 
-              : isFabPressed 
-                ? 'bg-[#BCE953] text-black scale-125 shadow-[#BCE953]/40 ring-4 ring-[#BCE953]/30'
-                : 'bg-[#BCE953] text-black hover:scale-105 active:scale-95'
+            ${isOpen
+              ? 'bg-black text-white rotate-45 scale-110 shadow-lg shadow-white/50'
+              : isFabPressed
+                ? 'bg-black text-white scale-125 shadow-lg shadow-white/50 ring-4 ring-white/20'
+                : 'bg-black text-white hover:scale-105 active:scale-95 shadow-lg shadow-white/20'
             }
-            text-black font-bold z-50
+            z-50
           `}
-          style={{
-            boxShadow: isFabPressed 
-              ? '0 8px 20px rgba(0, 0, 0, 0.25)' 
-              : isOpen
-                ? '0 15px 35px rgba(0, 0, 0, 0.3), 0 0 30px rgba(239, 68, 68, 0.4)'
-                : '0 10px 25px rgba(0, 0, 0, 0.2), 0 0 20px rgba(188, 233, 83, 0.3)'
-          }}
           aria-label={isOpen ? "Close menu" : "Press and hold to open menu"}
           aria-expanded={isOpen}
         >
-          <Plus className={`h-8 w-8 transition-transform duration-300 ${isOpen ? 'rotate-45' : 'rotate-0'}`} />
+          {isOpen ? (
+            <X className="h-8 w-8 transition-transform duration-300" />
+          ) : (
+            <GrokIcon className="h-8 w-8 transition-transform duration-300" />
+          )}
         </button>
       </div>
 

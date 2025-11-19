@@ -81,133 +81,133 @@ const EnhancedActionButton: React.FC<{
   onHover,
   showParticles,
 }) => {
-  const [isPressed, setIsPressed] = useState(false);
-  const [ripples, setRipples] = useState<Array<{ x: number; y: number; id: number }>>([]);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const rippleIdRef = useRef(0);
-  const countRef = useRef(count || 0);
-  const [displayCount, setDisplayCount] = useState(count);
+    const [isPressed, setIsPressed] = useState(false);
+    const [ripples, setRipples] = useState<Array<{ x: number; y: number; id: number }>>([]);
+    const buttonRef = useRef<HTMLButtonElement>(null);
+    const rippleIdRef = useRef(0);
+    const countRef = useRef(count || 0);
+    const [displayCount, setDisplayCount] = useState(count);
 
-  // Spring animations for scale and color
-  const scale = useSpring(isPressed ? 0.85 : 1, {
-    damping: 15,
-    stiffness: 300,
-    mass: 1,
-  });
+    // Spring animations for scale and color
+    const scale = useSpring(isPressed ? 0.85 : 1, {
+      damping: 15,
+      stiffness: 300,
+      mass: 1,
+    });
 
-  useEffect(() => {
-    if (count !== countRef.current) {
-      // Animate count change
-      const diff = (count || 0) - countRef.current;
-      if (diff > 0) {
-        setDisplayCount(count);
-        countRef.current = count || 0;
+    useEffect(() => {
+      if (count !== countRef.current) {
+        // Animate count change
+        const diff = (count || 0) - countRef.current;
+        if (diff > 0) {
+          setDisplayCount(count);
+          countRef.current = count || 0;
+        }
       }
-    }
-  }, [count]);
+    }, [count]);
 
-  const colorMap = {
-    red: isDark 
-      ? 'text-gray-500 hover:text-red-500 hover:bg-red-500/10' 
-      : 'text-gray-500 hover:text-red-600 hover:bg-red-100/60',
-    blue: isDark 
-      ? 'text-gray-500 hover:text-info-500 hover:bg-info-500/10' 
-      : 'text-gray-500 hover:text-info-600 hover:bg-info-100/60',
-    green: isDark 
-      ? 'text-gray-500 hover:text-green-500 hover:bg-green-500/10' 
-      : 'text-gray-500 hover:text-green-600 hover:bg-green-100/60',
-    yellow: isDark 
-      ? 'text-gray-500 hover:text-orange-500 hover:bg-orange-500/10' 
-      : 'text-gray-500 hover:text-orange-600 hover:bg-orange-100/60',
-  };
+    const colorMap = {
+      red: isDark
+        ? 'text-gray-500 hover:text-red-500 hover:bg-red-500/10'
+        : 'text-gray-500 hover:text-red-600 hover:bg-red-100/60',
+      blue: isDark
+        ? 'text-gray-500 hover:text-info-500 hover:bg-info-500/10'
+        : 'text-gray-500 hover:text-info-600 hover:bg-info-100/60',
+      green: isDark
+        ? 'text-gray-500 hover:text-green-500 hover:bg-green-500/10'
+        : 'text-gray-500 hover:text-green-600 hover:bg-green-100/60',
+      yellow: isDark
+        ? 'text-gray-500 hover:text-orange-500 hover:bg-orange-500/10'
+        : 'text-gray-500 hover:text-orange-600 hover:bg-orange-100/60',
+    };
 
-  const activeColorMap = {
-    red: isDark ? 'text-red-500 bg-red-500/15' : 'text-red-600 bg-red-100/80',
-    blue: isDark ? 'text-info-500 bg-info-500/15' : 'text-info-600 bg-info-100/80',
-    green: isDark ? 'text-green-500 bg-green-500/15' : 'text-green-600 bg-green-100/80',
-    yellow: isDark ? 'text-orange-500 bg-orange-500/15' : 'text-orange-600 bg-orange-100/80',
-  };
+    const activeColorMap = {
+      red: isDark ? 'text-red-500 ' : 'text-red-600 ',
+      blue: isDark ? 'text-info-500 ' : 'text-info-600 ',
+      green: isDark ? 'text-green-500 ' : 'text-green-600 ',
+      yellow: isDark ? 'text-orange-500 ' : 'text-orange-600 ',
+    };
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const rect = buttonRef.current?.getBoundingClientRect();
-    if (rect) {
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const id = rippleIdRef.current++;
-      setRipples((prev) => [...prev, { x, y, id }]);
+    const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
+      const rect = buttonRef.current?.getBoundingClientRect();
+      if (rect) {
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const id = rippleIdRef.current++;
+        setRipples((prev) => [...prev, { x, y, id }]);
 
-      setTimeout(() => {
-        setRipples((prev) => prev.filter((r) => r.id !== id));
-      }, 600);
-    }
-  };
+        setTimeout(() => {
+          setRipples((prev) => prev.filter((r) => r.id !== id));
+        }, 600);
+      }
+    };
 
-  const handleClick = () => {
-    setIsPressed(true);
-    onClick();
+    const handleClick = () => {
+      setIsPressed(true);
+      onClick();
 
-    // Haptic feedback
-    if (navigator.vibrate) {
-      navigator.vibrate(10);
-    }
+      // Haptic feedback
+      if (navigator.vibrate) {
+        navigator.vibrate(10);
+      }
 
-    setTimeout(() => setIsPressed(false), 150);
-  };
+      setTimeout(() => setIsPressed(false), 150);
+    };
 
-  return (
-    <motion.button
-      ref={buttonRef}
-      onClick={handleClick}
-      onMouseDown={handleMouseDown}
-      onHoverStart={() => onHover?.()}
-      onHoverEnd={() => onHover?.(false)}
-      style={{
-        scale,
-      }}
-      className={cn(
-        'relative flex items-center gap-1 px-2 py-1 rounded-full transition-all duration-300 group overflow-hidden',
-        isActive ? activeColorMap[color] : colorMap[color],
-        isMobile ? 'text-xs' : 'text-sm'
-      )}
-      whileTap={{ scale: 0.95 }}
-      whileHover={{ scale: 1.05 }}
-    >
-      {/* Ripple effects */}
-      {ripples.map((ripple) => (
-        <RippleEffect key={ripple.id} x={ripple.x} y={ripple.y} />
-      ))}
-
-      {/* Icon */}
-      <motion.div
-        className="relative"
-        animate={isPressed ? { scale: 1.2 } : { scale: 1 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+    return (
+      <motion.button
+        ref={buttonRef}
+        onClick={handleClick}
+        onMouseDown={handleMouseDown}
+        onHoverStart={() => onHover?.()}
+        onHoverEnd={() => onHover?.(false)}
+        style={{
+          scale,
+        }}
+        className={cn(
+          'relative flex items-center gap-1 px-2 py-1 rounded-full transition-all duration-300 group overflow-hidden',
+          isActive ? activeColorMap[color] : colorMap[color],
+          isMobile ? 'text-xs' : 'text-sm'
+        )}
+        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.05 }}
       >
-        {icon}
-      </motion.div>
-
-      {/* Count with increment animation */}
-      {count !== undefined && count > 0 && (
-        <motion.span
-          key={displayCount}
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 1.2, opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="text-xs opacity-75 font-medium"
-        >
-          {displayCount}
-        </motion.span>
-      )}
-
-      {/* Particles for like effect */}
-      {showParticles &&
-        [0, 1, 2, 3].map((i) => (
-          <FloatingParticle key={i} delay={i * 0.1} />
+        {/* Ripple effects */}
+        {ripples.map((ripple) => (
+          <RippleEffect key={ripple.id} x={ripple.x} y={ripple.y} />
         ))}
-    </motion.button>
-  );
-};
+
+        {/* Icon */}
+        <motion.div
+          className="relative"
+          animate={isPressed ? { scale: 1.2 } : { scale: 1 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+        >
+          {icon}
+        </motion.div>
+
+        {/* Count with increment animation */}
+        {count !== undefined && count > 0 && (
+          <motion.span
+            key={displayCount}
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 1.2, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="text-xs opacity-75 font-medium"
+          >
+            {displayCount}
+          </motion.span>
+        )}
+
+        {/* Particles for like effect */}
+        {showParticles &&
+          [0, 1, 2, 3].map((i) => (
+            <FloatingParticle key={i} delay={i * 0.1} />
+          ))}
+      </motion.button>
+    );
+  };
 
 // Post Card Container with elevation and hover effects
 const PostCardContainer: React.FC<{ children: React.ReactNode; isDark: boolean; isMobile: boolean }> = ({
@@ -259,7 +259,7 @@ const PostCardContainer: React.FC<{ children: React.ReactNode; isDark: boolean; 
       exit={{ opacity: 0, y: -10 }}
     >
       {children}
-    </motion.div>   
+    </motion.div>
   );
 };
 
@@ -366,25 +366,11 @@ export const EnhancedPostCardInteractions: React.FC<EnhancedPostCardInteractions
           isDark={isDark}
           isMobile={isMobile}
           color="blue"
+
           onClick={handleShareClick}
         />
 
-        {/* Bookmark Button */}
-        <EnhancedActionButton
-          icon={
-            <Bookmark
-              className={cn(
-                isMobile ? 'h-4 w-4' : 'h-5 w-5',
-                isBookmarked ? 'fill-current' : ''
-              )}
-            />
-          }
-          isActive={isBookmarked}
-          isDark={isDark}
-          isMobile={isMobile}
-          color="yellow"
-          onClick={handleBookmarkClick}
-        />
+
       </div>
     </PostCardContainer>
   );

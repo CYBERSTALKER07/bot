@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  MessageSquare,
-  Search,
-  Edit3,
   X,
   Camera,
   Video,
@@ -27,11 +24,12 @@ import QuoteTweetCard from './QuoteTweetCard';
 import EnhancedPostCardInteractions from './ui/EnhancedPostCardInteractions';
 import EnhancedVideoPlayer from './ui/EnhancedVideoPlayer';
 import ImageLightbox from './ui/ImageLightbox';
-import EnhancedFAB from './ui/EnhancedFAB';
+import { FloatingActionMenu } from './FloatingActionMenu';
 import ExploreFeed from './ExploreFeed';
 import LeftSidebar from './LeftSidebar';
 import RightSidebar from './RightSidebar';
 import { useInfiniteScroll, usePullToRefresh, useScrollDirection } from '../hooks/useScrollOptimizations';
+
 
 interface Post {
   id: string;
@@ -525,7 +523,7 @@ export default function Feed() {
                   <div
                     key={post.id}
                     className={cn(
-                      'border-b hover:bg-gray-50/5 transition-colors cursor-pointer',
+                      'border-b hover:bg-[#1C1F20]/30 transition-colors cursor-pointer',
                       isDark ? 'border-[#1C1F20]' : 'border-gray-200'
                     )}
                     onClick={() => navigate(`/post/${post.id}`)}
@@ -708,42 +706,10 @@ export default function Feed() {
 
       </div>
 
-      {/* Enhanced Floating Action Button */}
-      <EnhancedFAB
-        onAction={(actionId) => {
-          switch (actionId) {
-            case 'compose':
-              setShowPostModal(true);
-              break;
-            case 'search':
-              navigate('/search');
-              break;
-            case 'messages':
-              navigate('/messages');
-              break;
-          }
-        }}
-        actions={[
-          {
-            id: 'compose',
-            label: 'Compose Post',
-            icon: <Edit3 className="h-6 w-6" />,
-            color: 'bg-[#FFC627]',
-          },
-          {
-            id: 'search',
-            label: 'Search',
-            icon: <Search className="h-6 w-6" />,
-            color: 'bg-info-500',
-          },
-          {
-            id: 'messages',
-            label: 'Messages',
-            icon: <MessageSquare className="h-6 w-6" />,
-            color: 'bg-green-500',
-          },
-        ]}
-      />
+      {/* Grok Floating Action Menu */}
+      <div className="fixed bottom-4 right-4 z-40">      <FloatingActionMenu />
+      </div>
+
 
       {/* Image Lightbox Modal */}
       <ImageLightbox

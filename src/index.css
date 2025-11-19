@@ -38,17 +38,24 @@
 }
 
 .dark {
-  /* Dark theme */
-  --color-background: 10 10 10;
-  --color-foreground: 244 244 245;
-  --color-muted: 113 113 122;
-  --color-muted-foreground: 161 161 170;
+  /* X (Twitter) Dark theme */
+  --color-background: 0 0 0;
+  /* Pure Black */
+  --color-foreground: 231 233 234;
+  /* #e7e9ea */
+  --color-muted: 113 118 123;
+  /* #71767b */
+  --color-muted-foreground: 113 118 123;
+  /* #71767b */
 
-  --color-border: 120 122 122;
-  --color-input: 39 39 70;
-  --color-ring: 188 233 83;
+  --color-border: 47 51 54;
+  /* #2f3336 */
+  --color-input: 32 35 39;
+  /* #202327 */
+  --color-ring: 29 155 240;
+  /* #1d9bf0 (Twitter Blue) */
 
-  --shadow-color: 0 0 0;
+  --shadow-color: 255 255 255;
 }
 
 /* Base layer enhancements */

@@ -172,7 +172,7 @@ export default function Dock({
 
     return (
         <motion.div
-            className="h-full flex flex-col items-center justify-center py-4"
+            className="h-full  flex flex-col items-center justify-center py-4 "
         >
             <motion.div
                 onMouseMove={({ pageY }) => {
@@ -184,7 +184,7 @@ export default function Dock({
                     mouseY.set(Infinity);
                 }}
                 className={cn(
-                    "flex flex-col items-center gap-4 rounded-2xl pb-2 px-2 border bg-black border-gray-900",
+                    "flex flex-col items-center gap-4 rounded-full pb-2 px-2 border-none bg-transparent border-[rgba(255,255,255,0.5)] shadow-[0_0_70px_0_rgba(0,0,0,0.5)] shadow-white/50",
                     className
                 )}
                 style={{ width: panelWidth }}
