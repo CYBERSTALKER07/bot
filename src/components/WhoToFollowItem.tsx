@@ -87,7 +87,7 @@ export default function WhoToFollowItem({ user, onNavigate }: WhoToFollowItemPro
   return (
     <div
       className={cn(
-        "flex items-center justify-between cursor-pointer p-2 rounded-lg transition-colors",
+        "flex items-center justify-between cursor-pointer p-2 rounded-lg ",
         isDark ? 'hover:bg-gray-900/50' : 'hover:bg-gray-100'
       )}
       onMouseEnter={() => setHoveredFollowId(user.id)}
@@ -150,10 +150,10 @@ export default function WhoToFollowItem({ user, onNavigate }: WhoToFollowItemPro
       <Button
         size="medium"
         className={cn(
-          "rounded-xl w-[80px] h-[32px] font-semibold text-xs flex-shrink-0 ml-2 transition-all duration-300",
+          "rounded-xl w-[80px] h-[32px] font-semibold text-xs flex-shrink-0 ml-2 transition-all duration-500",
           isDark
             ? "bg-white text-black hover:bg-gray-100 border border-gray-300"
-            : "bg-black text-black hover:bg-gray-900 border border-gray-800"
+            : "bg-white text-black hover:bg-black hover:text-white border-gray-200 shadow-2xl hover:shadow-3xl "
         )}
         onClick={handleFollowClick}
         disabled={processingFollowId === user.id || statusLoading}

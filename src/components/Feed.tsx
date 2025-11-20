@@ -421,7 +421,7 @@ export default function Feed() {
 
         {/* Main Feed Content */}
         <div className={cn(
-          'flex-1 max-w-[600px]   min-h-screen',
+          'flex-1 max-w-[650px]   min-h-screen',
           isDark ? '' : 'border-gray-200'
         )}>
           {/* Header */}
@@ -478,19 +478,19 @@ export default function Feed() {
                   </div>
                   <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#1C1F20]/50">
                     <div className="flex gap-1 text-info-500">
-                      <button className="p-2 rounded-full text-[#FA4617] hover:bg-[#1C1F20] transition-colors" onClick={() => navigate('/create-post')}>
+                      <button className="p-2 rounded-full text-[#000000] hover:bg-black/10 transition-colors" onClick={() => navigate('/create-post')}>
                         <Camera className="w-5 h-5" />
                       </button>
-                      <button className="p-2 rounded-full text-[#FA4617] hover:bg-[#1C1F20] transition-colors" onClick={() => navigate('/create-post')}>
+                      <button className="p-2 rounded-full text-[#000000] hover:bg-black/10 transition-colors" onClick={() => navigate('/create-post')}>
                         <Video className="w-5 h-5" />
                       </button>
-                      <button className="p-2 rounded-full text-[#FA4617] hover:bg-[#1C1F20] transition-colors" onClick={() => navigate('/create-post')}>
+                      <button className="p-2 rounded-full text-[#000000] hover:bg-black/10 transition-colors" onClick={() => navigate('/create-post')}>
                         <MapPin className="w-5 h-5" />
                       </button>
                     </div>
                     <Button
                       onClick={() => navigate('/create-post')}
-                      className="bg-[#FA4617] hover:bg-[#FA4617]/80 text-white font-bold rounded-full px-5 py-1.5"
+                      className="bg-[#  D3FB52] hover:bg-[#D3FB52]/80 text-black font-bold rounded-full px-5 py-1.5"
                     >
                       Post
                     </Button>
@@ -524,7 +524,7 @@ export default function Feed() {
                     key={post.id}
                     className={cn(
                       'border-b hover:bg-[#1C1F20]/30 transition-colors cursor-pointer',
-                      isDark ? 'border-[#1C1F20]' : 'border-gray-200'
+                      isDark ? 'border-[#1C1F20]' : 'border-gray-200 shadow-sm hover:shadow-md'
                     )}
                     onClick={() => navigate(`/post/${post.id}`)}
                   >
@@ -572,7 +572,7 @@ export default function Feed() {
                             <span className="text-gray-500 text-sm">·</span>
                             <span className="text-gray-500 text-sm hover:underline">{formatTime(post.created_at)}</span>
                           </div>
-                          <button className="text-gray-500 hover:text-info-500 p-1 rounded-full hover:bg-[#FA4617] transition-colors">
+                          <button className="text-gray-500 hover:text-info-500 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
                             <span className="sr-only">More</span>
                             <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><g><path d="M3 12c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm9 2c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm7 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"></path></g></svg>
                           </button>

@@ -27,19 +27,19 @@ import Button from '../ui/Button';
 import { Card } from '../ui/Card';
 import PageLayout from '../ui/PageLayout';
 import { cn } from '../../lib/cva';
-import { 
-  aiJobMatchingEngine, 
-  UserProfile, 
-  JobRecommendation, 
+import {
+  aiJobMatchingEngine,
+  UserProfile,
+  JobRecommendation,
   TrendingJobInsight,
-  JobInteraction 
+  JobInteraction
 } from '../../lib/ai-job-matching';
 import { Job } from '../../types';
 
 export default function AIJobRecommendations() {
   const { isDark } = useTheme();
   const { user } = useAuth();
-  
+
   const [recommendations, setRecommendations] = useState<JobRecommendation[]>([]);
   const [trendingInsights, setTrendingInsights] = useState<TrendingJobInsight[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -59,16 +59,16 @@ export default function AIJobRecommendations() {
 
   const loadRecommendations = async () => {
     if (!user) return;
-    
+
     setIsLoading(true);
     try {
       // Create user profile from current user data
       const profile: UserProfile = createUserProfile(user);
       setUserProfile(profile);
-      
+
       // Get available jobs (in a real app, this would fetch from your API)
       const availableJobs = await getMockJobs();
-      
+
       // Get AI recommendations
       const recs = await aiJobMatchingEngine.getJobRecommendations(profile, availableJobs, 20);
       setRecommendations(recs);
@@ -172,7 +172,7 @@ export default function AIJobRecommendations() {
 
   const handleJobInteraction = async (job: Job, action: JobInteraction['action'], timeSpent: number = 0) => {
     if (!user || !userProfile) return;
-    
+
     const interaction: JobInteraction = {
       job_id: job.id,
       action,
@@ -180,10 +180,10 @@ export default function AIJobRecommendations() {
       time_spent: timeSpent,
       source: 'ai_recommendations'
     };
-    
+
     // Update AI engine with user interaction
     await aiJobMatchingEngine.updateUserProfileFromInteraction(user.id, interaction, job);
-    
+
     // Update local state if needed
     if (action === 'apply') {
       setUserProfile(prev => prev ? {
@@ -199,15 +199,15 @@ export default function AIJobRecommendations() {
   };
 
   const filteredRecommendations = recommendations.filter(rec => {
-    if (selectedFilters.recommendation_type !== 'all' && 
-        rec.recommendation_type !== selectedFilters.recommendation_type) {
+    if (selectedFilters.recommendation_type !== 'all' &&
+      rec.recommendation_type !== selectedFilters.recommendation_type) {
       return false;
     }
     if (rec.match_score < selectedFilters.min_match_score) {
       return false;
     }
-    if (selectedFilters.job_type !== 'all' && 
-        rec.job.type !== selectedFilters.job_type) {
+    if (selectedFilters.job_type !== 'all' &&
+      rec.job.type !== selectedFilters.job_type) {
       return false;
     }
     return true;
@@ -252,9 +252,8 @@ export default function AIJobRecommendations() {
   return (
     <PageLayout className={isDark ? 'bg-black text-white' : 'bg-white text-black'} maxWidth="full" padding="none">
       {/* Header */}
-      <div className={`sticky top-0 z-10 backdrop-blur-xl border-b ${
-        isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
-      }`}>
+      <div className={`sticky top-0 z-10 backdrop-blur-xl border-b ${isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
+        }`}>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -304,7 +303,7 @@ export default function AIJobRecommendations() {
                       <span>${(insight.average_salary / 1000).toFixed(0)}k avg</span>
                     </div>
                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
-                      <div 
+                      <div
                         className="bg-orange-500 h-1.5 rounded-full"
                         style={{ width: `${Math.min(100, insight.demand_growth * 2)}%` }}
                       />
@@ -341,7 +340,7 @@ export default function AIJobRecommendations() {
                     <option value="trending">Trending</option>
                   </select>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium mb-2">
                     Min Match Score: {(selectedFilters.min_match_score * 100).toFixed(0)}%
@@ -359,7 +358,7 @@ export default function AIJobRecommendations() {
                     className="w-full"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium mb-2">Job Type</label>
                   <select
@@ -397,13 +396,13 @@ export default function AIJobRecommendations() {
                   <Briefcase className="h-8 w-8 text-info-500" />
                 </div>
               </Card>
-              
+
               <Card className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">Avg Match Score</p>
                     <p className="text-2xl font-bold text-green-600">
-                      {recommendations.length > 0 
+                      {recommendations.length > 0
                         ? `${(recommendations.reduce((sum, r) => sum + r.match_score, 0) / recommendations.length * 100).toFixed(0)}%`
                         : '0%'
                       }
@@ -412,7 +411,7 @@ export default function AIJobRecommendations() {
                   <Target className="h-8 w-8 text-green-500" />
                 </div>
               </Card>
-              
+
               <Card className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -503,11 +502,11 @@ const JobRecommendationCard: React.FC<{
   };
 
   return (
-    <Card 
+    <Card
       className={cn(
         'p-6 transition-all duration-200 cursor-pointer hover:shadow-lg border-l-4',
-        match_score > 0.8 ? 'border-l-green-500' : 
-        match_score > 0.6 ? 'border-l-info-500' : 'border-l-gray-400'
+        match_score > 0.8 ? 'border-l-green-500' :
+          match_score > 0.6 ? 'border-l-info-500' : 'border-l-gray-400'
       )}
       onClick={handleCardClick}
     >
@@ -515,7 +514,7 @@ const JobRecommendationCard: React.FC<{
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <div className="flex items-center space-x-3 mb-2">
-            <Link 
+            <Link
               to={`/jobs/${job.id}`}
               className="text-xl font-bold hover:text-info-600 dark:hover:text-info-400"
               onClick={(e) => e.stopPropagation()}
@@ -530,7 +529,7 @@ const JobRecommendationCard: React.FC<{
               <span>{recommendation_type.replace('_', ' ')}</span>
             </span>
           </div>
-          
+
           <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400 mb-3">
             <span className="font-medium">{job.company}</span>
             <span className="flex items-center space-x-1">
@@ -546,7 +545,7 @@ const JobRecommendationCard: React.FC<{
             )}
           </div>
         </div>
-        
+
         <div className="text-right">
           <div className="text-2xl font-bold text-green-600 mb-1">
             {(match_score * 100).toFixed(0)}%
@@ -621,7 +620,7 @@ const JobRecommendationCard: React.FC<{
           <Clock className="h-4 w-4" />
           <span>Posted {new Date(job.posted_date).toLocaleDateString()}</span>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           <Button
             variant="ghost"
@@ -631,7 +630,7 @@ const JobRecommendationCard: React.FC<{
           >
             <Bookmark className="h-4 w-4" />
           </Button>
-          
+
           <Button
             variant="outlined"
             size="sm"
@@ -642,7 +641,7 @@ const JobRecommendationCard: React.FC<{
           >
             View Details
           </Button>
-          
+
           <Button
             size="sm"
             onClick={handleApply}

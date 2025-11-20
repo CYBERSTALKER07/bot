@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Sparkles } from 'lucide-react';
+import { ArrowLeft, Sparkles, Image, Globe, Users, Lock } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { cn } from '../lib/cva';
@@ -165,9 +165,9 @@ export default function CreatePostPage() {
                         onClick={handleSubmit}
                         disabled={!canPost}
                         className={cn(
-                            'rounded-full px-6 py-2 font-bold transition-all',
+                            'rounded-full px-6 py-2 font-bold transition-all shadow-lg',
                             canPost
-                                ? 'bg-[#BCE953] text-black hover:bg-[#BCE953]/90'
+                                ? 'bg-[#D3FB52] text-black hover:bg-[#D3FB52]/90 shadow-[#D3FB52]/20'
                                 : 'bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-gray-700 dark:text-gray-400'
                         )}
                     >
@@ -205,7 +205,7 @@ export default function CreatePostPage() {
                                 {contentSegments.map((segment, index) => (
                                     <span
                                         key={index}
-                                        className={segment.type === 'hashtag' ? 'text-info-500 font-medium' : ''}
+                                        className={segment.type === 'hashtag' ? 'text-[#D3FB52] font-medium' : ''}
                                     >
                                         {segment.value}
                                     </span>
@@ -263,7 +263,7 @@ export default function CreatePostPage() {
                                 isDark ? 'bg-gray-900/50' : 'bg-gray-50'
                             )}>
                                 <div className="flex items-center gap-2 mb-3">
-                                    <Sparkles className="w-4 h-4 text-info-500" />
+                                    <Sparkles className="w-4 h-4 text-[#D3FB52]" />
                                     <span className="text-sm font-medium">Trending topics</span>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
@@ -272,10 +272,10 @@ export default function CreatePostPage() {
                                             key={hashtag.id}
                                             onClick={() => setContent(prev => prev + `#${hashtag.name} `)}
                                             className={cn(
-                                                'px-3 py-1.5 rounded-full text-sm font-medium transition-colors',
+                                                'px-3 py-1.5 rounded-full text-sm font-medium transition-colors border',
                                                 isDark
-                                                    ? 'bg-gray-800 text-info-400 hover:bg-gray-700'
-                                                    : 'bg-info-50 text-info-600 hover:bg-info-100'
+                                                    ? 'bg-black text-[#D3FB52] hover:bg-gray-900 border-[#D3FB52]'
+                                                    : 'bg-white text-black hover:bg-gray-50 border-[#D3FB52]'
                                             )}
                                         >
                                             #{hashtag.name}
@@ -308,7 +308,8 @@ export default function CreatePostPage() {
                                             : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
                                     )}
                                 >
-                                    📷 Add Media
+                                    <Image className="w-4 h-4 inline-block mr-2" />
+                                    Add Media
                                 </label>
 
                                 {/* Visibility Selector */}
@@ -322,9 +323,9 @@ export default function CreatePostPage() {
                                             : 'bg-white text-gray-700 border border-gray-300'
                                     )}
                                 >
-                                    <option value="public">🌍 Public</option>
-                                    <option value="connections">👥 Connections</option>
-                                    <option value="private">🔒 Private</option>
+                                    <option value="public">Public</option>
+                                    <option value="connections">Connections</option>
+                                    <option value="private">Private</option>
                                 </select>
                             </div>
 
@@ -333,7 +334,7 @@ export default function CreatePostPage() {
                                 {extractedHashtags.length > 0 && (
                                     <span className={cn(
                                         'text-sm font-medium',
-                                        isDark ? 'text-info-400' : 'text-info-600'
+                                        isDark ? 'text-[#D3FB52]' : 'text-[#D3FB52]'
                                     )}>
                                         {extractedHashtags.length} {extractedHashtags.length === 1 ? 'hashtag' : 'hashtags'}
                                     </span>
@@ -364,7 +365,7 @@ export default function CreatePostPage() {
                                                     ? 'text-red-500'
                                                     : characterCount > MAX_CHARACTERS * 0.9
                                                         ? 'text-yellow-500'
-                                                        : 'text-info-500'
+                                                        : 'text-[#D3FB52]'
                                             )}
                                         />
                                     </svg>

@@ -6,16 +6,19 @@ import {
   ArrowLeft,
   AtSign,
   Users as UsersIcon,
-  Hash
+  Briefcase,
+  Calendar,
+  MapPin,
+  Clock
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { cn } from '../lib/cva';
-import { useSearch, useMostFollowedUsers, useFollowUser, useUnfollowUser, useFollowStatus } from '../hooks/useOptimizedQuery';
+import { useSearch, useMostFollowedUsers, useFollowUser, useUnfollowUser, useMostLikedPosts, useMatchedJobs } from '../hooks/useOptimizedQuery';
 import { useDebounce } from '../hooks/useDebounce';
 import { useAuth } from '../context/AuthContext';
-import Button from './ui/Button';
 import WhoToFollowItem from './WhoToFollowItem';
 import { SearchResultsListSkeleton, SearchPageSidebarSkeleton } from './ui/Skeleton';
+import { supabase } from '../lib/supabase';
 
 interface SearchResult {
   id: string;
@@ -80,6 +83,15 @@ const styles = `
     font-weight: 600;
   }
 
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
   @media (max-width: 640px) {
     .search-sidebar {
       display: none;
@@ -95,8 +107,6 @@ export default function SearchPage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [searchInput, setSearchInput] = useState(searchParams.get('q') || '');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [hoveredFollowId, setHoveredFollowId] = useState<string | null>(null);
-  const [processingFollowId, setProcessingFollowId] = useState<string | null>(null);
 
   // Parse search input to detect @ symbol
   const isUsernameSearch = searchInput.startsWith('@');
@@ -109,6 +119,85 @@ export default function SearchPage() {
   const { data: mostFollowedUsers = [], isLoading: isLoadingMostFollowed } = useMostFollowedUsers(5);
   const followUserMutation = useFollowUser();
   const unfollowUserMutation = useUnfollowUser();
+
+  // Fallback: Fetch regular users if mostFollowedUsers is empty
+  const [suggestedUsers, setSuggestedUsers] = useState<any[]>([]);
+  const [employers, setEmployers] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      if (mostFollowedUsers.length > 0) {
+        setSuggestedUsers(mostFollowedUsers);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('id, full_name, username, avatar_url, bio, verified')
+          .not('username', 'is', null)
+          .limit(10);
+
+        if (!error && data) {
+          setSuggestedUsers(data);
+        }
+      } catch (err) {
+        console.error('Error fetching users:', err);
+      }
+    };
+
+    fetchUsers();
+  }, [mostFollowedUsers]);
+
+  // Fetch employers/companies for left sidebar
+  useEffect(() => {
+    const fetchEmployers = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('id, full_name, username, avatar_url, bio, company_name, verified')
+          .eq('role', 'employer')
+          .not('company_name', 'is', null)
+          .limit(5);
+
+        if (!error && data) {
+          setEmployers(data);
+        }
+      } catch (err) {
+        console.error('Error fetching employers:', err);
+      }
+    };
+
+    fetchEmployers();
+  }, []);
+
+  // Fetch trending content for empty state
+  const { data: trendingPosts = [], isLoading: isLoadingPosts } = useMostLikedPosts(4, user?.id);
+  const { data: recentJobs = [] } = useMatchedJobs(undefined, 4);
+  const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
+
+  // Fetch upcoming events
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('employer_events')
+          .select('id, title, event_date, location, employer_id, status')
+          .gte('event_date', new Date().toISOString())
+          .eq('status', 'upcoming')
+          .order('event_date', { ascending: true })
+          .limit(3);
+
+        if (!error && data) {
+          setUpcomingEvents(data);
+        }
+      } catch (err) {
+        console.error('Error fetching events:', err);
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
 
   // Filter and sort results based on search type
@@ -217,38 +306,6 @@ export default function SearchPage() {
   const handleAtSymbolClick = () => {
     setSearchInput('@');
     inputRef.current?.focus();
-  };
-
-  const handleFollow = async (userId: string) => {
-    if (!user?.id) return;
-
-    setProcessingFollowId(userId);
-    try {
-      await followUserMutation.mutateAsync({
-        followerId: user.id,
-        followingId: userId
-      });
-    } catch (error) {
-      console.error('Error following user:', error);
-    } finally {
-      setProcessingFollowId(null);
-    }
-  };
-
-  const handleUnfollow = async (userId: string) => {
-    if (!user?.id) return;
-
-    setProcessingFollowId(userId);
-    try {
-      await unfollowUserMutation.mutateAsync({
-        followerId: user.id,
-        followingId: userId
-      });
-    } catch (error) {
-      console.error('Error unfollowing user:', error);
-    } finally {
-      setProcessingFollowId(null);
-    }
   };
 
   useEffect(() => {
@@ -371,18 +428,205 @@ export default function SearchPage() {
           </div>
 
           {/* Results Area */}
-          <div className="flex-1 overflow-y-auto w-full">
+          <div className="flex-1 overflow-y-auto w-full pb-20 lg:pb-0">
             {!searchInput && !isSearchFocused ? (
-              // Empty State
-              <div className="flex flex-col items-center justify-center h-full px-4 py-12 text-center max-w-2xl mx-auto">
-                <div className="mb-6">
-                  <SearchIcon className="w-16 h-16 text-gray-600 mx-auto mb-4 opacity-50" />
-                </div>
-                <h1 className="text-3xl font-serif mb-2">Search</h1>
+              // Full Post Cards Display
+              <div className="w-full max-w-2xl mx-auto">
+                {/* Trending Posts as Full Cards */}
+                {isLoadingPosts ? (
+                  <div className="space-y-4 p-4">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className={cn('p-6 rounded-xl animate-pulse', isDark ? 'bg-gray-900' : 'bg-gray-100')}>
+                        <div className="h-32 bg-gray-700 rounded"></div>
+                      </div>
+                    ))}
+                  </div>
+                ) : trendingPosts.length > 0 ? (
+                  <div className="space-y-0">
+                    {trendingPosts.map((post: any) => (
+                      <div
+                        key={post.id}
+                        className={cn(
+                          'p-4 border-b transition-colors',
+                          isDark ? 'border-gray-800 hover:bg-gray-900/50' : 'border-gray-200 hover:bg-gray-50'
+                        )}
+                      >
+                        {/* Post Header */}
+                        <div className="flex items-start gap-3 mb-3">
+                          <img
+                            src={post.author?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.author?.username}`}
+                            alt={post.author?.name}
+                            className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className="font-semibold text-base truncate">{post.author?.name}</p>
+                              {post.author?.verified && (
+                                <svg className="w-4 h-4 text-info-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                                </svg>
+                              )}
+                            </div>
+                            <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                              @{post.author?.username} • {new Date(post.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
 
+                        {/* Post Content */}
+                        <div className="mb-3">
+                          <p className={cn('text-base whitespace-pre-wrap', isDark ? 'text-white' : 'text-black')}>
+                            {post.content}
+                          </p>
+                        </div>
 
-                {/* Search Tips */}
+                        {/* Post Media */}
+                        {post.media && post.media.length > 0 && (
+                          <div className="mb-3 rounded-xl overflow-hidden">
+                            {post.media[0].type === 'image' ? (
+                              <img
+                                src={post.media[0].url}
+                                alt={post.media[0].alt || 'Post image'}
+                                className="w-full max-h-96 object-cover"
+                              />
+                            ) : (
+                              <video
+                                src={post.media[0].url}
+                                controls
+                                className="w-full max-h-96"
+                              />
+                            )}
+                          </div>
+                        )}
 
+                        {/* Engagement Stats (no interactions) */}
+
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+
+                {/* Who to Follow Section - Horizontal Scroll */}
+                {suggestedUsers.length > 0 && (
+                  <div className={cn('border-t border-b py-6', isDark ? 'border-gray-800' : 'border-gray-200')}>
+                    <div className="px-4">
+                      <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+                        <UsersIcon className="w-5 h-5" />
+                        Who to Follow
+                      </h2>
+                      <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+                        {suggestedUsers.map((user: any) => (
+                          <button
+                            key={user.id}
+                            onClick={() => navigate(`/profile/${user.id}`)}
+                            className={cn(
+                              'flex-shrink-0 w-48 p-4 rounded-2xl text-center transition-all border',
+                              isDark ? 'bg-gray-900 hover:bg-gray-800 border-gray-800' : 'bg-gray-50 hover:bg-gray-100 border-gray-200'
+                            )}
+                          >
+                            <img
+                              src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`}
+                              alt={user.full_name}
+                              className="w-16 h-16 rounded-full object-cover mx-auto mb-3"
+                            />
+                            <div className="mb-2">
+                              <p className="font-bold text-sm truncate">{user.full_name}</p>
+                              <p className={cn('text-xs truncate', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                                @{user.username}
+                              </p>
+                            </div>
+                            {user.bio && (
+                              <p className={cn('text-xs line-clamp-2 mb-3', isDark ? 'text-gray-500' : 'text-gray-600')}>
+                                {user.bio}
+                              </p>
+                            )}
+                            <div className={cn(
+                              'text-xs px-3 py-1.5 rounded-full font-medium',
+                              isDark ? 'bg-white text-black' : 'bg-black text-white'
+                            )}>
+                              Follow
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Jobs Section */}
+                {recentJobs.length > 0 && (
+                  <div className={cn('border-t', isDark ? 'border-gray-800' : 'border-gray-200')}>
+                    <div className="p-4">
+                      <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+                        <Briefcase className="w-5 h-5" />
+                        Recent Jobs
+                      </h2>
+                      <div className="space-y-3">
+                        {recentJobs.slice(0, 3).map((job: any) => (
+                          <button
+                            key={job.id}
+                            onClick={() => navigate(`/jobs/${job.id}`)}
+                            className={cn(
+                              'w-full p-4 rounded-xl text-left transition-all border',
+                              isDark ? 'bg-gray-900 hover:bg-gray-800 border-gray-800' : 'bg-white hover:bg-gray-50 border-gray-200'
+                            )}
+                          >
+                            <h3 className="font-bold text-base mb-2">{job.title}</h3>
+                            <p className={cn('text-sm mb-2', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                              {job.company}
+                            </p>
+                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                              <MapPin className="w-3 h-3" />
+                              <span>{job.location}</span>
+                              {job.type && (
+                                <>
+                                  <span>•</span>
+                                  <span>{job.type}</span>
+                                </>
+                              )}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Events Section */}
+                {upcomingEvents.length > 0 && (
+                  <div className={cn('border-t', isDark ? 'border-gray-800' : 'border-gray-200')}>
+                    <div className="p-4">
+                      <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+                        <Calendar className="w-5 h-5" />
+                        Upcoming Events
+                      </h2>
+                      <div className="space-y-3">
+                        {upcomingEvents.map((event: any) => (
+                          <button
+                            key={event.id}
+                            onClick={() => navigate(`/events/${event.id}`)}
+                            className={cn(
+                              'w-full p-4 rounded-xl text-left transition-all border',
+                              isDark ? 'bg-gray-900 hover:bg-gray-800 border-gray-800' : 'bg-white hover:bg-gray-50 border-gray-200'
+                            )}
+                          >
+                            <h3 className="font-bold text-base mb-2">{event.title}</h3>
+                            <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
+                              <Clock className="w-4 h-4" />
+                              <span>{new Date(event.event_date).toLocaleDateString()}</span>
+                            </div>
+                            {event.location && (
+                              <div className="flex items-center gap-2 text-sm text-gray-500">
+                                <MapPin className="w-4 h-4" />
+                                <span>{event.location}</span>
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : searchInput && loading ? (
               // Loading State
@@ -498,48 +742,92 @@ export default function SearchPage() {
           'search-sidebar hidden lg:block w-80 border-l overflow-y-auto',
           isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-100'
         )}>
-          <div className="p-4 sticky top-0">
-            {/* Most Followed Users Box */}
-            <div className={cn(
-              'rounded-2xl overflow-hidden border',
-              isDark ? 'bg-black border-gray-800' : 'bg-gray-50 border-gray-200'
-            )}>
+          <div className="p-4 space-y-6">
+            {/* Suggested Users Section */}
+            {suggestedUsers.length > 0 && (
               <div className={cn(
-                'p-4 border-b flex items-center gap-2',
-                isDark ? 'border-gray-800' : 'border-gray-200'
+                'rounded-2xl overflow-hidden border',
+                isDark ? 'bg-black border-gray-800' : 'bg-gray-50 border-gray-200'
               )}>
-                <UsersIcon className="w-5 h-5" />
-                <h2 className="font-serif text-lg">Most Followed</h2>
-              </div>
-
-              <div className={cn(
-                'divide-y',
-                isDark ? 'divide-gray-800' : 'divide-gray-200'
-              )}>
-                {isLoadingMostFollowed ? (
-                  <SearchPageSidebarSkeleton />
-                ) : mostFollowedUsers && mostFollowedUsers.length > 0 ? (
-                  mostFollowedUsers.map((user) => (
-                    <WhoToFollowItem
+                <div className={cn(
+                  'p-4 border-b flex items-center gap-2',
+                  isDark ? 'border-gray-800' : 'border-gray-200'
+                )}>
+                  <UsersIcon className="w-5 h-5" />
+                  <h2 className="font-serif text-lg">Suggested for you</h2>
+                </div>
+                <div className={cn(
+                  'divide-y',
+                  isDark ? 'divide-gray-800' : 'divide-gray-200'
+                )}>
+                  {suggestedUsers.slice(0, 5).map((user: any) => (
+                    <button
                       key={user.id}
-                      user={{
-                        id: user.id,
-                        full_name: user.full_name,
-                        username: user.username,
-                        avatar_url: user.avatar_url,
-                        verified: user.verified,
-                        bio: `${user.followerCount || 0} followers`
-                      }}
-                      onNavigate={() => { }}
-                    />
-                  ))
-                ) : (
-                  <div className={cn('p-4 text-center text-sm', isDark ? 'text-gray-500' : 'text-gray-400')}>
-                    No users found
-                  </div>
-                )}
+                      onClick={() => navigate(`/profile/${user.id}`)}
+                      className={cn(
+                        'w-full flex items-center gap-3 p-4 transition-colors text-left',
+                        isDark ? 'hover:bg-gray-900' : 'hover:bg-gray-100'
+                      )}
+                    >
+                      <img
+                        src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`}
+                        alt={user.full_name}
+                        className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm truncate">{user.full_name}</p>
+                        <p className={cn('text-xs truncate', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                          @{user.username}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Companies Section */}
+            {employers.length > 0 && (
+              <div className={cn(
+                'rounded-2xl overflow-hidden border',
+                isDark ? 'bg-black border-gray-800' : 'bg-gray-50 border-gray-200'
+              )}>
+                <div className={cn(
+                  'p-4 border-b flex items-center gap-2',
+                  isDark ? 'border-gray-800' : 'border-gray-200'
+                )}>
+                  <Briefcase className="w-5 h-5" />
+                  <h2 className="font-serif text-lg">Companies</h2>
+                </div>
+                <div className={cn(
+                  'divide-y',
+                  isDark ? 'divide-gray-800' : 'divide-gray-200'
+                )}>
+                  {employers.map((employer: any) => (
+                    <button
+                      key={employer.id}
+                      onClick={() => navigate(`/profile/${employer.id}`)}
+                      className={cn(
+                        'w-full flex items-center gap-3 p-4 transition-colors text-left',
+                        isDark ? 'hover:bg-gray-900' : 'hover:bg-gray-100'
+                      )}
+                    >
+                      <img
+                        src={employer.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${employer.company_name}`}
+                        alt={employer.company_name}
+                        className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm truncate">{employer.company_name}</p>
+                        <p className={cn('text-xs truncate', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                          {employer.full_name}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

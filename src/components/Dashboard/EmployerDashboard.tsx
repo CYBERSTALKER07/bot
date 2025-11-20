@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
+import {
   Users,
   Eye,
   Star,
@@ -69,10 +69,10 @@ export default function EmployerDashboard() {
   const { isDark } = useTheme();
   const { user } = useAuth();
   const { fetchEmployerJobs, getJobApplicants } = useJobManagement();
-  
+
   const [showPostEventModal, setShowPostEventModal] = useState(false);
   const [showPostJobModal, setShowPostJobModal] = useState(false);
-  
+
   // Data states
   const [jobPostings, setJobPostings] = useState<JobPosting[]>([]);
   const [events, setEvents] = useState<EventData[]>([]);
@@ -125,7 +125,7 @@ export default function EmployerDashboard() {
         // Fetch all applicants for employer's jobs
         if (jobsData.length > 0) {
           const allApplicants: Applicant[] = [];
-          
+
           for (const job of jobsData.slice(0, 10)) {
             const applicants = await getJobApplicants(job.id);
             allApplicants.push(...(applicants || []));
@@ -145,23 +145,23 @@ export default function EmployerDashboard() {
               label: 'Active Jobs',
               color: 'text-black dark:text-white',
               bgColor: 'bg-white dark:bg-black'
-              
+
             },
             {
               value: closedJobs,
               label: 'Closed Jobs',
               color: 'text-black dark:text-white',
               bgColor: 'bg-white dark:bg-black'
-              
+
             },
             {
               value: totalApplicants,
               label: 'Total Applicants',
               color: 'text-black dark:text-white',
               bgColor: 'bg-white dark:bg-black'
-              
+
             },
-           
+
           ]);
         }
 
@@ -212,7 +212,7 @@ export default function EmployerDashboard() {
   }
 
   return (
-    <PageLayout 
+    <PageLayout
       className={`min-h-screen ${isDark ? 'bg-black text-white' : 'bg-gray-50 text-black'}`}
       maxWidth="full"
       padding="none"
@@ -233,7 +233,7 @@ export default function EmployerDashboard() {
             <Button className="p-2" title="Notifications">
               <Bell className="h-5 w-5" />
             </Button>
-            <Button 
+            <Button
               className={cn(
                 'rounded-full px-3 py-2 font-thin text-sm',
                 isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800'
@@ -258,7 +258,7 @@ export default function EmployerDashboard() {
               </p>
             </div>
             <div className="flex items-center space-x-3">
-              <Button 
+              <Button
                 className={cn(
                   'rounded-full px-6 py-2 font-thin',
                   isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800'
@@ -268,7 +268,7 @@ export default function EmployerDashboard() {
                 <Plus className="h-4 w-4 mr-2" />
                 Post Job
               </Button>
-              <Button 
+              <Button
                 className={cn(
                   'rounded-full px-6 py-2 font-thin',
                   isDark ? 'bg-info-600 text-white hover:bg-info-700' : 'bg-info-500 text-white hover:bg-info-600'
@@ -287,25 +287,69 @@ export default function EmployerDashboard() {
           </div>
 
           {/* Top Metrics Cards - 4 columns on desktop, 2 on mobile */}
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6 lg:mb-8">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 lg:mb-8">
             {metrics.map((metric, index) => (
-              <div 
+              <div
                 key={index}
-                className={cn(
-                  'rounded-3xl p-3 sm:p-4 lg:p-6 transition-all hover:shadow-lg',
-                  metric.bgColor,
-                  isDark ? 'border border-gray-800' : 'border border-gray-200'
-                )}
+                className="group relative"
+                style={{
+                  perspective: '1000px',
+                }}
               >
-                <div className="flex items-start justify-between mb-3 sm:mb-4">
-                  <div className="flex-1">
-                    <p className={cn('text-xs lg:text-sm font-medium', isDark ? 'text-gray-400' : 'text-gray-600')}>
-                      {metric.label}
-                    </p>
-                    <p className="text-xl sm:text-2xl lg:text-3xl font-thin mt-1 sm:mt-2">{metric.value}</p>
+                <div
+                  className="relative rounded-3xl p-6 sm:p-8 lg:p-10 transition-all duration-500 ease-out transform hover:-translate-y-2 hover:scale-[1.02]"
+                  style={{
+                    background:
+                      index === 0
+                        ? 'linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%)'
+                        : index === 1
+                          ? 'linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%)'
+                          : 'linear-gradient(135deg, #3B82F6 20%, #8B5CF6 80%)',
+                    boxShadow: `
+                      0 10px 30px -5px rgba(59, 130, 246, 0.3),
+                      0 20px 40px -10px rgba(139, 92, 246, 0.2),
+                      0 30px 60px -15px rgba(0, 0, 0, 0.15),
+                      inset 0 1px 0 rgba(255, 255, 255, 0.2)
+                    `,
+                    transformStyle: 'preserve-3d',
+                  }}
+                >
+                  {/* 3D depth layer */}
+                  <div
+                    className="absolute inset-0 rounded-3xl opacity-50"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+                      transform: 'translateZ(-10px)',
+                    }}
+                  />
+
+                  {/* Shine effect */}
+                  <div
+                    className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%)',
+                    }}
+                  />
+
+                  <div className="relative z-10 flex items-start justify-between mb-4 sm:mb-6">
+                    <div className="flex-1">
+                      <p className="text-xs lg:text-sm font-semibold text-white/90 uppercase tracking-wider mb-2">
+                        {metric.label}
+                      </p>
+                      <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white drop-shadow-lg">
+                        {metric.value}
+                      </p>
+                    </div>
                   </div>
+
+                  {/* Decorative corner accent */}
+                  <div
+                    className="absolute top-4 right-4 w-16 h-16 rounded-full opacity-20"
+                    style={{
+                      background: 'radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%)',
+                    }}
+                  />
                 </div>
-               
               </div>
             ))}
           </div>
@@ -414,8 +458,8 @@ export default function EmployerDashboard() {
                         <span className={cn(
                           'text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0',
                           event.status === 'upcoming' ? (isDark ? 'bg-info-900 text-info-200' : 'bg-info-100 text-info-800') :
-                          event.status === 'ongoing' ? (isDark ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800') :
-                          isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-200 text-gray-800'
+                            event.status === 'ongoing' ? (isDark ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800') :
+                              isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-200 text-gray-800'
                         )}>
                           {event.status}
                         </span>
@@ -483,7 +527,7 @@ export default function EmployerDashboard() {
                         </div>
                       </div>
                       <div className="flex space-x-1 sm:space-x-2 flex-shrink-0 ml-2">
-                        <Button 
+                        <Button
                           className={cn(
                             'rounded-lg text-xs px-2 sm:px-3 py-1 sm:py-2',
                             isDark ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-200 hover:bg-gray-300 text-black'
@@ -491,7 +535,7 @@ export default function EmployerDashboard() {
                         >
                           View
                         </Button>
-                        <Button 
+                        <Button
                           className={cn(
                             'rounded-lg text-xs px-2 sm:px-3 py-1 sm:py-2',
                             isDark ? 'bg-info-600 hover:bg-info-700' : 'bg-info-500 hover:bg-info-600',

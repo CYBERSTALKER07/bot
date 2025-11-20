@@ -155,7 +155,7 @@ export function FloatingActionMenu({
       icon: Edit3,
       label: 'Create Post',
       description: 'Create a new post',
-      color: 'bg-blue-500 hover:bg-blue-600',
+      color: 'bg-[#D3FB52] hover:bg-[#D3FB52]/90 text-black',
       action: () => navigate('/create-post')
     },
     {
@@ -163,7 +163,7 @@ export function FloatingActionMenu({
       icon: MessageSquare,
       label: 'Messages',
       description: 'View your messages',
-      color: 'bg-green-500 hover:bg-green-600',
+      color: 'bg-white hover:bg-gray-100 text-black',
       action: () => navigate('/messages')
     },
     {
@@ -171,7 +171,7 @@ export function FloatingActionMenu({
       icon: Share2,
       label: 'Share',
       description: 'Share content',
-      color: 'bg-purple-500 hover:bg-purple-600',
+      color: 'bg-black hover:bg-gray-900 text-white border-white',
       action: () => console.log('Share')
     },
     {
@@ -179,7 +179,7 @@ export function FloatingActionMenu({
       icon: Bookmark,
       label: 'Bookmarks',
       description: 'View bookmarked items',
-      color: 'bg-orange-500 hover:bg-orange-600',
+      color: 'bg-[#D3FB52] hover:bg-[#D3FB52]/90 text-black',
       action: () => navigate('/bookmarks')
     }
   ];
@@ -413,7 +413,7 @@ export function FloatingActionMenu({
             {/* Center close button */}
             <button
               onClick={() => setShowCenterMenu(false)}
-              className="w-16 h-16 rounded-full bg-black text-white shadow-2xl shadow-white/20 flex items-center justify-center border border-gray-800 transform transition-all duration-300 hover:scale-110"
+              className="w-16 h-16 rounded-full bg-black text-[#D3FB52] shadow-2xl shadow-[#D3FB52]/20 flex items-center justify-center border-2 border-[#D3FB52] transform transition-all duration-300 hover:scale-110"
               aria-label="Close menu"
             >
               <X className="h-8 w-8" />
@@ -452,14 +452,14 @@ export function FloatingActionMenu({
                   }}
                   className={`
                     absolute w-16 h-16 rounded-full shadow-xl flex items-center justify-center
-                    transition-all duration-400 ease-out text-white border-2 border-white/20
+                    transition-all duration-400 ease-out border-2
                     touch-manipulation select-none transform-gpu
                     opacity-100 scale-100 pointer-events-auto
                     ${isPressed
-                      ? 'scale-125 shadow-2xl ring-4 ring-white/30 border-white/40'
+                      ? 'scale-125 shadow-2xl ring-4 ring-[#D3FB52]/30 border-[#D3FB52]'
                       : isHovered
-                        ? 'scale-110 shadow-xl border-white/30'
-                        : 'scale-100 hover:scale-105 active:scale-95'
+                        ? 'scale-110 shadow-xl border-[#D3FB52]/50'
+                        : 'scale-100 hover:scale-105 active:scale-95 border-white/20'
                     }
                     ${action.color}
                   `}
@@ -570,14 +570,14 @@ export function FloatingActionMenu({
                 }}
                 className={`
                   absolute w-14 h-14 rounded-full shadow-xl flex items-center justify-center
-                  transition-all duration-300 ease-out text-white border-2 border-white/20
+                  transition-all duration-300 ease-out border-2
                   touch-manipulation select-none transform-gpu
                   ${isOpen ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-0 pointer-events-none'}
                   ${isPressed || isDraggedOver
-                    ? 'scale-150 shadow-2xl ring-4 ring-white/30 border-white/40'
+                    ? 'scale-150 shadow-2xl ring-4 ring-[#D3FB52]/30 border-[#D3FB52]'
                     : isHovered
-                      ? 'scale-125 shadow-xl border-white/30'
-                      : 'scale-100 hover:scale-110 active:scale-95'
+                      ? 'scale-125 shadow-xl border-[#D3FB52]/50'
+                      : 'scale-100 hover:scale-110 active:scale-95 border-white/20'
                   }
                   ${action.color}
                 `}
@@ -601,13 +601,13 @@ export function FloatingActionMenu({
           onClick={handleFabClick}
           className={`
             relative w-16 h-16 rounded-full flex items-center justify-center
-            transition-all duration-300 ease-out border border-gray-900
+            transition-all duration-300 ease-out border-2
             touch-manipulation select-none transform-gpu
             ${isOpen
-              ? 'bg-black text-white rotate-45 scale-110 shadow-lg shadow-white/50'
+              ? 'bg-black text-[#D3FB52] rotate-45 scale-110 shadow-lg shadow-[#D3FB52]/50 border-[#D3FB52]'
               : isFabPressed
-                ? 'bg-black text-white scale-125 shadow-lg shadow-white/50 ring-4 ring-white/20'
-                : 'bg-black text-white hover:scale-105 active:scale-95 shadow-lg shadow-white/20'
+                ? 'bg-black text-[#D3FB52] scale-125 shadow-lg shadow-[#D3FB52]/50 ring-4 ring-[#D3FB52]/20 border-[#D3FB52]'
+                : 'bg-black text-[#D3FB52] hover:scale-105 active:scale-95 shadow-lg shadow-[#D3FB52]/20 border-[#D3FB52]'
             }
             z-50
           `}

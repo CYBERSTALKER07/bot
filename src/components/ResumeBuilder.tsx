@@ -14,7 +14,7 @@ const colorThemes = [
   { name: 'Modern Purple', primary: '#7c3aed', secondary: '#a855f7', accent: '#c4b5fd', text: '#374151' },
   { name: 'Elegant Green', primary: '#059669', secondary: '#10b981', accent: '#86efac', text: '#111827' },
   { name: 'Classic Black', primary: '#111827', secondary: '#374151', accent: '#9ca3af', text: '#1f2937' },
-  { name: 'Warm Orange', primary: '#ea580c', secondary: '#f97316', accent: '#fed7aa', text: '#1c1917' },
+  { name: 'Cool Blue', primary: '#3b82f6', secondary: '#60a5fa', accent: '#bfdbfe', text: '#1c1917' },
   { name: 'Tech Cyan', primary: '#0891b2', secondary: '#06b6d4', accent: '#a5f3fc', text: '#0f172a' },
 ];
 
@@ -160,7 +160,7 @@ export default function ResumeBuilder() {
   const updateExperience = (id: string, field: string, value: string | boolean) => {
     setResumeData(prev => ({
       ...prev,
-      experience: prev.experience.map(exp => 
+      experience: prev.experience.map(exp =>
         exp.id === id ? { ...exp, [field]: value } : exp
       )
     }));
@@ -192,7 +192,7 @@ export default function ResumeBuilder() {
   const updateEducation = (id: string, field: string, value: string) => {
     setResumeData(prev => ({
       ...prev,
-      education: prev.education.map(edu => 
+      education: prev.education.map(edu =>
         edu.id === id ? { ...edu, [field]: value } : edu
       )
     }));
@@ -220,7 +220,7 @@ export default function ResumeBuilder() {
   const updateSkillCategory = (id: string, category: string) => {
     setResumeData(prev => ({
       ...prev,
-      skills: prev.skills.map(skill => 
+      skills: prev.skills.map(skill =>
         skill.id === id ? { ...skill, category } : skill
       )
     }));
@@ -230,7 +230,7 @@ export default function ResumeBuilder() {
     const itemsArray = items.split(',').map(item => item.trim()).filter(item => item);
     setResumeData(prev => ({
       ...prev,
-      skills: prev.skills.map(skill => 
+      skills: prev.skills.map(skill =>
         skill.id === id ? { ...skill, items: itemsArray } : skill
       )
     }));
@@ -258,7 +258,7 @@ export default function ResumeBuilder() {
       tempDiv.style.fontSize = '14px';
       tempDiv.style.lineHeight = '1.5';
       tempDiv.style.color = '#000000';
-      
+
       // Create the resume HTML structure for PDF
       tempDiv.innerHTML = `
         <div style="padding: 32px; min-height: 297mm; background: white;">
@@ -488,8 +488,8 @@ export default function ResumeBuilder() {
           onChange={(e) => updatePersonalInfo('fullName', e.target.value)}
           className={cn(
             "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
-            isDark 
-              ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400' 
+            isDark
+              ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400'
               : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
           )}
         />
@@ -500,8 +500,8 @@ export default function ResumeBuilder() {
           onChange={(e) => updatePersonalInfo('email', e.target.value)}
           className={cn(
             "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
-            isDark 
-              ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400' 
+            isDark
+              ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400'
               : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
           )}
         />
@@ -512,8 +512,8 @@ export default function ResumeBuilder() {
           onChange={(e) => updatePersonalInfo('phone', e.target.value)}
           className={cn(
             "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
-            isDark 
-              ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400' 
+            isDark
+              ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400'
               : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
           )}
         />
@@ -524,8 +524,8 @@ export default function ResumeBuilder() {
           onChange={(e) => updatePersonalInfo('location', e.target.value)}
           className={cn(
             "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
-            isDark 
-              ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400' 
+            isDark
+              ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400'
               : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
           )}
         />
@@ -536,8 +536,8 @@ export default function ResumeBuilder() {
           onChange={(e) => updatePersonalInfo('website', e.target.value)}
           className={cn(
             "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
-            isDark 
-              ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400' 
+            isDark
+              ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400'
               : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
           )}
         />
@@ -548,8 +548,8 @@ export default function ResumeBuilder() {
           onChange={(e) => updatePersonalInfo('linkedin', e.target.value)}
           className={cn(
             "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
-            isDark 
-              ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400' 
+            isDark
+              ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400'
               : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
           )}
         />
@@ -561,8 +561,8 @@ export default function ResumeBuilder() {
         rows={4}
         className={cn(
           "w-full px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500 resize-none",
-          isDark 
-            ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400' 
+          isDark
+            ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400'
             : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
         )}
       />
@@ -592,8 +592,8 @@ export default function ResumeBuilder() {
                 onChange={(e) => updateExperience(exp.id, 'company', e.target.value)}
                 className={cn(
                   "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
-                  isDark 
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                  isDark
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
                 )}
               />
@@ -604,8 +604,8 @@ export default function ResumeBuilder() {
                 onChange={(e) => updateExperience(exp.id, 'position', e.target.value)}
                 className={cn(
                   "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
-                  isDark 
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                  isDark
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
                 )}
               />
@@ -616,8 +616,8 @@ export default function ResumeBuilder() {
                 onChange={(e) => updateExperience(exp.id, 'startDate', e.target.value)}
                 className={cn(
                   "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
-                  isDark 
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                  isDark
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
                 )}
               />
@@ -631,8 +631,8 @@ export default function ResumeBuilder() {
                   className={cn(
                     "flex-1 px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
                     exp.current && "opacity-50",
-                    isDark 
-                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                    isDark
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                       : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
                   )}
                 />
@@ -663,14 +663,14 @@ export default function ResumeBuilder() {
             rows={4}
             className={cn(
               "w-full px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500 resize-none",
-              isDark 
-                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+              isDark
+                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                 : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
             )}
           />
         </div>
       ))}
-      
+
       {resumeData.experience.length === 0 && (
         <div className={cn(
           "text-center py-12 rounded-xl border-2 border-dashed",
@@ -707,8 +707,8 @@ export default function ResumeBuilder() {
                 onChange={(e) => updateEducation(edu.id, 'institution', e.target.value)}
                 className={cn(
                   "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
-                  isDark 
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                  isDark
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
                 )}
               />
@@ -719,8 +719,8 @@ export default function ResumeBuilder() {
                 onChange={(e) => updateEducation(edu.id, 'degree', e.target.value)}
                 className={cn(
                   "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
-                  isDark 
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                  isDark
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
                 )}
               />
@@ -731,8 +731,8 @@ export default function ResumeBuilder() {
                 onChange={(e) => updateEducation(edu.id, 'field', e.target.value)}
                 className={cn(
                   "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
-                  isDark 
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                  isDark
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
                 )}
               />
@@ -743,8 +743,8 @@ export default function ResumeBuilder() {
                 onChange={(e) => updateEducation(edu.id, 'gpa', e.target.value)}
                 className={cn(
                   "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
-                  isDark 
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                  isDark
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
                 )}
               />
@@ -755,8 +755,8 @@ export default function ResumeBuilder() {
                 onChange={(e) => updateEducation(edu.id, 'startDate', e.target.value)}
                 className={cn(
                   "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
-                  isDark 
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                  isDark
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
                 )}
               />
@@ -767,8 +767,8 @@ export default function ResumeBuilder() {
                 onChange={(e) => updateEducation(edu.id, 'endDate', e.target.value)}
                 className={cn(
                   "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
-                  isDark 
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                  isDark
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
                 )}
               />
@@ -784,7 +784,7 @@ export default function ResumeBuilder() {
           </div>
         </div>
       ))}
-      
+
       {resumeData.education.length === 0 && (
         <div className={cn(
           "text-center py-12 rounded-xl border-2 border-dashed",
@@ -820,8 +820,8 @@ export default function ResumeBuilder() {
               onChange={(e) => updateSkillCategory(skill.id, e.target.value)}
               className={cn(
                 "flex-1 px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
-                isDark 
-                  ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                isDark
+                  ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                   : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
               )}
             />
@@ -841,14 +841,14 @@ export default function ResumeBuilder() {
             rows={3}
             className={cn(
               "w-full px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500 resize-none",
-              isDark 
-                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+              isDark
+                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                 : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
             )}
           />
         </div>
       ))}
-      
+
       {resumeData.skills.length === 0 && (
         <div className={cn(
           "text-center py-12 rounded-xl border-2 border-dashed",
@@ -864,10 +864,10 @@ export default function ResumeBuilder() {
 
   // Resume Preview Component with all templates
   const renderResumePreview = () => (
-    <div 
+    <div
       ref={resumeRef}
       className="bg-white w-full max-w-[210mm] mx-auto shadow-lg"
-      style={{ 
+      style={{
         minHeight: '297mm',
         fontFamily: 'Arial, sans-serif',
         color: currentTheme.text,
@@ -885,11 +885,11 @@ export default function ResumeBuilder() {
     <div className="p-8">
       {/* Header */}
       <div className="mb-8">
-        <div 
+        <div
           className="w-full h-2 mb-6"
           style={{ backgroundColor: currentTheme.primary }}
         />
-        <h1 
+        <h1
           className="text-4xl font-bold mb-2"
           style={{ color: currentTheme.primary }}
         >
@@ -925,11 +925,11 @@ export default function ResumeBuilder() {
       {/* Experience */}
       {resumeData.experience.length > 0 && (
         <div className="mb-6">
-          <h2 
+          <h2
             className="text-xl font-bold mb-4 pb-2 border-b-2"
-            style={{ 
+            style={{
               color: currentTheme.primary,
-              borderColor: currentTheme.accent 
+              borderColor: currentTheme.accent
             }}
           >
             <Briefcase className="inline h-5 w-5 mr-2" />
@@ -959,11 +959,11 @@ export default function ResumeBuilder() {
       {/* Education */}
       {resumeData.education.length > 0 && (
         <div className="mb-6">
-          <h2 
+          <h2
             className="text-xl font-bold mb-4 pb-2 border-b-2"
-            style={{ 
+            style={{
               color: currentTheme.primary,
-              borderColor: currentTheme.accent 
+              borderColor: currentTheme.accent
             }}
           >
             <GraduationCap className="inline h-5 w-5 mr-2" />
@@ -991,11 +991,11 @@ export default function ResumeBuilder() {
       {/* Skills */}
       {resumeData.skills.length > 0 && (
         <div className="mb-6">
-          <h2 
+          <h2
             className="text-xl font-bold mb-4 pb-2 border-b-2"
-            style={{ 
+            style={{
               color: currentTheme.primary,
-              borderColor: currentTheme.accent 
+              borderColor: currentTheme.accent
             }}
           >
             <Award className="inline h-5 w-5 mr-2" />
@@ -1008,12 +1008,12 @@ export default function ResumeBuilder() {
               </h3>
               <div className="flex flex-wrap gap-2">
                 {skill.items.map((item, index) => (
-                  <span 
+                  <span
                     key={index}
                     className="px-2 py-1 text-xs rounded"
-                    style={{ 
+                    style={{
                       backgroundColor: currentTheme.accent,
-                      color: currentTheme.text 
+                      color: currentTheme.text
                     }}
                   >
                     {item}
@@ -1032,7 +1032,7 @@ export default function ResumeBuilder() {
     <div className="p-8">
       {/* Header */}
       <div className="text-center mb-8 pb-6 border-b-2" style={{ borderColor: currentTheme.primary }}>
-        <h1 
+        <h1
           className="text-3xl font-bold mb-3"
           style={{ color: currentTheme.primary }}
         >
@@ -1064,7 +1064,7 @@ export default function ResumeBuilder() {
       {/* Experience */}
       {resumeData.experience.length > 0 && (
         <div className="mb-8">
-          <h2 
+          <h2
             className="text-lg font-bold mb-4 uppercase tracking-wider border-b pb-2"
             style={{ color: currentTheme.primary, borderColor: currentTheme.accent }}
           >
@@ -1096,7 +1096,7 @@ export default function ResumeBuilder() {
       {/* Education */}
       {resumeData.education.length > 0 && (
         <div className="mb-8">
-          <h2 
+          <h2
             className="text-lg font-bold mb-4 uppercase tracking-wider border-b pb-2"
             style={{ color: currentTheme.primary, borderColor: currentTheme.accent }}
           >
@@ -1126,7 +1126,7 @@ export default function ResumeBuilder() {
       {/* Skills */}
       {resumeData.skills.length > 0 && (
         <div className="mb-6">
-          <h2 
+          <h2
             className="text-lg font-bold mb-4 uppercase tracking-wider border-b pb-2"
             style={{ color: currentTheme.primary, borderColor: currentTheme.accent }}
           >
@@ -1205,11 +1205,11 @@ export default function ResumeBuilder() {
                     <div key={index} className="mb-3">
                       <div className="text-sm font-medium mb-1">{item}</div>
                       <div className="w-full bg-gray-600 rounded-full h-1">
-                        <div 
+                        <div
                           className="h-1 rounded-full"
-                          style={{ 
+                          style={{
                             backgroundColor: currentTheme.accent,
-                            width: `${Math.max(70, 90 - index * 5)}%` 
+                            width: `${Math.max(70, 90 - index * 5)}%`
                           }}
                         />
                       </div>
@@ -1262,13 +1262,13 @@ export default function ResumeBuilder() {
       <div className="w-2/3 bg-white p-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 
+          <h1
             className="text-4xl font-bold mb-2 tracking-wide"
             style={{ color: currentTheme.primary }}
           >
             {resumeData.personalInfo.fullName || 'HENRY MADISON'}
           </h1>
-          <div 
+          <div
             className="text-lg font-medium mb-6 tracking-wider"
             style={{ color: currentTheme.secondary }}
           >
@@ -1280,7 +1280,7 @@ export default function ResumeBuilder() {
         {resumeData.personalInfo.summary && (
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4">
-              <div 
+              <div
                 className="w-8 h-8 rounded-full flex items-center justify-center"
                 style={{ backgroundColor: currentTheme.primary }}
               >
@@ -1300,7 +1300,7 @@ export default function ResumeBuilder() {
         {resumeData.experience.length > 0 && (
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-6">
-              <div 
+              <div
                 className="w-8 h-8 rounded-full flex items-center justify-center"
                 style={{ backgroundColor: currentTheme.primary }}
               >
@@ -1310,7 +1310,7 @@ export default function ResumeBuilder() {
                 EXPERIENCE
               </h2>
             </div>
-            
+
             {resumeData.experience.map((exp, index) => (
               <div key={exp.id} className={`mb-6 ${index > 0 ? 'border-t border-gray-200 pt-6' : ''}`}>
                 <div className="flex justify-between items-start mb-2">
@@ -1340,7 +1340,7 @@ export default function ResumeBuilder() {
         {resumeData.education.length > 0 && (
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-6">
-              <div 
+              <div
                 className="w-8 h-8 rounded-full flex items-center justify-center"
                 style={{ backgroundColor: currentTheme.primary }}
               >
@@ -1350,7 +1350,7 @@ export default function ResumeBuilder() {
                 EDUCATION
               </h2>
             </div>
-            
+
             {resumeData.education.map((edu, index) => (
               <div key={edu.id} className={`mb-6 ${index > 0 ? 'border-t border-gray-200 pt-6' : ''}`}>
                 <div className="flex justify-between items-start mb-2">
@@ -1379,7 +1379,7 @@ export default function ResumeBuilder() {
         {/* References Section */}
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-6">
-            <div 
+            <div
               className="w-8 h-8 rounded-full flex items-center justify-center"
               style={{ backgroundColor: currentTheme.primary }}
             >
@@ -1389,7 +1389,7 @@ export default function ResumeBuilder() {
               REFERENCES
             </h2>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-6">
             <div>
               <h4 className="font-bold text-base mb-1" style={{ color: currentTheme.secondary }}>
@@ -1418,13 +1418,13 @@ export default function ResumeBuilder() {
     <div className="p-12">
       {/* Header */}
       <div className="mb-12">
-        <h1 
+        <h1
           className="text-4xl font-light mb-6 tracking-wide"
           style={{ color: currentTheme.primary }}
         >
           {resumeData.personalInfo.fullName || 'Your Name'}
         </h1>
-        
+
         <div className="flex flex-wrap gap-8 text-sm text-gray-600 mb-8">
           {resumeData.personalInfo.email && <div>{resumeData.personalInfo.email}</div>}
           {resumeData.personalInfo.phone && <div>{resumeData.personalInfo.phone}</div>}
@@ -1442,7 +1442,7 @@ export default function ResumeBuilder() {
       {/* Experience */}
       {resumeData.experience.length > 0 && (
         <div className="mb-12">
-          <h2 
+          <h2
             className="text-lg font-light mb-8 uppercase tracking-widest pb-2"
             style={{ color: currentTheme.primary, borderBottom: `1px solid ${currentTheme.accent}` }}
           >
@@ -1472,7 +1472,7 @@ export default function ResumeBuilder() {
       {/* Education */}
       {resumeData.education.length > 0 && (
         <div className="mb-12">
-          <h2 
+          <h2
             className="text-lg font-light mb-8 uppercase tracking-widest pb-2"
             style={{ color: currentTheme.primary, borderBottom: `1px solid ${currentTheme.accent}` }}
           >
@@ -1500,7 +1500,7 @@ export default function ResumeBuilder() {
       {/* Skills */}
       {resumeData.skills.length > 0 && (
         <div className="mb-8">
-          <h2 
+          <h2
             className="text-lg font-light mb-8 uppercase tracking-widest pb-2"
             style={{ color: currentTheme.primary, borderBottom: `1px solid ${currentTheme.accent}` }}
           >
@@ -1536,9 +1536,8 @@ export default function ResumeBuilder() {
         "pt-20 lg:pt-0 lg:ml-20"
       )}>
         <div className="flex flex-col items-center space-y-4">
-          <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${
-            isDark ? 'border-white' : 'border-black'
-          }`}></div>
+          <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${isDark ? 'border-white' : 'border-black'
+            }`}></div>
           <span className="text-sm font-medium">Generating your resume...</span>
         </div>
       </div>
@@ -1563,7 +1562,7 @@ export default function ResumeBuilder() {
                 <span>AI Builder</span>
               </button>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               {/* ...existing code... */}
             </div>
@@ -1573,7 +1572,7 @@ export default function ResumeBuilder() {
 
       {/* Conditional rendering for AI Builder */}
       {showAIBuilder ? (
-        <AIResumeBuilder 
+        <AIResumeBuilder
           onGenerate={handleAIGenerate}
           onBack={() => setShowAIBuilder(false)}
         />
@@ -1588,4 +1587,4 @@ export default function ResumeBuilder() {
     </div>
   );
 }
-                    </li>                  </ul>                </div>              </div>
+                    </li >                  </ul >                </div >              </div >

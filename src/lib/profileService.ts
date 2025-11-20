@@ -52,7 +52,7 @@ export class ProfileService {
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${userId}/avatar-${Date.now()}.${fileExt}`;
-      
+
       // Use 'avatars' bucket
       const { error } = await supabase.storage
         .from('avatars')
@@ -85,7 +85,7 @@ export class ProfileService {
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${userId}/cover-${Date.now()}.${fileExt}`;
-      
+
       // Use 'covers' bucket
       const { error } = await supabase.storage
         .from('covers')
@@ -266,7 +266,7 @@ export class ProfileService {
   static async getCurrentProfile(): Promise<ProfileData | null> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         throw new Error('No authenticated user');
       }
@@ -301,11 +301,11 @@ export class ProfileService {
         post_count,
         ...validUpdates
       } = updates;
-      
+
       // If username is being updated, validate and normalize it
       if (validUpdates.username) {
         validUpdates.username = validUpdates.username.toLowerCase().replace(/[^a-z0-9_]/g, '');
-        
+
         if (validUpdates.username.length < 3) {
           throw new Error('Username must be at least 3 characters long');
         }
@@ -333,24 +333,24 @@ export class ProfileService {
 
       if (error) {
         console.error('Supabase update error:', error);
-        
+
         // Check for specific error types
         if (error.code === '23505' || error.message?.includes('duplicate')) {
           throw new Error('Username is already taken. Please choose a different username.');
         }
-        
+
         if (error.code === '42501' || error.message?.includes('permission')) {
           throw new Error('You do not have permission to edit this profile.');
         }
-        
+
         if (error.code === 'PGRST116') {
           throw new Error('Profile not found. Please refresh and try again.');
         }
-        
+
         if (error.message?.includes('violates')) {
           throw new Error('Invalid data format. Please check your entries.');
         }
-        
+
         throw new Error(`Failed to update profile: ${error.message}`);
       }
 
@@ -394,7 +394,7 @@ export class ProfileService {
           .replace(/[^a-z0-9]/g, '')
           .substring(0, 20);
       }
-      
+
       // Fallback username if still not set
       if (!validData.username) {
         validData.username = `user_${userId.substring(0, 8)}`;
@@ -541,7 +541,7 @@ export class ProfileService {
       img.onload = () => {
         // Calculate new dimensions
         let { width, height } = img;
-        
+
         if (width > height) {
           if (width > maxWidth) {
             height = (height * maxWidth) / width;

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
+import {
   GraduationCap,
   Search,
   Building2,
@@ -16,7 +16,7 @@ import {
   ChevronRight,
   Home,
   Briefcase,
-  Users,  
+  Users,
   Settings,
   FileText,
   BarChart3,
@@ -49,10 +49,10 @@ interface UnifiedNavigationProps {
 // Public routes that should show the landing navigation
 const LANDING_ROUTES = [
   '/',
-  '/login', 
+  '/login',
   '/register',
   '/mobile-app',
-  '/for-students', 
+  '/for-students',
   '/for-employers',
   '/career-tips',
   '/whos-hiring'
@@ -75,7 +75,7 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
   const location = useLocation();
   const navigate = useNavigate();
   const { isVisible: isBottomNavVisible } = useScrollDirection({ threshold: 3 });
-  
+
   // Always call all hooks first, before any conditional logic
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -83,10 +83,10 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
   const [isHovered, setIsHovered] = useState(false);
   const [unreadCount, setUnreadCount] = useState(3);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  
+
   // Use exclusive accordion for navigation groups
   const { toggle: toggleGroup, isOpen: isGroupOpen } = useExclusiveAccordion();
-  
+
   const sidebarRef = useRef<HTMLDivElement>(null);
   const hoverZoneRef = useRef<HTMLDivElement>(null);
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -113,9 +113,9 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
   }, []);
 
   // Determine navigation mode
-  const isLandingRoute = LANDING_ROUTES.includes(location.pathname) || 
+  const isLandingRoute = LANDING_ROUTES.includes(location.pathname) ||
     SEMI_PUBLIC_ROUTES.some(route => location.pathname.startsWith(route));
-  
+
   const shouldShowLandingNav = mode === 'landing' || (isLandingRoute && !user);
   const shouldShowAuthenticatedNav = mode === 'authenticated' || (user && !isLandingRoute);
 
@@ -129,19 +129,17 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
     return (
       <>
         {/* Landing Page Navigation */}
-        <nav className={`fixed top-0 w-full z-50 border-b transition-colors duration-300 ${
-          isDark 
-            ? 'bg-dark-surface/95 backdrop-blur-sm border-gray-700' 
+        <nav className={`fixed top-0 w-full z-50 border-b transition-colors duration-300 ${isDark
+            ? 'bg-dark-surface/95 backdrop-blur-sm border-gray-700'
             : 'bg-white/95 backdrop-blur-sm border-gray-200'
-        }`}>
+          }`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               {/* Left side - Logo */}
               <Link to="/" className="flex items-center space-x-3">
                 <GraduationCap className={`h-8 w-8 ${isDark ? 'text-lime' : 'text-asu-maroon'}`} />
-                <span className={`font-bold text-xl -skew-x-12 ${
-                  isDark ? 'text-lime' : 'text-asu-maroon'
-                }`}>
+                <span className={`font-bold text-xl -skew-x-12 ${isDark ? 'text-lime' : 'text-asu-maroon'
+                  }`}>
                   AUTHandshake
                 </span>
               </Link>
@@ -150,76 +148,69 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
               <div className="hidden md:flex items-center space-x-8">
                 {onScrollToSection && (
                   <>
-                    <button 
-                      onClick={() => onScrollToSection('features')} 
-                      className={`text-sm font-medium transition-colors duration-200 ${
-                        isDark 
-                          ? 'text-dark-muted hover:text-dark-text' 
+                    <button
+                      onClick={() => onScrollToSection('features')}
+                      className={`text-sm font-medium transition-colors duration-200 ${isDark
+                          ? 'text-dark-muted hover:text-dark-text'
                           : 'text-gray-600 hover:text-gray-900'
-                      }`}
+                        }`}
                     >
                       Features
                     </button>
-                    <button 
-                      onClick={() => onScrollToSection('howItWorks')} 
-                      className={`text-sm font-medium transition-colors duration-200 ${
-                        isDark 
-                          ? 'text-dark-muted hover:text-dark-text' 
+                    <button
+                      onClick={() => onScrollToSection('howItWorks')}
+                      className={`text-sm font-medium transition-colors duration-200 ${isDark
+                          ? 'text-dark-muted hover:text-dark-text'
                           : 'text-gray-600 hover:text-gray-900'
-                      }`}
+                        }`}
                     >
                       How it Works
                     </button>
                   </>
                 )}
-                <Link 
+                <Link
                   to="/for-students"
-                  className={`text-sm font-medium transition-colors duration-200 ${
-                    isDark 
-                      ? 'text-dark-muted hover:text-dark-text' 
+                  className={`text-sm font-medium transition-colors duration-200 ${isDark
+                      ? 'text-dark-muted hover:text-dark-text'
                       : 'text-gray-600 hover:text-gray-900'
-                  }`}
+                    }`}
                 >
                   For Students
                 </Link>
-                <Link 
+                <Link
                   to="/for-employers"
-                  className={`text-sm font-medium transition-colors duration-200 ${
-                    isDark 
-                      ? 'text-dark-muted hover:text-dark-text' 
+                  className={`text-sm font-medium transition-colors duration-200 ${isDark
+                      ? 'text-dark-muted hover:text-dark-text'
                       : 'text-gray-600 hover:text-gray-900'
-                  }`}
+                    }`}
                 >
                   For Employers
                 </Link>
-                <Link 
+                <Link
                   to="/career-tips"
-                  className={`text-sm font-medium transition-colors duration-200 ${
-                    isDark 
-                      ? 'text-dark-muted hover:text-dark-text' 
+                  className={`text-sm font-medium transition-colors duration-200 ${isDark
+                      ? 'text-dark-muted hover:text-dark-text'
                       : 'text-gray-600 hover:text-gray-900'
-                  }`}
+                    }`}
                 >
                   Career Tips
                 </Link>
-                <Link 
+                <Link
                   to="/whos-hiring"
-                  className={`text-sm font-medium transition-colors duration-200 ${
-                    isDark 
-                      ? 'text-dark-muted hover:text-dark-text' 
+                  className={`text-sm font-medium transition-colors duration-200 ${isDark
+                      ? 'text-dark-muted hover:text-dark-text'
                       : 'text-gray-600 hover:text-gray-900'
-                  }`}
+                    }`}
                 >
                   Who's Hiring
                 </Link>
                 {onScrollToSection && (
-                  <button 
-                    onClick={() => onScrollToSection('demo')} 
-                    className={`text-sm font-medium transition-colors duration-200 ${
-                      isDark 
-                        ? 'text-dark-muted hover:text-dark-text' 
+                  <button
+                    onClick={() => onScrollToSection('demo')}
+                    className={`text-sm font-medium transition-colors duration-200 ${isDark
+                        ? 'text-dark-muted hover:text-dark-text'
                         : 'text-gray-600 hover:text-gray-900'
-                    }`}
+                      }`}
                   >
                     Demo
                   </button>
@@ -229,18 +220,17 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
               {/* Right side - Authentication & Mobile Menu */}
               <div className="flex items-center space-x-4">
                 <ThemeToggle size="small" />
-                
+
                 {/* Desktop Auth Links */}
                 <div className="hidden md:flex items-center space-x-4">
                   {user ? (
                     <>
-                      <Link 
-                        to="/dashboard" 
-                        className={`text-sm font-medium transition-colors duration-200 ${
-                          isDark 
-                            ? 'text-dark-muted hover:text-dark-text' 
+                      <Link
+                        to="/dashboard"
+                        className={`text-sm font-medium transition-colors duration-200 ${isDark
+                            ? 'text-dark-muted hover:text-dark-text'
                             : 'text-gray-600 hover:text-gray-900'
-                        }`}
+                          }`}
                       >
                         Dashboard
                       </Link>
@@ -250,23 +240,21 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                     </>
                   ) : (
                     <>
-                      <Link 
-                        to="/login" 
-                        className={`text-sm font-medium transition-colors duration-200 ${
-                          isDark 
-                            ? 'text-dark-muted hover:text-dark-text' 
+                      <Link
+                        to="/login"
+                        className={`text-sm font-medium transition-colors duration-200 ${isDark
+                            ? 'text-dark-muted hover:text-dark-text'
                             : 'text-gray-600 hover:text-gray-900'
-                        }`}
+                          }`}
                       >
                         Sign In
                       </Link>
-                      <Link 
-                        to="/register" 
-                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                          isDark 
-                            ? 'bg-lime text-dark-surface hover:bg-lime/90' 
+                      <Link
+                        to="/register"
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${isDark
+                            ? 'bg-lime text-dark-surface hover:bg-lime/90'
                             : 'bg-asu-maroon text-white hover:bg-asu-maroon-dark'
-                        }`}
+                          }`}
                       >
                         Sign Up
                       </Link>
@@ -299,92 +287,92 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
             {/* Mobile Menu Dropdown */}
             {isMobileMenuOpen && (
               <div className="border-t border-neutral-200 bg-background">
-              <nav className="py-2 max-h-[70vh] overflow-y-auto" role="navigation" aria-label="Mobile navigation">
-                {/* Profile Section */}
-                <div className="px-4 py-3 border-b border-neutral-200">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center text-sm font-medium">
-                      {user?.name?.charAt(0) || <User className="h-5 w-5" />}
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">{user?.name || 'User'}</p>
-                      <p className="text-xs text-neutral-500">{user?.email || 'user@example.com'}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Navigation Groups */}
-                {Object.entries(groupedItems).map(([group, items]) => (
-                  <div key={group} className="py-2">
-                    {group !== 'main' && (
-                      <div className="px-4 py-2">
-                        <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
-                          {group}
-                        </h3>
+                <nav className="py-2 max-h-[70vh] overflow-y-auto" role="navigation" aria-label="Mobile navigation">
+                  {/* Profile Section */}
+                  <div className="px-4 py-3 border-b border-neutral-200">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center text-sm font-medium">
+                        {user?.name?.charAt(0) || <User className="h-5 w-5" />}
                       </div>
-                    )}
-                    {items.map((item, index) => {
-                      const Icon = item.icon;
-                      const active = isCurrentPath(item.path);
-                      
-                      return (
-                        <Link
-                          key={`${group}-${index}`}
-                          to={item.path}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className={cn(
-                            'flex items-center justify-between px-4 py-3 mx-2 rounded-lg transition-colors',
-                            active
-                              ? 'bg-brand-primary/10 text-brand-primary'
-                              : 'text-neutral-700 hover:bg-neutral-50'
-                          )}
-                          aria-current={active ? 'page' : undefined}
-                        >
-                          <div className="flex items-center space-x-3">
-                            <Icon className="h-5 w-5" />
-                            <span className="font-medium">{item.label}</span>
-                          </div>
-                          {item.badge && item.badge > 0 && (
-                            <span className="bg-error text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center">
-                              {item.badge > 99 ? '99+' : item.badge}
-                            </span>
-                          )}
-                        </Link>
-                      );
-                    })}
+                      <div>
+                        <p className="font-medium text-sm">{user?.name || 'User'}</p>
+                        <p className="text-xs text-neutral-500">{user?.email || 'user@example.com'}</p>
+                      </div>
+                    </div>
                   </div>
-                ))}
-                
-                <div className="border-t border-neutral-200 mt-2 pt-2">
-                  <Link
-                    to="/profile"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={cn(
-                      'flex items-center space-x-3 px-4 py-3 mx-2 rounded-lg transition-colors',
-                      isCurrentPath('/profile')
-                        ? 'bg-brand-primary/10 text-brand-primary'
-                        : 'text-neutral-700 hover:bg-neutral-50'
-                    )}
-                    aria-current={isCurrentPath('/profile') ? 'page' : undefined}
-                  >
-                    <User className="h-5 w-5" />
-                    <span className="font-medium">My Profile</span>
-                  </Link>
-                  
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      handleLogout();
-                    }}
-                    className="w-full justify-start px-4 py-3 mx-2 text-error hover:bg-error/10 rounded-lg"
-                  >
-                    <LogOut className="h-5 w-5 mr-3" />
-                    Logout
-                  </Button>
-                </div>
-              </nav>
-            </div>
+
+                  {/* Navigation Groups */}
+                  {Object.entries(groupedItems).map(([group, items]) => (
+                    <div key={group} className="py-2">
+                      {group !== 'main' && (
+                        <div className="px-4 py-2">
+                          <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+                            {group}
+                          </h3>
+                        </div>
+                      )}
+                      {items.map((item, index) => {
+                        const Icon = item.icon;
+                        const active = isCurrentPath(item.path);
+
+                        return (
+                          <Link
+                            key={`${group}-${index}`}
+                            to={item.path}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className={cn(
+                              'flex items-center justify-between px-4 py-3 mx-2 rounded-lg transition-colors',
+                              active
+                                ? 'bg-brand-primary/10 text-brand-primary'
+                                : 'text-neutral-700 hover:bg-neutral-50'
+                            )}
+                            aria-current={active ? 'page' : undefined}
+                          >
+                            <div className="flex items-center space-x-3">
+                              <Icon className="h-5 w-5" />
+                              <span className="font-medium">{item.label}</span>
+                            </div>
+                            {item.badge && item.badge > 0 && (
+                              <span className="bg-error text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center">
+                                {item.badge > 99 ? '99+' : item.badge}
+                              </span>
+                            )}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  ))}
+
+                  <div className="border-t border-neutral-200 mt-2 pt-2">
+                    <Link
+                      to="/profile"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={cn(
+                        'flex items-center space-x-3 px-4 py-3 mx-2 rounded-lg transition-colors',
+                        isCurrentPath('/profile')
+                          ? 'bg-brand-primary/10 text-brand-primary'
+                          : 'text-neutral-700 hover:bg-neutral-50'
+                      )}
+                      aria-current={isCurrentPath('/profile') ? 'page' : undefined}
+                    >
+                      <User className="h-5 w-5" />
+                      <span className="font-medium">My Profile</span>
+                    </Link>
+
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        handleLogout();
+                      }}
+                      className="w-full justify-start px-4 py-3 mx-2 text-error hover:bg-error/10 rounded-lg"
+                    >
+                      <LogOut className="h-5 w-5 mr-3" />
+                      Logout
+                    </Button>
+                  </div>
+                </nav>
+              </div>
             )}
           </div>
         </nav>
@@ -518,18 +506,18 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
     return (
       <>
         {/* Top App Bar with Enhanced iOS Safe Area - Positioned Lower */}
-        <header 
-          className="fixed left-0 right-0 z-50 ios-header ios-safe-top ios-pro-max-adjust ios-pro-adjust ios-standard-adjust ios-x-adjust ios-se-adjust" 
-          style={{ 
+        <header
+          className="fixed left-0 right-0 z-50 ios-header ios-safe-top ios-pro-max-adjust ios-pro-adjust ios-standard-adjust ios-x-adjust ios-se-adjust"
+          style={{
             top: '0',
-            paddingTop: 'calc(max(env(safe-area-inset-top), 44px) + 100px)' 
+            paddingTop: 'calc(max(env(safe-area-inset-top), 44px) + 100px)'
           }}
         >
           {/* iOS Status Bar Safe Area */}
           <div className="h-12 bg-black ios-only" />
           <div className="h-12 bg-black ios-only" />
           <div className="h-8 bg-black ios-only" />
-          
+
           <div className="flex justify-between items-center h-16 px-4 ios-landscape-header mt-6">
             <Link to="/dashboard" className="flex items-center space-x-2">
               <GraduationCap className="h-6 w-6 text-brand-primary" />
@@ -584,8 +572,8 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
         <div
           className={cn(
             "fixed top-0 left-0 h-full w-80 border-r z-50 shadow-xl ios-safe-area ios-momentum-scroll ios-sidebar-fix",
-            isDark 
-              ? 'bg-black border-gray-800' 
+            isDark
+              ? 'bg-black border-gray-800'
               : 'bg-white border-neutral-200'
           )}
           style={{
@@ -597,8 +585,8 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
           {/* Sidebar Header with Enhanced iOS spacing */}
           <div className={cn(
             "flex items-center justify-between h-14 px-4 border-b ios-header-safe ios-pro-max-adjust ios-pro-adjust ios-standard-adjust ios-x-adjust ios-se-adjust ios-sidebar-fix",
-            isDark 
-              ? 'bg-black border-gray-800' 
+            isDark
+              ? 'bg-black border-gray-800'
               : 'bg-white border-neutral-200'
           )}>
             <div className="flex items-center space-x-3">
@@ -614,8 +602,8 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
               onClick={() => setIsMobileMenuOpen(false)}
               className={cn(
                 "ios-touch-target",
-                isDark 
-                  ? 'text-gray-400 hover:text-white' 
+                isDark
+                  ? 'text-gray-400 hover:text-white'
                   : 'text-neutral-500 hover:text-neutral-700'
               )}
             >
@@ -658,14 +646,14 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                       {items.map((item, index) => {
                         const Icon = item.icon;
                         const active = isCurrentPath(item.path);
-                        
+
                         return (
                           <Link
                             key={`${group}-${index}`}
                             to={item.path}
                             onClick={() => setIsMobileMenuOpen(false)}
                             className={cn(
-                              'flex items-center justify-between px-3 py-3.5 mx-1 ios-rounded-lg transition-all duration-200 ios-touch-target-large ios-nav-item', 
+                              'flex items-center justify-between px-3 py-3.5 mx-1 ios-rounded-lg transition-all duration-200 ios-touch-target-large ios-nav-item',
                               active
                                 ? 'bg-brand-primary/10 text-brand-primary shadow-sm'
                                 : 'text-neutral-700 hover:bg-neutral-50 hover:translate-x-1 active:bg-neutral-100'
@@ -687,7 +675,7 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                     </div>
                   </div>
                 ))}
-                
+
                 {/* Profile and Logout Section with Enhanced iOS spacing */}
                 <div className="border-t border-neutral-200 mt-4 pt-4 ios-bottom-safe">
                   <div className="space-y-1">
@@ -705,7 +693,7 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                       <User className="h-5 w-5" />
                       <span className="font-medium">My Profile</span>
                     </Link>
-                    
+
                     <Button
                       variant="ghost"
                       onClick={() => {
@@ -729,22 +717,22 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
           'fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl border-t transition-all duration-300 ios-bottom-nav',
           isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200',
           // Apply scroll-based visibility with smooth animation
-          isBottomNavVisible 
-            ? 'translate-y-0 opacity-100' 
+          isBottomNavVisible
+            ? 'translate-y-0 opacity-100'
             : 'translate-y-full opacity-0'
         )}>
           <div className="grid grid-cols-5 h-16 ios-home-indicator-safe">
             {mobileNavItems.slice(0, 5).map((item, index) => {
               const Icon = item.icon;
               const isActive = isCurrentPath(item.path);
-              
+
               return (
                 <Link
                   key={index}
                   to={item.path}
                   className={cn(
                     'flex flex-col items-center justify-center py-2 transition-all duration-200 relative ios-touch-target',
-                    isActive 
+                    isActive
                       ? isDark ? 'text-white' : 'text-black'
                       : isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-800'
                   )}
@@ -758,7 +746,7 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                     )}
                   </div>
                   <span className="text-xs mt-1 truncate">{item.label}</span>
-                  
+
                   {/* Active indicator */}
                   {isActive && (
                     <div className={cn(
@@ -777,7 +765,7 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
 
   // DESKTOP NAVIGATION
   return (
-    <div 
+    <div
       className={cn(
         "hidden lg:flex flex-col h-screen sticky top-0",
         isDark ? 'bg-black' : 'bg-white'
@@ -818,7 +806,7 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                 {items.map((item, index) => {
                   const Icon = item.icon;
                   const active = isCurrentPath(item.path);
-                  
+
                   return (
                     <Link
                       key={`${group}-${index}`}

@@ -67,7 +67,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
 
     return (
         <aside className={cn(
-            'hidden xl:block w-[350px] pl-6 py-4 h-screen sticky top-0 overflow-y-auto scrollbar-hide',
+            'hidden xl:block w-[400px] pl-6 py-4 h-screen sticky top-0 overflow-y-auto scrollbar-hide',
             isDark ? 'bg-black border-l border-[#1C1F20]' : 'bg-white border-l border-gray-200'
         )}>
             <div className="space-y-6 pb-20">
@@ -187,7 +187,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                 {/* Job Recommendations */}
                 <div className={cn(
                     'rounded-3xl p-4 border',
-                    isDark ? 'bg-black border-[#1C1F20]' : 'bg-white border-gray-200'
+                    isDark ? 'bg-black border-[#1C1F20]' : 'bg-white border-gray-200 shadow-lg'
                 )}>
                     <h3 className="font-bold text-3xl font-serif mb-4 flex items-center">
                         <Bookmark className="h-5 w-5 mr-2" />
@@ -246,7 +246,10 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                     <div className="mt-4">
                         <Button
                             variant="ghost"
-                            className="w-full text-info-500 hover:bg-info-500/10"
+                            className={cn(
+                                'w-full',
+                                isDark ? 'text-white hover:bg-white/10' : 'text-gray-900 hover:bg-gray-100'
+                            )}
                             onClick={() => navigate('/explore')}
                         >
                             Show more
@@ -257,7 +260,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                 {/* Who to Follow */}
                 <div className={cn(
                     'rounded-3xl p-4 border',
-                    isDark ? 'bg-black border-[#1C1F20]' : 'bg-white border-gray-200'
+                    isDark ? 'bg-black border-[#1C1F20]' : 'bg-white border-gray-200 shadow-lg'
                 )}>
                     <h3 className="font-serif text-lg mb-4 flex items-center">
                         <Users className="h-5 w-5 mr-2" />
@@ -289,7 +292,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                     </div>
                     <Button
                         variant="ghost"
-                        className="w-full mt-4 text-info-500 hover:bg-info-500/10"
+                        className="w-full mt-4 text-white hover:bg-white/10"
                         onClick={() => navigate('/explore')}
                     >
                         Show more

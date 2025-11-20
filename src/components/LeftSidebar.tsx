@@ -119,7 +119,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
                 {/* AI Career Assistant */}
                 <div className={cn(
                     "rounded-3xl border p-4 transition-colors cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900",
-                    isDark ? 'bg-black border-[#1C1F20] text-white' : 'bg-white border-gray-200 text-black'
+                    isDark ? 'bg-black border-[#1C1F20] text-white' : 'bg-white border-gray-200 text-black shadow-lg'
                 )}>
                     <div className="flex items-center gap-2 mb-3">
                         <Search className="w-5 h-5 text-info-500" />
@@ -133,7 +133,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
                 {/* Trending Topics */}
                 <div className={cn(
                     "rounded-3xl border overflow-hidden",
-                    isDark ? 'bg-black border-[#1C1F20] text-white' : 'bg-white border-gray-200 text-black'
+                    isDark ? 'bg-black border-[#1C1F20] text-white' : 'bg-white border-gray-200 text-black shadow-lg'
                 )}>
                     <div className={cn("p-4 border-b", isDark ? "border-[#1C1F20]" : "border-gray-200")}>
                         <h3 className="font-bold text-xl">Trending</h3>
@@ -169,7 +169,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
                 {/* Matched Jobs */}
                 <div className={cn(
                     "rounded-3xl border overflow-hidden",
-                    isDark ? 'bg-black border-[#1C1F20] text-white' : 'bg-white border-gray-200 text-black'
+                    isDark ? 'bg-black border-[#1C1F20] text-white' : 'bg-white border-gray-200 text-black shadow-sm'
                 )}>
                     <div className={cn("p-4 border-b", isDark ? "border-[#1C1F20]" : "border-gray-200")}>
                         <h3 className="font-bold text-xl">Jobs for you</h3>

@@ -499,20 +499,20 @@ export default function CreatePost() {
               <div className="flex items-center gap-4 mt-4 text-gray-500">
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="hover:text-[#1d9bf0] transition-colors"
+                  className="hover:text-[#D3FB52] transition-colors"
                 >
                   <ImageIcon className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => videoInputRef.current?.click()}
-                  className="hover:text-[#1d9bf0] transition-colors"
+                  className="hover:text-[#D3FB52] transition-colors"
                 >
                   <Video className="w-5 h-5" />
                 </button>
-                <button className="hover:text-[#1d9bf0] transition-colors">
+                <button className="hover:text-[#D3FB52] transition-colors">
                   <div className="text-xs font-medium border border-current rounded px-1">GIF</div>
                 </button>
-                <button className="hover:text-[#1d9bf0] transition-colors">
+                <button className="hover:text-[#D3FB52] transition-colors">
                   <MapPin className="w-5 h-5" />
                 </button>
               </div>
@@ -531,12 +531,12 @@ export default function CreatePost() {
               onClick={createPost}
               disabled={!canPost}
               className={cn(
-                'rounded-full px-6 py-2 font-bold transition-all',
+                'rounded-full px-6 py-2 font-bold transition-all shadow-lg',
                 canPost
-                  ? 'bg-[#1d9bf0] text-white hover:bg-[#1a8cd8]'
+                  ? 'bg-[#D3FB52] text-black hover:bg-[#D3FB52]/90 shadow-[#D3FB52]/20'
                   : 'bg-opacity-50 cursor-not-allowed',
-                !canPost && isDark ? 'bg-[#1d9bf0]/50 text-white/50' : '',
-                !canPost && !isDark ? 'bg-blue-300 text-white' : ''
+                !canPost && isDark ? 'bg-[#D3FB52]/30 text-black/50' : '',
+                !canPost && !isDark ? 'bg-gray-300 text-gray-500' : ''
               )}
             >
               {isPosting ? 'Posting...' : 'Post'}
@@ -624,8 +624,8 @@ export default function CreatePost() {
                   className={cn(
                     'w-full p-4 rounded-lg border-2 text-left transition-all',
                     isDark
-                      ? 'border-[#2f3336] hover:border-[#1d9bf0] hover:bg-[#16181c]'
-                      : 'border-gray-200 hover:border-blue-500 hover:bg-gray-50'
+                      ? 'border-[#2f3336] hover:border-[#D3FB52] hover:bg-[#16181c]'
+                      : 'border-gray-200 hover:border-[#D3FB52] hover:bg-gray-50'
                   )}
                 >
                   <div className="flex items-center justify-between">
@@ -651,8 +651,8 @@ export default function CreatePost() {
                   className={cn(
                     'w-full p-4 rounded-lg border-2 text-left transition-all',
                     isDark
-                      ? 'border-[#2f3336] hover:border-[#1d9bf0] hover:bg-[#16181c]'
-                      : 'border-gray-200 hover:border-blue-500 hover:bg-gray-50'
+                      ? 'border-[#2f3336] hover:border-[#D3FB52] hover:bg-[#16181c]'
+                      : 'border-gray-200 hover:border-[#D3FB52] hover:bg-gray-50'
                   )}
                 >
                   <div className="flex items-center justify-between">
