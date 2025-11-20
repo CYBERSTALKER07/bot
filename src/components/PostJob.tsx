@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
   Save,
   Eye,
@@ -27,27 +28,28 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useJobManagement } from '../hooks/useJobManagement';
 import { supabase } from '../lib/supabase';
-import Button from './ui/Button';
 import Avatar from './ui/Avatar';
 import PageLayout from './ui/PageLayout';
 import Stepper, { Step } from './ui/Stepper';
 import { cn } from '../lib/cva';
+import { buttonVariants } from '../lib/animations';
+import { triggerSuccessConfetti } from '../lib/confetti';
 
 export default function PostJob() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isDark } = useTheme();
   const { postJob, loading, error, success, clearMessages } = useJobManagement();
-  
+
   const [showPreview, setShowPreview] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<File | null>(null);
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
   const [uploadingMedia, setUploadingMedia] = useState(false);
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
-  
+
   const [formData, setFormData] = useState({
     title: '',
     company: user?.profile?.company_name || '',
@@ -64,9 +66,19 @@ export default function PostJob() {
     experience_level: 'entry',
     department: ''
   });
-  
+
   const [newSkill, setNewSkill] = useState('');
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Check if user is employer
   useEffect(() => {
@@ -96,7 +108,7 @@ export default function PostJob() {
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random()}.${fileExt}`;
       const userId = user?.id;
-      
+
       const isVideo = file.type.startsWith('video/');
       const bucketName = isVideo ? 'videos' : 'post-images';
       const filePath = `${userId}/jobs/${fileName}`;
@@ -128,7 +140,7 @@ export default function PostJob() {
       setSelectedMedia(file);
       const previewUrl = URL.createObjectURL(file);
       setMediaPreview(previewUrl);
-      
+
       // Auto-upload media
       try {
         await uploadMedia(file);
@@ -145,7 +157,7 @@ export default function PostJob() {
       URL.revokeObjectURL(mediaPreview);
     }
     setMediaPreview(null);
-    
+
     if (fileInputRef.current) fileInputRef.current.value = '';
     if (videoInputRef.current) fileInputRef.current.value = '';
   };
@@ -192,15 +204,18 @@ export default function PostJob() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     try {
       setIsSubmitting(true);
-      const result = await postJob(formData);
-      
+      const result = await postJob(formData); // Assuming formData is the correct variable name for jobData
+
+      // Trigger success animation
+      triggerSuccessConfetti();
+
       if (result) {
         setTimeout(() => {
           clearMessages();
@@ -213,18 +228,18 @@ export default function PostJob() {
   };
 
   return (
-    <PageLayout 
+    <PageLayout
       className={cn(isDark ? 'bg-black text-white' : 'bg-white text-black')}
       maxWidth="7xl"
       padding="none"
     >
       {/* Header */}
-      <div className={cn("sticky top-0 z-10 backdrop-blur-xl border-b", isDark ? 'bg-black text-white bordbg-black' : 'bg-white text-black border-gray-300')}>
+      <div className={cn("sticky top-0 z-10 backdrop-blur-xl border-b", isDark ? 'bg-zinc-900/80 border-white/10 text-white' : 'bg-white/80 border-gray-200 text-gray-900')}>
         <div className="flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-12 py-3">
           <div className="flex items-center space-x-4">
             <button
               onClick={() => navigate(-1)}
-              className={cn("p-2 rounded-full transition-colors", isDark ? 'hover:bg-black' : 'hover:bg-gray-200')}
+              className={cn("p-2 rounded-full transition-colors", isDark ? 'hover:bg-white/10' : 'hover:bg-gray-100')}
               title="Go back"
             >
               <ArrowLeft className="h-5 w-5" />
@@ -235,7 +250,7 @@ export default function PostJob() {
           </div>
           <button
             onClick={() => navigate(-1)}
-            className="p-2"
+            className={cn("p-2 rounded-full transition-colors", isDark ? 'hover:bg-white/10' : 'hover:bg-gray-100')}
             title="Close"
           >
             <XIcon className="h-5 w-5" />
@@ -245,22 +260,22 @@ export default function PostJob() {
 
       {/* Messages */}
       {error && (
-        <div className={cn("border-b p-4", isDark ? 'bordbg-black bg-red-950/30' : 'border-gray-300 bg-red-50')}>
+        <div className={cn("border-b p-4", isDark ? 'border-white/10 bg-red-500/10' : 'border-red-200 bg-red-50')}>
           <div className="flex items-start space-x-3 max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
             <AlertCircle className={cn("h-5 w-5 flex-shrink-0 mt-0.5", isDark ? 'text-red-400' : 'text-red-600')} />
             <div className="flex-1">
-              <p className={cn("font-semibold text-sm sm:text-base", isDark ? 'text-red-400' : 'text-red-800')}>{error}</p>
+              <p className={cn("font-semibold text-sm sm:text-base", isDark ? 'text-red-400' : 'text-red-700')}>{error}</p>
             </div>
           </div>
         </div>
       )}
 
       {success && (
-        <div className={cn("border-b p-4", isDark ? 'bordbg-black bg-green-950/30' : 'border-gray-300 bg-green-50')}>
+        <div className={cn("border-b p-4", isDark ? 'border-white/10 bg-lime-400/10' : 'border-lime-200 bg-lime-50')}>
           <div className="flex items-start space-x-3 max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
-            <CheckCircle className={cn("h-5 w-5 flex-shrink-0 mt-0.5", isDark ? 'text-green-400' : 'text-green-600')} />
+            <CheckCircle className={cn("h-5 w-5 flex-shrink-0 mt-0.5", isDark ? 'text-lime-400' : 'text-lime-600')} />
             <div className="flex-1">
-              <p className={cn("font-semibold text-sm sm:text-base", isDark ? 'text-green-400' : 'text-green-800')}>{success}</p>
+              <p className={cn("font-semibold text-sm sm:text-base", isDark ? 'text-lime-400' : 'text-lime-700')}>{success}</p>
             </div>
           </div>
         </div>
@@ -269,28 +284,54 @@ export default function PostJob() {
       {/* Main Content - Full Width */}
       <div className={cn("w-full", isDark ? 'bg-black' : 'bg-white')}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-8">
+          {/* Progress Bar */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-3">
+              <span className={cn("text-sm font-medium", isDark ? 'text-gray-400' : 'text-gray-600')}>
+                Step {currentStep} of 4
+              </span>
+              <span className={cn("text-sm font-medium", isDark ? 'text-lime-400' : 'text-lime-600')}>
+                {Math.round((currentStep / 4) * 100)}% Complete
+              </span>
+            </div>
+            <div className={cn(
+              "h-2 rounded-full overflow-hidden",
+              isDark ? 'bg-zinc-800' : 'bg-gray-200'
+            )}>
+              <motion.div
+                className={cn(
+                  "h-full rounded-full",
+                  isDark ? 'bg-lime-400' : 'bg-lime-500'
+                )}
+                initial={{ width: '25%' }}
+                animate={{ width: `${(currentStep / 4) * 100}%` }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+              />
+            </div>
+          </div>
+
           <form onSubmit={handleSubmit} className="w-full">
             <Stepper
               initialStep={1}
-              onStepChange={() => {
-                // Step change handler
+              onStepChange={(step) => {
+                setCurrentStep(step);
               }}
               backButtonText="← Previous"
               nextButtonText="Next →"
               stepCircleContainerClassName={cn(
-                isDark ? 'bg-black bordbg-black' : 'bg-gray-50 border-gray-300',
-                'border rounded-xl'
+                isDark ? 'bg-zinc-900 border-white/10' : 'bg-white border-gray-200',
+                'border rounded-2xl'
               )}
               stepContainerClassName={cn(isDark ? '' : '')}
               contentClassName={cn(
                 'py-8 sm:py-10',
-                isDark ? 'bg-gray-900/50' : 'bg-gray-50/50'
+                isDark ? 'bg-zinc-900/50' : 'bg-white'
               )}
               footerClassName={cn(isDark ? '' : '')}
             >
               {/* Step 1: Basic Information */}
               <Step>
-                <div className="space-y-6 bg-black">
+                <div className={cn("space-y-6", isDark ? 'bg-black' : 'bg-white')}>
                   <div>
                     <h2 className={cn("text-2xl font-bold mb-2", isDark ? 'text-white' : 'text-black')}>
                       Job Basics
@@ -301,9 +342,9 @@ export default function PostJob() {
                   </div>
 
                   <div className="flex items-start space-x-4">
-                    <Avatar 
-                      src={user?.profile.avatar_url || ''} 
-                      alt={user?.profile.full_name || 'User'} 
+                    <Avatar
+                      src={user?.profile.avatar_url || ''}
+                      alt={user?.profile.full_name || 'User'}
                       size="lg"
                       className="flex-shrink-0"
                     />
@@ -323,7 +364,7 @@ export default function PostJob() {
                       onChange={handleInputChange}
                       placeholder="e.g., Senior Product Manager, Frontend Engineer..."
                       rows={2}
-                      className={cn("w-full text-lg font-semibold bg-transparent border rounded-lg px-4 py-3 outline-none focus:border-2 resize-none", isDark ? 'border-gray-700 placeholder-gray-500 text-white focus:border-info-500' : 'border-gray-300 placeholder-gray-400 text-black focus:bg-white focus:border-black')}
+                      className={cn("w-full text-lg font-semibold bg-transparent border rounded-2xl px-4 py-3 outline-none focus:border-2 resize-none transition-all", isDark ? 'border-white/10 placeholder-gray-500 text-white focus:border-lime-400' : 'border-gray-200 placeholder-gray-400 text-gray-900 focus:border-lime-500 shadow-sm')}
                     />
                     {validationErrors.title && (
                       <p className="text-red-600 text-sm">{validationErrors.title}</p>
@@ -342,7 +383,7 @@ export default function PostJob() {
                         value={formData.company}
                         onChange={handleInputChange}
                         placeholder="Company name"
-                        className={cn("w-full border rounded-lg px-4 py-2 outline-none focus:border-2", isDark ? 'bg-black border-gray-700 text-white focus:border-info-500' : 'bg-white border-gray-300 text-black focus:bg-white focus:border-black')}
+                        className={cn("w-full border rounded-2xl px-4 py-2 outline-none focus:border-2 transition-all", isDark ? 'bg-zinc-900 border-white/10 text-white focus:border-lime-400' : 'bg-white border-gray-200 text-gray-900 focus:border-lime-500 shadow-sm')}
                       />
                       {validationErrors.company && (
                         <p className="text-red-600 text-sm">{validationErrors.company}</p>
@@ -359,7 +400,7 @@ export default function PostJob() {
                         value={formData.location}
                         onChange={handleInputChange}
                         placeholder="City, State or Remote"
-                        className={cn("w-full border rounded-lg px-4 py-2 outline-none focus:border-2", isDark ? 'bg-black border-gray-700 text-white focus:border-info-500' : 'bg-white border-gray-300 text-black focus:bg-white focus:border-black')}
+                        className={cn("w-full border rounded-2xl px-4 py-2 outline-none focus:border-2 transition-all", isDark ? 'bg-zinc-900 border-white/10 text-white focus:border-lime-400' : 'bg-white border-gray-200 text-gray-900 focus:border-lime-500 shadow-sm')}
                       />
                       {validationErrors.location && (
                         <p className="text-red-600 text-sm">{validationErrors.location}</p>
@@ -401,13 +442,13 @@ export default function PostJob() {
                     </div>
                   </div>
 
-                  <label className={cn("flex items-center space-x-3 cursor-pointer p-3 rounded-lg border-2", isDark ? 'border-gray-700 hover:bg-black' : 'border-gray-300 hover:bg-gray-100', formData.is_remote ? (isDark ? 'bg-info-600/10 border-info-500' : 'bg-info-50 border-info-500') : '')}>
+                  <label className={cn("flex items-center space-x-3 cursor-pointer p-3 rounded-2xl border-2 transition-all", isDark ? 'border-white/10 hover:bg-white/5' : 'border-gray-200 hover:bg-gray-50', formData.is_remote ? (isDark ? 'bg-lime-400/10 border-lime-400/30' : 'bg-lime-50 border-lime-300') : '')}>
                     <input
                       type="checkbox"
                       name="is_remote"
                       checked={formData.is_remote}
                       onChange={handleInputChange}
-                      className={cn("w-5 h-5 rounded border-2 focus:ring-2", isDark ? 'border-gray-600 bg-black focus:ring-info-500' : 'border-gray-400 focus:ring-black')}
+                      className={cn("w-5 h-5 rounded border-2 focus:ring-2", isDark ? 'border-white/20 bg-zinc-900 text-lime-400 focus:ring-lime-400/20' : 'border-gray-300 bg-white text-lime-500 focus:ring-lime-500/20')}
                     />
                     <span className="font-semibold">🌍 Remote work available</span>
                   </label>
@@ -416,7 +457,7 @@ export default function PostJob() {
 
               {/* Step 2: Description & Media */}
               <Step>
-                <div className="space-y-6 bg-black">
+                <div className={cn("space-y-6", isDark ? 'bg-black' : 'bg-white')}>
                   <div>
                     <h2 className={cn("text-2xl font-bold mb-2", isDark ? 'text-white' : 'text-black')}>
                       Job Description
@@ -437,7 +478,7 @@ export default function PostJob() {
                       onChange={handleInputChange}
                       placeholder="Describe the role, responsibilities, and what makes this opportunity exciting..."
                       rows={5}
-                      className={cn("w-full border rounded-lg px-4 py-2 outline-none focus:border-2 resize-none", isDark ? 'bg-black border-gray-700 text-white focus:border-info-500' : 'bg-white border-gray-300 text-black focus:bg-white focus:border-black')}
+                      className={cn("w-full border rounded-2xl px-4 py-2 outline-none focus:border-2 resize-none transition-all", isDark ? 'bg-zinc-900 border-white/10 text-white focus:border-lime-400' : 'bg-white border-gray-200 text-gray-900 focus:border-lime-500 shadow-sm')}
                     />
                     {validationErrors.description && (
                       <p className="text-red-600 text-sm">{validationErrors.description}</p>
@@ -449,20 +490,20 @@ export default function PostJob() {
                       <ImageIcon className="h-4 w-4" />
                       <span>Add Media (optional)</span>
                     </div>
-                    
+
                     {!mediaPreview ? (
                       <div className="flex flex-col sm:flex-row gap-3">
                         <button
                           type="button"
                           onClick={() => fileInputRef.current?.click()}
-                          className={cn("flex-1 border-2 border-dashed rounded-lg p-6 transition-colors text-center", isDark ? 'border-gray-700 hover:border-info-500 hover:bg-black/50' : 'border-gray-400 hover:border-black hover:bg-gray-100')}
+                          className={cn("flex-1 border-2 border-dashed rounded-2xl p-6 transition-all text-center", isDark ? 'border-white/10 hover:border-lime-400/30 hover:bg-white/5' : 'border-gray-300 hover:border-lime-500/30 hover:bg-lime-50/50')}
                           title="Upload image"
                         >
                           <ImageIcon className={cn("h-8 w-8 mx-auto mb-2", isDark ? 'text-gray-400' : 'text-gray-600')} />
                           <div className={cn("font-semibold text-sm", isDark ? 'text-white' : 'text-black')}>Add Image</div>
                           <div className={cn("text-xs", isDark ? 'text-gray-400' : 'text-gray-600')}>JPG, PNG up to 5MB</div>
                         </button>
-                        
+
                         <button
                           type="button"
                           onClick={() => videoInputRef.current?.click()}
@@ -477,15 +518,15 @@ export default function PostJob() {
                     ) : (
                       <div className={cn("relative rounded-lg overflow-hidden", isDark ? 'bg-black' : 'bg-gray-100')}>
                         {selectedMedia?.type.startsWith('image/') ? (
-                          <img 
-                            src={mediaPreview} 
-                            alt="Preview" 
+                          <img
+                            src={mediaPreview}
+                            alt="Preview"
                             className="w-full h-auto max-h-96 object-cover"
                           />
                         ) : (
-                          <video 
-                            src={mediaPreview} 
-                            controls 
+                          <video
+                            src={mediaPreview}
+                            controls
                             className="w-full h-auto max-h-96"
                           />
                         )}
@@ -525,7 +566,7 @@ export default function PostJob() {
 
               {/* Step 3: Requirements & Skills */}
               <Step>
-                <div className="space-y-6 bg-black">
+                <div className={cn("space-y-6", isDark ? 'bg-black' : 'bg-white')}>
                   <div>
                     <h2 className={cn("text-2xl font-bold mb-2", isDark ? 'text-white' : 'text-black')}>
                       Requirements & Skills
@@ -558,7 +599,7 @@ export default function PostJob() {
                       <Users className="h-4 w-4" />
                       <span>Required Skills * ({formData.skills.length})</span>
                     </label>
-                    
+
                     <div className="flex flex-col sm:flex-row gap-2">
                       <input
                         type="text"
@@ -576,20 +617,20 @@ export default function PostJob() {
                       <button
                         type="button"
                         onClick={addSkill}
-                        className={cn("px-6 py-2 rounded-lg font-bold transition-colors flex items-center justify-center", isDark ? 'bg-info-600 text-white hover:bg-info-700' : 'bg-black text-white hover:bg-black')}
+                        className={cn("px-6 py-2 rounded-2xl font-bold transition-all flex items-center justify-center", isDark ? 'bg-lime-400 text-black hover:bg-lime-300 shadow-lg shadow-lime-400/20' : 'bg-lime-500 text-white hover:bg-lime-600 shadow-lg shadow-lime-500/30')}
                         title="Add skill"
                       >
                         <Plus className="h-5 w-5" />
                       </button>
                     </div>
-                    
+
                     <div className="flex flex-wrap gap-2">
                       {formData.skills.map((skill, index) => (
                         <button
                           key={index}
                           type="button"
                           onClick={() => removeSkill(skill)}
-                          className={cn("px-3 py-2 rounded-full text-sm font-medium flex items-center space-x-2 transition-colors", isDark ? 'bg-info-600 text-white hover:bg-info-700' : 'bg-black text-white hover:bg-black')}
+                          className={cn("px-3 py-2 rounded-full text-sm font-medium flex items-center space-x-2 transition-all", isDark ? 'bg-lime-400 text-black hover:bg-lime-300' : 'bg-lime-500 text-white hover:bg-lime-600')}
                           title={`Remove ${skill}`}
                         >
                           <span>{skill}</span>
@@ -606,7 +647,7 @@ export default function PostJob() {
 
               {/* Step 4: Additional Details */}
               <Step>
-                <div className="space-y-6 bg-black">
+                <div className={cn("space-y-6", isDark ? 'bg-black' : 'bg-white')}>
                   <div>
                     <h2 className={cn("text-2xl font-bold mb-2", isDark ? 'text-white' : 'text-black')}>
                       Final Details
@@ -677,20 +718,28 @@ export default function PostJob() {
                     </ul>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                    <button
+                  <div className="flex gap-4">
+                    <motion.button
                       type="button"
                       onClick={() => setShowPreview(!showPreview)}
-                      className={cn("flex-1 border-2 py-3 rounded-lg font-bold transition-colors flex items-center justify-center", isDark ? 'border-info-600 text-info-400 bg-transparent hover:bg-info-600/10' : 'border-black text-black bg-white hover:bg-gray-100')}
+                      variants={buttonVariants}
+                      initial="rest"
+                      whileHover="hover"
+                      whileTap="tap"
+                      className={cn("flex-1 border-2 py-3 rounded-2xl font-bold transition-all flex items-center justify-center", isDark ? 'border-lime-400/30 text-lime-400 bg-transparent hover:bg-lime-400/10' : 'border-lime-500 text-lime-600 bg-white hover:bg-lime-50')}
                       disabled={isSubmitting || loading}
                       title="Preview job posting"
                     >
                       <Eye className="h-5 w-5 mr-2" />
                       Preview
-                    </button>
-                    <button
+                    </motion.button>
+                    <motion.button
                       type="submit"
-                      className={cn("flex-1 py-3 rounded-lg font-bold transition-colors flex items-center justify-center disabled:opacity-50", isDark ? 'bg-info-600 text-white hover:bg-info-700' : 'bg-black text-white hover:bg-black')}
+                      variants={buttonVariants}
+                      initial="rest"
+                      whileHover="hover"
+                      whileTap="tap"
+                      className={cn("flex-1 py-3 rounded-2xl font-bold transition-all flex items-center justify-center disabled:opacity-50", isDark ? 'bg-lime-400 text-black hover:bg-lime-300 shadow-lg shadow-lime-400/20' : 'bg-lime-500 text-white hover:bg-lime-600 shadow-lg shadow-lime-500/30')}
                       disabled={isSubmitting || loading}
                       title="Submit and post job"
                     >
@@ -705,7 +754,7 @@ export default function PostJob() {
                           Post Job
                         </>
                       )}
-                    </button>
+                    </motion.button>
                   </div>
                 </div>
               </Step>
@@ -714,13 +763,53 @@ export default function PostJob() {
         </div>
       </div>
 
+      {/* Sticky Mobile Submit Button */}
+      {isMobile && currentStep === 4 && (
+        <motion.div
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 100, opacity: 0 }}
+          className={cn(
+            "fixed bottom-0 left-0 right-0 p-4 pb-safe border-t backdrop-blur-xl z-40",
+            isDark ? 'bg-zinc-900/90 border-white/10' : 'bg-white/90 border-gray-200'
+          )}
+        >
+          <motion.button
+            type="submit"
+            onClick={handleSubmit}
+            variants={buttonVariants}
+            whileHover="hover"
+            whileTap="tap"
+            disabled={isSubmitting || loading}
+            className={cn(
+              "w-full py-4 rounded-2xl font-bold transition-all flex items-center justify-center disabled:opacity-50",
+              isDark
+                ? 'bg-lime-400 text-black hover:bg-lime-300 shadow-lg shadow-lime-400/30'
+                : 'bg-lime-500 text-white hover:bg-lime-600 shadow-lg shadow-lime-500/40'
+            )}
+          >
+            {isSubmitting || loading ? (
+              <>
+                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                Posting...
+              </>
+            ) : (
+              <>
+                <Save className="h-5 w-5 mr-2" />
+                Post Job
+              </>
+            )}
+          </motion.button>
+        </motion.div>
+      )}
+
       {/* Preview Modal */}
       {showPreview && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className={cn("max-w-2xl w-full max-h-[90vh] overflow-y-auto rounded-2xl border-2", isDark ? 'bg-black border-info-600 text-white' : 'bg-white border-black text-black')}>
-            
+          <div className={cn("max-w-2xl w-full max-h-[90vh] overflow-y-auto rounded-3xl border-2", isDark ? 'bg-zinc-900 border-lime-400/30 text-white' : 'bg-white border-gray-200 text-gray-900 shadow-2xl')}>
+
             {/* Preview Header */}
-            <div className={cn("sticky top-0 backdrop-blur-xl border-b-2 p-4 flex items-center justify-between", isDark ? 'bg-black/80 bordbg-black' : 'bg-white/80 border-gray-200')}>
+            <div className={cn("sticky top-0 backdrop-blur-xl border-b p-4 flex items-center justify-between", isDark ? 'bg-zinc-900/80 border-white/10' : 'bg-white/80 border-gray-200')}>
               <h2 className="text-xl font-bold">Job Preview</h2>
               <button
                 onClick={() => setShowPreview(false)}
@@ -735,9 +824,9 @@ export default function PostJob() {
             <div className="p-6 space-y-6">
               {/* Header Info */}
               <div className={cn("flex items-start space-x-4 pb-4 border-b-2", isDark ? 'bordbg-black' : 'border-gray-300')}>
-                <Avatar 
-                  src={user?.profile.avatar_url || ''} 
-                  alt={user?.profile.full_name || 'User'} 
+                <Avatar
+                  src={user?.profile.avatar_url || ''}
+                  alt={user?.profile.full_name || 'User'}
                   size="lg"
                 />
                 <div>
@@ -751,7 +840,7 @@ export default function PostJob() {
                 <h1 className="text-3xl font-bold mb-4">
                   {formData.title || 'Job Title'}
                 </h1>
-                
+
                 {/* Quick Info */}
                 <div className="flex flex-wrap gap-4 text-sm font-semibold mb-4">
                   {formData.company && (
@@ -795,7 +884,7 @@ export default function PostJob() {
                   )}
                 </div>
               )}
-              
+
               {/* Description */}
               {formData.description && (
                 <div>
@@ -805,7 +894,7 @@ export default function PostJob() {
                   </p>
                 </div>
               )}
-              
+
               {/* Requirements */}
               {formData.requirements && (
                 <div>
@@ -815,7 +904,7 @@ export default function PostJob() {
                   </p>
                 </div>
               )}
-              
+
               {/* Skills */}
               {formData.skills.length > 0 && (
                 <div>
@@ -832,7 +921,7 @@ export default function PostJob() {
                   </div>
                 </div>
               )}
-              
+
               {/* Benefits */}
               {formData.benefits && (
                 <div>

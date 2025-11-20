@@ -75,6 +75,7 @@ const HashtagDetailPage = lazy(() => import('./components/HashtagDetailPage'));
 const SearchDemoPage = lazy(() => import('./components/SearchDemoPage'));
 const SearchPage = lazy(() => import('./components/SearchPage'));
 const ExplorePage = lazy(() => import('./components/ExplorePage'));
+const PostEventPage = lazy(() => import('./pages/PostEventPage'));
 
 // LinkedIn Integration
 const LinkedInJobImport = lazy(() => import('./components/LinkedIn/LinkedInJobImport'));
@@ -426,6 +427,13 @@ function AppContent() {
             <ProtectedRoute>
               <Suspense fallback={<LoadingFallback message="Loading job posting..." />}>
                 <PostJob />
+              </Suspense>
+            </ProtectedRoute>
+          } />
+          <Route path="/post-event" element={
+            <ProtectedRoute>
+              <Suspense fallback={<LoadingFallback message="Loading event form..." />}>
+                <PostEventPage />
               </Suspense>
             </ProtectedRoute>
           } />

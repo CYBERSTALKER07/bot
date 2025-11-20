@@ -81,10 +81,10 @@ function DockItem({
             onClick={onClick}
             className={cn(
                 "relative inline-flex items-center justify-center rounded-full shadow-md transition-colors duration-200",
-                "border border-gray-900", // Fixed border color
+                "border border-gray-200",
                 isActive
-                    ? "bg-white text-black shadow-lg shadow-white/50"
-                    : "bg-black text-white hover:bg-gray-900", // Active white with glow, default black with hover
+                    ? "bg-black text-white shadow-lg shadow-gray-500/50" // Active state is a darker gray with a subtle glow
+                    : "bg-white text-black hover:bg-white/50",
                 className
             )}
             tabIndex={0}

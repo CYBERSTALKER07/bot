@@ -3,16 +3,15 @@ import { Link } from 'react-router-dom';
 import {
   Users,
   Eye,
-  Star,
   Plus,
   Calendar,
   ArrowUpRight,
-  Play,
-  Pause,
   X,
   Bell,
   MapPin,
-  Heart
+  Briefcase,
+  TrendingUp,
+  Clock
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
@@ -27,8 +26,8 @@ import { supabase } from '../../lib/supabase';
 interface Metric {
   value: number;
   label: string;
-  color: string;
-  bgColor: string;
+  icon: any;
+  trend?: string;
 }
 
 interface JobPosting {
@@ -39,6 +38,7 @@ interface JobPosting {
   status?: string;
   applications_count?: number;
   views_count?: number;
+  created_at?: string;
 }
 
 interface EventData {
@@ -54,7 +54,11 @@ interface Applicant {
   id: string;
   profiles?: {
     full_name: string;
+    avatar_url?: string;
+    headline?: string;
   };
+  status?: string;
+  applied_at?: string;
 }
 
 interface Follower {
@@ -62,6 +66,7 @@ interface Follower {
   follower?: {
     full_name: string;
     avatar_url?: string;
+    headline?: string;
   };
 }
 
@@ -80,7 +85,6 @@ export default function EmployerDashboard() {
   const [followers, setFollowers] = useState<Follower[]>([]);
   const [metrics, setMetrics] = useState<Metric[]>([]);
   const [loading, setLoading] = useState(true);
-  const [timeTracking, setTimeTracking] = useState({ hours: 1, minutes: 24, seconds: 8, isRunning: false });
 
   // Fetch all employer data on component mount
   useEffect(() => {
@@ -135,33 +139,34 @@ export default function EmployerDashboard() {
 
           // Calculate metrics
           const totalApplicants = allApplicants.length;
-          const activeJobs = jobsData.filter(j => j.status === 'active' || j.status === 'open' || j.status === 'inactive').length;
-          const closedJobs = jobsData.filter(j => j.status === 'closed').length;
-          const followerCount = followersData?.length || 0;
+          const activeJobs = jobsData.filter(j => j.status === 'active' || j.status === 'open').length;
+          const totalViews = jobsData.reduce((acc, job) => acc + (job.views_count || 0), 0);
 
           setMetrics([
             {
               value: activeJobs,
               label: 'Active Jobs',
-              color: 'text-black dark:text-white',
-              bgColor: 'bg-white dark:bg-black'
-
-            },
-            {
-              value: closedJobs,
-              label: 'Closed Jobs',
-              color: 'text-black dark:text-white',
-              bgColor: 'bg-white dark:bg-black'
-
+              icon: Briefcase,
+              trend: '+2 this week'
             },
             {
               value: totalApplicants,
               label: 'Total Applicants',
-              color: 'text-black dark:text-white',
-              bgColor: 'bg-white dark:bg-black'
-
+              icon: Users,
+              trend: '+12% vs last month'
             },
-
+            {
+              value: totalViews,
+              label: 'Total Views',
+              icon: Eye,
+              trend: '+5% vs last week'
+            },
+          ]);
+        } else {
+          setMetrics([
+            { value: 0, label: 'Active Jobs', icon: Briefcase },
+            { value: 0, label: 'Total Applicants', icon: Users },
+            { value: 0, label: 'Total Views', icon: Eye },
           ]);
         }
 
@@ -177,35 +182,334 @@ export default function EmployerDashboard() {
     }
   }, [user, fetchEmployerJobs, getJobApplicants]);
 
-  // Timer effect
-  useEffect(() => {
-    if (!timeTracking.isRunning) return;
-
-    const interval = setInterval(() => {
-      setTimeTracking(prev => {
-        let { hours, minutes, seconds } = prev;
-        seconds += 1;
-        if (seconds === 60) {
-          seconds = 0;
-          minutes += 1;
-          if (minutes === 60) {
-            minutes = 0;
-            hours += 1;
-          }
-        }
-        return { ...prev, hours, minutes, seconds };
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [timeTracking.isRunning]);
-
   if (loading) {
     return (
-      <PageLayout className={`min-h-screen flex items-center justify-center ${isDark ? 'bg-black' : 'bg-gray-50'}`}>
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-info-500 mx-auto mb-4"></div>
-          <p>Loading dashboard...</p>
+      <PageLayout className={cn(
+        "min-h-screen",
+        isDark ? "bg-black text-white" : "bg-gray-50 text-gray-900"
+      )}
+        maxWidth="full"
+        padding="none"
+      >
+        {/* Mobile Header Skeleton */}
+        <div className={cn(
+          "sticky top-0 z-50 backdrop-blur-xl border-b lg:hidden",
+          isDark ? "bg-black/80 border-white/10" : "bg-white/80 border-gray-200"
+        )}>
+          <div className="flex items-center justify-between px-4 py-4">
+            <div className="space-y-2">
+              <div className={cn(
+                "h-5 w-24 rounded animate-pulse",
+                isDark ? "bg-white/10" : "bg-gray-200"
+              )}></div>
+              <div className={cn(
+                "h-3 w-16 rounded animate-pulse",
+                isDark ? "bg-white/5" : "bg-gray-100"
+              )}></div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className={cn(
+                "h-8 w-8 rounded-full animate-pulse",
+                isDark ? "bg-white/10" : "bg-gray-200"
+              )}></div>
+              <div className={cn(
+                "h-8 w-8 rounded-full animate-pulse",
+                isDark ? "bg-lime-400/20" : "bg-lime-200"
+              )}></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content Skeleton */}
+        <div className="pb-24 lg:pb-8 pt-4 lg:pt-12">
+          <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+
+            {/* Desktop Header Skeleton */}
+            <div className="hidden lg:flex items-end justify-between mb-8">
+              <div className="space-y-3">
+                <div className={cn(
+                  "h-10 w-48 rounded animate-pulse",
+                  isDark ? "bg-white/10" : "bg-gray-200"
+                )}></div>
+                <div className={cn(
+                  "h-4 w-64 rounded animate-pulse",
+                  isDark ? "bg-white/5" : "bg-gray-100"
+                )}></div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className={cn(
+                  "h-11 w-36 rounded-2xl animate-pulse",
+                  isDark ? "bg-white/10" : "bg-gray-200"
+                )}></div>
+                <div className={cn(
+                  "h-11 w-40 rounded-2xl animate-pulse",
+                  isDark ? "bg-lime-400/20" : "bg-lime-200"
+                )}></div>
+              </div>
+            </div>
+
+            {/* Bento Grid Skeleton */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+
+              {/* Metric Cards Skeleton */}
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className={cn(
+                    "p-5 rounded-2xl lg:rounded-3xl",
+                    isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-sm"
+                  )}
+                >
+                  <div className="flex justify-between items-start mb-6">
+                    <div className={cn(
+                      "h-11 w-11 rounded-xl animate-pulse",
+                      isDark ? "bg-white/10" : "bg-gray-200"
+                    )}></div>
+                    <div className={cn(
+                      "h-6 w-20 rounded-full animate-pulse",
+                      isDark ? "bg-lime-400/10" : "bg-lime-100"
+                    )}></div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className={cn(
+                      "h-9 w-16 rounded animate-pulse",
+                      isDark ? "bg-white/10" : "bg-gray-200"
+                    )}></div>
+                    <div className={cn(
+                      "h-3 w-24 rounded animate-pulse",
+                      isDark ? "bg-white/5" : "bg-gray-100"
+                    )}></div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Main Content Area Skeleton */}
+              <div className="lg:col-span-3 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+
+                {/* Jobs Section Skeleton */}
+                <div className={cn(
+                  "lg:col-span-2 p-5 lg:p-6 rounded-2xl lg:rounded-3xl",
+                  isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-sm"
+                )}>
+                  <div className="flex items-center justify-between mb-5">
+                    <div className={cn(
+                      "h-6 w-40 rounded animate-pulse",
+                      isDark ? "bg-white/10" : "bg-gray-200"
+                    )}></div>
+                    <div className={cn(
+                      "h-4 w-16 rounded animate-pulse",
+                      isDark ? "bg-white/5" : "bg-gray-100"
+                    )}></div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 lg:gap-4">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div
+                        key={i}
+                        className={cn(
+                          "p-4 rounded-3xl",
+                          isDark ? "bg-black border border-white/5" : "bg-white border border-gray-200 shadow-lg"
+                        )}
+                      >
+                        <div className="space-y-3">
+                          <div className="flex justify-between">
+                            <div className="space-y-2 flex-1">
+                              <div className={cn(
+                                "h-5 w-32 rounded animate-pulse",
+                                isDark ? "bg-white/10" : "bg-gray-200"
+                              )}></div>
+                              <div className={cn(
+                                "h-3 w-24 rounded animate-pulse",
+                                isDark ? "bg-white/5" : "bg-gray-100"
+                              )}></div>
+                            </div>
+                            <div className={cn(
+                              "h-6 w-12 rounded-md animate-pulse",
+                              isDark ? "bg-white/5" : "bg-gray-100"
+                            )}></div>
+                          </div>
+                          <div className={cn(
+                            "pt-3 border-t flex gap-4",
+                            isDark ? "border-white/5" : "border-gray-200"
+                          )}>
+                            <div className={cn(
+                              "h-3 w-20 rounded animate-pulse",
+                              isDark ? "bg-white/5" : "bg-gray-100"
+                            )}></div>
+                            <div className={cn(
+                              "h-3 w-16 rounded animate-pulse",
+                              isDark ? "bg-white/5" : "bg-gray-100"
+                            )}></div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Applicants Skeleton */}
+                <div className={cn(
+                  "p-5 lg:p-6 rounded-2xl lg:rounded-3xl",
+                  isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-sm"
+                )}>
+                  <div className="flex items-center justify-between mb-5">
+                    <div className={cn(
+                      "h-6 w-36 rounded animate-pulse",
+                      isDark ? "bg-white/10" : "bg-gray-200"
+                    )}></div>
+                    <div className={cn(
+                      "h-4 w-16 rounded animate-pulse",
+                      isDark ? "bg-white/5" : "bg-gray-100"
+                    )}></div>
+                  </div>
+                  <div className="space-y-3">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <div
+                        key={i}
+                        className={cn(
+                          "flex items-center gap-3 p-3 rounded-xl",
+                          isDark ? "bg-black border border-white/5" : "bg-gray-50 border border-gray-200"
+                        )}
+                      >
+                        <div className={cn(
+                          "h-10 w-10 rounded-full animate-pulse",
+                          isDark ? "bg-white/10" : "bg-gray-200"
+                        )}></div>
+                        <div className="flex-1 space-y-2">
+                          <div className={cn(
+                            "h-4 w-24 rounded animate-pulse",
+                            isDark ? "bg-white/10" : "bg-gray-200"
+                          )}></div>
+                          <div className={cn(
+                            "h-3 w-32 rounded animate-pulse",
+                            isDark ? "bg-white/5" : "bg-gray-100"
+                          )}></div>
+                        </div>
+                        <div className={cn(
+                          "h-8 w-8 rounded-full animate-pulse",
+                          isDark ? "bg-white/5" : "bg-gray-100"
+                        )}></div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Events Skeleton */}
+                <div className={cn(
+                  "p-5 lg:p-6 rounded-2xl lg:rounded-3xl",
+                  isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-sm"
+                )}>
+                  <div className="flex items-center justify-between mb-5">
+                    <div className={cn(
+                      "h-6 w-24 rounded animate-pulse",
+                      isDark ? "bg-white/10" : "bg-gray-200"
+                    )}></div>
+                    <div className={cn(
+                      "h-4 w-16 rounded animate-pulse",
+                      isDark ? "bg-white/5" : "bg-gray-100"
+                    )}></div>
+                  </div>
+                  <div className="space-y-3">
+                    {[1, 2, 3].map((i) => (
+                      <div
+                        key={i}
+                        className={cn(
+                          "relative p-4 rounded-xl overflow-hidden",
+                          isDark ? "bg-black border border-white/5" : "bg-gray-50 border border-gray-200"
+                        )}
+                      >
+                        <div className={cn(
+                          "absolute top-0 left-0 w-1 h-full",
+                          isDark ? "bg-lime-400/50" : "bg-lime-500/50"
+                        )} />
+                        <div className="pl-3 space-y-2">
+                          <div className={cn(
+                            "h-4 w-32 rounded animate-pulse",
+                            isDark ? "bg-white/10" : "bg-gray-200"
+                          )}></div>
+                          <div className="flex gap-3">
+                            <div className={cn(
+                              "h-3 w-20 rounded animate-pulse",
+                              isDark ? "bg-white/5" : "bg-gray-100"
+                            )}></div>
+                            <div className={cn(
+                              "h-3 w-16 rounded animate-pulse",
+                              isDark ? "bg-white/5" : "bg-gray-100"
+                            )}></div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Sidebar Skeleton */}
+              <div className="lg:col-span-1 space-y-4 lg:space-y-6">
+
+                {/* Quick Actions Skeleton */}
+                <div className={cn(
+                  "p-5 lg:p-6 rounded-2xl lg:rounded-3xl",
+                  isDark
+                    ? "bg-gradient-to-br from-lime-400/20 to-lime-600/20"
+                    : "bg-gradient-to-br from-lime-500/20 to-lime-600/20"
+                )}>
+                  <div className={cn(
+                    "h-6 w-28 rounded animate-pulse mb-4",
+                    isDark ? "bg-white/20" : "bg-white/40"
+                  )}></div>
+                  <div className="space-y-2">
+                    <div className={cn(
+                      "h-12 w-full rounded-xl animate-pulse",
+                      "bg-black/10"
+                    )}></div>
+                    <div className={cn(
+                      "h-12 w-full rounded-xl animate-pulse",
+                      "bg-black/10"
+                    )}></div>
+                  </div>
+                </div>
+
+                {/* Followers Skeleton */}
+                <div className={cn(
+                  "p-5 lg:p-6 rounded-2xl lg:rounded-3xl",
+                  isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-sm"
+                )}>
+                  <div className="flex items-center justify-between mb-5">
+                    <div className={cn(
+                      "h-5 w-20 rounded animate-pulse",
+                      isDark ? "bg-white/10" : "bg-gray-200"
+                    )}></div>
+                    <div className={cn(
+                      "h-3 w-12 rounded animate-pulse",
+                      isDark ? "bg-white/5" : "bg-gray-100"
+                    )}></div>
+                  </div>
+                  <div className="space-y-3">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <div key={i} className="flex items-center gap-3">
+                        <div className={cn(
+                          "h-8 w-8 rounded-full animate-pulse",
+                          isDark ? "bg-white/10" : "bg-gray-200"
+                        )}></div>
+                        <div className={cn(
+                          "h-4 w-24 rounded animate-pulse flex-1",
+                          isDark ? "bg-white/10" : "bg-gray-200"
+                        )}></div>
+                        <div className={cn(
+                          "h-3 w-10 rounded animate-pulse",
+                          isDark ? "bg-white/5" : "bg-gray-100"
+                        )}></div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </main>
         </div>
       </PageLayout>
     );
@@ -213,412 +517,559 @@ export default function EmployerDashboard() {
 
   return (
     <PageLayout
-      className={`min-h-screen ${isDark ? 'bg-black text-white' : 'bg-gray-50 text-black'}`}
+      className={cn(
+        "min-h-screen",
+        isDark ? "bg-black text-white" : "bg-gray-50 text-gray-900"
+      )}
       maxWidth="full"
       padding="none"
     >
       {/* Mobile Header */}
       <div className={cn(
-        'sticky top-0 z-50 backdrop-blur-xl border-b lg:hidden ios-header-safe',
-        isDark ? 'bg-black/95 border-gray-800' : 'bg-white/95 border-gray-200'
+        "sticky top-0 z-50 backdrop-blur-xl border-b lg:hidden",
+        isDark ? "bg-black/80 border-white/10" : "bg-white/80 border-gray-200"
       )}>
-        <div className="flex items-center justify-between px-4 py-4 ios-nav-spacing">
+        <div className="flex items-center justify-between px-4 py-4">
           <div>
-            <h1 className="text-lg font-thin">Dashboard</h1>
-            <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-600')}>
-              Welcome back!
+            <h1 className="text-lg font-bold tracking-tight">Dashboard</h1>
+            <p className={cn("text-xs", isDark ? "text-gray-400" : "text-gray-600")}>
+              Overview
             </p>
           </div>
           <div className="flex items-center space-x-2">
-            <Button className="p-2" title="Notifications">
+            <Button className={cn(
+              "p-2 transition-colors",
+              isDark ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900"
+            )} title="Notifications">
               <Bell className="h-5 w-5" />
             </Button>
             <Button
               className={cn(
-                'rounded-full px-3 py-2 font-thin text-sm',
-                isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800'
+                "rounded-full h-8 w-8 flex items-center justify-center transition-colors",
+                isDark ? "bg-lime-400 text-black hover:bg-lime-300" : "bg-lime-500 text-white hover:bg-lime-600"
               )}
               onClick={() => setShowPostJobModal(true)}
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-5 w-5" />
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="pb-20 lg:pb-0 pt-16 lg:pt-20">
-        <main className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
-          {/* Desktop Header */}
-          <div className="hidden lg:flex items-center justify-between mb-8">
+      {/* Main Content with Safe Area Padding */}
+      <div className="pb-24 lg:pb-8 pt-4 lg:pt-12">
+        <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+
+          {/* Header Section */}
+          <div className="hidden lg:flex items-end justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-thin mb-2">Dashboard</h1>
-              <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>
-                Manage your jobs, events, and applicants
+              <h1 className={cn(
+                "text-4xl font-bold tracking-tight mb-2",
+                isDark ? "text-white" : "text-gray-900"
+              )}>
+                Dashboard
+              </h1>
+              <p className={cn(
+                "font-light",
+                isDark ? "text-gray-400" : "text-gray-600"
+              )}>
+                Manage your recruitment pipeline and company events
               </p>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center gap-3">
               <Button
                 className={cn(
-                  'rounded-full px-6 py-2 font-thin',
-                  isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800'
-                )}
-                onClick={() => setShowPostJobModal(true)}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Post Job
-              </Button>
-              <Button
-                className={cn(
-                  'rounded-full px-6 py-2 font-thin',
-                  isDark ? 'bg-info-600 text-white hover:bg-info-700' : 'bg-info-500 text-white hover:bg-info-600'
+                  "px-5 py-2.5 rounded-2xl font-medium transition-all duration-300",
+                  isDark
+                    ? "bg-zinc-900 border border-zinc-800 text-white hover:border-lime-400/50"
+                    : "bg-white border border-gray-200 text-gray-900 hover:border-lime-500/50 shadow-sm"
                 )}
                 onClick={() => setShowPostEventModal(true)}
               >
-                <Calendar className="h-4 w-4 mr-2" />
-                Post Event
+                <span className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Create Event
+                </span>
+              </Button>
+              <Button
+                className={cn(
+                  "px-5 py-2.5 rounded-2xl font-bold transition-all duration-300",
+                  isDark
+                    ? "bg-lime-400 text-black hover:bg-lime-300 shadow-[0_0_20px_-5px_rgba(163,230,53,0.4)]"
+                    : "bg-lime-500 text-white hover:bg-lime-600 shadow-lg shadow-lime-500/30"
+                )}
+                onClick={() => setShowPostJobModal(true)}
+              >
+                <span className="flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  Post New Job
+                </span>
               </Button>
             </div>
           </div>
 
-          {/* Mobile: Title + Filters (if needed) */}
-          <div className="lg:hidden mb-4">
-            <h2 className="text-xl font-thin mb-3 text-white">Dashboard</h2>
-          </div>
+          {/* Bento Grid Layout */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
 
-          {/* Top Metrics Cards - 4 columns on desktop, 2 on mobile */}
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 lg:mb-8">
+            {/* Metrics Cards - Responsive Bento Style */}
             {metrics.map((metric, index) => (
               <div
                 key={index}
-                className="group relative"
-                style={{
-                  perspective: '1000px',
-                }}
+                className={cn(
+                  "group relative p-5 rounded-2xl lg:rounded-3xl transition-all duration-300 overflow-hidden",
+                  isDark
+                    ? "bg-zinc-900/50 border border-white/5 hover:border-lime-400/30"
+                    : "bg-white border border-gray-200 hover:border-lime-500/30 shadow-sm hover:shadow-md"
+                )}
               >
-                <div
-                  className="relative rounded-3xl p-6 sm:p-8 lg:p-10 transition-all duration-500 ease-out transform hover:-translate-y-2 hover:scale-[1.02]"
-                  style={{
-                    background:
-                      index === 0
-                        ? 'linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%)'
-                        : index === 1
-                          ? 'linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%)'
-                          : 'linear-gradient(135deg, #3B82F6 20%, #8B5CF6 80%)',
-                    boxShadow: `
-                      0 10px 30px -5px rgba(59, 130, 246, 0.3),
-                      0 20px 40px -10px rgba(139, 92, 246, 0.2),
-                      0 30px 60px -15px rgba(0, 0, 0, 0.15),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                    `,
-                    transformStyle: 'preserve-3d',
-                  }}
-                >
-                  {/* 3D depth layer */}
-                  <div
-                    className="absolute inset-0 rounded-3xl opacity-50"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
-                      transform: 'translateZ(-10px)',
-                    }}
-                  />
+                <div className={cn(
+                  "absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500",
+                  isDark ? "from-lime-400/5 via-transparent to-transparent" : "from-lime-500/5 via-transparent to-transparent"
+                )} />
 
-                  {/* Shine effect */}
-                  <div
-                    className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%)',
-                    }}
-                  />
-
-                  <div className="relative z-10 flex items-start justify-between mb-4 sm:mb-6">
-                    <div className="flex-1">
-                      <p className="text-xs lg:text-sm font-semibold text-white/90 uppercase tracking-wider mb-2">
-                        {metric.label}
-                      </p>
-                      <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white drop-shadow-lg">
-                        {metric.value}
-                      </p>
-                    </div>
+                <div className="relative z-10 flex justify-between items-start mb-6">
+                  <div className={cn(
+                    "p-2.5 rounded-xl transition-colors",
+                    isDark
+                      ? "bg-black border border-white/10 group-hover:border-lime-400/30"
+                      : "bg-gray-50 border border-gray-200 group-hover:border-lime-500/30"
+                  )}>
+                    <metric.icon className={cn(
+                      "h-5 w-5 transition-colors",
+                      isDark
+                        ? "text-white group-hover:text-lime-400"
+                        : "text-gray-700 group-hover:text-lime-600"
+                    )} />
                   </div>
+                  {metric.trend && (
+                    <span className={cn(
+                      "flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full",
+                      isDark
+                        ? "text-lime-400 bg-lime-400/10"
+                        : "text-lime-600 bg-lime-50"
+                    )}>
+                      <TrendingUp className="h-3 w-3" />
+                      {metric.trend}
+                    </span>
+                  )}
+                </div>
 
-                  {/* Decorative corner accent */}
-                  <div
-                    className="absolute top-4 right-4 w-16 h-16 rounded-full opacity-20"
-                    style={{
-                      background: 'radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%)',
-                    }}
-                  />
+                <div className="relative z-10">
+                  <h3 className={cn(
+                    "text-3xl font-bold mb-1 tracking-tight",
+                    isDark ? "text-white" : "text-gray-900"
+                  )}>{metric.value}</h3>
+                  <p className={cn(
+                    "text-xs font-medium uppercase tracking-wider",
+                    isDark ? "text-gray-400" : "text-gray-600"
+                  )}>{metric.label}</p>
                 </div>
               </div>
             ))}
-          </div>
 
-          {/* Main Grid - Jobs & Events: Desktop 2/3 & 1/3, Mobile stacked */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
-            {/* Posted Jobs - Takes 2/3 on desktop */}
-            <div className={cn(
-              'lg:col-span-2 rounded-3xl p-4 lg:p-6',
-              isDark ? 'bg-black border border-gray-800' : 'bg-white border border-gray-200'
-            )}>
-              <div className="flex items-center justify-between mb-4 sm:mb-6">
-                <h2 className="text-lg sm:text-xl font-thin">Your Posted Jobs</h2>
-                <Link to="/posted-jobs" className="text-info-500 hover:underline text-xs sm:text-sm whitespace-nowrap">
-                  View all
-                </Link>
+            {/* Main Content Area - Bento Grid */}
+            <div className="lg:col-span-3 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+
+              {/* Active Jobs Section */}
+              <div className={cn(
+                "lg:col-span-2 p-5 lg:p-6 rounded-2xl lg:rounded-3xl",
+                isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-sm"
+              )}>
+                <div className="flex items-center justify-between mb-5">
+                  <h2 className={cn(
+                    "text-lg font-bold flex items-center gap-2",
+                    isDark ? "text-white" : "text-gray-900"
+                  )}>
+                    <Briefcase className={cn(
+                      "h-5 w-5",
+                      isDark ? "text-lime-400" : "text-lime-600"
+                    )} />
+                    Active Positions
+                  </h2>
+                  <Link to="/posted-jobs" className={cn(
+                    "text-sm transition-colors flex items-center gap-1 group",
+                    isDark ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900"
+                  )}>
+                    View All <ArrowUpRight className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  </Link>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 lg:gap-4">
+                  {jobPostings.length > 0 ? (
+                    jobPostings.slice(0, 4).map((job) => (
+                      <div
+                        key={job.id}
+                        className={cn(
+                          "group p-4 rounded-3xl transition-all duration-300 hover:-translate-y-1",
+                          isDark
+                            ? "bg-black border border-white/5 hover:border-lime-400/30"
+                            : "bg-white  border-gray-200 hover:border-lime-500/30 shadow-lg hover:shadow-md"
+                        )}
+                      >
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="flex-1 min-w-0">
+                            <h3 className={cn(
+                              "font-bold truncate transition-colors",
+                              isDark
+                                ? "text-white group-hover:text-lime-400"
+                                : "text-gray-900 group-hover:text-lime-600"
+                            )}>
+                              {job.title}
+                            </h3>
+                            <p className={cn(
+                              "text-xs mt-1",
+                              isDark ? "text-gray-500" : "text-gray-600"
+                            )}>{job.location}</p>
+                          </div>
+                          <span className={cn(
+                            "px-2 py-1 rounded-md text-xs font-medium ml-2",
+                            isDark
+                              ? "bg-white/5 text-gray-300 border border-white/5"
+                              : "bg-gray-100 text-gray-700 border border-gray-200"
+                          )}>
+                            {job.status || 'Draft'}
+                          </span>
+                        </div>
+
+                        <div className={cn(
+                          "flex items-center gap-4 mt-4 pt-4 border-t",
+                          isDark ? "border-white/5" : "border-gray-200"
+                        )}>
+                          <div className={cn(
+                            "flex items-center gap-1.5 text-xs",
+                            isDark ? "text-gray-400" : "text-gray-600"
+                          )}>
+                            <Users className="h-3.5 w-3.5" />
+                            <span className={cn(
+                              "font-medium",
+                              isDark ? "text-white" : "text-gray-900"
+                            )}>{job.applications_count || 0}</span>
+                            <span>Applicants</span>
+                          </div>
+                          <div className={cn(
+                            "flex items-center gap-1.5 text-xs",
+                            isDark ? "text-gray-400" : "text-gray-600"
+                          )}>
+                            <Eye className="h-3.5 w-3.5" />
+                            <span className={cn(
+                              "font-medium",
+                              isDark ? "text-white" : "text-gray-900"
+                            )}>{job.views_count || 0}</span>
+                            <span>Views</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className={cn(
+                      "col-span-2 py-12 text-center border border-dashed rounded-2xl",
+                      isDark ? "border-white/10" : "border-gray-300"
+                    )}>
+                      <p className={cn(
+                        "mb-4",
+                        isDark ? "text-gray-500" : "text-gray-600"
+                      )}>No active job postings</p>
+                      <Button onClick={() => setShowPostJobModal(true)} className={cn(
+                        "text-sm hover:underline",
+                        isDark ? "text-lime-400" : "text-lime-600"
+                      )}>
+                        Create your first job posting
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="space-y-3 sm:space-y-4 max-h-96 overflow-y-auto">
-                {jobPostings.length > 0 ? (
-                  jobPostings.slice(0, 4).map((job) => (
-                    <div
-                      key={job.id}
-                      className={cn(
-                        'p-3 sm:p-4 rounded-xl transition-colors hover:bg-gray-50/5',
-                        isDark ? 'bg-black border-[0.5px] border-gray-800' : 'bg-white'
-                      )}
-                    >
-                      <div className="flex items-start justify-between gap-2 mb-2">
+
+              {/* Recent Applicants */}
+              <div className={cn(
+                "p-5 lg:p-6 rounded-2xl lg:rounded-3xl h-full",
+                isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-sm"
+              )}>
+                <div className="flex items-center justify-between mb-5">
+                  <h2 className={cn(
+                    "text-lg font-bold flex items-center gap-2",
+                    isDark ? "text-white" : "text-gray-900"
+                  )}>
+                    <Users className={cn(
+                      "h-5 w-5",
+                      isDark ? "text-lime-400" : "text-lime-600"
+                    )} />
+                    Recent Applicants
+                  </h2>
+                  <Link to="/applicants" className={cn(
+                    "text-sm transition-colors",
+                    isDark ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900"
+                  )}>
+                    View All
+                  </Link>
+                </div>
+
+                <div className="space-y-3">
+                  {recentApplicants.length > 0 ? (
+                    recentApplicants.slice(0, 5).map((applicant) => (
+                      <div key={applicant.id} className={cn(
+                        "flex items-center gap-3 p-3 rounded-xl transition-colors group",
+                        isDark
+                          ? "bg-black border border-white/5 hover:border-lime-400/30"
+                          : "bg-gray-50 border border-gray-200 hover:border-lime-500/30"
+                      )}>
+                        <div className={cn(
+                          "h-10 w-10 rounded-full flex items-center justify-center text-sm border transition-colors",
+                          isDark
+                            ? "bg-zinc-800 border-white/5 group-hover:border-lime-400/50"
+                            : "bg-gray-100 border-gray-200 group-hover:border-lime-500/50"
+                        )}>
+                          {applicant.profiles?.avatar_url ? (
+                            <img src={applicant.profiles.avatar_url} alt="" className="h-full w-full rounded-full object-cover" />
+                          ) : (
+                            <span className={cn(
+                              "transition-colors",
+                              isDark
+                                ? "text-gray-400 group-hover:text-white"
+                                : "text-gray-600 group-hover:text-gray-900"
+                            )}>
+                              {applicant.profiles?.full_name?.[0] || 'A'}
+                            </span>
+                          )}
+                        </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-sm sm:text-base truncate">{job.title}</h3>
-                          <p className={cn('text-xs mt-1 truncate', isDark ? 'text-gray-400' : 'text-gray-600')}>
-                            {job.company} • {job.location}
+                          <h4 className={cn(
+                            "text-sm font-medium truncate transition-colors",
+                            isDark
+                              ? "text-white group-hover:text-lime-400"
+                              : "text-gray-900 group-hover:text-lime-600"
+                          )}>
+                            {applicant.profiles?.full_name || 'Unknown Applicant'}
+                          </h4>
+                          <p className={cn(
+                            "text-xs truncate",
+                            isDark ? "text-gray-500" : "text-gray-600"
+                          )}>
+                            {applicant.profiles?.headline || 'Software Engineer'}
                           </p>
                         </div>
-                        {/* <span className={cn(
-                          'text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0',
-                          job.status === 'open' || job.status === 'active' ? (isDark ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800') :
-                          job.status === 'closed' ? (isDark ? 'bg-red-900 text-red-200' : 'bg-red-100 text-red-800') :
-                          isDark ? 'bg-yellow-900 text-yellow-200' : 'bg-yellow-100 text-yellow-800'
+                        <Button className={cn(
+                          "h-8 w-8 rounded-full flex items-center justify-center transition-all",
+                          isDark
+                            ? "bg-white/5 hover:bg-lime-400 hover:text-black"
+                            : "bg-gray-100 hover:bg-lime-500 hover:text-white"
                         )}>
-                          {job.status || 'draft'}
-                        </span> */}
+                          <ArrowUpRight className="h-4 w-4" />
+                        </Button>
                       </div>
-                      <div className="flex flex-wrap items-center gap-3 mt-3 text-xs text-gray-500">
-                        <div className="flex items-center space-x-1">
-                          <Users className="h-3 w-3" />
-                          <span>{job.applications_count || 0} applicants</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Eye className="h-3 w-3" />
-                          <span>{job.views_count || 0} views</span>
-                        </div>
-                      </div>
+                    ))
+                  ) : (
+                    <div className="py-8 text-center">
+                      <p className={cn(
+                        "text-sm",
+                        isDark ? "text-gray-500" : "text-gray-600"
+                      )}>No new applicants yet</p>
                     </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8">
-                    <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>
-                      No jobs posted yet
-                    </p>
-                    <Button
-                      className="mt-3 text-info-500 text-sm"
-                      onClick={() => setShowPostJobModal(true)}
-                    >
-                      Post your first job
-                    </Button>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
 
-            {/* Events - Takes 1/3 on desktop */}
-            <div className={cn(
-              'lg:col-span-1 rounded-3xl p-4 lg:p-6',
-              isDark ? 'bg-black border border-gray-800' : 'bg-white border border-gray-200'
-            )}>
-              <div className="flex items-center justify-between mb-4 sm:mb-6">
-                <h2 className="text-lg sm:text-xl font-thin">Your Events</h2>
-                <Link to="/events" className="text-info-500 hover:underline text-xs sm:text-sm whitespace-nowrap">
-                  View all
-                </Link>
-              </div>
-              <div className="space-y-3 sm:space-y-4 max-h-96 overflow-y-auto">
-                {events.length > 0 ? (
-                  events.slice(0, 3).map((event) => (
-                    <div
-                      key={event.id}
-                      className={cn(
-                        'p-3 sm:p-4 rounded-xl transition-colors hover:bg-gray-50/5',
-                        isDark ? 'bg-black border-[0.7px] border-gray-900' : 'bg-gray-100/50'
-                      )}
-                    >
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-sm sm:text-base truncate">{event.title}</h3>
-                          <div className="flex items-center space-x-1 mt-1 text-xs text-gray-500">
-                            <Calendar className="h-3 w-3 flex-shrink-0" />
-                            <span className="truncate">
-                              {new Date(event.event_date).toLocaleDateString('en-US', {
-                                month: 'short',
-                                day: 'numeric'
-                              })}
+              {/* Upcoming Events */}
+              <div className={cn(
+                "p-5 lg:p-6 rounded-2xl lg:rounded-3xl h-full",
+                isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-sm"
+              )}>
+                <div className="flex items-center justify-between mb-5">
+                  <h2 className={cn(
+                    "text-lg font-bold flex items-center gap-2",
+                    isDark ? "text-white" : "text-gray-900"
+                  )}>
+                    <Calendar className={cn(
+                      "h-5 w-5",
+                      isDark ? "text-lime-400" : "text-lime-600"
+                    )} />
+                    Events
+                  </h2>
+                  <Link to="/events" className={cn(
+                    "text-sm transition-colors",
+                    isDark ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900"
+                  )}>
+                    View All
+                  </Link>
+                </div>
+
+                <div className="space-y-3">
+                  {events.length > 0 ? (
+                    events.slice(0, 3).map((event) => (
+                      <div key={event.id} className={cn(
+                        "relative p-4 rounded-3xl overflow-hidden group",
+                        isDark ? "bg-black shadow-lg border-white/5" : "bg-white border border-gray-200"
+                      )}>
+                        {/* <div className={cn(
+                          "absolute top-0 left-0 w-1 h-full transition-colors",
+                          isDark
+                            ? "bg-lime-400/50 group-hover:bg-lime-400"
+                            : "bg-lime-500/50 group-hover:bg-lime-500"
+                        )} /> */}
+                        <div className="pl-3">
+                          <h4 className={cn(
+                            "text-sm font-bold truncate mb-1",
+                            isDark ? "text-white" : "text-gray-900"
+                          )}>{event.title}</h4>
+                          <div className={cn(
+                            "flex items-center gap-3 text-xs",
+                            isDark ? "text-gray-500" : "text-gray-600"
+                          )}>
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {new Date(event.event_date).toLocaleDateString()}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <MapPin className="h-3 w-3" />
+                              {event.location || 'Remote'}
                             </span>
                           </div>
                         </div>
-                        <span className={cn(
-                          'text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0',
-                          event.status === 'upcoming' ? (isDark ? 'bg-info-900 text-info-200' : 'bg-info-100 text-info-800') :
-                            event.status === 'ongoing' ? (isDark ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800') :
-                              isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-200 text-gray-800'
-                        )}>
-                          {event.status}
-                        </span>
                       </div>
-                      <div className="flex items-center space-x-2 mt-2 text-xs text-gray-500">
-                        <Users className="h-3 w-3" />
-                        <span>{event.attendees_count || 0} attendees</span>
-                        {event.location && (
-                          <>
-                            <span>•</span>
-                            <MapPin className="h-3 w-3" />
-                            <span className="truncate">{event.location}</span>
-                          </>
-                        )}
-                      </div>
+                    ))
+                  ) : (
+                    <div className="py-8 text-center">
+                      <p className={cn(
+                        "text-sm mb-2",
+                        isDark ? "text-gray-500" : "text-gray-600"
+                      )}>No upcoming events</p>
+                      <Button onClick={() => setShowPostEventModal(true)} className={cn(
+                        "text-xs hover:underline",
+                        isDark ? "text-lime-400" : "text-lime-600"
+                      )}>
+                        Schedule an event
+                      </Button>
                     </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8">
-                    <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>
-                      No events posted yet
-                    </p>
-                    <Button
-                      className="mt-3 text-info-500 text-sm"
-                      onClick={() => setShowPostEventModal(true)}
-                    >
-                      Create your first event
-                    </Button>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
-          </div>
 
-          {/* Bottom Section - Recent Applicants (2/3), Followers (1/3) on desktop, stacked on mobile */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 lg:mb-8">
-            {/* Recent Applicants - Takes 2/3 on desktop */}
-            <div className={cn(
-              'lg:col-span-2 rounded-3xl p-4 lg:p-6',
-              isDark ? 'bg-black border border-gray-800' : 'bg-white border border-gray-200'
-            )}>
-              <div className="flex items-center justify-between mb-4 sm:mb-6">
-                <h2 className="text-lg sm:text-xl font-thin">Recent Applicants</h2>
-                <Link to="/applicants" className="text-info-500 hover:underline text-xs sm:text-sm whitespace-nowrap">
-                  View all
-                </Link>
+            </div>
+
+            {/* Right Sidebar - Quick Actions & Followers */}
+            <div className="lg:col-span-1 space-y-4 lg:space-y-6">
+
+              {/* Quick Actions */}
+              <div className={cn(
+                "p-5 lg:p-6 rounded-2xl lg:rounded-3xl",
+                isDark
+                  ? "bg-gradient-to-br from-lime-400 to-lime-600 text-black"
+                  : "bg-gradient-to-br from-lime-500 to-lime-600 text-white shadow-lg shadow-lime-500/30"
+              )}>
+                <h3 className="text-lg font-bold mb-4">Quick Actions</h3>
+                <div className="space-y-2">
+                  <button
+                    onClick={() => setShowPostJobModal(true)}
+                    className="w-full p-3 rounded-xl bg-black/10 hover:bg-black/20 transition-colors flex items-center justify-between font-medium"
+                  >
+                    <span>Post a Job</span>
+                    <Plus className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setShowPostEventModal(true)}
+                    className="w-full p-3 rounded-xl bg-black/10 hover:bg-black/20 transition-colors flex items-center justify-between font-medium"
+                  >
+                    <span>Create Event</span>
+                    <Calendar className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
-              <div className="space-y-3 sm:space-y-4">
-                {recentApplicants.length > 0 ? (
-                  recentApplicants.slice(0, 4).map((applicant) => (
-                    <div key={applicant.id} className={cn(
-                      'flex items-center justify-between p-3 sm:p-4 rounded-xl transition-colors',
-                      isDark ? 'hover:bg-black border-[0.7px] border-slate-50' : 'hover:bg-gray-50'
-                    )}>
-                      <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-lg sm:text-xl flex-shrink-0 bg-gradient-to-br from-green-400 to-info-500">
-                          👤
+
+              {/* Followers */}
+              <div className={cn(
+                "p-5 lg:p-6 rounded-2xl lg:rounded-3xl",
+                isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-sm"
+              )}>
+                <div className="flex items-center justify-between mb-5">
+                  <h2 className={cn(
+                    "text-base font-bold",
+                    isDark ? "text-white" : "text-gray-900"
+                  )}>Followers</h2>
+                  <Link to="/followers" className={cn(
+                    "text-xs hover:underline",
+                    isDark ? "text-lime-400 hover:text-lime-300" : "text-lime-600 hover:text-lime-700"
+                  )}>
+                    See All
+                  </Link>
+                </div>
+                <div className="space-y-3">
+                  {followers.length > 0 ? (
+                    followers.slice(0, 5).map((follow) => (
+                      <div key={follow.id} className="flex items-center gap-3">
+                        <div className={cn(
+                          "h-8 w-8 rounded-full flex items-center justify-center text-xs border",
+                          isDark
+                            ? "bg-zinc-800 text-white border-white/10"
+                            : "bg-gray-100 text-gray-900 border-gray-200"
+                        )}>
+                          {follow.follower?.full_name?.[0] || 'U'}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm sm:text-base truncate">{applicant.profiles?.full_name || 'Applicant'}</p>
-                          <div className="flex items-center space-x-1 mt-0.5">
-                            <Star className="h-3 w-3 text-yellow-500 fill-current flex-shrink-0" />
-                            <span className="text-xs text-yellow-500">{(Math.random() * 2 + 3).toFixed(1)}</span>
-                          </div>
+                          <p className={cn(
+                            "text-sm font-medium truncate",
+                            isDark ? "text-white" : "text-gray-900"
+                          )}>{follow.follower?.full_name}</p>
                         </div>
-                      </div>
-                      <div className="flex space-x-1 sm:space-x-2 flex-shrink-0 ml-2">
-                        <Button
-                          className={cn(
-                            'rounded-lg text-xs px-2 sm:px-3 py-1 sm:py-2',
-                            isDark ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-200 hover:bg-gray-300 text-black'
-                          )}
-                        >
+                        <Button className={cn(
+                          "text-xs",
+                          isDark ? "text-gray-500 hover:text-white" : "text-gray-600 hover:text-gray-900"
+                        )}>
                           View
                         </Button>
-                        <Button
-                          className={cn(
-                            'rounded-lg text-xs px-2 sm:px-3 py-1 sm:py-2',
-                            isDark ? 'bg-info-600 hover:bg-info-700' : 'bg-info-500 hover:bg-info-600',
-                            'text-white'
-                          )}
-                        >
-                          Review
-                        </Button>
                       </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8">
-                    <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>
-                      No applicants yet
-                    </p>
-                  </div>
-                )}
+                    ))
+                  ) : (
+                    <p className={cn(
+                      "text-xs text-center py-4",
+                      isDark ? "text-gray-500" : "text-gray-600"
+                    )}>No followers yet</p>
+                  )}
+                </div>
               </div>
+
             </div>
 
-            {/* Followers - Takes 1/3 on desktop */}
-            <div className={cn(
-              'lg:col-span-1 rounded-3xl p-4 lg:p-6',
-              isDark ? 'bg-black border border-gray-800' : 'bg-white border border-gray-200'
-            )}>
-              <div className="flex items-center justify-between mb-4 sm:mb-6">
-                <h2 className="text-lg sm:text-xl font-thin">Followers</h2>
-                <Link to="/followers" className="text-info-500 hover:underline text-xs sm:text-sm whitespace-nowrap">
-                  View all
-                </Link>
-              </div>
-              <div className="space-y-2 sm:space-y-3">
-                {followers.length > 0 ? (
-                  followers.slice(0, 5).map((follow) => (
-                    <div key={follow.id} className={cn(
-                      'flex items-center justify-between p-2 sm:p-3 rounded-xl transition-colors',
-                      isDark ? 'hover:bg-black border-[0.7px] border-slate-50' : 'hover:bg-gray-50'
-                    )}>
-                      <div className="flex items-center space-x-2 flex-1 min-w-0">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-base sm:text-lg bg-gradient-to-br from-blue-400 to-purple-500 flex-shrink-0">
-                          👤
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-xs sm:text-sm truncate">{follow.follower?.full_name || 'User'}</p>
-                          <p className={cn('text-xs', isDark ? 'text-gray-500' : 'text-gray-500')}>
-                            Recently
-                          </p>
-                        </div>
-                      </div>
-                      <Heart className="h-4 w-4 text-red-500 fill-current flex-shrink-0" />
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-6 sm:py-8">
-                    <p className={cn('text-xs sm:text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>
-                      No followers yet
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
 
         </main>
       </div>
 
-      {/* Post Job Modal */}
+      {/* Modals */}
       {showPostJobModal && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className={cn(
+          "fixed inset-0 z-[9999] flex items-center justify-center backdrop-blur-sm p-4",
+          isDark ? "bg-black/80" : "bg-black/60"
+        )}>
+          <div className={cn(
+            "relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl",
+            isDark ? "bg-zinc-900 border border-white/10" : "bg-white border border-gray-200"
+          )}>
             <PostJob />
+            <button
+              onClick={() => setShowPostJobModal(false)}
+              className={cn(
+                "absolute top-4 right-4 p-2 rounded-full transition-colors",
+                isDark
+                  ? "bg-black/50 text-white hover:bg-white hover:text-black"
+                  : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+              )}
+            >
+              <X className="h-5 w-5" />
+            </button>
           </div>
         </div>
       )}
 
-      {/* Post Event Modal */}
       {showPostEventModal && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <PostEventForm
-              onClose={() => setShowPostEventModal(false)}
-            />
+        <div className={cn(
+          "fixed inset-0 z-[9999] flex items-center justify-center backdrop-blur-sm p-4",
+          isDark ? "bg-black/80" : "bg-black/60"
+        )}>
+          <div className={cn(
+            "w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl",
+            isDark ? "bg-zinc-900 border border-white/10" : "bg-white border border-gray-200"
+          )}>
+            <PostEventForm onClose={() => setShowPostEventModal(false)} />
           </div>
         </div>
       )}

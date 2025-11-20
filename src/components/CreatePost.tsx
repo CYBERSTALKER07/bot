@@ -5,9 +5,6 @@ import {
   Image as ImageIcon,
   Video,
   MapPin,
-  Globe,
-  Lock,
-  Users2,
   ArrowLeft,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -17,6 +14,7 @@ import Button from './ui/Button';
 import Avatar from './ui/Avatar';
 import PageLayout from './ui/PageLayout';
 import { cn } from '../lib/cva';
+import MentionInput from './mentions/MentionInput';
 
 interface NewPost {
   content: string;
@@ -24,6 +22,7 @@ interface NewPost {
   visibility: 'public' | 'connections' | 'private';
   location?: string;
   tags?: string[];
+  mentions?: string[];
   image_url?: string;
   video_url?: string;
   likes_count: number;
@@ -64,6 +63,7 @@ export default function CreatePost() {
     media_type: 'text',
     visibility: 'public',
     tags: [],
+    mentions: [],
     likes_count: 0,
     comments_count: 0,
     shares_count: 0
@@ -71,13 +71,11 @@ export default function CreatePost() {
   const [isPosting, setIsPosting] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<File | null>(null);
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
-  const [characterCount, setCharacterCount] = useState(0);
   const [imageValidation, setImageValidation] = useState<ImageValidation | null>(null);
   const [showImageOptimizer, setShowImageOptimizer] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const MAX_CHARACTERS = 280;
 
@@ -271,6 +269,7 @@ export default function CreatePost() {
         visibility: newPost.visibility,
         location: newPost.location || null,
         tags: hashtags.length > 0 ? hashtags : null,
+        mentions: newPost.mentions || [],
         image_url: mediaType === 'image' ? mediaUrl : null,
         video_url: mediaType === 'video' ? mediaUrl : null,
         likes_count: 0,
@@ -297,18 +296,14 @@ export default function CreatePost() {
     }
   };
 
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const content = e.target.value;
-    if (content.length <= MAX_CHARACTERS) {
-      setNewPost(prev => ({ ...prev, content }));
-      setCharacterCount(content.length);
-
-      // Auto-resize textarea
-      if (textareaRef.current) {
-        textareaRef.current.style.height = 'auto';
-        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-      }
+  const handleContentChange = (value: string) => {
+    if (value.length <= MAX_CHARACTERS) {
+      setNewPost(prev => ({ ...prev, content: value }));
     }
+  };
+
+  const handleMentionsChange = (mentionedUserIds: string[]) => {
+    setNewPost(prev => ({ ...prev, mentions: mentionedUserIds }));
   };
 
   const handleMediaSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -370,17 +365,10 @@ export default function CreatePost() {
     setNewPost(prev => ({ ...prev, media_type: 'text' }));
 
     if (fileInputRef.current) fileInputRef.current.value = '';
-    if (videoInputRef.current) fileInputRef.current.value = '';
+    if (videoInputRef.current) videoInputRef.current.value = '';
   };
 
-  const getVisibilityIcon = () => {
-    switch (newPost.visibility) {
-      case 'public': return <Globe className="w-4 h-4" />;
-      case 'connections': return <Users2 className="w-4 h-4" />;
-      case 'private': return <Lock className="w-4 h-4" />;
-      default: return <Globe className="w-4 h-4" />;
-    }
-  };
+
 
   const canPost = (newPost.content.trim().length > 0 || selectedMedia) && !isPosting;
 
@@ -427,8 +415,8 @@ export default function CreatePost() {
             {/* Left Side: Avatar & Thread Line */}
             <div className="flex flex-col items-center">
               <Avatar
-                src={user?.profile.avatar_url}
-                alt={user?.profile.full_name}
+                src={user?.profile.avatar_url || undefined}
+                alt={user?.profile.full_name || 'User'}
                 size="md"
                 className="z-10"
               />
@@ -437,8 +425,8 @@ export default function CreatePost() {
                 isDark ? "bg-[#333639]" : "bg-gray-200"
               )} />
               <Avatar
-                src={user?.profile.avatar_url}
-                alt={user?.profile.full_name}
+                src={user?.profile.avatar_url || undefined}
+                alt={user?.profile.full_name || 'User'}
                 size="xs"
                 className="opacity-50"
               />
@@ -451,18 +439,17 @@ export default function CreatePost() {
               </div>
 
               {/* Text Input */}
-              <textarea
-                ref={textareaRef}
+              <MentionInput
                 value={newPost.content}
                 onChange={handleContentChange}
+                onMentionsChange={handleMentionsChange}
                 placeholder="Start a thread..."
                 className={cn(
                   'w-full text-base bg-transparent border-none resize-none p-0',
-                  'focus:outline-none min-h-[60px] placeholder-gray-500',
+                  'focus:outline-none min-h-[60px] placeholder-gray-500 focus:ring-0',
                   isDark ? 'text-[#e7e9ea]' : 'text-black'
                 )}
-                style={{ height: 'auto' }}
-                autoFocus
+                minHeight="auto"
               />
 
               {/* Media Preview */}

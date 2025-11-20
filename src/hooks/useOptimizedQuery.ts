@@ -646,13 +646,23 @@ export function useNotifications(userId: string | undefined) {
 
       const { data, error } = await supabase
         .from('notifications')
-        .select('id,user_id,type,content,read,created_at,related_user_id')
+        .select('id,user_id,type,title,message,is_read,created_at,actor_id,post_id,comment_id')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(50);
 
       if (error) throw error;
-      return data || [];
+
+      // Map DB fields to frontend interface if needed, or just return data
+      // The frontend expects: id, type, content (mapped from message), read (mapped from is_read), related_user_id (from actor_id)
+      return (data || []).map(n => ({
+        ...n,
+        content: n.message,
+        title: n.title,
+        read: n.is_read,
+        related_user_id: n.actor_id,
+        related_post_id: n.post_id
+      }));
     },
     enabled: !!userId,
     staleTime: 2 * 60 * 1000, // 2 minutes

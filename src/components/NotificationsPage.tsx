@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Bell,
@@ -9,13 +9,12 @@ import {
   MessageCircle,
   Calendar,
   Heart,
-  Filter,
-  MoreHorizontal,
   Trash2,
   Settings,
   Eye,
   EyeOff,
-  ChevronRight
+  ChevronRight,
+  AtSign
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -29,7 +28,7 @@ import { PostCardSkeleton } from './ui/Skeleton';
 
 interface Notification {
   id: string;
-  type: 'job_match' | 'application_update' | 'message' | 'event' | 'like' | 'follow';
+  type: 'job_match' | 'application_update' | 'message' | 'event' | 'like' | 'follow' | 'mention_post' | 'mention_comment';
   title: string;
   message: string;
   timestamp: Date;
@@ -42,23 +41,31 @@ interface Notification {
 export default function NotificationsPage() {
   const { user } = useAuth();
   const { isDark } = useTheme();
-  const [filter, setFilter] = useState<'all' | 'unread' | 'job_match' | 'application_update'>('all');
+  const [filter, setFilter] = useState<'all' | 'unread' | 'job_match' | 'application_update' | 'mention'>('all');
+
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   // Fetch real notifications
   const { data: notificationsData, isLoading: loading, error } = useNotifications(user?.id);
 
-  // Transform to component format
-  const notifications: Notification[] = notificationsData?.map(notif => ({
-    id: notif.id,
-    type: notif.type,
-    title: notif.title,
-    message: notif.message,
-    timestamp: new Date(notif.created_at),
-    isRead: notif.is_read || false,
-    actionUrl: notif.action_url,
-    avatar: notif.avatar_url,
-    company: notif.company,
-  })) || [];
+  useEffect(() => {
+    if (notificationsData) {
+      const formattedNotifications: Notification[] = notificationsData.map(notif => ({
+        id: notif.id,
+        type: notif.type as Notification['type'],
+        title: notif.title || 'Notification',
+        message: notif.content,
+        timestamp: new Date(notif.created_at),
+        isRead: notif.read,
+        actionUrl: (notif.type === 'mention_post' || notif.type === 'mention_comment') && notif.related_post_id
+          ? `/post/${notif.related_post_id}`
+          : `/profile/${notif.related_user_id}`,
+        avatar: undefined, // We might need to fetch this or include in query
+        company: undefined,
+      }));
+      setNotifications(formattedNotifications);
+    }
+  }, [notificationsData]);
 
   const getNotificationIcon = (type: Notification['type']) => {
     switch (type) {
@@ -67,20 +74,22 @@ export default function NotificationsPage() {
       case 'message': return <MessageCircle className="h-5 w-5 text-green-500" />;
       case 'event': return <Calendar className="h-5 w-5 text-purple-500" />;
       case 'like': return <Heart className="h-5 w-5 text-red-500" />;
+      case 'mention_post':
+      case 'mention_comment': return <AtSign className="h-5 w-5 text-blue-500" />;
       default: return <Bell className="h-5 w-5 text-gray-500" />;
     }
   };
 
   const markAsRead = (id: string) => {
-    setNotifications(prev => 
-      prev.map(notif => 
+    setNotifications(prev =>
+      prev.map(notif =>
         notif.id === id ? { ...notif, isRead: true } : notif
       )
     );
   };
 
   const markAllAsRead = () => {
-    setNotifications(prev => 
+    setNotifications(prev =>
       prev.map(notif => ({ ...notif, isRead: true }))
     );
   };
@@ -92,6 +101,7 @@ export default function NotificationsPage() {
   const filteredNotifications = notifications.filter(notif => {
     if (filter === 'all') return true;
     if (filter === 'unread') return !notif.isRead;
+    if (filter === 'mention') return notif.type === 'mention_post' || notif.type === 'mention_comment';
     return notif.type === filter;
   });
 
@@ -127,26 +137,26 @@ export default function NotificationsPage() {
   }
 
   return (
-    <PageLayout 
+    <PageLayout
       className={cn(
         "min-h-screen transition-colors duration-300 pb-20", // Added bottom padding for mobile nav
         isDark ? 'bg-black text-white' : 'bg-gray-50 text-black'
-      )} 
+      )}
       maxWidth="4xl"
     >
       {/* Mobile-optimized Header */}
       <div className="mb-4 sm:mb-8">
         <div className="flex items-start justify-between mb-4 sm:items-center">
           <div className="flex-1 min-w-0">
-            <Typography 
-              variant="h4" 
+            <Typography
+              variant="h4"
               className="font-bold mb-1 sm:mb-2 text-xl sm:text-2xl lg:text-3xl"
             >
               Notifications
             </Typography>
             {unreadCount > 0 && (
-              <Typography 
-                variant="body2" 
+              <Typography
+                variant="body2"
                 color="textSecondary"
                 className="text-sm sm:text-base"
               >
@@ -154,13 +164,13 @@ export default function NotificationsPage() {
               </Typography>
             )}
           </div>
-          
+
           {/* Mobile-optimized action buttons */}
           <div className="flex items-center space-x-2 flex-shrink-0">
             {unreadCount > 0 && (
-              <Button 
-                variant="outlined" 
-                size="sm" 
+              <Button
+                variant="outlined"
+                size="small"
                 onClick={markAllAsRead}
                 className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2"
               >
@@ -169,9 +179,9 @@ export default function NotificationsPage() {
               </Button>
             )}
             <Link to="/settings">
-              <Button 
-                variant="ghost" 
-                size="sm"
+              <Button
+                variant="ghost"
+                size="small"
                 className="p-1.5 sm:p-2"
               >
                 <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -185,14 +195,15 @@ export default function NotificationsPage() {
           {[
             { key: 'all', label: 'All', count: notifications.length },
             { key: 'unread', label: 'Unread', count: unreadCount },
+            { key: 'mention', label: 'Mentions', count: notifications.filter(n => n.type === 'mention_post' || n.type === 'mention_comment').length },
             { key: 'job_match', label: 'Jobs', count: notifications.filter(n => n.type === 'job_match').length },
             { key: 'application_update', label: 'Apps', count: notifications.filter(n => n.type === 'application_update').length }
           ].map((tab) => (
             <Button
               key={tab.key}
-              variant={filter === tab.key ? 'contained' : 'ghost'}
-              size="sm"
-              onClick={() => setFilter(tab.key as any)}
+              variant={filter === tab.key ? 'filled' : 'ghost'}
+              size="small"
+              onClick={() => setFilter(tab.key as 'all' | 'unread' | 'mention' | 'job_match' | 'application_update')}
               className={cn(
                 "whitespace-nowrap flex-shrink-0 text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-full transition-all duration-200",
                 "ios-touch-target", // iOS-friendly touch target
@@ -203,8 +214,8 @@ export default function NotificationsPage() {
               {tab.count > 0 && (
                 <span className={cn(
                   "ml-1 sm:ml-2 px-1.5 sm:px-2 py-0.5 rounded-full text-xs font-medium",
-                  filter === tab.key 
-                    ? 'bg-white/20 text-white' 
+                  filter === tab.key
+                    ? 'bg-white/20 text-white'
                     : isDark ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600'
                 )}>
                   {tab.count}
@@ -229,13 +240,13 @@ export default function NotificationsPage() {
             <Typography variant="h6" className="mb-2 text-base sm:text-lg">
               No notifications
             </Typography>
-            <Typography 
-              variant="body2" 
+            <Typography
+              variant="body2"
               color="textSecondary"
               className="text-sm sm:text-base px-4"
             >
-              {filter === 'unread' 
-                ? "You're all caught up!" 
+              {filter === 'unread'
+                ? "You're all caught up!"
                 : "We'll notify you when something important happens."
               }
             </Typography>
@@ -248,8 +259,8 @@ export default function NotificationsPage() {
                 "transition-all duration-200 hover:shadow-md cursor-pointer mx-2 sm:mx-0 rounded-xl sm:rounded-2xl",
                 "active:scale-[0.98] active:shadow-sm", // Mobile press feedback
                 "ios-touch-target ios-nav-item", // iOS-friendly interactions
-                !notification.isRead && (isDark 
-                  ? 'bg-lime/5 border-lime/20 shadow-lime/5' 
+                !notification.isRead && (isDark
+                  ? 'bg-lime/5 border-lime/20 shadow-lime/5'
                   : 'bg-info-50 border-info-200 shadow-blue/5'
                 ),
                 isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
@@ -266,9 +277,9 @@ export default function NotificationsPage() {
                   {/* Mobile-optimized avatar/icon */}
                   <div className="flex-shrink-0">
                     {notification.avatar ? (
-                      <img 
-                        src={notification.avatar} 
-                        alt="" 
+                      <img
+                        src={notification.avatar}
+                        alt=""
                         className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
                       />
                     ) : (
@@ -288,8 +299,8 @@ export default function NotificationsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0 pr-2">
-                        <Typography 
-                          variant="body1" 
+                        <Typography
+                          variant="body1"
                           className={cn(
                             'mb-1 text-sm sm:text-base leading-tight',
                             !notification.isRead ? 'font-semibold' : 'font-medium'
@@ -297,14 +308,14 @@ export default function NotificationsPage() {
                         >
                           {notification.title}
                         </Typography>
-                        <Typography 
-                          variant="body2" 
-                          color="textSecondary" 
+                        <Typography
+                          variant="body2"
+                          color="textSecondary"
                           className="mb-2 text-xs sm:text-sm leading-relaxed line-clamp-2"
                         >
                           {notification.message}
                         </Typography>
-                        
+
                         {/* Mobile-optimized metadata */}
                         <div className="flex items-center space-x-2 text-xs text-gray-500">
                           <Clock className="h-3 w-3 flex-shrink-0" />
@@ -322,12 +333,12 @@ export default function NotificationsPage() {
                       <div className="flex items-center space-x-1 flex-shrink-0">
                         <Button
                           variant="ghost"
-                          size="sm"
+                          size="small"
                           onClick={(e) => {
                             e.stopPropagation();
                             if (notification.isRead) {
-                              setNotifications(prev => 
-                                prev.map(n => 
+                              setNotifications(prev =>
+                                prev.map(n =>
                                   n.id === notification.id ? { ...n, isRead: false } : n
                                 )
                               );
@@ -337,14 +348,14 @@ export default function NotificationsPage() {
                           }}
                           className="p-1 sm:p-1.5 ios-touch-target"
                         >
-                          {notification.isRead ? 
-                            <EyeOff className="h-3 w-3 sm:h-4 sm:w-4" /> : 
+                          {notification.isRead ?
+                            <EyeOff className="h-3 w-3 sm:h-4 sm:w-4" /> :
                             <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
                           }
                         </Button>
                         <Button
                           variant="ghost"
-                          size="sm"
+                          size="small"
                           onClick={(e) => {
                             e.stopPropagation();
                             deleteNotification(notification.id);
@@ -353,7 +364,7 @@ export default function NotificationsPage() {
                         >
                           <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
-                        
+
                         {/* Chevron for mobile */}
                         <div className="sm:hidden">
                           <ChevronRight className="h-4 w-4 text-gray-400" />

@@ -28,7 +28,7 @@ import { FloatingActionMenu } from './FloatingActionMenu';
 import ExploreFeed from './ExploreFeed';
 import LeftSidebar from './LeftSidebar';
 import RightSidebar from './RightSidebar';
-import { useInfiniteScroll, usePullToRefresh, useScrollDirection } from '../hooks/useScrollOptimizations';
+import { useInfiniteScroll, usePullToRefresh } from '../hooks/useScrollOptimizations';
 
 
 interface Post {
@@ -465,7 +465,7 @@ export default function Feed() {
               isDark ? 'border-[#1C1F20]' : 'border-gray-200'
             )}>
               <div className="flex gap-3">
-                <Avatar src={(user as any)?.user_metadata?.avatar_url} alt={(user as any)?.user_metadata?.full_name} size="md" />
+                <Avatar src={user?.profile?.avatar_url || undefined} alt={user?.profile?.full_name || undefined} size="md" />
                 <div className="flex-1">
                   <div
                     className={cn(
@@ -604,6 +604,37 @@ export default function Feed() {
                                   </span>
                                 );
                               }
+
+                              // Check if word is a mention
+                              const mentionMatch = word.match(/^@(\w+)/);
+                              if (mentionMatch) {
+                                const username = mentionMatch[1];
+                                return (
+                                  <span key={index}>
+                                    <Link
+                                      to={`/profile/${username}`} // Note: This assumes we can route by username or we need to look up ID. 
+                                      // If routing by username is not supported, we might need a different approach or just link to search.
+                                      // However, usually mentions link to profile. Let's assume /profile/username or search.
+                                      // Given the current app structure, /profile/:id is used. 
+                                      // We might not have the ID here easily unless we parse it from a rich text format or look it up.
+                                      // For now, let's link to a search for that username or a specific route if it exists.
+                                      // Actually, better to link to a search page or handle it if we can't resolve ID.
+                                      // But wait, we stored mentions as UUIDs in the DB. 
+                                      // The frontend text just has @username. 
+                                      // To link correctly to ID, we'd need the ID.
+                                      // But for now, let's link to /profile/username and ensure the router handles it or use search.
+                                      // Let's try linking to search for now as a safe fallback if we don't have ID map.
+                                      to={`/search?q=@${username}`}
+                                      className="text-info-500 hover:underline font-medium"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      @{username}
+                                    </Link>
+                                    {word.substring(mentionMatch[0].length)}
+                                  </span>
+                                );
+                              }
+
                               return <span key={index}>{word}</span>;
                             })}
                           </div>
@@ -632,7 +663,7 @@ export default function Feed() {
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   if (media.type === 'image') {
-                                    setLightboxImages(post.media as any);
+                                    setLightboxImages(post.media || []);
                                     setSelectedImageIndex(index);
                                     setLightboxOpen(true);
                                   }
@@ -732,7 +763,7 @@ export default function Feed() {
             </button>
             <h2 className="text-xl font-semibold mb-4">Create Post</h2>
             <div className="flex items-start space-x-4">
-              <Avatar src={(user as any)?.user_metadata?.avatar_url} alt={(user as any)?.user_metadata?.full_name} size="lg" />
+              <Avatar src={user?.profile?.avatar_url || undefined} alt={user?.profile?.full_name || undefined} size="lg" />
               <div className="flex-1">
                 <textarea
                   className="w-full p-2 border border-gray-300 rounded-3xl dark:bg-gray-700 dark:border-gray-600 dark:text-white"

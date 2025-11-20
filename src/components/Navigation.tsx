@@ -21,7 +21,6 @@ import { useScrollDirection } from '../hooks/useScrollDirection';
 import Button from './ui/Button';
 import { cn } from '../lib/cva';
 import { FloatingActionMenu } from './FloatingActionMenu';
-import PostEventForm from './PostEventForm';
 import Dock from './Dock';
 
 // Helper component for thin icons
@@ -45,7 +44,6 @@ export default function Navigation() {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
-  const [showPostEventModal, setShowPostEventModal] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -117,13 +115,6 @@ export default function Navigation() {
     // Haptic feedback for mobile devices
     if (navigator.vibrate) {
       navigator.vibrate(10);
-    }
-
-    // Handle Post Event modal separately
-    if (path === '/post-event') {
-      setShowPostEventModal(true);
-      setIsMobileMenuOpen(false);
-      return;
     }
 
     // Visual feedback - could add press state here
@@ -359,17 +350,6 @@ export default function Navigation() {
 
         {/* Mobile Floating Action Menu - Enhanced with advanced interactions */}
         <FloatingActionMenu />
-
-        {/* Post Event Modal */}
-        {showPostEventModal && (
-          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
-            <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <PostEventForm
-                onClose={() => setShowPostEventModal(false)}
-              />
-            </div>
-          </div>
-        )}
       </>
     );
   }
@@ -412,17 +392,6 @@ export default function Navigation() {
 
       {/* Floating Action Button with Curved Menu - Bottom Right */}
       <FloatingActionMenu />
-
-      {/* Post Event Modal */}
-      {showPostEventModal && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <PostEventForm
-              onClose={() => setShowPostEventModal(false)}
-            />
-          </div>
-        </div>
-      )}
     </>
   );
 }
