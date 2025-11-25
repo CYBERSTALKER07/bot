@@ -8,8 +8,8 @@ interface SkeletonProps {
   animation?: 'pulse' | 'wave' | 'none';
 }
 
-export function Skeleton({ 
-  className, 
+export function Skeleton({
+  className,
   variant = 'rectangular',
   width,
   height,
@@ -108,7 +108,7 @@ export function ProfileHeaderSkeleton() {
     <div className="space-y-4">
       {/* Cover Photo Skeleton */}
       <Skeleton width="100%" height={192} className="rounded-none" />
-      
+
       {/* Profile Info Section */}
       <div className="px-4 pb-4 space-y-4">
         {/* Avatar and Edit Button */}
@@ -116,31 +116,31 @@ export function ProfileHeaderSkeleton() {
           <Skeleton variant="circular" width={128} height={128} />
           <Skeleton width={120} height={36} className="rounded-full mt-4" />
         </div>
-        
+
         {/* Name and Username */}
         <div className="space-y-2">
           <Skeleton width="40%" height={28} />
           <Skeleton width="30%" height={20} />
         </div>
-        
+
         {/* Bio */}
         <div className="space-y-2">
           <Skeleton width="100%" height={16} />
           <Skeleton width="90%" height={16} />
         </div>
-        
+
         {/* Metadata (Location, Join Date) */}
         <div className="flex gap-4">
           <Skeleton width={150} height={16} />
           <Skeleton width={150} height={16} />
         </div>
-        
+
         {/* Following/Followers Stats */}
         <div className="flex gap-5">
           <Skeleton width={100} height={16} />
           <Skeleton width={100} height={16} />
         </div>
-        
+
         {/* Verification Banner */}
         <Skeleton width="100%" height={100} className="rounded-xl" />
       </div>
@@ -170,7 +170,7 @@ export function ProfilePostsSkeleton() {
           <div className="flex gap-3">
             {/* Avatar */}
             <Skeleton variant="circular" width={40} height={40} />
-            
+
             {/* Content */}
             <div className="flex-1 space-y-3">
               {/* Header */}
@@ -179,17 +179,17 @@ export function ProfilePostsSkeleton() {
                 <Skeleton width="15%" height={14} />
                 <Skeleton width="15%" height={14} />
               </div>
-              
+
               {/* Post Text */}
               <div className="space-y-2">
                 <Skeleton width="100%" height={16} />
                 <Skeleton width="95%" height={16} />
                 <Skeleton width="70%" height={16} />
               </div>
-              
+
               {/* Image Placeholder */}
               <Skeleton width="100%" height={200} className="rounded-2xl" />
-              
+
               {/* Action Buttons */}
               <div className="flex justify-between max-w-md">
                 <Skeleton width={60} height={32} className="rounded-full" />
@@ -211,7 +211,7 @@ export function ProfileSidebarSkeleton() {
     <div className="space-y-4">
       {/* Search Bar */}
       <Skeleton width="100%" height={40} className="rounded-full" />
-      
+
       {/* "You might like" Section */}
       <div className="rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800">
         <div className="p-4 border-b border-gray-200 dark:border-gray-800">
@@ -232,7 +232,7 @@ export function ProfileSidebarSkeleton() {
           ))}
         </div>
       </div>
-      
+
       {/* "What's Happening" Section */}
       <div className="rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800">
         <div className="p-4 border-b border-gray-200 dark:border-gray-800">
@@ -248,7 +248,7 @@ export function ProfileSidebarSkeleton() {
           ))}
         </div>
       </div>
-      
+
       {/* Industry Pulse Section */}
       <div className="rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800">
         <div className="p-4 border-b border-gray-200 dark:border-gray-800">
@@ -266,7 +266,7 @@ export function ProfileSidebarSkeleton() {
           ))}
         </div>
       </div>
-      
+
       {/* Profile Completion Card */}
       <Skeleton width="100%" height={140} className="rounded-2xl" />
     </div>
@@ -278,10 +278,10 @@ export function LeftSidebarSkeleton() {
     <div className="space-y-6">
       {/* User Profile Card */}
       <Skeleton width="100%" height={180} className="rounded-2xl" />
-      
+
       {/* AI Career Coach */}
       <Skeleton width="100%" height={160} className="rounded-2xl" />
-      
+
       {/* Industry Insights */}
       <div className="rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800">
         <div className="p-4 border-b border-gray-200 dark:border-gray-800">
@@ -296,7 +296,7 @@ export function LeftSidebarSkeleton() {
           ))}
         </div>
       </div>
-      
+
       {/* Recent Connections */}
       <div className="rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800">
         <div className="p-4 border-b border-gray-200 dark:border-gray-800">
@@ -314,7 +314,7 @@ export function LeftSidebarSkeleton() {
           ))}
         </div>
       </div>
-      
+
       {/* Settings and Logout Buttons */}
       <div className="space-y-2">
         <Skeleton width="100%" height={40} className="rounded-lg" />
@@ -330,7 +330,7 @@ export function EventCardSkeleton() {
       <div className="flex items-start gap-3">
         {/* Avatar */}
         <Skeleton variant="circular" width={48} height={48} />
-        
+
         {/* Content */}
         <div className="flex-1 space-y-2 min-w-0">
           <Skeleton width="70%" height={16} />
@@ -341,7 +341,7 @@ export function EventCardSkeleton() {
             <Skeleton width={60} height={20} className="rounded-full" />
           </div>
         </div>
-        
+
         {/* Attendees Count */}
         <Skeleton width={50} height={24} className="rounded-full flex-shrink-0" />
       </div>
@@ -354,12 +354,12 @@ export function EventDetailsSkeleton() {
     <div className="space-y-4">
       {/* Banner Image */}
       <Skeleton width="100%" height={300} className="rounded-lg" />
-      
+
       {/* Event Header */}
       <div className="px-4 space-y-4">
         {/* Title */}
         <Skeleton width="80%" height={32} />
-        
+
         {/* Organizer Info */}
         <div className="flex items-center gap-3">
           <Skeleton variant="circular" width={48} height={48} />
@@ -368,7 +368,7 @@ export function EventDetailsSkeleton() {
             <Skeleton width="50%" height={12} />
           </div>
         </div>
-        
+
         {/* Event Details Grid */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -380,14 +380,14 @@ export function EventDetailsSkeleton() {
             <Skeleton width="70%" height={16} />
           </div>
         </div>
-        
+
         {/* Description */}
         <div className="space-y-2">
           <Skeleton width="100%" height={16} />
           <Skeleton width="100%" height={16} />
           <Skeleton width="70%" height={16} />
         </div>
-        
+
         {/* Buttons */}
         <div className="flex gap-3">
           <Skeleton width="50%" height={44} className="rounded-lg" />
@@ -404,7 +404,7 @@ export function CompanyCardSkeleton() {
       <div className="flex items-start gap-3">
         {/* Logo */}
         <Skeleton variant="rectangular" width={48} height={48} className="rounded-lg flex-shrink-0" />
-        
+
         {/* Company Info */}
         <div className="flex-1 space-y-2 min-w-0">
           <Skeleton width="60%" height={16} />
@@ -421,7 +421,7 @@ export function CompanyDetailsSkeleton() {
     <div className="space-y-6">
       {/* Cover Image */}
       <Skeleton width="100%" height={200} className="rounded-lg" />
-      
+
       {/* Company Header */}
       <div className="px-4 space-y-4">
         {/* Logo and Title */}
@@ -436,7 +436,7 @@ export function CompanyDetailsSkeleton() {
             </div>
           </div>
         </div>
-        
+
         {/* Stats */}
         <div className="grid grid-cols-4 gap-3">
           {[...Array(4)].map((_, i) => (
@@ -446,7 +446,7 @@ export function CompanyDetailsSkeleton() {
             </div>
           ))}
         </div>
-        
+
         {/* Description */}
         <div className="space-y-2">
           <Skeleton width="30%" height={16} />
@@ -466,7 +466,7 @@ export function SearchResultsSkeleton() {
         <div key={i} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900/50">
           {/* Avatar */}
           <Skeleton variant="circular" width={40} height={40} />
-          
+
           {/* Content */}
           <div className="flex-1 space-y-2 min-w-0">
             <Skeleton width="50%" height={14} />
@@ -487,7 +487,7 @@ export function NotificationsSkeleton() {
           <div className="flex gap-3">
             {/* Avatar */}
             <Skeleton variant="circular" width={40} height={40} />
-            
+
             {/* Content */}
             <div className="flex-1 space-y-2">
               <Skeleton width="60%" height={14} />
@@ -519,7 +519,7 @@ export function MessagesSkeleton() {
           </div>
         ))}
       </div>
-      
+
       {/* Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
@@ -530,7 +530,7 @@ export function MessagesSkeleton() {
             <Skeleton width="30%" height={12} />
           </div>
         </div>
-        
+
         {/* Messages */}
         <div className="flex-1 p-4 space-y-4 overflow-y-auto">
           {[...Array(4)].map((_, i) => (
@@ -561,7 +561,7 @@ export function JobDetailsSkeleton() {
           </div>
         </div>
       </div>
-      
+
       {/* Key Details */}
       <div className="grid grid-cols-2 gap-4">
         {[...Array(4)].map((_, i) => (
@@ -571,7 +571,7 @@ export function JobDetailsSkeleton() {
           </div>
         ))}
       </div>
-      
+
       {/* Description */}
       <div className="space-y-3">
         <Skeleton width="30%" height={18} />
@@ -582,7 +582,7 @@ export function JobDetailsSkeleton() {
           <Skeleton width="70%" height={14} />
         </div>
       </div>
-      
+
       {/* Requirements */}
       <div className="space-y-3">
         <Skeleton width="40%" height={18} />
@@ -592,7 +592,7 @@ export function JobDetailsSkeleton() {
           ))}
         </div>
       </div>
-      
+
       {/* Action Button */}
       <Skeleton width="100%" height={48} className="rounded-lg" />
     </div>
@@ -607,7 +607,7 @@ export function ApplicationsSkeleton() {
           <div className="flex gap-3">
             {/* Avatar */}
             <Skeleton variant="circular" width={48} height={48} />
-            
+
             {/* Content */}
             <div className="flex-1 space-y-2">
               <div className="flex justify-between items-start">
@@ -634,7 +634,7 @@ export function ApplicantCardSkeleton() {
       <div className="flex gap-4">
         {/* Large Avatar */}
         <Skeleton variant="circular" width={80} height={80} />
-        
+
         {/* Info */}
         <div className="flex-1 space-y-3">
           <Skeleton width="50%" height={18} />
@@ -645,7 +645,7 @@ export function ApplicantCardSkeleton() {
           </div>
           <Skeleton width="80%" height={12} />
         </div>
-        
+
         {/* Actions */}
         <div className="flex flex-col gap-2">
           <Skeleton width={100} height={36} className="rounded-lg" />
@@ -662,14 +662,14 @@ export function WhoToFollowItemSkeleton() {
       <div className="flex items-center gap-3 flex-1 min-w-0">
         {/* Avatar */}
         <Skeleton variant="circular" width={40} height={40} />
-        
+
         {/* Info */}
         <div className="flex-1 space-y-2 min-w-0">
           <Skeleton width="60%" height={14} />
           <Skeleton width="70%" height={12} />
         </div>
       </div>
-      
+
       {/* Follow Button */}
       <Skeleton width={80} height={32} className="rounded-full flex-shrink-0 ml-2" />
     </div>
@@ -691,7 +691,7 @@ export function ExploreSidebarSkeleton() {
     <div className="w-80 space-y-4">
       {/* Search */}
       <Skeleton width="100%" height={40} className="rounded-full" />
-      
+
       {/* Companies Section */}
       <div className="rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
         <div className="p-4 border-b border-gray-200 dark:border-gray-800">
@@ -703,7 +703,7 @@ export function ExploreSidebarSkeleton() {
           ))}
         </div>
       </div>
-      
+
       {/* Who to Follow Section */}
       <div className="rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
         <div className="p-4 border-b border-gray-200 dark:border-gray-800">
@@ -728,7 +728,7 @@ export function ResumeBuildeSkeleton() {
           <Skeleton key={i} width="100%" height={44} className="rounded-lg" />
         ))}
       </div>
-      
+
       {/* Main Content */}
       <div className="lg:col-span-2 space-y-6">
         {[...Array(5)].map((_, i) => (
@@ -797,7 +797,7 @@ export function RightSidebarSearchSkeleton() {
           <div key={i} className="flex items-center gap-3 p-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-900/50">
             {/* Avatar */}
             <Skeleton variant="circular" width={40} height={40} />
-            
+
             {/* Content */}
             <div className="flex-1 space-y-2 min-w-0">
               <Skeleton width="50%" height={14} />
@@ -878,14 +878,14 @@ export function RightSidebarWhoToFollowSkeleton() {
             <div className="flex items-center gap-3 flex-1 min-w-0">
               {/* Avatar */}
               <Skeleton variant="circular" width={40} height={40} className="bg-gray-800" />
-              
+
               {/* Info */}
               <div className="flex-1 space-y-2 min-w-0">
                 <Skeleton width="60%" height={14} className="bg-gray-800" />
                 <Skeleton width="70%" height={12} className="bg-gray-800" />
               </div>
             </div>
-            
+
             {/* Follow Button */}
             <Skeleton width={80} height={32} className="rounded-full flex-shrink-0 ml-2 bg-gray-800" />
           </div>
@@ -903,13 +903,13 @@ export function RightSidebarSkeleton() {
       <div className="p-4 space-y-6">
         {/* Search Field */}
         <Skeleton width="100%" height={40} className="rounded-lg" />
-        
+
         {/* Job Recommendations */}
         <RightSidebarJobsSkeleton />
-        
+
         {/* Who to Follow */}
         <RightSidebarWhoToFollowSkeleton />
-        
+
         {/* Recent Activity / Recommended Vacancies */}
         <div className="rounded-xl p-4 border bg-[#800020] border-gray-700">
           <Skeleton width="40%" height={24} className="mb-4 bg-white/20" />
@@ -923,7 +923,7 @@ export function RightSidebarSkeleton() {
             ))}
           </div>
         </div>
-        
+
         {/* Footer Links */}
         <div className="space-y-2">
           <div className="flex flex-wrap gap-2">
@@ -974,22 +974,22 @@ export function SearchResultSkeleton() {
     <div className="p-4 border-b border-gray-200 dark:border-gray-800">
       <div className="flex gap-4">
         {/* Avatar */}
-        <Skeleton variant="circular" width={56} height={56} />
-        
+        <Skeleton variant="circular" width={56} height={56} animation="wave" />
+
         {/* Content */}
         <div className="flex-1 space-y-2 py-1">
           {/* Title and verified badge */}
           <div className="flex items-center gap-2">
-            <Skeleton width="40%" height={16} />
+            <Skeleton width="40%" height={16} animation="wave" />
           </div>
-          
+
           {/* Subtitle */}
-          <Skeleton width="25%" height={14} />
-          
+          <Skeleton width="25%" height={14} animation="wave" />
+
           {/* Description */}
           <div className="space-y-1 mt-1.5">
-            <Skeleton width="100%" height={12} />
-            <Skeleton width="80%" height={12} />
+            <Skeleton width="100%" height={12} animation="wave" />
+            <Skeleton width="80%" height={12} animation="wave" />
           </div>
         </div>
       </div>
@@ -1026,7 +1026,7 @@ export function SearchPageSidebarSkeleton() {
               <Skeleton width="50%" height={20} />
             </div>
           </div>
-          
+
           {/* Users List */}
           <div className="divide-y divide-gray-200 dark:divide-gray-800">
             {[...Array(5)].map((_, i) => (
@@ -1034,14 +1034,14 @@ export function SearchPageSidebarSkeleton() {
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   {/* Avatar */}
                   <Skeleton variant="circular" width={40} height={40} />
-                  
+
                   {/* Info */}
                   <div className="flex-1 space-y-2 min-w-0">
                     <Skeleton width="60%" height={14} />
                     <Skeleton width="70%" height={12} />
                   </div>
                 </div>
-                
+
                 {/* Follow Button */}
                 <Skeleton width={80} height={32} className="rounded-full flex-shrink-0 ml-2" />
               </div>
@@ -1090,7 +1090,7 @@ export function PostDetailsSkeleton() {
       <div className="flex space-x-3">
         {/* Author Avatar */}
         <Skeleton variant="circular" width={56} height={56} />
-        
+
         {/* Post Content */}
         <div className="flex-1 min-w-0 space-y-4">
           {/* Author Info */}
@@ -1098,31 +1098,31 @@ export function PostDetailsSkeleton() {
             <Skeleton width="40%" height={20} />
             <Skeleton width="25%" height={16} />
           </div>
-          
+
           {/* Post Text */}
           <div className="space-y-2">
             <Skeleton width="100%" height={18} />
             <Skeleton width="100%" height={18} />
             <Skeleton width="80%" height={18} />
           </div>
-          
+
           {/* Media Placeholder */}
           <Skeleton width="100%" height={300} className="rounded-2xl" />
-          
+
           {/* Metadata */}
           <div className="flex items-center space-x-4 py-3 border-t border-b border-gray-200 dark:border-gray-800">
             <Skeleton width={150} height={14} />
             <Skeleton width={120} height={14} />
             <Skeleton width={100} height={14} />
           </div>
-          
+
           {/* Engagement Stats */}
           <div className="flex items-center space-x-6">
             <Skeleton width={120} height={14} />
             <Skeleton width={120} height={14} />
             <Skeleton width={120} height={14} />
           </div>
-          
+
           {/* Action Buttons */}
           <div className="flex items-center justify-around py-3 border-t border-b border-gray-200 dark:border-gray-800">
             {[...Array(5)].map((_, i) => (
@@ -1152,7 +1152,7 @@ export function CommentsSectionSkeleton() {
           </div>
         </div>
       </div>
-      
+
       {/* Comment Items */}
       {[...Array(4)].map((_, i) => (
         <div key={i} className="p-4 border-b border-gray-200 dark:border-gray-800">
@@ -1252,7 +1252,7 @@ export function CompactPostDetailsSkeleton() {
       <div className="flex space-x-3">
         {/* Avatar */}
         <Skeleton variant="circular" width={48} height={48} />
-        
+
         {/* Content */}
         <div className="flex-1 space-y-2">
           <Skeleton width="60%" height={16} />
