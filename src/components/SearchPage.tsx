@@ -489,7 +489,7 @@ export default function SearchPage() {
 
           {/* Results Area */}
           <div className="flex-1 overflow-y-auto w-full pb-20 lg:pb-0 scrollbar-hide">
-            {!searchInput && !isSearchFocused ? (
+            {!searchInput ? (
               // Full Post Cards Display
               <div className="w-full max-w-2xl mx-auto">
                 {/* Trending Posts as Full Cards */}
@@ -785,10 +785,53 @@ export default function SearchPage() {
 
         {/* Right Sidebar - Desktop Only */}
         <div className={cn(
-          'search-sidebar hidden mr-24 lg:block w-100 border-l overflow-y-auto',
+          'search-sidebar hidden mr-4 lg:block w-96 border-l overflow-y-auto',
           isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-100'
         )}>
           <div className="p-4 space-y-6">
+            {/* Companies Section - Moved to Top */}
+            {employers.length > 0 && (
+              <div className={cn(
+                'rounded-2xl overflow-hidden border',
+                isDark ? 'bg-black border-gray-800' : 'bg-gray-50 border-gray-200'
+              )}>
+                <div className={cn(
+                  'p-4 border-b flex items-center gap-2',
+                  isDark ? 'border-gray-800' : 'border-gray-200'
+                )}>
+                  <Briefcase className="w-5 h-5" />
+                  <h2 className="font-serif text-lg">Companies</h2>
+                </div>
+                <div className={cn(
+                  'divide-y',
+                  isDark ? 'divide-gray-800' : 'divide-gray-200'
+                )}>
+                  {employers.map((employer: any) => (
+                    <button
+                      key={employer.id}
+                      onClick={() => navigate(`/profile/${employer.id}`)}
+                      className={cn(
+                        'w-full flex items-center gap-3 p-4 transition-colors text-left',
+                        isDark ? 'hover:bg-gray-900' : 'hover:bg-gray-100'
+                      )}
+                    >
+                      <img
+                        src={employer.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${employer.company_name}`}
+                        alt={employer.company_name}
+                        className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm truncate">{employer.company_name}</p>
+                        <p className={cn('text-xs truncate', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                          {employer.full_name}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Suggested Users Section */}
             {suggestedUsers.length > 0 && (
               <div className={cn(
@@ -824,49 +867,6 @@ export default function SearchPage() {
                         <p className="font-semibold text-sm truncate">{user.full_name}</p>
                         <p className={cn('text-xs truncate', isDark ? 'text-gray-400' : 'text-gray-600')}>
                           @{user.username}
-                        </p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Companies Section */}
-            {employers.length > 0 && (
-              <div className={cn(
-                'rounded-2xl overflow-hidden border',
-                isDark ? 'bg-black border-gray-800' : 'bg-gray-50 border-gray-200'
-              )}>
-                <div className={cn(
-                  'p-4 border-b flex items-center gap-2',
-                  isDark ? 'border-gray-800' : 'border-gray-200'
-                )}>
-                  <Briefcase className="w-5 h-5" />
-                  <h2 className="font-serif text-lg">Companies</h2>
-                </div>
-                <div className={cn(
-                  'divide-y',
-                  isDark ? 'divide-gray-800' : 'divide-gray-200'
-                )}>
-                  {employers.map((employer: any) => (
-                    <button
-                      key={employer.id}
-                      onClick={() => navigate(`/profile/${employer.id}`)}
-                      className={cn(
-                        'w-full flex items-center gap-3 p-4 transition-colors text-left',
-                        isDark ? 'hover:bg-gray-900' : 'hover:bg-gray-100'
-                      )}
-                    >
-                      <img
-                        src={employer.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${employer.company_name}`}
-                        alt={employer.company_name}
-                        className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-sm truncate">{employer.company_name}</p>
-                        <p className={cn('text-xs truncate', isDark ? 'text-gray-400' : 'text-gray-600')}>
-                          {employer.full_name}
                         </p>
                       </div>
                     </button>
