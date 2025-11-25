@@ -288,17 +288,6 @@ export class ProfileService {
         id,
         created_at,
         updated_at,
-        // Remove fields that don't exist in the database schema you provided
-        phone,
-        linkedin_url,
-        github_url,
-        portfolio_url,
-        industry,
-        company_size,
-        company_description,
-        follower_count,
-        following_count,
-        post_count,
         ...validUpdates
       } = updates;
 
@@ -378,9 +367,6 @@ export class ProfileService {
         linkedin_url,
         github_url,
         portfolio_url,
-        major,
-        graduation_year,
-        skills,
         industry,
         company_size,
         company_description,

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { 
+import {
   ArrowLeft,
   Calendar,
   MapPin,
@@ -29,6 +29,7 @@ import {
   Repeat2,
   Feather
 } from 'lucide-react';
+import gsap from 'gsap';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { supabase } from '../../lib/supabase';
@@ -113,10 +114,10 @@ export default function Profile() {
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
   const [activeTab, setActiveTab] = useState<'posts' | 'replies' | 'highlights' | 'media' | 'likes'>('posts');
-  
+
   // Determine if viewing own profile or another user's profile
   const isOwnProfile = !userId || userId === user?.id;
-  
+
   // Enhanced responsive breakpoints
   const [screenSize, setScreenSize] = useState(() => {
     const width = window.innerWidth;
@@ -162,7 +163,7 @@ export default function Profile() {
 
   // Suggested users data
   const { data: recommendedUsers } = useRecommendedUsers(user?.id);
-  
+
   // Fetch matched jobs with intelligent matching
   const { data: matchedJobs = [], isLoading: matchedJobsLoading } = useMatchedJobs(user?.id, 2);
 
@@ -236,7 +237,7 @@ export default function Profile() {
 
   const loadProfileData = async () => {
     if (!user) return;
-    
+
     try {
       setLoading(true);
       const { data: profile, error } = await supabase
@@ -250,7 +251,7 @@ export default function Profile() {
       }
 
       if (profile) {
-        console.log('✅ Own profile loaded:', { 
+        console.log('✅ Own profile loaded:', {
           full_name: profile.full_name,
           avatar_url: profile.avatar_url,
           cover_image_url: profile.cover_image_url
@@ -272,7 +273,7 @@ export default function Profile() {
     try {
       setLoading(true);
       console.log('👥 Fetching other user profile:', targetUserId);
-      
+
       // Fetch real profile data from the database
       const { data: profile, error } = await supabase
         .from('profiles')
@@ -300,7 +301,7 @@ export default function Profile() {
           username: `user_${targetUserId.slice(0, 8)}`
         });
       } else if (profile) {
-        console.log('✅ Other user profile loaded:', { 
+        console.log('✅ Other user profile loaded:', {
           full_name: profile.full_name,
           avatar_url: profile.avatar_url,
           cover_image_url: profile.cover_image_url
@@ -334,7 +335,7 @@ export default function Profile() {
 
     try {
       setPostsLoading(true);
-      
+
       // First, check if user is authenticated
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       if (!currentUser) {
@@ -342,7 +343,7 @@ export default function Profile() {
         setPosts([]);
         return;
       }
-      
+
       // Fetch posts for the user with proper error handling
       const { data: postsData, error: postsError } = await supabase
         .from('posts')
@@ -395,7 +396,7 @@ export default function Profile() {
       }));
 
       setPosts(transformedPosts);
-      
+
       // Update profile stats with actual post count
       setProfileStats(prev => ({
         ...prev,
@@ -414,11 +415,11 @@ export default function Profile() {
   const fetchTrendingTopics = async () => {
     try {
       setTrendingLoading(true);
-      
+
       // Fetch recent posts with tags (last 7 days for relevance)
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-      
+
       const { data: postsWithTags, error } = await supabase
         .from('posts')
         .select('id, tags, likes_count, comments_count, shares_count, created_at')
@@ -435,7 +436,7 @@ export default function Profile() {
 
       // Process hashtags and calculate engagement
       const hashtagStats = new Map<string, { count: number; engagement: number }>();
-      
+
       postsWithTags?.forEach(post => {
         const engagement = (post.likes_count || 0) + (post.comments_count || 0) + (post.shares_count || 0);
         post.tags?.forEach((tag: string) => {
@@ -517,7 +518,7 @@ export default function Profile() {
   const fetchIndustryInsights = async () => {
     try {
       setInsightsLoading(true);
-      
+
       // Get current date and 30 days ago for comparison
       const now = new Date();
       const thirtyDaysAgo = new Date();
@@ -548,7 +549,7 @@ export default function Profile() {
 
       // Analyze job titles to find trending roles
       const roleCounts = new Map<string, { current: number; previous: number }>();
-      
+
       // Count current period jobs
       recentJobs?.forEach(job => {
         const role = job.title.toLowerCase();
@@ -565,7 +566,7 @@ export default function Profile() {
 
       // Analyze skills demand
       const skillCounts = new Map<string, { current: number; previous: number }>();
-      
+
       recentJobs?.forEach(job => {
         job.skills?.forEach((skill: string) => {
           const current = skillCounts.get(skill) || { current: 0, previous: 0 };
@@ -586,7 +587,7 @@ export default function Profile() {
       // Top trending roles
       const topRoles = Array.from(roleCounts.entries())
         .map(([role, counts]) => {
-          const change = counts.previous > 0 
+          const change = counts.previous > 0
             ? ((counts.current - counts.previous) / counts.previous) * 100
             : counts.current > 0 ? 100 : 0;
           return { role, counts, change };
@@ -597,7 +598,7 @@ export default function Profile() {
 
       topRoles.forEach(item => {
         insights.push({
-          title: item.role.split(' ').map(word => 
+          title: item.role.split(' ').map(word =>
             word.charAt(0).toUpperCase() + word.slice(1)
           ).join(' '),
           change: item.change > 0 ? `+${Math.round(item.change)}%` : `${Math.round(item.change)}%`,
@@ -610,7 +611,7 @@ export default function Profile() {
       // Top trending skills
       const topSkills = Array.from(skillCounts.entries())
         .map(([skill, counts]) => {
-          const change = counts.previous > 0 
+          const change = counts.previous > 0
             ? ((counts.current - counts.previous) / counts.previous) * 100
             : counts.current > 0 ? 100 : 0;
           return { skill, counts, change };
@@ -676,7 +677,7 @@ export default function Profile() {
   const formatJoinDate = (dateString?: string) => {
     if (!dateString) return 'Joined recently';
     const date = new Date(dateString);
-    return `Joined ${date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
+    return ` ${date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
   };
 
   // Fetch real follower and following counts from database
@@ -792,10 +793,10 @@ export default function Profile() {
             ) : (
               <div className="absolute inset-0 bg-gradient-to-r from-info-500 to-purple-600 rounded-2xl" />
             )}
-            
+
             {/* Dark overlay for better text readability */}
             <div className="absolute inset-0 bg-black/40 rounded-2xl" />
-            
+
             {/* Content */}
             <div className="relative z-10">
               <div className="flex items-center gap-3 mb-4">
@@ -843,11 +844,11 @@ export default function Profile() {
             <p className="text-sm text-white/90 mb-3">
               Get personalized career guidance based on your profile and goals
             </p>
-       
+
           </div>
 
           {/* Skills Development Tracker */}
-    
+
 
           {/* Industry Insights */}
           <div className={cn("rounded-2xl border overflow-hidden", isDark ? "bg-black border-gray-800" : "bg-white border-gray-200")}>
@@ -867,10 +868,10 @@ export default function Profile() {
             </div>
           </div>
 
-        
+
 
           {/* Career Opportunities Scanner */}
-          
+
           {/* Create Post Button */}
           <Button
             onClick={() => navigate('/create-post')}
@@ -923,7 +924,7 @@ export default function Profile() {
               <span>Settings</span>
             </button>
             <button
-              onClick={() => {/* handle logout */}}
+              onClick={() => {/* handle logout */ }}
               className={cn("w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors", isDark ? "text-red-400 hover:bg-red-950" : "text-red-600 hover:bg-red-50")}
             >
               <LogOut className="w-5 h-5" />
@@ -937,7 +938,7 @@ export default function Profile() {
           {/* Header */}
           <div className={cn("sticky top-0 backdrop-blur-md z-20 border-b", isDark ? "bg-black/80 border-gray-800" : "bg-white/80 border-gray-200")}>
             <div className="flex items-center py-3 px-4">
-              <button 
+              <button
                 onClick={() => navigate(-1)}
                 className={cn("p-2 rounded-full transition-colors mr-4", isDark ? "hover:bg-gray-900" : "hover:bg-gray-100")}
               >
@@ -984,71 +985,71 @@ export default function Profile() {
                 ) : (
                   <div className={cn("w-32 h-32 rounded-full border-4 flex items-center justify-center font-bold text-4xl shadow-lg", isDark ? "bg-gray-900 border-black text-gray-400" : "bg-gray-300 border-white text-gray-700")}>
                     {(profileData.full_name || user?.name || 'U').charAt(0)}
-                  </div> 
+                  </div>
                 )}
               </div>
 
               {/* Edit Profile Button */}
-                {isOwnProfile ? (
-                  <div className="mt-4 group">
-                    <Button
-                      variant="outlined"
-                      onClick={handleEditProfile}
-                      className={cn(
-                        "rounded-3xl px-6 py-1.5 font-thin transition-all duration-300 flex items-center gap-2 overflow-hidden relative",
-                        isDark 
-                          ? "border-none text-white hover:bg-black/90 bg-black" 
-                          : "border-none text-black hover:bg-gray-100 hover:border-gray-400"
-                      )}
-                      onMouseEnter={(e) => {
-                        const span = e.currentTarget.querySelector('.edit-text');
-                        if (span) {
-                          // Animate text transformation
-                          gsap.to(span, {
-                            scale: 0.8,
-                            opacity: 0,
-                            duration: 0.2,
-                            ease: "power2.in",
-                            onComplete: () => {
-                              span.textContent = "Profile";
-                              gsap.to(span, {
-                                scale: 1,
-                                opacity: 1,
-                                duration: 0.2,
-                                ease: "power2.out"
-                              });
-                            }
-                          });
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        const span = e.currentTarget.querySelector('.edit-text');
-                        if (span) {
-                          gsap.to(span, {
-                            scale: 0.8,
-                            opacity: 0,
-                            duration: 0.2,
-                            ease: "power2.in",
-                            onComplete: () => {
-                              span.textContent = "Edit";
-                              gsap.to(span, {
-                                scale: 1,
-                                opacity: 1,
-                                duration: 0.2,
-                                ease: "power2.out"
-                              });
-                            }
-                          });
-                        }
-                      }}
-                    >
-                      <Feather className="w-4 h-4 transition-all duration-300 group-hover:scale-110 group-hover:rotate-12" />
-                      <span className="edit-text inline-block">Edit</span>
-                    </Button>
-                  </div>
-                ) : (
-                  <FollowButton targetUserId={userId} />
-                )}
+              {isOwnProfile ? (
+                <div className="mt-4 group">
+                  <Button
+                    variant="outlined"
+                    onClick={handleEditProfile}
+                    className={cn(
+                      "rounded-3xl px-6 py-1.5 font-thin transition-all duration-300 flex items-center gap-2 overflow-hidden relative",
+                      isDark
+                        ? "border-none text-white hover:bg-black/90 bg-black"
+                        : "border-none text-black hover:bg-gray-100 hover:border-gray-400"
+                    )}
+                    onMouseEnter={(e) => {
+                      const span = e.currentTarget.querySelector('.edit-text');
+                      if (span) {
+                        // Animate text transformation
+                        gsap.to(span, {
+                          scale: 0.8,
+                          opacity: 0,
+                          duration: 0.2,
+                          ease: "power2.in",
+                          onComplete: () => {
+                            span.textContent = "Profile";
+                            gsap.to(span, {
+                              scale: 1,
+                              opacity: 1,
+                              duration: 0.2,
+                              ease: "power2.out"
+                            });
+                          }
+                        });
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      const span = e.currentTarget.querySelector('.edit-text');
+                      if (span) {
+                        gsap.to(span, {
+                          scale: 0.8,
+                          opacity: 0,
+                          duration: 0.2,
+                          ease: "power2.in",
+                          onComplete: () => {
+                            span.textContent = "Edit";
+                            gsap.to(span, {
+                              scale: 1,
+                              opacity: 1,
+                              duration: 0.2,
+                              ease: "power2.out"
+                            });
+                          }
+                        });
+                      }
+                    }}
+                  >
+                    <Feather className="w-4 h-4 transition-all duration-300 group-hover:scale-110 group-hover:rotate-12" />
+                    <span className="edit-text inline-block">Edit</span>
+                  </Button>
+                </div>
+              ) : (
+                <FollowButton targetUserId={userId} />
+              )}
             </div>
 
             {/* User Info */}
@@ -1077,7 +1078,7 @@ export default function Profile() {
                 {profileData.location && (
                   <div className="flex items-center gap-1">
                     <MapPin className="w-4 h-4" />
-                    <span>Mobile Application</span>
+                    {profileData.location}
                   </div>
                 )}
                 <div className="flex items-center gap-1">
@@ -1116,7 +1117,7 @@ export default function Profile() {
                     <Verified className={cn("w-5 h-5", isDark ? "text-gray-400" : "text-[#7BA805]")} />
                   </div>
                   <p className={cn("text-sm mb-3", isDark ? "text-gray-400" : "text-gray-700")}>
-                    Get verified for boosted replies, analytics, ad-free browsing, and more. 
+                    Get verified for boosted replies, analytics, ad-free browsing, and more.
                     Upgrade your profile now.
                   </p>
                   <Button
@@ -1226,21 +1227,21 @@ export default function Profile() {
                       <p className={cn("mb-3 leading-relaxed whitespace-pre-wrap", isDark ? "text-gray-300" : "text-gray-900")}>
                         {post.content}
                       </p>
-                      
+
                       {/* Media Content */}
                       {post.image_url && (
                         <div className={cn("rounded-2xl overflow-hidden mb-3 border", isDark ? "border-gray-700" : "border-gray-300")}>
-                          <img 
-                            src={post.image_url} 
+                          <img
+                            src={post.image_url}
                             alt="Post image"
                             className="w-full h-auto max-h-96 object-cover"
                           />
                         </div>
                       )}
-                      
+
                       {post.video_url && (
                         <div className={cn("rounded-2xl overflow-hidden mb-3 border", isDark ? "border-gray-700" : "border-gray-300")}>
-                          <video 
+                          <video
                             src={post.video_url}
                             controls
                             className="w-full h-auto max-h-96"
@@ -1249,9 +1250,9 @@ export default function Profile() {
                           </video>
                         </div>
                       )}
-                      
+
                       <div className={cn("flex items-center justify-between max-w-md", isDark ? "text-gray-400" : "text-gray-600")}>
-                        <button 
+                        <button
                           className={cn("flex items-center gap-2 transition-colors group", isDark ? "hover:text-info-400" : "hover:text-info-500")}
                           onClick={(e) => {
                             e.stopPropagation();
@@ -1316,8 +1317,8 @@ export default function Profile() {
             <div className="divide-y divide-gray-200">
               {recommendedUsers && recommendedUsers.length > 0 ? (
                 recommendedUsers.slice(0, 3).map((recommendedUser) => (
-                  <WhoToFollowItem 
-                    key={recommendedUser.id} 
+                  <WhoToFollowItem
+                    key={recommendedUser.id}
                     user={{
                       id: recommendedUser.id,
                       full_name: recommendedUser.full_name,
@@ -1326,7 +1327,7 @@ export default function Profile() {
                       verified: recommendedUser.verified,
                       bio: recommendedUser.bio
                     }}
-                    onNavigate={() => {}}
+                    onNavigate={() => { }}
                   />
                 ))
               ) : (
@@ -1336,7 +1337,7 @@ export default function Profile() {
               )}
             </div>
             <div className="p-4">
-              <button 
+              <button
                 className="text-[#7BA805] hover:underline text-sm"
                 onClick={() => navigate('/explore')}
               >
@@ -1387,21 +1388,21 @@ export default function Profile() {
             </div>
             <div className="divide-y divide-gray-200">
               {[
-                { 
-                  title: 'AI/ML Engineers', 
-                  change: '+23%', 
+                {
+                  title: 'AI/ML Engineers',
+                  change: '+23%',
                   trend: 'up',
                   description: 'Demand surge this month'
                 },
-                { 
-                  title: 'Full-Stack Developers', 
-                  change: '+15%', 
+                {
+                  title: 'Full-Stack Developers',
+                  change: '+15%',
                   trend: 'up',
                   description: 'Remote opportunities rising'
                 },
-                { 
-                  title: 'UX Designers', 
-                  change: '+8%', 
+                {
+                  title: 'UX Designers',
+                  change: '+8%',
                   trend: 'up',
                   description: 'Fintech sector leading'
                 }
@@ -1437,8 +1438,8 @@ export default function Profile() {
                 <div className="text-center py-4 text-gray-400">Loading opportunities...</div>
               ) : matchedJobs && matchedJobs.length > 0 ? (
                 matchedJobs.map((job: any, index: number) => (
-                  <div 
-                    key={job.id || index} 
+                  <div
+                    key={job.id || index}
                     className={cn("border rounded-lg p-3 cursor-pointer transition-all hover:shadow-md", isDark ? "border-gray-700 hover:border-gray-600" : "border-gray-200 hover:border-gray-400")}
                     onClick={() => navigate(`/job/${job.id}`)}
                   >
@@ -1450,8 +1451,8 @@ export default function Profile() {
                       <div className="text-right ml-2">
                         <div className={cn(
                           'text-xs px-2 py-1 rounded-full font-medium',
-                          job.matchPercentage >= 70 
-                            ? 'bg-green-100/20 text-green-400' 
+                          job.matchPercentage >= 70
+                            ? 'bg-green-100/20 text-green-400'
                             : job.matchPercentage >= 50
                               ? 'bg-yellow-100/20 text-yellow-400'
                               : 'bg-info-100/20 text-info-400'
@@ -1460,7 +1461,7 @@ export default function Profile() {
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Match Reasons */}
                     {job.matchReasons && job.matchReasons.length > 0 && (
                       <div className="flex flex-wrap gap-1 mb-2">
@@ -1469,8 +1470,8 @@ export default function Profile() {
                             key={idx}
                             className={cn(
                               'text-xs px-2 py-0.5 rounded-full',
-                              isDark 
-                                ? 'bg-info-900/30 text-info-300' 
+                              isDark
+                                ? 'bg-info-900/30 text-info-300'
                                 : 'bg-info-50 text-info-600'
                             )}
                           >
@@ -1479,7 +1480,7 @@ export default function Profile() {
                         ))}
                       </div>
                     )}
-                    
+
                     <div className={cn("flex items-center justify-between text-xs", isDark ? "text-gray-400" : "text-gray-500")}>
                       <span>{job.location || 'Remote'}</span>
                       <span>{job.type || 'Full-time'}</span>

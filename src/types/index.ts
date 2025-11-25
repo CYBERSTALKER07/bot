@@ -66,7 +66,7 @@ export interface Job {
   deadline?: string;
   applicants_count?: number;
   employer_id: string;
-  status?: 'active' | 'inactive' | 'draft' | 'closed';
+  status?: 'active' | 'inactive' | 'draft' | 'closed' | 'open';
   views?: number;
   benefits?: string;
   experience_level?: string;

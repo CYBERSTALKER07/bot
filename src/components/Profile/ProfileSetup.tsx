@@ -14,8 +14,8 @@ interface ProfileData {
   full_name: string;
   bio: string;
   phone: string;
-  location: string; 
-  
+  location: string;
+
   // Student fields
   major?: string;
   graduation_year?: number;
@@ -23,7 +23,7 @@ interface ProfileData {
   portfolio_url?: string;
   linkedin_url?: string;
   github_url?: string;
-  
+
   // Employer fields
   company_name?: string;
   job_title?: string;
@@ -116,31 +116,31 @@ export default function ProfileSetup() {
 
     try {
       // Clean up data based on user role
-      const cleanData = user?.role === 'student' 
+      const cleanData = user?.role === 'student'
         ? {
-            full_name: profileData.full_name,
-            bio: profileData.bio,
-            phone: profileData.phone,
-            location: profileData.location,
-            major: profileData.major,
-            graduation_year: profileData.graduation_year,
-            skills: profileData.skills,
-            portfolio_url: profileData.portfolio_url,
-            linkedin_url: profileData.linkedin_url,
-            github_url: profileData.github_url,
-          }
+          full_name: profileData.full_name,
+          bio: profileData.bio,
+          phone: profileData.phone,
+          location: profileData.location,
+          major: profileData.major,
+          graduation_year: profileData.graduation_year,
+          skills: profileData.skills,
+          portfolio_url: profileData.portfolio_url,
+          linkedin_url: profileData.linkedin_url,
+          github_url: profileData.github_url,
+        }
         : {
-            full_name: profileData.full_name,
-            bio: profileData.bio,
-            phone: profileData.phone,
-            location: profileData.location,
-            company_name: profileData.company_name,
-            job_title: profileData.job_title,
-            industry: profileData.industry,
-            company_size: profileData.company_size,
-            company_description: profileData.company_description,
-            website: profileData.website,
-          };
+          full_name: profileData.full_name,
+          bio: profileData.bio,
+          phone: profileData.phone,
+          location: profileData.location,
+          company_name: profileData.company_name,
+          job_title: profileData.job_title,
+          industry: profileData.industry,
+          company_size: profileData.company_size,
+          company_description: profileData.company_description,
+          website: profileData.website,
+        };
 
       try {
         await updateProfile(cleanData);
@@ -148,10 +148,10 @@ export default function ProfileSetup() {
       } catch (updateError: any) {
         if (updateError.code === 'PGRST116' || updateError.message?.includes('No rows found')) {
           console.log('Profile not found, creating new profile...');
-          
+
           const { error: createError } = await supabase.auth.getUser().then(async ({ data: { user: authUser } }) => {
             if (!authUser) throw new Error('No authenticated user');
-            
+
             const username = authUser.email?.split('@')[0] || '';
             return await supabase
               .from('profiles')
@@ -161,7 +161,7 @@ export default function ProfileSetup() {
                 ...cleanData
               });
           });
-          
+
           if (createError) throw createError;
           navigate('/dashboard');
         } else {
@@ -453,10 +453,10 @@ export default function ProfileSetup() {
           {/* Navigation Buttons */}
           <div className="flex justify-between items-center">
             <Button
-              variant="outline"
+              variant="outlined"
               onClick={prevStep}
               disabled={currentStep === 1}
-              leftIcon={<ArrowLeft className="h-4 w-4" />}
+              startIcon={<ArrowLeft className="h-4 w-4" />}
             >
               Previous
             </Button>
@@ -464,19 +464,19 @@ export default function ProfileSetup() {
             <div className="flex gap-3">
               {currentStep < steps.length ? (
                 <Button
-                  variant="primary"
+                  variant="filled"
                   onClick={nextStep}
                   disabled={!isStepValid(currentStep)}
-                  rightIcon={<ArrowRight className="h-4 w-4" />}
+                  endIcon={<ArrowRight className="h-4 w-4" />}
                 >
                   Next Step
                 </Button>
               ) : (
                 <Button
-                  variant="primary"
+                  variant="filled"
                   onClick={handleSubmit}
                   loading={loading}
-                  leftIcon={<Save className="h-4 w-4" />}
+                  startIcon={<Save className="h-4 w-4" />}
                 >
                   Complete Profile
                 </Button>

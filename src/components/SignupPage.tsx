@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Eye, EyeOff, Mail, Lock, User, GraduationCap, AtSign } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, AtSign } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 
@@ -16,7 +16,7 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  
+
   const { signUp } = useAuth();
   const submitTimeoutRef = useRef<NodeJS.Timeout>();
 
@@ -61,10 +61,10 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Prevent multiple submissions
     if (loading) return;
-    
+
     setError('');
     setSuccess('');
 
@@ -82,7 +82,7 @@ export default function SignupPage() {
         full_name: formData.fullName,
         username: formData.username
       });
-      
+
       if (error) {
         setError(error.message);
         setLoading(false);
@@ -110,7 +110,7 @@ export default function SignupPage() {
         <div className="text-center">
           <div className="flex justify-center mb-6">
             <div className="w-16 h-16 bg-info-600 rounded-2xl flex items-center justify-center">
-              <GraduationCap className="w-8 h-8 text-white" />
+              <span className="text-3xl font-bold text-white">W</span>
             </div>
           </div>
           <h2 className="text-3xl font-bold text-gray-900">Join your school</h2>

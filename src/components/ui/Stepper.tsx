@@ -1,11 +1,11 @@
 import React, { useState, Children, useRef, useLayoutEffect, HTMLAttributes, ReactNode } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 
-interface StepperProps extends HTMLAttributes<HTMLDivElement> {
-  children: ReactNode;
+export interface StepperProps extends React.HTMLAttributes<HTMLDivElement> {
+  children?: React.ReactNode;
   initialStep?: number;
   onStepChange?: (step: number) => void;
-  onFinalStepCompleted?: () => void;
+  onComplete?: () => void;
   stepCircleContainerClassName?: string;
   stepContainerClassName?: string;
   contentClassName?: string;
@@ -20,13 +20,16 @@ interface StepperProps extends HTMLAttributes<HTMLDivElement> {
     currentStep: number;
     onStepClick: (clicked: number) => void;
   }) => ReactNode;
+  steps?: any[];
+  currentStep?: number;
+  orientation?: 'horizontal' | 'vertical';
 }
 
 export default function Stepper({
   children,
   initialStep = 1,
-  onStepChange = () => {},
-  onFinalStepCompleted = () => {},
+  onStepChange = () => { },
+  onComplete = () => { },
   stepCircleContainerClassName = '',
   stepContainerClassName = '',
   contentClassName = '',
@@ -37,19 +40,30 @@ export default function Stepper({
   nextButtonText = 'Continue',
   disableStepIndicators = false,
   renderStepIndicator,
+  steps,
+  currentStep: controlledCurrentStep,
+  orientation,
   ...rest
 }: StepperProps) {
-  const [currentStep, setCurrentStep] = useState<number>(initialStep);
+  const [internalCurrentStep, setInternalCurrentStep] = useState<number>(initialStep);
+  const currentStep = controlledCurrentStep !== undefined ? controlledCurrentStep : internalCurrentStep;
+
   const [direction, setDirection] = useState<number>(0);
-  const stepsArray = Children.toArray(children);
-  const totalSteps = stepsArray.length;
+
+  // Determine steps from props or children
+  const stepsCount = steps ? steps.length : Children.count(children);
+  const totalSteps = stepsCount;
+
   const isCompleted = currentStep > totalSteps;
   const isLastStep = currentStep === totalSteps;
 
   const updateStep = (newStep: number) => {
-    setCurrentStep(newStep);
+    if (controlledCurrentStep === undefined) {
+      setInternalCurrentStep(newStep);
+    }
+
     if (newStep > totalSteps) {
-      onFinalStepCompleted();
+      onComplete();
     } else {
       onStepChange(newStep);
     }
@@ -83,7 +97,7 @@ export default function Stepper({
         className={`w-full ${stepCircleContainerClassName}`}
       >
         <div className={`${stepContainerClassName} flex w-full items-center p-4 sm:p-6 md:p-8`}>
-          {stepsArray.map((_, index) => {
+          {Array.from({ length: totalSteps }).map((_, index) => {
             const stepNumber = index + 1;
             const isNotLastStep = index < totalSteps - 1;
             return (
@@ -114,40 +128,43 @@ export default function Stepper({
           })}
         </div>
 
-        <StepContentWrapper
-          isCompleted={isCompleted}
-          currentStep={currentStep}
-          direction={direction}
-          className={`space-y-2 px-4 sm:px-6 md:px-8 ${contentClassName}`}
-        >
-          {stepsArray[currentStep - 1]}
-        </StepContentWrapper>
+        {children && (
+          <>
+            <StepContentWrapper
+              isCompleted={isCompleted}
+              currentStep={currentStep}
+              direction={direction}
+              className={`space-y-2 px-4 sm:px-6 md:px-8 ${contentClassName}`}
+            >
+              {Children.toArray(children)[currentStep - 1]}
+            </StepContentWrapper>
 
-        {!isCompleted && (
-          <div className={`px-4 sm:px-6 md:px-8 pb-4 sm:pb-6 md:pb-8 ${footerClassName}`}>
-            <div className={`mt-8 sm:mt-10 flex ${currentStep !== 1 ? 'justify-between' : 'justify-end'}`}>
-              {currentStep !== 1 && (
-                <button
-                  onClick={handleBack}
-                  className={`duration-350 rounded px-3 sm:px-4 py-2 sm:py-2.5 transition text-sm sm:text-base font-medium ${
-                    currentStep === 1
-                      ? 'pointer-events-none opacity-50 text-neutral-400'
-                      : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200'
-                  }`}
-                  {...backButtonProps}
-                >
-                  {backButtonText}
-                </button>
-              )}
-              <button
-                onClick={isLastStep ? handleComplete : handleNext}
-                className="duration-350 flex items-center justify-center rounded-full bg-info-600 dark:bg-info-600 py-2 sm:py-2.5 px-4 sm:px-5 font-medium text-sm sm:text-base tracking-tight text-white transition hover:bg-info-700 dark:hover:bg-info-700 active:bg-info-800 dark:active:bg-info-800"
-                {...nextButtonProps}
-              >
-                {isLastStep ? 'Complete' : nextButtonText}
-              </button>
-            </div>
-          </div>
+            {!isCompleted && (
+              <div className={`px-4 sm:px-6 md:px-8 pb-4 sm:pb-6 md:pb-8 ${footerClassName}`}>
+                <div className={`mt-8 sm:mt-10 flex ${currentStep !== 1 ? 'justify-between' : 'justify-end'}`}>
+                  {currentStep !== 1 && (
+                    <button
+                      onClick={handleBack}
+                      className={`duration-350 rounded px-3 sm:px-4 py-2 sm:py-2.5 transition text-sm sm:text-base font-medium ${currentStep === 1
+                        ? 'pointer-events-none opacity-50 text-neutral-400'
+                        : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200'
+                        }`}
+                      {...backButtonProps}
+                    >
+                      {backButtonText}
+                    </button>
+                  )}
+                  <button
+                    onClick={isLastStep ? handleComplete : handleNext}
+                    className="duration-350 flex items-center justify-center rounded-full bg-info-600 dark:bg-info-600 py-2 sm:py-2.5 px-4 sm:px-5 font-medium text-sm sm:text-base tracking-tight text-white transition hover:bg-info-700 dark:hover:bg-info-700 active:bg-info-800 dark:active:bg-info-800"
+                    {...nextButtonProps}
+                  >
+                    {isLastStep ? 'Complete' : nextButtonText}
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

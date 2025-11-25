@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Camera, Save, Loader2, MapPin, LinkIcon, Calendar, Building2, GraduationCap, Award, Globe, Github, Linkedin, Phone, Eye, EyeOff, User, Briefcase, BookOpen } from 'lucide-react';
+import { X, Loader2, MapPin, Calendar, Building2, GraduationCap, Award, Globe, User, Briefcase, BookOpen } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
@@ -21,17 +21,6 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [hasChanges, setHasChanges] = useState(false);
-
-  // Screen size detection
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   const [profileData, setProfileData] = useState<ProfileData & {
     display_name?: string;
@@ -77,7 +66,7 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
 
   const loadProfileData = async () => {
     if (!user) return;
-    
+
     try {
       setLoading(true);
       const profile = await ProfileService.getCurrentProfile();
@@ -175,7 +164,7 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
       ...prev,
       [field]: value
     }));
-    
+
     // Clear specific error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({
@@ -195,7 +184,7 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
 
     try {
       setSaving(true);
-      
+
       // Prepare data for saving - include all new fields
       const saveData: Partial<ProfileData> = {
         full_name: profileData.full_name?.trim(),
@@ -219,11 +208,11 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
         saveData.company_name = profileData.company_name?.trim();
         saveData.title = profileData.title?.trim();
       }
-      
-      await ProfileService.updateProfile(user.id, saveData);
+
+      await ProfileService.upsertProfile(user.id, saveData);
       setOriginalData(profileData);
       setHasChanges(false);
-      
+
       if (isModal && onClose) {
         onClose();
       } else {
@@ -231,7 +220,7 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
       }
     } catch (error: any) {
       console.error('Error saving profile:', error);
-      
+
       // Provide specific error messages based on error type
       if (error.message?.includes('duplicate') || error.message?.includes('409')) {
         setErrors({ general: 'Username is already taken. Please choose a different username.' });
@@ -252,12 +241,16 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
       const confirmLeave = window.confirm('You have unsaved changes. Are you sure you want to leave?');
       if (!confirmLeave) return;
     }
-    
+
     if (isModal && onClose) {
       onClose();
     } else {
       navigate('/profile');
     }
+  };
+
+  const handleCoverUpload = async (url: string) => {
+    await handleImageUpload('cover', url);
   };
 
   const handleImageUpload = async (type: 'avatar' | 'cover', imageUrl: string) => {
@@ -413,10 +406,9 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                 <ImageUpload
                   type="cover"
-                  currentImageUrl={profileData.cover_image_url}
-                  onUploadSuccess={(url) => handleImageUpload('cover', url)}
-                  onUploadError={handleImageUploadError}
-                  className="p-3 bg-black/50 rounded-full text-white hover:bg-black/70 transition-colors"
+                  onUploadSuccess={handleCoverUpload}
+                  onUploadError={(error) => console.error(error)}
+                  className="absolute bottom-4 right-4"
                 />
               </div>
             </div>
@@ -441,7 +433,6 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
                 <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                   <ImageUpload
                     type="avatar"
-                    currentImageUrl={profileData.avatar_url}
                     onUploadSuccess={(url) => handleImageUpload('avatar', url)}
                     onUploadError={handleImageUploadError}
                     className="text-white"
@@ -472,16 +463,16 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
           <div className="space-y-4">
             <h2 className="text-lg font-semibold">Professional Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {user?.role === 'employer' 
+              {user?.role === 'employer'
                 ? renderField('Company', 'company_name', 'Your company name', 'text', <Building2 className="w-4 h-4" />, undefined, true)
                 : renderField('Company', 'company_name', 'Your company name', 'text', <Building2 className="w-4 h-4" />)
               }
-              {user?.role === 'employer' 
+              {user?.role === 'employer'
                 ? renderField('Job Title', 'title', 'Your job title', 'text', <Briefcase className="w-4 h-4" />, undefined, true)
                 : renderField('Job Title', 'title', 'Your job title', 'text', <Briefcase className="w-4 h-4" />)
               }
             </div>
-            
+
             {/* Role Selection - Read Only */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-900 dark:text-white">
@@ -502,18 +493,18 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
           {user?.role === 'student' && (
             <div className="space-y-4">
               <h2 className="text-lg font-semibold">Education & Skills</h2>
-              
+
               {/* Education Fields */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {renderField('School/University', 'school', 'e.g., Stanford University', 'text', <GraduationCap className="w-4 h-4" />)}
                 {renderField('Major', 'major', 'e.g., Computer Science', 'text', <BookOpen className="w-4 h-4" />)}
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {renderField('Graduation Year', 'graduation_year', '2025', 'number', <Calendar className="w-4 h-4" />)}
                 {renderField('GPA', 'gpa', '3.5 (out of 4.0)', 'number', <Award className="w-4 h-4" />)}
               </div>
-              
+
               {/* Skills Array Field */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-900 dark:text-white">
@@ -540,7 +531,7 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
                   Separate skills with commas. These help match you with relevant opportunities.
                 </p>
               </div>
-              
+
               {/* Interests Array Field */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-900 dark:text-white">

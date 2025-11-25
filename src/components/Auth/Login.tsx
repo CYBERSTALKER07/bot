@@ -121,12 +121,12 @@ export default function Login() {
       }
 
       // After successful sign up, redirect to profile setup
-      navigate('/profile-setup', { 
-        state: { 
+      navigate('/profile-setup', {
+        state: {
           isNewUser: true,
           role: signUpData.role,
           welcomeMessage: `Welcome to AUT Handshake, ${signUpData.firstName}!`
-        } 
+        }
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Sign up failed. Please try again.');
@@ -156,7 +156,7 @@ export default function Login() {
             )}
           >
             <g>
-              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
+              <path d="M4 4h3l2 10 2-10h3l2 10 2-10h3l-3 16h-3l-2-10-2 10h-3l-3-16z"></path>
             </g>
           </svg>
         </div>
@@ -175,7 +175,7 @@ export default function Login() {
                 )}
               >
                 <g>
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
+                  <path d="M4 4h3l2 10 2-10h3l2 10 2-10h3l-3 16h-3l-2-10-2 10h-3l-3-16z"></path>
                 </g>
               </svg>
             </div>
