@@ -211,7 +211,7 @@ export default function WhosHiringPage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center space-x-4">
-              <div className="p-3 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800">
+              <div className="p-3 rounded-2xl bg-linear-to-br from-purple-600 to-purple-800">
                 <GraduationCap className="h-8 w-8 text-white" />
               </div>
               <Link to="/" className="text-2xl font-bold text-gray-900">
@@ -229,7 +229,7 @@ export default function WhosHiringPage() {
               <Link to="/login" className="px-6 py-2 text-gray-700 hover:text-purple-600 font-medium transition-colors">
                 Sign in
               </Link>
-              <Link to="/register" className="px-8 py-3 bg-gradient-to-r from-purple-600 to-purple-800 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-purple-900 transition-all duration-200 shadow-lg hover:shadow-xl">
+              <Link to="/register" className="px-8 py-3 bg-linear-to-r from-purple-600 to-purple-800 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-purple-900 transition-all duration-200 shadow-lg hover:shadow-xl">
                 Sign up
               </Link>
             </div>
@@ -238,7 +238,7 @@ export default function WhosHiringPage() {
       </nav>
 
       {/* Hero Section */}
-      <section ref={heroRef} className="pt-32 pb-20 px-6 lg:px-8 bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900">
+      <section ref={heroRef} className="pt-32 pb-20 px-6 lg:px-8 bg-linear-to-br from-purple-900 via-purple-800 to-indigo-900">
         <div className="max-w-7xl mx-auto text-center">
           <div className="hero-content">
             <h1 className="text-6xl md:text-7xl lg:text-8xl font-black text-orange-500 mb-8"
@@ -319,7 +319,7 @@ export default function WhosHiringPage() {
                   <div className="grid grid-cols-2 gap-4 mb-6">
                     {category.companies.map((company, idx) => (
                       <div key={idx} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
-                        <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                        <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-xs">
                           {/* <img 
                             src={company.logo} 
                             alt={company.name}
@@ -347,7 +347,7 @@ export default function WhosHiringPage() {
       </section>
 
       {/* Top Employers Section */}
-      <section ref={employersRef} className="py-24 px-6 lg:px-8 bg-gradient-to-br from-purple-50 to-indigo-50">
+      <section ref={employersRef} className="py-24 px-6 lg:px-8 bg-linear-to-br from-purple-50 to-indigo-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
             <h2 className="text-4xl font-black text-gray-900 mb-6">
@@ -425,10 +425,10 @@ export default function WhosHiringPage() {
       </section>
 
       {/* Testimonial Section */}
-      <section className="py-24 px-6 lg:px-8 bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900">
+      <section className="py-24 px-6 lg:px-8 bg-linear-to-br from-purple-900 via-purple-800 to-indigo-900">
         <div className="max-w-5xl mx-auto text-center">
           <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-12 border border-white/20">
-            <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-8">
+            <div className="w-20 h-20 bg-linear-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-8">
               <Building2 className="h-10 w-10 text-white" />
             </div>
             
@@ -457,7 +457,7 @@ export default function WhosHiringPage() {
               <input
                 type="email"
                 placeholder="Email"
-                className="flex-1 px-6 py-4 text-lg text-gray-900 placeholder-gray-500 border-0 bg-transparent rounded-xl focus:outline-none focus:ring-0"
+                className="flex-1 px-6 py-4 text-lg text-gray-900 placeholder-gray-500 border-0 bg-transparent rounded-xl focus:outline-hidden focus:ring-0"
               />
               <button className="px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-colors">
                 Sign up

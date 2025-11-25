@@ -215,7 +215,7 @@ export const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.2 }}
             className={cn(
-              'absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent',
+              'absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 via-black/40 to-transparent',
               'p-4 space-y-3'
             )}
             onClick={(e) => e.stopPropagation()}
@@ -234,7 +234,7 @@ export const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
                 )}
                 data-progress={Math.floor((currentTime / duration) * 100)}
               />
-              <span className="text-xs text-white/80 min-w-[3rem]">
+              <span className="text-xs text-white/80 min-w-12">
                 {formatTime(currentTime)} / {formatTime(duration)}
               </span>
             </div>

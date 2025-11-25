@@ -138,7 +138,7 @@ export default function UserSearch({ onClose, isOpen = true, minimalMode = false
             onBlur={handleBlur}
             placeholder="Search users"
             className={cn(
-              'flex-1 bg-transparent outline-none text-sm',
+              'flex-1 bg-transparent outline-hidden text-sm',
               isDark ? 'text-white placeholder:text-gray-500' : 'text-gray-900 placeholder:text-gray-500'
             )}
           />
@@ -191,11 +191,11 @@ export default function UserSearch({ onClose, isOpen = true, minimalMode = false
                       <img
                         src={user.avatar_url}
                         alt={user.full_name}
-                        className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                        className="w-10 h-10 rounded-full object-cover shrink-0"
                       />
                     ) : (
                       <div className={cn(
-                        'w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0',
+                        'w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0',
                         isDark ? 'bg-gray-800 text-gray-400' : 'bg-gray-200 text-gray-700'
                       )}>
                         {user.full_name.charAt(0).toUpperCase()}
@@ -207,7 +207,7 @@ export default function UserSearch({ onClose, isOpen = true, minimalMode = false
                           {user.full_name}
                         </p>
                         {user.verified && (
-                          <Verified className="w-4 h-4 text-info-500 flex-shrink-0" />
+                          <Verified className="w-4 h-4 text-info-500 shrink-0" />
                         )}
                       </div>
                       <p className={cn('text-xs truncate', isDark ? 'text-gray-500' : 'text-gray-600')}>
@@ -257,7 +257,7 @@ export default function UserSearch({ onClose, isOpen = true, minimalMode = false
                 ? 'bg-black border-gray-700'
                 : 'bg-gray-100 border-gray-300'
           )}>
-            <SearchIcon className="w-5 h-5 text-gray-500 flex-shrink-0" />
+            <SearchIcon className="w-5 h-5 text-gray-500 shrink-0" />
 
             <input
               ref={inputRef}
@@ -268,7 +268,7 @@ export default function UserSearch({ onClose, isOpen = true, minimalMode = false
               onBlur={handleBlur}
               placeholder="Search by name or username"
               className={cn(
-                'flex-1 bg-transparent outline-none text-base',
+                'flex-1 bg-transparent outline-hidden text-base',
                 isDark ? 'text-white placeholder:text-gray-500' : 'text-black placeholder:text-gray-500'
               )}
               autoComplete="off"
@@ -279,7 +279,7 @@ export default function UserSearch({ onClose, isOpen = true, minimalMode = false
                 onClick={handleClearSearch}
                 title="Clear search"
                 className={cn(
-                  'p-2 rounded-full transition-colors flex-shrink-0',
+                  'p-2 rounded-full transition-colors shrink-0',
                   isDark
                     ? 'text-gray-500 hover:text-white hover:bg-gray-900'
                     : 'text-gray-500 hover:text-black hover:bg-gray-200'
@@ -293,7 +293,7 @@ export default function UserSearch({ onClose, isOpen = true, minimalMode = false
               onClick={handleClose}
               title="Close search"
               className={cn(
-                'md:hidden p-2 rounded-full transition-colors flex-shrink-0',
+                'md:hidden p-2 rounded-full transition-colors shrink-0',
                 isDark
                   ? 'text-gray-500 hover:text-white hover:bg-gray-900'
                   : 'text-gray-500 hover:text-black hover:bg-gray-200'
@@ -355,11 +355,11 @@ export default function UserSearch({ onClose, isOpen = true, minimalMode = false
                     <img
                       src={user.avatar_url}
                       alt={user.full_name}
-                      className="w-12 h-12 md:w-10 md:h-10 rounded-full object-cover flex-shrink-0"
+                      className="w-12 h-12 md:w-10 md:h-10 rounded-full object-cover shrink-0"
                     />
                   ) : (
                     <div className={cn(
-                      'w-12 h-12 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold flex-shrink-0',
+                      'w-12 h-12 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold shrink-0',
                       isDark ? 'bg-gray-800 text-gray-400' : 'bg-gray-200 text-gray-700'
                     )}>
                       {user.full_name.charAt(0).toUpperCase()}
@@ -373,7 +373,7 @@ export default function UserSearch({ onClose, isOpen = true, minimalMode = false
                         {user.full_name}
                       </p>
                       {user.verified && (
-                        <Verified className="w-5 h-5 md:w-4 md:h-4 text-info-500 flex-shrink-0" />
+                        <Verified className="w-5 h-5 md:w-4 md:h-4 text-info-500 shrink-0" />
                       )}
                     </div>
                     <p className={cn('text-sm md:text-xs truncate', isDark ? 'text-gray-500' : 'text-gray-600')}>
@@ -388,7 +388,7 @@ export default function UserSearch({ onClose, isOpen = true, minimalMode = false
 
                   {/* Arrow indicator */}
                   <div className={cn(
-                    'text-gray-500 flex-shrink-0',
+                    'text-gray-500 shrink-0',
                     selectedIndex === idx ? (isDark ? 'text-white' : 'text-gray-900') : ''
                   )}>
                     <svg className="w-5 h-5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

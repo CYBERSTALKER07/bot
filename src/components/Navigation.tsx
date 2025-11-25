@@ -5,20 +5,18 @@ import {
   Search,
   Bell,
   User,
-  Briefcase,
-  Building2,
-  FileText,
+  Suitcase,
+  BuildingWorkspace,
+  FileDocument,
   Calendar,
-  BarChart3,
-  Users,
-  LogOut,
-  Feather,
-  Menu,
+  BarChart,
+  Members,
+  Logout,
   X as XIcon,
-  GraduationCap,
+  Graduate,
   Sparkles,
-  MessageSquare
-} from 'lucide-react';
+  Chat
+} from '@openai/apps-sdk-ui/components/Icon';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useScrollDirection } from '../hooks/useScrollDirection';
@@ -27,8 +25,7 @@ import { cn } from '../lib/cva';
 import { FloatingActionMenu } from './FloatingActionMenu';
 import Dock from './Dock';
 
-// Helper component for thin icons
-const ThinIcon = ({ Icon, ...props }: any) => <Icon strokeWidth={1.5} {...props} />;
+
 
 interface NavigationItem {
   icon: React.ComponentType<any>;
@@ -74,42 +71,42 @@ export default function Navigation() {
     if (user?.role === 'student') {
       return [
         ...baseItems,
-        { icon: Briefcase, label: 'Jobs', path: '/jobs' },
-        { icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
-        { icon: Building2, label: 'Companies', path: '/companies' },
-        { icon: FileText, label: 'Applications', path: '/applications' },
-        // { icon: FileText, label: 'Resume Builder', path: '/resume-builder' },
+        { icon: Suitcase, label: 'Jobs', path: '/jobs' },
+        { icon: BarChart, label: 'Dashboard', path: '/dashboard' },
+        { icon: BuildingWorkspace, label: 'Companies', path: '/companies' },
+        { icon: FileDocument, label: 'Applications', path: '/applications' },
+        // { icon: FileDocument, label: 'Resume Builder', path: '/resume-builder' },
         { icon: Calendar, label: 'Events', path: '/events' },
         { icon: User, label: 'Profile', path: '/profile' }
       ];
     } else if (user?.role === 'employer') {
       return [
         ...baseItems,
-        { icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
-        { icon: Briefcase, label: 'Post Jobs', path: '/post-job' },
+        { icon: BarChart, label: 'Dashboard', path: '/dashboard' },
+        { icon: Suitcase, label: 'Post Jobs', path: '/post-job' },
         { icon: Calendar, label: 'Post Event', path: '/post-event' },
-        { icon: Users, label: 'Applicants', path: '/applicants' },
+        { icon: Members, label: 'Applicants', path: '/applicants' },
         { icon: User, label: 'Profile', path: '/profile' }
       ];
     } else { // admin role
       const adminItems: NavigationItem[] = [
         ...baseItems,
-        { icon: BarChart3, label: 'Admin', path: '/admin' },
+        { icon: BarChart, label: 'Admin', path: '/admin' },
       ];
 
       // Add University Dashboard if admin belongs to a university
       if (user?.profile?.university_id) {
         adminItems.push({
-          icon: GraduationCap,
+          icon: Graduate,
           label: 'University',
           path: '/university-dashboard'
         });
       }
 
       adminItems.push(
-        { icon: Users, label: 'Users', path: '/users' },
-        { icon: Briefcase, label: 'Jobs', path: '/jobs' },
-        { icon: MessageSquare, label: 'Messages', path: '/messages' },
+        { icon: Members, label: 'Users', path: '/users' },
+        { icon: Suitcase, label: 'Jobs', path: '/jobs' },
+        { icon: Chat, label: 'Messages', path: '/messages' },
         { icon: Sparkles, label: 'Premium', path: '/premium-upgrade' },
         // { icon: Settings, label: 'Settings', path: '/settings' },
         { icon: User, label: 'Profile', path: '/profile' }
@@ -164,7 +161,7 @@ export default function Navigation() {
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                 isDark ? 'bg-white' : 'bg-black'
               }`}>
-                <ThinIcon Icon={Feather} className={`h-4 w-4 ${isDark ? 'text-black' : 'text-white'}`} />
+                <Sparkles className={`size-4 ${isDark ? 'text-black' : 'text-white'}`} />
               </div>
               <span className={`font-light text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 AUT Handshake
@@ -183,7 +180,7 @@ export default function Navigation() {
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? (
-                <ThinIcon Icon={XIcon} className="h-5 w-5" />
+                <XIcon className="size-5" />
               ) : (
                 <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-normal overflow-hidden border border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-700">
                   {user?.profile?.avatar_url ? (
@@ -232,7 +229,7 @@ export default function Navigation() {
             <div className="flex items-center space-x-3">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isDark ? 'bg-white' : 'bg-[#800002]'
                 }`}>
-                <ThinIcon Icon={Feather} className={`h-4 w-4 ${isDark ? 'text-black' : 'text-white'}`} />
+                <Sparkles className={`size-4 ${isDark ? 'text-black' : 'text-white'}`} />
               </div>
               <span className={`font-light text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 Menu
@@ -244,7 +241,7 @@ export default function Navigation() {
               onClick={() => setIsMobileMenuOpen(false)}
               className={isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'}
             >
-              <ThinIcon Icon={XIcon} className="h-5 w-5" />
+              <XIcon className="size-5" />
             </Button>
           </div>
 
@@ -282,7 +279,7 @@ export default function Navigation() {
                     aria-label={`Navigate to ${item.label}`}
                   >
                     <div className="flex items-center space-x-3">
-                      <ThinIcon Icon={Icon} className="h-5 w-5" />
+                      <Icon className="size-5" />
                       <span className="font-normal">{item.label}</span>
                     </div>
                     {item.badge && item.badge > 0 && (
@@ -305,7 +302,7 @@ export default function Navigation() {
                 }}
                 className="w-full justify-start px-3 py-3 text-red-500 hover:bg-red-500/10 rounded-xl"
               >
-                <ThinIcon Icon={LogOut} className="h-5 w-5 mr-3" />
+                <Logout className="size-5 mr-3" />
                 <span className="font-normal">Logout</span>
               </Button>
             </div>
@@ -350,7 +347,7 @@ export default function Navigation() {
                   aria-label={`Navigate to ${item.label}`}
                 >
                   <div className="relative">
-                    <ThinIcon Icon={Icon} className="h-6 w-6" />
+                    <Icon className="size-6" />
                     {item.badge && item.badge > 0 && (
                       <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
                         {item.badge > 9 ? '9+' : item.badge}
@@ -384,14 +381,14 @@ export default function Navigation() {
           <Dock
             items={[
               ...navigationItems.map(item => ({
-                icon: <item.icon size={24} strokeWidth={1.5} />,
+                icon: <item.icon className="size-6" />,
                 label: item.label,
                 onClick: () => handleNavItemPress(item.path, item),
                 isActive: isCurrentPath(item.path),
               })),
               // Add Logout item at the bottom
               {
-                icon: <LogOut size={24} strokeWidth={1.5} />,
+                icon: <Logout className="size-6" />,
                 label: 'Logout',
                 onClick: handleLogout
               }

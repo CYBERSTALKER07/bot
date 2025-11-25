@@ -615,7 +615,7 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
           <div className="flex-1 overflow-y-auto ios-momentum-scroll ios-landscape-safe">
             <nav className="py-2" role="navigation" aria-label="Mobile navigation">
               {/* Profile Section with Enhanced iOS spacing */}
-              <div className="px-4 py-4 border-b border-neutral-200 bg-gradient-to-r from-brand-primary/5 to-transparent ios-nav-spacing">
+              <div className="px-4 py-4 border-b border-neutral-200 bg-linear-to-r from-brand-primary/5 to-transparent ios-nav-spacing">
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 ios-rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-lg font-medium">
                     {user?.name?.charAt(0) || <User className="h-6 w-6" />}
@@ -655,17 +655,17 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                             className={cn(
                               'flex items-center justify-between px-3 py-3.5 mx-1 ios-rounded-lg transition-all duration-200 ios-touch-target-large ios-nav-item',
                               active
-                                ? 'bg-brand-primary/10 text-brand-primary shadow-sm'
+                                ? 'bg-brand-primary/10 text-brand-primary shadow-xs'
                                 : 'text-neutral-700 hover:bg-neutral-50 hover:translate-x-1 active:bg-neutral-100'
                             )}
                             aria-current={active ? 'page' : undefined}
                           >
                             <div className="flex items-center space-x-3">
-                              <Icon className="h-5 w-5 flex-shrink-0" />
+                              <Icon className="h-5 w-5 shrink-0" />
                               <span className="font-medium">{item.label}</span>
                             </div>
                             {item.badge && item.badge > 0 && (
-                              <span className="bg-error text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center flex-shrink-0">
+                              <span className="bg-error text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center shrink-0">
                                 {item.badge > 99 ? '99+' : item.badge}
                               </span>
                             )}
@@ -685,7 +685,7 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                       className={cn(
                         'flex items-center space-x-3 px-3 py-3.5 mx-1 ios-rounded-lg transition-all duration-200 ios-touch-target-large',
                         isCurrentPath('/profile')
-                          ? 'bg-brand-primary/10 text-brand-primary shadow-sm'
+                          ? 'bg-brand-primary/10 text-brand-primary shadow-xs'
                           : 'text-neutral-700 hover:bg-neutral-50 hover:translate-x-1 active:bg-neutral-100'
                       )}
                       aria-current={isCurrentPath('/profile') ? 'page' : undefined}

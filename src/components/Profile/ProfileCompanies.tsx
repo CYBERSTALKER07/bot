@@ -229,7 +229,7 @@ export default function ProfileCompanies({
               <div className="flex gap-3">
                 {/* Company Logo/Avatar */}
                 <div className={cn(
-                  "w-12 h-12 rounded-lg flex items-center justify-center font-bold text-lg flex-shrink-0",
+                  "w-12 h-12 rounded-lg flex items-center justify-center font-bold text-lg shrink-0",
                   isDark ? "bg-gray-900" : "bg-gray-100"
                 )}>
                   {company.logo_url ? (

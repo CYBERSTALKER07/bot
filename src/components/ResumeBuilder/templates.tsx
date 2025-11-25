@@ -57,7 +57,7 @@ function EditableText({
         onChange={(e) => setTempValue(e.target.value)}
         onBlur={handleSave}
         onKeyDown={handleKeyDown}
-        className={`${className} border-2 border-info-500 bg-info-50 focus:outline-none resize-none`}
+        className={`${className} border-2 border-info-500 bg-info-50 focus:outline-hidden resize-none`}
         style={style}
         autoFocus
         rows={3}
@@ -69,7 +69,7 @@ function EditableText({
         onChange={(e) => setTempValue(e.target.value)}
         onBlur={handleSave}
         onKeyDown={handleKeyDown}
-        className={`${className} border-2 border-info-500 bg-info-50 focus:outline-none`}
+        className={`${className} border-2 border-info-500 bg-info-50 focus:outline-hidden`}
         style={style}
         autoFocus
       />
@@ -86,7 +86,7 @@ function EditableText({
     >
       {value || (onEdit ? 'Click to edit...' : '')}
       {onEdit && isHovered && (
-        <Edit3 className="absolute -top-2 -right-2 h-4 w-4 text-info-500 bg-white rounded-full p-0.5 shadow-sm" />
+        <Edit3 className="absolute -top-2 -right-2 h-4 w-4 text-info-500 bg-white rounded-full p-0.5 shadow-xs" />
       )}
     </div>
   );
@@ -555,7 +555,7 @@ export function ProfessionalTemplate({ resumeData, currentTheme, isVisualEditMod
           <div className="space-y-3 text-sm">
             {resumeData.personalInfo.location && (
               <div className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
                 <div>
                   <div className="font-medium">Address</div>
                   <div className="text-gray-300">{resumeData.personalInfo.location}</div>
@@ -564,7 +564,7 @@ export function ProfessionalTemplate({ resumeData, currentTheme, isVisualEditMod
             )}
             {resumeData.personalInfo.phone && (
               <div className="flex items-start gap-3">
-                <Phone className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <Phone className="w-4 h-4 mt-0.5 shrink-0" />
                 <div>
                   <div className="font-medium">Phone</div>
                   <div className="text-gray-300">{resumeData.personalInfo.phone}</div>
@@ -573,7 +573,7 @@ export function ProfessionalTemplate({ resumeData, currentTheme, isVisualEditMod
             )}
             {resumeData.personalInfo.email && (
               <div className="flex items-start gap-3">
-                <Mail className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <Mail className="w-4 h-4 mt-0.5 shrink-0" />
                 <div>
                   <div className="font-medium">Web</div>
                   <div className="text-gray-300">{resumeData.personalInfo.email}</div>
@@ -813,7 +813,7 @@ export function CreativeTemplate({ resumeData, currentTheme, isVisualEditMode, o
 
           {resumeData.personalInfo.summary && (
             <div 
-              className="p-6 rounded-2xl border-l-8 shadow-sm"
+              className="p-6 rounded-2xl border-l-8 shadow-xs"
               style={{ 
                 backgroundColor: `${currentTheme.primary}05`,
                 borderLeftColor: currentTheme.primary 
@@ -981,7 +981,7 @@ export function AUTSpecialTemplate({ resumeData, currentTheme, isVisualEditMode,
   return (
     <div className="bg-white">
       {/* Header with enhanced AUT branding */}
-      <div className="bg-gradient-to-r from-red-800 via-red-900 to-black text-white p-8 relative overflow-hidden">
+      <div className="bg-linear-to-r from-red-800 via-red-900 to-black text-white p-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
         <div className="relative z-10">
@@ -1025,7 +1025,7 @@ export function AUTSpecialTemplate({ resumeData, currentTheme, isVisualEditMode,
           <div className="mb-10">
             <div className="flex items-center gap-4 mb-6">
               <div 
-                className="w-2 h-12 rounded-full bg-gradient-to-b"
+                className="w-2 h-12 rounded-full bg-linear-to-b"
                 style={{ backgroundImage: `linear-gradient(to bottom, ${currentTheme.primary}, ${currentTheme.secondary})` }}
               />
               <h2 
@@ -1035,7 +1035,7 @@ export function AUTSpecialTemplate({ resumeData, currentTheme, isVisualEditMode,
                 EXECUTIVE SUMMARY
               </h2>
             </div>
-            <div className="bg-gradient-to-r from-gray-50 via-white to-gray-50 p-8 rounded-xl border-l-8" 
+            <div className="bg-linear-to-r from-gray-50 via-white to-gray-50 p-8 rounded-xl border-l-8" 
                  style={{ borderLeftColor: currentTheme.primary }}>
               <p className="text-gray-800 leading-relaxed text-lg font-medium">
                 {resumeData.personalInfo.summary}
@@ -1049,7 +1049,7 @@ export function AUTSpecialTemplate({ resumeData, currentTheme, isVisualEditMode,
           <div className="mb-10">
             <div className="flex items-center gap-4 mb-8">
               <div 
-                className="w-2 h-12 rounded-full bg-gradient-to-b"
+                className="w-2 h-12 rounded-full bg-linear-to-b"
                 style={{ backgroundImage: `linear-gradient(to bottom, ${currentTheme.primary}, ${currentTheme.secondary})` }}
               />
               <h2 
@@ -1115,7 +1115,7 @@ export function AUTSpecialTemplate({ resumeData, currentTheme, isVisualEditMode,
           <div className="mb-10">
             <div className="flex items-center gap-4 mb-8">
               <div 
-                className="w-2 h-12 rounded-full bg-gradient-to-b"
+                className="w-2 h-12 rounded-full bg-linear-to-b"
                 style={{ backgroundImage: `linear-gradient(to bottom, ${currentTheme.primary}, ${currentTheme.secondary})` }}
               />
               <h2 
@@ -1130,7 +1130,7 @@ export function AUTSpecialTemplate({ resumeData, currentTheme, isVisualEditMode,
               {resumeData.education.map((edu) => (
                 <div 
                   key={edu.id}
-                  className="bg-gradient-to-r from-white via-gray-50 to-white p-8 rounded-xl shadow-lg border-t-8"
+                  className="bg-linear-to-r from-white via-gray-50 to-white p-8 rounded-xl shadow-lg border-t-8"
                   style={{ borderTopColor: currentTheme.accent }}
                 >
                   <div className="flex justify-between items-start">
@@ -1171,7 +1171,7 @@ export function AUTSpecialTemplate({ resumeData, currentTheme, isVisualEditMode,
           <div className="mb-10">
             <div className="flex items-center gap-4 mb-8">
               <div 
-                className="w-2 h-12 rounded-full bg-gradient-to-b"
+                className="w-2 h-12 rounded-full bg-linear-to-b"
                 style={{ backgroundImage: `linear-gradient(to bottom, ${currentTheme.primary}, ${currentTheme.secondary})` }}
               />
               <h2 
@@ -1217,7 +1217,7 @@ export function AUTSpecialTemplate({ resumeData, currentTheme, isVisualEditMode,
           className="text-center py-8 rounded-xl shadow-lg relative overflow-hidden"
           style={{ backgroundColor: currentTheme.primary }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-y-1"></div>
+          <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent transform -skew-y-1"></div>
           <div className="relative z-10">
             <div className="text-white text-lg font-bold mb-2">
               American University of Technology

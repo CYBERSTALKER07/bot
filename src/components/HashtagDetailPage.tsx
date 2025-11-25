@@ -139,7 +139,7 @@ export default function HashtagDetailPage() {
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className={cn(
                                         'w-16 h-16 rounded-2xl flex items-center justify-center',
-                                        'bg-gradient-to-br from-info-500 to-purple-600'
+                                        'bg-linear-to-br from-info-500 to-purple-600'
                                     )}>
                                         <Hash className="w-8 h-8 text-white" />
                                     </div>
@@ -332,7 +332,7 @@ export default function HashtagDetailPage() {
                                                 src={post.author.avatar_url}
                                                 alt={post.author.name}
                                                 size="md"
-                                                className="flex-shrink-0"
+                                                className="shrink-0"
                                             />
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 mb-1">

@@ -157,10 +157,10 @@ export default function TrendingHashtags({
 
                                 {/* Trending Indicator */}
                                 {hashtag.trending_score > 50 && (
-                                    <div className="flex-shrink-0">
+                                    <div className="shrink-0">
                                         <div className={cn(
                                             'px-2 py-1 rounded-full text-xs font-bold',
-                                            'bg-gradient-to-r from-orange-500 to-red-500 text-white'
+                                            'bg-linear-to-r from-orange-500 to-red-500 text-white'
                                         )}>
                                             HOT
                                         </div>

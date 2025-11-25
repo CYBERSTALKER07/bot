@@ -264,7 +264,7 @@ export default function ProfileSetup() {
                       required
                       value={profileData.major}
                       onChange={(e) => updateField('major', e.target.value)}
-                      className="w-full px-3 py-2 border border-neutral-300 rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-md bg-background text-foreground focus:outline-hidden focus:ring-2 focus:ring-brand-primary"
                     >
                       <option value="">Select your major</option>
                       {majors.map(major => (
@@ -280,7 +280,7 @@ export default function ProfileSetup() {
                       required
                       value={profileData.graduation_year}
                       onChange={(e) => updateField('graduation_year', parseInt(e.target.value))}
-                      className="w-full px-3 py-2 border border-neutral-300 rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-md bg-background text-foreground focus:outline-hidden focus:ring-2 focus:ring-brand-primary"
                     >
                       <option value="">Select graduation year</option>
                       {Array.from({ length: 6 }, (_, i) => new Date().getFullYear() + i).map(year => (
@@ -325,7 +325,7 @@ export default function ProfileSetup() {
                       required
                       value={profileData.industry}
                       onChange={(e) => updateField('industry', e.target.value)}
-                      className="w-full px-3 py-2 border border-neutral-300 rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-md bg-background text-foreground focus:outline-hidden focus:ring-2 focus:ring-brand-primary"
                     >
                       <option value="">Select industry</option>
                       {industries.map(industry => (
@@ -341,7 +341,7 @@ export default function ProfileSetup() {
                       required
                       value={profileData.company_size}
                       onChange={(e) => updateField('company_size', e.target.value)}
-                      className="w-full px-3 py-2 border border-neutral-300 rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-md bg-background text-foreground focus:outline-hidden focus:ring-2 focus:ring-brand-primary"
                     >
                       <option value="">Select company size</option>
                       <option value="1-10">1-10 employees</option>

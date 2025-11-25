@@ -195,7 +195,7 @@ export default function EventDetails() {
                 : 'bg-gray-50 border border-gray-200'
             )}>
               <Calendar className={cn(
-                'h-6 w-6 flex-shrink-0 mt-1',
+                'h-6 w-6 shrink-0 mt-1',
                 isDark ? 'text-yellow-400' : 'text-yellow-500'
               )} />
               <div>
@@ -221,12 +221,12 @@ export default function EventDetails() {
             )}>
               {event.virtual_link ? (
                 <Video className={cn(
-                  'h-6 w-6 flex-shrink-0 mt-1',
+                  'h-6 w-6 shrink-0 mt-1',
                   isDark ? 'text-green-400' : 'text-green-500'
                 )} />
               ) : (
                 <MapPin className={cn(
-                  'h-6 w-6 flex-shrink-0 mt-1',
+                  'h-6 w-6 shrink-0 mt-1',
                   isDark ? 'text-red-400' : 'text-red-500'
                 )} />
               )}
@@ -244,7 +244,7 @@ export default function EventDetails() {
                 : 'bg-gray-50 border border-gray-200'
             )}>
               <Users className={cn(
-                'h-6 w-6 flex-shrink-0 mt-1',
+                'h-6 w-6 shrink-0 mt-1',
                 isDark ? 'text-purple-400' : 'text-purple-500'
               )} />
               <div>
@@ -268,7 +268,7 @@ export default function EventDetails() {
                     isDark ? 'bg-gray-700' : 'bg-gray-300'
                   )}>
                     <div 
-                      className="h-full bg-gradient-to-r from-yellow-400 to-yellow-300 transition-all duration-300"
+                      className="h-full bg-linear-to-r from-yellow-400 to-yellow-300 transition-all duration-300"
                       style={{ width: `${Math.min(registrationPercentage, 100)}%` }}
                     />
                   </div>
@@ -373,7 +373,7 @@ export default function EventDetails() {
                 <img 
                   src={event.banner_image_url} 
                   alt={event.title}
-                  className="w-full h-80 object-cover inset-0 bg-black/100 via-transparent to-transparent "
+                  className="w-full h-80 object-cover inset-0 bg-black via-transparent to-transparent "
                   
                 />
                              
@@ -437,8 +437,8 @@ export default function EventDetails() {
                     <div className={cn(
                       'w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold mb-4 border-4',
                       isDark
-                        ? 'bg-gradient-to-br from-info-600 to-purple-600 text-white border-info-500'
-                        : 'bg-gradient-to-br from-blue-400 to-purple-500 text-white border-info-400'
+                        ? 'bg-linear-to-br from-info-600 to-purple-600 text-white border-info-500'
+                        : 'bg-linear-to-br from-blue-400 to-purple-500 text-white border-info-400'
                     )}>
                       {event.employer.name?.charAt(0).toUpperCase()}
                     </div>
@@ -518,8 +518,8 @@ export default function EventDetails() {
                         <div className={cn(
                           'w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold',
                           isDark
-                            ? 'bg-gradient-to-br from-info-600 to-purple-600 text-white'
-                            : 'bg-gradient-to-br from-blue-400 to-purple-500 text-white'
+                            ? 'bg-linear-to-br from-info-600 to-purple-600 text-white'
+                            : 'bg-linear-to-br from-blue-400 to-purple-500 text-white'
                         )}>
                           {attendee.profiles?.full_name?.charAt(0).toUpperCase()}
                         </div>
@@ -594,7 +594,7 @@ export default function EventDetails() {
                   value={registrationData.dietary_restrictions}
                   onChange={(e) => setRegistrationData(prev => ({ ...prev, dietary_restrictions: e.target.value }))}
                   className={cn(
-                    'w-full p-3 border rounded-lg focus:ring-2 focus:ring-info-500 focus:border-transparent outline-none',
+                    'w-full p-3 border rounded-lg focus:ring-2 focus:ring-info-500 focus:border-transparent outline-hidden',
                     isDark
                       ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
                       : 'bg-white border-gray-300 text-blbg-black placeholder-gray-400'
@@ -615,7 +615,7 @@ export default function EventDetails() {
                   value={registrationData.accessibility_needs}
                   onChange={(e) => setRegistrationData(prev => ({ ...prev, accessibility_needs: e.target.value }))}
                   className={cn(
-                    'w-full p-3 border rounded-lg focus:ring-2 focus:ring-info-500 focus:border-transparent outline-none',
+                    'w-full p-3 border rounded-lg focus:ring-2 focus:ring-info-500 focus:border-transparent outline-hidden',
                     isDark
                       ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
                       : 'bg-white border-gray-300 text-blbg-black placeholder-gray-400'

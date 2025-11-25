@@ -77,7 +77,7 @@ export const ProfileHoverCard: React.FC<ProfileHoverCardProps> = ({
             onClick={(e) => e.stopPropagation()}
           >
             {/* Cover Photo */}
-            <div className="h-20 bg-gradient-to-r from-info-500/30 to-purple-500/30" />
+            <div className="h-20 bg-linear-to-r from-info-500/30 to-purple-500/30" />
 
             {/* Content */}
             <div className="p-4 pt-2">
@@ -85,7 +85,7 @@ export const ProfileHoverCard: React.FC<ProfileHoverCardProps> = ({
               <div className="flex items-start justify-between -mt-10 mb-3">
                 <motion.div
                   whileHover={{ scale: 1.05 }}
-                  className="flex-shrink-0"
+                  className="shrink-0"
                 >
                   {user.avatar_url ? (
                     <img

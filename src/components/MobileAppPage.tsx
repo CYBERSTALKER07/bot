@@ -312,7 +312,7 @@ export default function MobileAppPage() {
 
       {/* Hero Section */}
       <section ref={heroRef} className={`pt-16 sm:pt-24 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden ${
-        isDark ? 'bg-gradient-to-br from-dark-surface to-dark-bg' : 'bg-gradient-to-br from-white to-gray-50'
+        isDark ? 'bg-linear-to-br from-dark-surface to-dark-bg' : 'bg-linear-to-br from-white to-gray-50'
       }`}>
         {/* Floating decorative elements */}
         <div className="absolute inset-0 pointer-events-none">
@@ -341,8 +341,8 @@ export default function MobileAppPage() {
                 Your Career
                 <span className={`block bg-clip-text text-transparent ${
                   isDark 
-                    ? 'bg-gradient-to-r from-lime to-dark-accent' 
-                    : 'bg-gradient-to-r from-asu-maroon to-asu-gold'
+                    ? 'bg-linear-to-r from-lime to-dark-accent' 
+                    : 'bg-linear-to-r from-asu-maroon to-asu-gold'
                 }`}>
                   In Your Pocket
                 </span>
@@ -475,7 +475,7 @@ export default function MobileAppPage() {
             {features.map((feature, index) => (
               <Card key={index} className="feature-card group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
                 <div className="p-6">
-                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.color} mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-linear-to-br ${feature.color} mb-4 group-hover:scale-110 transition-transform duration-300`}>
                     <div className="text-white">
                       {feature.icon}
                     </div>
@@ -517,7 +517,7 @@ export default function MobileAppPage() {
             {screenshots.map((screenshot, index) => (
               <div key={index} className="screenshot-card group">
                 <Card className="overflow-hidden hover:shadow-2xl transition-all duration-500">
-                  <div className="aspect-w-9 aspect-h-16 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800">
+                  <div className="aspect-w-9 aspect-h-16 bg-linear-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800">
                     <img 
                       src={screenshot.image} 
                       alt={screenshot.title}
@@ -625,7 +625,7 @@ export default function MobileAppPage() {
           <div className="relative">
             <div className="flex space-x-8 testimonial-carousel">
               {[...testimonials, ...testimonials].map((testimonial, index) => (
-                <Card key={index} className="testimonial-card flex-shrink-0 w-96">
+                <Card key={index} className="testimonial-card shrink-0 w-96">
                   <div className="p-6">
                     <div className="flex items-center mb-4">
                       <img 
@@ -664,7 +664,7 @@ export default function MobileAppPage() {
 
       {/* Download Section */}
       <section ref={downloadRef} className={`py-20 px-4 sm:px-6 lg:px-8 ${
-        isDark ? 'bg-gradient-to-br from-dark-surface to-dark-bg' : 'bg-gradient-to-br from-white to-gray-50'
+        isDark ? 'bg-linear-to-br from-dark-surface to-dark-bg' : 'bg-linear-to-br from-white to-gray-50'
       }`}>
         <div className="max-w-4xl mx-auto text-center">
           <div className="download-section">

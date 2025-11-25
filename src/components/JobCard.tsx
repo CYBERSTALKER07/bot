@@ -89,7 +89,7 @@ export default function JobCard({
             'absolute inset-0 opacity-0 transition-opacity duration-300',
             isHovered && 'opacity-5'
           )}>
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-500 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-b from-transparent via-gray-500 to-transparent" />
           </div>
 
           {/* Company Logo/Avatar */}
@@ -221,7 +221,7 @@ export default function JobCard({
             isDark ? 'border-gray-800' : 'border-gray-200'
           )}>
             <div className="flex items-center gap-2">
-              <MapPin className={cn('w-4 h-4 flex-shrink-0', isDark ? 'text-gray-500' : 'text-gray-500')} />
+              <MapPin className={cn('w-4 h-4 shrink-0', isDark ? 'text-gray-500' : 'text-gray-500')} />
               <span className={cn(
                 'text-sm',
                 isDark ? 'text-gray-400' : 'text-gray-600'
@@ -233,7 +233,7 @@ export default function JobCard({
               <>
                 <div className={cn('w-1 h-1 rounded-full', isDark ? 'bg-gray-700' : 'bg-gray-400')} />
                 <div className="flex items-center gap-2">
-                  <DollarSign className={cn('w-4 h-4 flex-shrink-0', isDark ? 'text-gray-500' : 'text-gray-500')} />
+                  <DollarSign className={cn('w-4 h-4 shrink-0', isDark ? 'text-gray-500' : 'text-gray-500')} />
                   <span className={cn(
                     'text-sm font-semibold',
                     isDark ? 'text-gray-300' : 'text-gray-700'

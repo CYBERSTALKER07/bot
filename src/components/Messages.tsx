@@ -347,7 +347,7 @@ export default function Messages() {
                           ? 'bg-info-500 text-white'
                           : (isDark ? 'bg-gray-800' : 'bg-gray-100')
                       }`}>
-                        <p className="break-words">{message.content}</p>
+                        <p className="wrap-break-word">{message.content}</p>
                         <p className={`text-xs mt-1 ${
                           message.sender_id === user?.id
                             ? 'text-info-100'
@@ -376,7 +376,7 @@ export default function Messages() {
                     onChange={(e) => setNewMessage(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                     placeholder="Type a message..."
-                    className={`flex-1 bg-transparent outline-none ${
+                    className={`flex-1 bg-transparent outline-hidden ${
                       isDark ? 'text-white placeholder-gray-400' : 'text-black placeholder-gray-600'
                     }`}
                   />

@@ -210,7 +210,7 @@ export default function Register() {
                         : isDark
                           ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-[#BCE953]'
                           : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#BCE953]'
-                    } focus:outline-none focus:ring-2 focus:ring-[#BCE953]/20`}
+                    } focus:outline-hidden focus:ring-2 focus:ring-[#BCE953]/20`}
                   />
                   {validationErrors.firstName && (
                     <p className="text-red-500 text-sm flex items-center space-x-1">
@@ -232,7 +232,7 @@ export default function Register() {
                         : isDark
                           ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-[#BCE953]'
                           : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#BCE953]'
-                    } focus:outline-none focus:ring-2 focus:ring-[#BCE953]/20`}
+                    } focus:outline-hidden focus:ring-2 focus:ring-[#BCE953]/20`}
                   />
                   {validationErrors.lastName && (
                     <p className="text-red-500 text-sm flex items-center space-x-1">
@@ -257,7 +257,7 @@ export default function Register() {
                         : isDark
                           ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-[#BCE953]'
                           : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#BCE953]'
-                    } focus:outline-none focus:ring-2 focus:ring-[#BCE953]/20`}
+                    } focus:outline-hidden focus:ring-2 focus:ring-[#BCE953]/20`}
                   />
                   <Mail className={`absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 ${
                     isDark ? 'text-gray-400' : 'text-gray-500'
@@ -285,7 +285,7 @@ export default function Register() {
                         : isDark
                           ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-[#BCE953]'
                           : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#BCE953]'
-                    } focus:outline-none focus:ring-2 focus:ring-[#BCE953]/20`}
+                    } focus:outline-hidden focus:ring-2 focus:ring-[#BCE953]/20`}
                   />
                   {validationErrors.companyName && (
                     <p className="text-red-500 text-sm flex items-center space-x-1">
@@ -311,7 +311,7 @@ export default function Register() {
                           : isDark
                             ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-[#BCE953]'
                             : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#BCE953]'
-                      } focus:outline-none focus:ring-2 focus:ring-[#BCE953]/20`}
+                      } focus:outline-hidden focus:ring-2 focus:ring-[#BCE953]/20`}
                     />
                     <button
                       type="button"
@@ -344,7 +344,7 @@ export default function Register() {
                           : isDark
                             ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-[#BCE953]'
                             : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#BCE953]'
-                      } focus:outline-none focus:ring-2 focus:ring-[#BCE953]/20`}
+                      } focus:outline-hidden focus:ring-2 focus:ring-[#BCE953]/20`}
                     />
                     <button
                       type="button"
@@ -464,10 +464,10 @@ export default function Register() {
         <div className="hidden lg:flex relative flex-1 overflow-hidden">
           <div className={`absolute inset-0 ${
             isDark 
-              ? 'bg-gradient-to-br from-gray-900 via-black to-gray-900' 
-              : 'bg-gradient-to-br from-info-600 via-purple-600 to-indigo-600'
+              ? 'bg-linear-to-br from-gray-900 via-black to-gray-900' 
+              : 'bg-linear-to-br from-info-600 via-purple-600 to-indigo-600'
           }`}>
-            <div className="absolute inset-0 bg-gradient-to-br from-[#BCE953]/20 to-transparent"></div>
+            <div className="absolute inset-0 bg-linear-to-br from-[#BCE953]/20 to-transparent"></div>
           </div>
           
           <div className="relative z-10 flex flex-col justify-center items-center h-full p-12 text-white">

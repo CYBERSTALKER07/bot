@@ -65,7 +65,7 @@ export default function Avatar({
 
   const baseClasses = "relative inline-flex items-center justify-center overflow-hidden transition-all duration-200";
   const borderClasses = bordered ? "ring-2 ring-white shadow-lg" : "";
-  const gradientClasses = gradient ? "bg-gradient-to-br from-asu-maroon to-asu-maroon-dark" : "bg-gray-200";
+  const gradientClasses = gradient ? "bg-linear-to-br from-asu-maroon to-asu-maroon-dark" : "bg-gray-200";
   const clickableClasses = onClick ? "cursor-pointer hover:scale-105 transform" : "";
 
   const avatarClasses = `

@@ -48,7 +48,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(({
   };
 
   const getVariantClasses = () => {
-    const baseClasses = 'transition-all duration-200 ease-material-standard focus:outline-none cursor-pointer appearance-none';
+    const baseClasses = 'transition-all duration-200 ease-material-standard focus:outline-hidden cursor-pointer appearance-none';
     
     if (variant === 'outlined') {
       return error

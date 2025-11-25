@@ -343,7 +343,7 @@ export function EventCardSkeleton() {
         </div>
 
         {/* Attendees Count */}
-        <Skeleton width={50} height={24} className="rounded-full flex-shrink-0" />
+        <Skeleton width={50} height={24} className="rounded-full shrink-0" />
       </div>
     </div>
   );
@@ -403,7 +403,7 @@ export function CompanyCardSkeleton() {
     <div className="p-3 rounded-xl border border-gray-200 dark:border-gray-800">
       <div className="flex items-start gap-3">
         {/* Logo */}
-        <Skeleton variant="rectangular" width={48} height={48} className="rounded-lg flex-shrink-0" />
+        <Skeleton variant="rectangular" width={48} height={48} className="rounded-lg shrink-0" />
 
         {/* Company Info */}
         <div className="flex-1 space-y-2 min-w-0">
@@ -426,7 +426,7 @@ export function CompanyDetailsSkeleton() {
       <div className="px-4 space-y-4">
         {/* Logo and Title */}
         <div className="flex items-start gap-4">
-          <Skeleton variant="rectangular" width={80} height={80} className="rounded-lg flex-shrink-0" />
+          <Skeleton variant="rectangular" width={80} height={80} className="rounded-lg shrink-0" />
           <div className="flex-1 space-y-3">
             <Skeleton width="60%" height={28} />
             <Skeleton width="40%" height={16} />
@@ -671,7 +671,7 @@ export function WhoToFollowItemSkeleton() {
       </div>
 
       {/* Follow Button */}
-      <Skeleton width={80} height={32} className="rounded-full flex-shrink-0 ml-2" />
+      <Skeleton width={80} height={32} className="rounded-full shrink-0 ml-2" />
     </div>
   );
 }
@@ -852,7 +852,7 @@ export function RightSidebarCompaniesSkeleton() {
           <div key={i} className="p-3 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors">
             <div className="flex items-start space-x-3">
               {/* Company Logo */}
-              <Skeleton variant="rectangular" width={40} height={40} className="rounded-lg flex-shrink-0" />
+              <Skeleton variant="rectangular" width={40} height={40} className="rounded-lg shrink-0" />
               <div className="flex-1 space-y-2 min-w-0">
                 <Skeleton width="60%" height={16} />
                 <Skeleton width="70%" height={12} />
@@ -887,7 +887,7 @@ export function RightSidebarWhoToFollowSkeleton() {
             </div>
 
             {/* Follow Button */}
-            <Skeleton width={80} height={32} className="rounded-full flex-shrink-0 ml-2 bg-gray-800" />
+            <Skeleton width={80} height={32} className="rounded-full shrink-0 ml-2 bg-gray-800" />
           </div>
         ))}
       </div>
@@ -1043,7 +1043,7 @@ export function SearchPageSidebarSkeleton() {
                 </div>
 
                 {/* Follow Button */}
-                <Skeleton width={80} height={32} className="rounded-full flex-shrink-0 ml-2" />
+                <Skeleton width={80} height={32} className="rounded-full shrink-0 ml-2" />
               </div>
             ))}
           </div>

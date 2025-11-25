@@ -326,7 +326,7 @@ export default function ResourceDetails() {
   }
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-gray-50 to-white relative">
+    <div ref={containerRef} className="min-h-screen bg-linear-to-br from-gray-50 to-white relative">
       {/* Decorative elements */}
       <div className="resource-decoration absolute top-16 right-24 w-4 h-4 bg-asu-gold/40 rounded-full"></div>
       <div className="resource-decoration absolute top-32 left-16 w-3 h-3 bg-asu-maroon/30 rounded-full"></div>
@@ -358,7 +358,7 @@ export default function ResourceDetails() {
 
         {/* Header */}
         <div ref={headerRef} className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden mb-8">
-          <div className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark p-8 text-white">
+          <div className="bg-linear-to-r from-asu-maroon to-asu-maroon-dark p-8 text-white">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-4">
                 <div className={`flex items-center space-x-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm`}>

@@ -152,7 +152,7 @@ export default function MentionInput({
                 onKeyDown={handleKeyDown}
                 placeholder={placeholder}
                 className={cn(
-                    "w-full p-4 rounded-xl resize-none focus:outline-none focus:ring-2 transition-all duration-200",
+                    "w-full p-4 rounded-xl resize-none focus:outline-hidden focus:ring-2 transition-all duration-200",
                     isDark
                         ? "bg-gray-900 text-white placeholder-gray-500 focus:ring-gray-700"
                         : "bg-gray-50 text-gray-900 placeholder-gray-400 focus:ring-gray-200",

@@ -221,7 +221,7 @@ export default function Carousel({
         {items.map((item, index) => (
           <div
             key={item.id}
-            className="flex-shrink-0 select-none"
+            className="shrink-0 select-none"
             style={{ width: `${100 / items.length}%` }}
           >
             {item.content}
@@ -295,7 +295,7 @@ export default function Carousel({
                   : isDark
                   ? 'bg-dark-muted/50 hover:bg-dark-muted'
                   : 'bg-white/50 hover:bg-white/80'
-              } backdrop-blur-sm shadow-sm`}
+              } backdrop-blur-sm shadow-xs`}
             />
           ))}
         </div>

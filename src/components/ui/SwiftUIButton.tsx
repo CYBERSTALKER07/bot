@@ -105,7 +105,7 @@ const SwiftUIButton = forwardRef<HTMLButtonElement, SwiftUIButtonProps>(({
   const baseClasses = `
     relative inline-flex items-center justify-center font-medium
     transition-all duration-200 ease-out
-    focus:outline-none focus:ring-2 focus:ring-offset-2 
+    focus:outline-hidden focus:ring-2 focus:ring-offset-2 
     disabled:opacity-50 disabled:cursor-not-allowed
     disabled:pointer-events-none overflow-hidden
     select-none cursor-pointer

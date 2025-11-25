@@ -115,7 +115,7 @@ export default function QuoteRetweetModal({
               src={user?.profile?.avatar_url}
               alt={user?.profile?.full_name || 'User'}
               size="md"
-              className="flex-shrink-0"
+              className="shrink-0"
             />
             <div className="flex-1 min-w-0">
               <div className={cn(
@@ -140,7 +140,7 @@ export default function QuoteRetweetModal({
             placeholder="Add a comment..."
             className={cn(
               'w-full text-lg placeholder-gray-400 bg-transparent border-none resize-none',
-              'focus:outline-none min-h-[100px]',
+              'focus:outline-hidden min-h-[100px]',
               isDark ? 'text-white' : 'text-black'
             )}
           />
@@ -177,7 +177,7 @@ export default function QuoteRetweetModal({
                 src={post.author.avatar_url}
                 alt={post.author.name}
                 size="sm"
-                className="flex-shrink-0 mt-1"
+                className="shrink-0 mt-1"
               />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center space-x-2 mb-1">

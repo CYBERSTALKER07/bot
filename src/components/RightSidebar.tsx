@@ -88,7 +88,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                             type="text"
                             placeholder="Search users, jobs, companies..."
                             className={cn(
-                                'bg-transparent border-none outline-none w-full text-sm placeholder-gray-500',
+                                'bg-transparent border-none outline-hidden w-full text-sm placeholder-gray-500',
                                 isDark ? 'text-white' : 'text-black'
                             )}
                             value={sidebarSearchInput}
@@ -211,12 +211,12 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                                         <img
                                             src={company.logo_url}
                                             alt={company.name}
-                                            className="w-10 h-10 rounded-3xl object-cover flex-shrink-0"
+                                            className="w-10 h-10 rounded-3xl object-cover shrink-0"
                                         />
                                     ) : (
                                         <div className={cn(
-                                            'w-10 h-10 rounded-3xl flex items-center justify-center flex-shrink-0 font-bold text-sm text-white',
-                                            'bg-gradient-to-br from-[#1C1F20] to-gray-600'
+                                            'w-10 h-10 rounded-3xl flex items-center justify-center shrink-0 font-bold text-sm text-white',
+                                            'bg-linear-to-br from-[#1C1F20] to-gray-600'
                                         )}>
                                             {company.name?.charAt(0) || '🏢'}
                                         </div>

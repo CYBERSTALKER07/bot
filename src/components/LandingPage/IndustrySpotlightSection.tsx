@@ -108,8 +108,8 @@ export default function IndustrySpotlightSection({ industryRef }: IndustrySpotli
           >
             Explore Career Paths by <span className={`bg-clip-text text-transparent ${
               isDark 
-                ? 'bg-gradient-to-r from-lime to-dark-accent' 
-                : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
+                ? 'bg-linear-to-r from-lime to-dark-accent' 
+                : 'bg-linear-to-r from-asu-maroon to-asu-maroon-dark'
             }`}>Industry</span>
           </Typography>
           <Typography 
@@ -134,15 +134,15 @@ export default function IndustrySpotlightSection({ industryRef }: IndustrySpotli
               elevation={3}
             >
               {/* Gradient overlay */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${industry.color} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
+              <div className={`absolute inset-0 bg-linear-to-br ${industry.color} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
               
               <div className="relative p-6">
                 {/* Icon and title */}
                 <div className="flex items-center justify-between mb-4">
                   <div className={`p-8 rounded-2xl text-white relative overflow-hidden transition-colors duration-300 ${
                     isDark 
-                      ? 'bg-gradient-to-r from-dark-surface to-lime' 
-                      : 'bg-gradient-to-r from-asu-maroon to-asu-maroon'
+                      ? 'bg-linear-to-r from-dark-surface to-lime' 
+                      : 'bg-linear-to-r from-asu-maroon to-asu-maroon'
                   }`}>
                     <div className="text-white">{industry.icon}</div>
                   </div>

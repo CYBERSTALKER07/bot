@@ -166,7 +166,7 @@ export default function NotificationsPage() {
           </div>
 
           {/* Mobile-optimized action buttons */}
-          <div className="flex items-center space-x-2 flex-shrink-0">
+          <div className="flex items-center space-x-2 shrink-0">
             {unreadCount > 0 && (
               <Button
                 variant="outlined"
@@ -205,9 +205,9 @@ export default function NotificationsPage() {
               size="small"
               onClick={() => setFilter(tab.key as 'all' | 'unread' | 'mention' | 'job_match' | 'application_update')}
               className={cn(
-                "whitespace-nowrap flex-shrink-0 text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-full transition-all duration-200",
+                "whitespace-nowrap shrink-0 text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-full transition-all duration-200",
                 "ios-touch-target", // iOS-friendly touch target
-                filter === tab.key && "shadow-sm"
+                filter === tab.key && "shadow-xs"
               )}
             >
               {tab.label}
@@ -257,7 +257,7 @@ export default function NotificationsPage() {
               key={notification.id}
               className={cn(
                 "transition-all duration-200 hover:shadow-md cursor-pointer mx-2 sm:mx-0 rounded-xl sm:rounded-2xl",
-                "active:scale-[0.98] active:shadow-sm", // Mobile press feedback
+                "active:scale-[0.98] active:shadow-xs", // Mobile press feedback
                 "ios-touch-target ios-nav-item", // iOS-friendly interactions
                 !notification.isRead && (isDark
                   ? 'bg-lime/5 border-lime/20 shadow-lime/5'
@@ -275,7 +275,7 @@ export default function NotificationsPage() {
               <div className="p-3 sm:p-4">
                 <div className="flex items-start space-x-3 sm:space-x-4">
                   {/* Mobile-optimized avatar/icon */}
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     {notification.avatar ? (
                       <img
                         src={notification.avatar}
@@ -318,7 +318,7 @@ export default function NotificationsPage() {
 
                         {/* Mobile-optimized metadata */}
                         <div className="flex items-center space-x-2 text-xs text-gray-500">
-                          <Clock className="h-3 w-3 flex-shrink-0" />
+                          <Clock className="h-3 w-3 shrink-0" />
                           <span className="truncate">{formatTimestamp(notification.timestamp)}</span>
                           {notification.company && (
                             <>
@@ -330,7 +330,7 @@ export default function NotificationsPage() {
                       </div>
 
                       {/* Mobile-optimized action buttons */}
-                      <div className="flex items-center space-x-1 flex-shrink-0">
+                      <div className="flex items-center space-x-1 shrink-0">
                         <Button
                           variant="ghost"
                           size="small"

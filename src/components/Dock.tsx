@@ -126,7 +126,7 @@ function DockLabel({ children, className = '', isHovered }: DockLabelProps) {
                     exit={{ opacity: 0, x: 10 }}
                     transition={{ duration: 0.2 }}
                     className={cn(
-                        "absolute left-full ml-3 w-fit whitespace-pre rounded-md border border-neutral-200 bg-white px-2 py-0.5 text-xs text-black shadow-sm",
+                        "absolute left-full ml-3 w-fit whitespace-pre rounded-md border border-neutral-200 bg-white px-2 py-0.5 text-xs text-black shadow-xs",
                         "dark:border-neutral-800 dark:bg-black dark:text-white",
                         className
                     )}
@@ -147,7 +147,8 @@ type DockIconProps = {
 };
 
 function DockIcon({ children, className = '' }: DockIconProps) {
-    return <div className={`flex items-center justify-center ${className}`}>{children}</div>;
+    // Apply default size for SDK UI icons (size-6) and allow overrides via className
+    return <div className={cn(`flex items-center justify-center size-6 ${className}`)}>{children}</div>;
 }
 
 export default function Dock({

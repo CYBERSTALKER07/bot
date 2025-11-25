@@ -296,8 +296,8 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 				ref={decorativeRef}
 				className={`absolute top-0 left-0 w-full h-2 transform -skew-x-12 ${
 					isDark
-						? 'bg-gradient-to-r from-transparent via-lime/30 to-transparent'
-						: 'bg-gradient-to-r from-transparent via-asu-maroon/30 to-transparent'
+						? 'bg-linear-to-r from-transparent via-lime/30 to-transparent'
+						: 'bg-linear-to-r from-transparent via-asu-maroon/30 to-transparent'
 				}`}
 			/>
 
@@ -330,13 +330,13 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 			<div ref={firstRowRef} className="relative overflow-hidden mb-8">
 				<div className="carousel-container flex space-x-6 items-center">
 					{[...firstRowCompanies, ...firstRowCompanies].map((company, index) => (
-						<div key={`first-${index}`} className={`hiring-card group relative rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 border min-w-[320px] flex-shrink-0 bg-white hover:border-info-300 ${
+						<div key={`first-${index}`} className={`hiring-card group relative rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 border min-w-[320px] shrink-0 bg-white hover:border-info-300 ${
 							isDark
 								? 'border-gray-200'
 								: 'border-gray-200'
 						}`}>
 							<div className="flex items-start space-x-4">
-								<div className="flex-shrink-0">
+								<div className="shrink-0">
 									<div className="relative">
 										<img
 											src={company.logo}
@@ -375,13 +375,13 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 			<div ref={secondRowRef} className="relative overflow-hidden">
 				<div className="carousel-container flex space-x-6 items-center">
 					{[...secondRowCompanies, ...secondRowCompanies].map((company, index) => (
-						<div key={`second-${index}`} className={`hiring-card group relative rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 border min-w-[320px] flex-shrink-0 bg-white hover:border-info-300 ${
+						<div key={`second-${index}`} className={`hiring-card group relative rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 border min-w-[320px] shrink-0 bg-white hover:border-info-300 ${
 							isDark
 								? 'border-gray-200'
 								: 'border-gray-200'
 						}`}>
 							<div className="flex items-start space-x-4">
-								<div className="flex-shrink-0">
+								<div className="shrink-0">
 									<div className="relative">
 										<img
 											src={company.logo}
@@ -419,13 +419,13 @@ export default function CompanySection({ companiesRef }: CompanySectionProps) {
 			{/* Animated Gradient overlays */}
 			<div className={`absolute left-0 top-0 w-32 h-full z-10 pointer-events-none ${
 				isDark
-					? 'bg-gradient-to-r from-dark-surface to-transparent'
-					: 'bg-gradient-to-r from-white to-transparent'
+					? 'bg-linear-to-r from-dark-surface to-transparent'
+					: 'bg-linear-to-r from-white to-transparent'
 			}`}></div>
 			<div className={`absolute right-0 top-0 w-32 h-full z-10 pointer-events-none ${
 				isDark
-					? 'bg-gradient-to-l from-dark-surface to-transparent'
-					: 'bg-gradient-to-l from-white to-transparent'
+					? 'bg-linear-to-l from-dark-surface to-transparent'
+					: 'bg-linear-to-l from-white to-transparent'
 			}`}></div>
 		</section>
 	);

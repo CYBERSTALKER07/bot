@@ -61,7 +61,7 @@ export default function QuoteTweetCard({ post, isDark, onClick }: QuoteTweetCard
           <Link 
             to={`/profile/${post.author.id}`}
             onClick={(e) => e.stopPropagation()}
-            className="flex-shrink-0"
+            className="shrink-0"
           >
             <Avatar
               src={post.author.avatar_url}
@@ -80,7 +80,7 @@ export default function QuoteTweetCard({ post, isDark, onClick }: QuoteTweetCard
               {post.author.name}
             </Link>
             {post.author.verified && (
-              <div className="w-4 h-4 bg-info-500 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-4 h-4 bg-info-500 rounded-full flex items-center justify-center shrink-0">
                 <span className="text-white text-[10px]">✓</span>
               </div>
             )}

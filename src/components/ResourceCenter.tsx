@@ -296,7 +296,7 @@ export default function ResourceCenter() {
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className={`px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
+                className={`px-4 py-3 border rounded-lg focus:outline-hidden focus:ring-2 transition-colors ${
                   isDark 
                     ? 'border-gray-600 bg-dark-surface text-dark-text focus:ring-lime' 
                     : 'border-gray-300 bg-white text-gray-900 focus:ring-asu-maroon'
@@ -311,7 +311,7 @@ export default function ResourceCenter() {
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className={`px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
+                className={`px-4 py-3 border rounded-lg focus:outline-hidden focus:ring-2 transition-colors ${
                   isDark 
                     ? 'border-gray-600 bg-dark-surface text-dark-text focus:ring-lime' 
                     : 'border-gray-300 bg-white text-gray-900 focus:ring-asu-maroon'

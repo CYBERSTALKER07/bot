@@ -133,7 +133,7 @@ export const TrendingTopics: React.FC<TrendingTopicsProps> = ({
                     scale: hoveredTopic === topic.id ? 1.1 : 1,
                   }}
                   className={cn(
-                    'ml-2 px-2 py-1 rounded-full text-xs font-bold flex-shrink-0 flex items-center gap-1',
+                    'ml-2 px-2 py-1 rounded-full text-xs font-bold shrink-0 flex items-center gap-1',
                     hoveredTopic === topic.id
                       ? isDark
                         ? 'bg-info-500/20 text-info-400'

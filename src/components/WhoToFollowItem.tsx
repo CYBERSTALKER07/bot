@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
+import { Button } from "@openai/apps-sdk-ui/components/Button";
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useFollowUser, useUnfollowUser, useFollowStatus } from '../hooks/useOptimizedQuery';
 import { cn } from '../lib/cva';
-import Button from './ui/Button';
 import { useNavigate } from 'react-router-dom';
 
 interface WhoToFollowItemProps {
@@ -105,11 +105,11 @@ export default function WhoToFollowItem({ user, onNavigate }: WhoToFollowItemPro
           <img
             src={user.avatar_url}
             alt={user.full_name}
-            className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+            className="w-10 h-10 rounded-full object-cover shrink-0"
           />
         ) : (
           <div className={cn(
-            "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold text-sm",
+            "w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-white font-bold text-sm",
             isDark ? 'bg-gray-700' : 'bg-gray-400'
           )}>
             {user.full_name?.charAt(0).toUpperCase() || 'U'}
@@ -124,7 +124,7 @@ export default function WhoToFollowItem({ user, onNavigate }: WhoToFollowItemPro
               {user.full_name}
             </h4>
             {user.verified && (
-              <div className="w-4 h-4 bg-info-500 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-4 h-4 bg-info-500 rounded-full flex items-center justify-center shrink-0">
                 <span className="text-white text-xs">✓</span>
               </div>
             )}
@@ -148,15 +148,15 @@ export default function WhoToFollowItem({ user, onNavigate }: WhoToFollowItemPro
 
       {/* Follow Button */}
       <Button
-        size="medium"
-        className={cn(
-          "rounded-xl w-[80px] h-[32px] font-semibold text-xs flex-shrink-0 ml-2 transition-all duration-500",
-          isDark
-            ? "bg-white text-black hover:bg-gray-100 border border-gray-300"
-            : "bg-white text-black hover:bg-black hover:text-white border-gray-200 shadow-2xl hover:shadow-3xl "
-        )}
+        size="sm"
+        color={isFollowing ? "secondary" : "primary"}
+        variant={isFollowing ? "soft" : "solid"}
         onClick={handleFollowClick}
         disabled={processingFollowId === user.id || statusLoading}
+        className={cn(
+          "w-[80px] shrink-0 ml-2 text-xs",
+          isFollowing && hoveredFollowId === user.id && 'hover:!bg-red-500 hover:!text-white'
+        )}
       >
         <span className={cn(
           "inline-block transition-all duration-300 ease-in-out",

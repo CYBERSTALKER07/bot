@@ -257,7 +257,7 @@ export default function AIJobRecommendations() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="p-2 rounded-lg bg-gradient-to-r from-info-500 to-purple-600">
+              <div className="p-2 rounded-lg bg-linear-to-r from-info-500 to-purple-600">
                 <Sparkles className="h-6 w-6 text-white" />
               </div>
               <div>

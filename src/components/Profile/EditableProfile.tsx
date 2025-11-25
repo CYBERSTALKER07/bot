@@ -284,7 +284,7 @@ export default function EditableProfile() {
     )}>
       {/* Cover Image */}
       <div 
-        className="relative h-48 bg-gradient-to-r from-info-500 to-purple-600"
+        className="relative h-48 bg-linear-to-r from-info-500 to-purple-600"
         style={{ backgroundColor: profile.banner_color }}
       >
         {profile.cover_image_url && (

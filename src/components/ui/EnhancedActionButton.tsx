@@ -146,7 +146,7 @@ export const EnhancedActionButton: React.FC<EnhancedActionButtonProps> = ({
       whileTap={isMobile ? { scale: 0.85 } : undefined}
       className={cn(
         'relative flex items-center gap-2 px-3 py-2 rounded-full',
-        'transition-all duration-200 outline-none',
+        'transition-all duration-200 outline-hidden',
         'group',
         colors.hoverBg,
         isActive ? colors.active : colors.default,

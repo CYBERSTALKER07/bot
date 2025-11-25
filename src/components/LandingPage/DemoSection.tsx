@@ -43,8 +43,8 @@ export default function DemoSection({ demoRef }: DemoSectionProps) {
   return (
     <section ref={demoRef} className={`relative py-24 overflow-hidden transition-colors duration-300 ${
       isDark 
-        ? 'bg-gradient-to-r from-dark-surface via-dark-bg to-dark-surface' 
-        : 'bg-gradient-to-r from-asu-maroon via-asu-maroon-dark to-asu-maroon'
+        ? 'bg-linear-to-r from-dark-surface via-dark-bg to-dark-surface' 
+        : 'bg-linear-to-r from-asu-maroon via-asu-maroon-dark to-asu-maroon'
     }`}>
       <div className={`demo-bg absolute inset-0 ${
         isDark ? 'bg-dark-bg/20' : 'bg-black/20'
@@ -219,8 +219,8 @@ export default function DemoSection({ demoRef }: DemoSectionProps) {
                   {/* Profile Completion */}
                   <div className={`rounded-xl p-6 text-white ${
                     isDark 
-                      ? 'bg-gradient-to-br from-lime to-dark-accent' 
-                      : 'bg-gradient-to-br from-asu-maroon to-asu-maroon-dark'
+                      ? 'bg-linear-to-br from-lime to-dark-accent' 
+                      : 'bg-linear-to-br from-asu-maroon to-asu-maroon-dark'
                   }`}>
                     <h3 className="font-bold mb-3">Profile Strength</h3>
                     <div className="w-full bg-white/20 rounded-full h-2 mb-3">

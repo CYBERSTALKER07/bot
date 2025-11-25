@@ -57,7 +57,7 @@ export default function CompanyCard({
             className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
           />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-r from-info-500 to-purple-600" />
+          <div className="absolute inset-0 bg-linear-to-r from-info-500 to-purple-600" />
         )}
         
         {/* Dark overlay for better text readability */}
@@ -125,7 +125,7 @@ export default function CompanyCard({
             
             {/* Location and Size */}
             <div className="flex items-center gap-2 text-xs text-white/80">
-              <MapPin className="w-3 h-3 flex-shrink-0" />
+              <MapPin className="w-3 h-3 shrink-0" />
               <span className="line-clamp-1">{location}</span>
             </div>
          
@@ -156,7 +156,7 @@ export default function CompanyCard({
         </div>
 
         {/* Hover Overlay Effect */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-5" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-5" />
       </div>
     </Link>
   );

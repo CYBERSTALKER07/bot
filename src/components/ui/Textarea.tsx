@@ -29,7 +29,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(({
   value,
   ...props
 }, ref) => {
-  const baseClasses = "transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-asu-maroon border-2";
+  const baseClasses = "transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-asu-maroon border-2";
   
   const variantClasses = {
     default: "bg-white border-gray-200 focus:border-asu-maroon hover:shadow-md",

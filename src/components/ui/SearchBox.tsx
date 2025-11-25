@@ -90,7 +90,7 @@ export default function SearchBox({
         disabled={disabled}
         className={`
           w-full ${inputSizeClasses[size]} 
-          bg-transparent border-0 outline-none 
+          bg-transparent border-0 outline-hidden 
           text-gray-900 placeholder-gray-500
           ${clearable && value ? 'pr-10' : ''}
         `.trim().replace(/\s+/g, ' ')}

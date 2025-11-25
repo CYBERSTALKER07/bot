@@ -421,7 +421,7 @@ export default function CreatePost() {
                 className="z-10"
               />
               <div className={cn(
-                "w-0.5 flex-grow mt-2 mb-2 rounded-full",
+                "w-0.5 grow mt-2 mb-2 rounded-full",
                 isDark ? "bg-[#333639]" : "bg-gray-200"
               )} />
               <Avatar
@@ -446,7 +446,7 @@ export default function CreatePost() {
                 placeholder="Start a thread..."
                 className={cn(
                   'w-full text-base bg-transparent border-none resize-none p-0',
-                  'focus:outline-none min-h-[60px] placeholder-gray-500 focus:ring-0',
+                  'focus:outline-hidden min-h-[60px] placeholder-gray-500 focus:ring-0',
                   isDark ? 'text-[#e7e9ea]' : 'text-black'
                 )}
                 minHeight="auto"

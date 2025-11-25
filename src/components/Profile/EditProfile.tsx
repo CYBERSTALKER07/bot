@@ -293,7 +293,7 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
                 ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
                 : 'border-gray-300 dark:border-gray-600 focus:border-info-500 focus:ring-info-500',
               'bg-white dark:bg-gray-900 text-gray-900 dark:text-white',
-              'focus:outline-none focus:ring-2'
+              'focus:outline-hidden focus:ring-2'
             )}
             rows={3}
             maxLength={maxLength}
@@ -311,7 +311,7 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
                 ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
                 : 'border-gray-300 dark:border-gray-600 focus:border-info-500 focus:ring-info-500',
               'bg-white dark:bg-gray-900 text-gray-900 dark:text-white',
-              'focus:outline-none focus:ring-2'
+              'focus:outline-hidden focus:ring-2'
             )}
             maxLength={maxLength}
           />
@@ -350,7 +350,7 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
     )}>
       {/* Header */}
       <div className={cn(
-        'sticky top-0 z-10 backdrop-blur-md border-b flex-shrink-0',
+        'sticky top-0 z-10 backdrop-blur-md border-b shrink-0',
         isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
       )}>
         <div className="flex items-center justify-between p-4">
@@ -401,7 +401,7 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500" />
+                <div className="w-full h-full bg-linear-to-br from-blue-400 via-purple-500 to-pink-500" />
               )}
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                 <ImageUpload
@@ -426,7 +426,7 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
                     className="w-20 h-20 rounded-full object-cover border-4 border-white dark:border-gray-800"
                   />
                 ) : (
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-info-500 to-purple-600 flex items-center justify-center text-white font-bold text-2xl border-4 border-white dark:border-gray-800">
+                  <div className="w-20 h-20 rounded-full bg-linear-to-br from-info-500 to-purple-600 flex items-center justify-center text-white font-bold text-2xl border-4 border-white dark:border-gray-800">
                     {(profileData.full_name || 'U').charAt(0)}
                   </div>
                 )}
@@ -522,7 +522,7 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
                       'w-full px-3 py-2 pl-10 border rounded-lg resize-none transition-colors',
                       'border-gray-300 dark:border-gray-600 focus:border-info-500 focus:ring-info-500',
                       'bg-white dark:bg-gray-900 text-gray-900 dark:text-white',
-                      'focus:outline-none focus:ring-2'
+                      'focus:outline-hidden focus:ring-2'
                     )}
                     rows={2}
                   />
@@ -552,7 +552,7 @@ export default function EditProfile({ isModal = false, onClose }: EditProfilePro
                       'w-full px-3 py-2 pl-10 border rounded-lg resize-none transition-colors',
                       'border-gray-300 dark:border-gray-600 focus:border-info-500 focus:ring-info-500',
                       'bg-white dark:bg-gray-900 text-gray-900 dark:text-white',
-                      'focus:outline-none focus:ring-2'
+                      'focus:outline-hidden focus:ring-2'
                     )}
                     rows={2}
                   />

@@ -59,7 +59,7 @@ export default function PremiumUpgrade() {
                     <button
                         onClick={() => setBillingCycle('monthly')}
                         className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${billingCycle === 'monthly'
-                            ? 'bg-white text-black shadow-sm'
+                            ? 'bg-white text-black shadow-xs'
                             : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-300'
                             }`}
                     >
@@ -68,7 +68,7 @@ export default function PremiumUpgrade() {
                     <button
                         onClick={() => setBillingCycle('yearly')}
                         className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${billingCycle === 'yearly'
-                            ? 'bg-white text-black shadow-sm'
+                            ? 'bg-white text-black shadow-xs'
                             : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-300'
                             }`}
                     >

@@ -158,7 +158,7 @@ export default function CompanyLogosBackground({
         {logoConfig.map((logo) => (
           <div
             key={logo.id}
-            className="absolute w-12 h-12 bg-white/90 backdrop-blur-sm border border-gray-200/30 shadow-sm rounded-lg flex items-center justify-center"
+            className="absolute w-12 h-12 bg-white/90 backdrop-blur-sm border border-gray-200/30 shadow-xs rounded-lg flex items-center justify-center"
             style={{
               left: `${logo.x}%`,
               top: `${logo.y}%`,
@@ -188,7 +188,7 @@ export default function CompanyLogosBackground({
         <div
           key={logo.id}
           id={logo.id}
-          className="floating-logo absolute bg-white/90 backdrop-blur-sm border border-gray-200/30 shadow-sm rounded-lg flex items-center justify-center will-change-transform"
+          className="floating-logo absolute bg-white/90 backdrop-blur-sm border border-gray-200/30 shadow-xs rounded-lg flex items-center justify-center will-change-transform"
           style={{
             width: `${logo.size}px`,
             height: `${logo.size}px`,

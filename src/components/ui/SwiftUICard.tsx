@@ -115,8 +115,8 @@ export const SwiftUICard: React.FC<SwiftUICardProps> = ({
       ? "bg-dark-bg border-0" 
       : "bg-gray-50 border-0",
     outlined: isDark 
-      ? "bg-dark-surface border-2 border-lime/20 shadow-sm" 
-      : "bg-white border-2 border-gray-200 shadow-sm"
+      ? "bg-dark-surface border-2 border-lime/20 shadow-xs" 
+      : "bg-white border-2 border-gray-200 shadow-xs"
   };
 
   const paddingClasses = {

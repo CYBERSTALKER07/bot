@@ -267,7 +267,7 @@ export default function EnhancedPostCreator({
                             src={(user as any)?.user_metadata?.avatar_url}
                             alt={(user as any)?.user_metadata?.full_name}
                             size="lg"
-                            className="flex-shrink-0"
+                            className="shrink-0"
                         />
 
                         {/* Input Area */}
@@ -304,7 +304,7 @@ export default function EnhancedPostCreator({
                                     placeholder="What's happening?!"
                                     className={cn(
                                         'relative w-full px-3 py-2 text-xl bg-transparent border-none resize-none',
-                                        'focus:outline-none min-h-[120px] placeholder-gray-500',
+                                        'focus:outline-hidden min-h-[120px] placeholder-gray-500',
                                         'caret-info-500',
                                         isDark ? 'text-white' : 'text-black'
                                     )}
@@ -459,7 +459,7 @@ export default function EnhancedPostCreator({
                                         <select
                                             value={visibility}
                                             onChange={(e) => setVisibility(e.target.value as any)}
-                                            className="bg-transparent text-sm font-medium border-none outline-none cursor-pointer"
+                                            className="bg-transparent text-sm font-medium border-none outline-hidden cursor-pointer"
                                         >
                                             <option value="public">Public</option>
                                             <option value="connections">Connections</option>

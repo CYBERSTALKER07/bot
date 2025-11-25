@@ -433,7 +433,7 @@ export default function BookmarksPage() {
                     <img 
                       src={item.image} 
                       alt={item.title} 
-                      className="w-12 h-12 rounded object-cover flex-shrink-0"
+                      className="w-12 h-12 rounded object-cover shrink-0"
                     />
                   )}
 

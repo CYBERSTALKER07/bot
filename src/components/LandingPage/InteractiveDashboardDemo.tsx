@@ -325,7 +325,7 @@ export default function InteractiveDashboardDemo({ onClose }: InteractiveDashboa
 
         <div className="space-y-6">
           <div className={`profile-completion p-6 rounded-xl text-white cursor-pointer transition-all duration-200 hover:scale-[1.02] ${
-            isDark ? 'bg-gradient-to-br from-lime to-dark-accent' : 'bg-gradient-to-br from-asu-maroon to-asu-maroon-dark'
+            isDark ? 'bg-linear-to-br from-lime to-dark-accent' : 'bg-linear-to-br from-asu-maroon to-asu-maroon-dark'
           }`} onClick={waitingForClick && currentTargetElement === '.profile-completion' ? handleTargetClick : undefined}>
             <h3 className="font-bold mb-3">Profile Strength</h3>
             <div className="w-full bg-white/20 rounded-full h-2 mb-3">
@@ -910,7 +910,7 @@ export default function InteractiveDashboardDemo({ onClose }: InteractiveDashboa
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
         <div className={`download-cta p-8 rounded-2xl text-center ${
-          isDark ? 'bg-gradient-to-br from-lime to-dark-accent' : 'bg-gradient-to-br from-asu-maroon to-asu-maroon-dark'
+          isDark ? 'bg-linear-to-br from-lime to-dark-accent' : 'bg-linear-to-br from-asu-maroon to-asu-maroon-dark'
         }`}>
           <Smartphone className="w-16 h-16 text-white mx-auto mb-4" />
           <h3 className="text-2xl font-bold text-white mb-4">Mobile App</h3>

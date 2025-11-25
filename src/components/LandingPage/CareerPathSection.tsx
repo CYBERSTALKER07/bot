@@ -157,8 +157,8 @@ export default function CareerPathSection() {
   return (
     <section className={`py-24 relative overflow-hidden transition-colors duration-300 ${
       isDark 
-        ? 'bg-gradient-to-br from-lime/5 to-dark-accent/5' 
-        : 'bg-gradient-to-br from-asu-maroon/5 to-asu-gold/5'
+        ? 'bg-linear-to-br from-lime/5 to-dark-accent/5' 
+        : 'bg-linear-to-br from-asu-maroon/5 to-asu-gold/5'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div ref={headerRef} className="text-center mb-20">
@@ -171,8 +171,8 @@ export default function CareerPathSection() {
           >
             Your Career <span className={`bg-clip-text text-transparent ${
               isDark 
-                ? 'bg-gradient-to-r from-lime to-dark-accent' 
-                : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
+                ? 'bg-linear-to-r from-lime to-dark-accent' 
+                : 'bg-linear-to-r from-asu-maroon to-asu-maroon-dark'
             }`}>Journey</span>
           </Typography>
           <Typography 
@@ -196,8 +196,8 @@ export default function CareerPathSection() {
           }`}>
             <div className={`relative w-full h-96 rounded-2xl p-6 overflow-hidden transition-colors duration-300 ${
               isDark 
-                ? 'bg-gradient-to-br from-dark-bg to-dark-surface' 
-                : 'bg-gradient-to-br from-gray-50 to-white'
+                ? 'bg-linear-to-br from-dark-bg to-dark-surface' 
+                : 'bg-linear-to-br from-gray-50 to-white'
             }`}>
               {/* Background Pattern */}
               <div className="absolute inset-0 opacity-10">
@@ -216,8 +216,8 @@ export default function CareerPathSection() {
                 <div className="career-step flex items-center justify-center">
                   <div className={`rounded-2xl p-4 shadow-lg ${
                     isDark 
-                      ? 'bg-gradient-to-r from-lime to-dark-accent' 
-                      : 'bg-gradient-to-r from-asu-gold to-yellow-300'
+                      ? 'bg-linear-to-r from-lime to-dark-accent' 
+                      : 'bg-linear-to-r from-asu-gold to-yellow-300'
                   }`}>
                     <div className="flex items-center space-x-3">
                       <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
@@ -330,10 +330,10 @@ export default function CareerPathSection() {
           {/* Career Path Benefits */}
           <div ref={benefitsRef} className="space-y-8">
             <div className="benefit-item flex items-start space-x-4">
-              <div className={`benefit-icon w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+              <div className={`benefit-icon w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
                 isDark 
-                  ? 'bg-gradient-to-r from-lime to-dark-accent' 
-                  : 'bg-gradient-to-r from-asu-maroon to-asu-maroon'
+                  ? 'bg-linear-to-r from-lime to-dark-accent' 
+                  : 'bg-linear-to-r from-asu-maroon to-asu-maroon'
               }`}>
                 <User className={`h-6 w-6 ${
                   isDark ? 'text-dark-surface' : 'text-white'
@@ -350,7 +350,7 @@ export default function CareerPathSection() {
             </div>
 
             <div className="benefit-item flex items-start space-x-4">
-              <div className={`benefit-icon w-12 h-12 border-2 rounded-xl flex items-center justify-center flex-shrink-0 ${
+              <div className={`benefit-icon w-12 h-12 border-2 rounded-xl flex items-center justify-center shrink-0 ${
                 isDark 
                   ? 'bg-dark-surface border-lime' 
                   : 'bg-white border-asu-maroon'
@@ -370,10 +370,10 @@ export default function CareerPathSection() {
             </div>
 
             <div className="benefit-item flex items-start space-x-4">
-              <div className={`benefit-icon w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+              <div className={`benefit-icon w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
                 isDark 
-                  ? 'bg-gradient-to-r from-lime to-dark-accent' 
-                  : 'bg-gradient-to-r from-asu-maroon to-asu-maroon'
+                  ? 'bg-linear-to-r from-lime to-dark-accent' 
+                  : 'bg-linear-to-r from-asu-maroon to-asu-maroon'
               }`}>
                 <Target className={`h-6 w-6 ${
                   isDark ? 'text-dark-surface' : 'text-white'
@@ -390,7 +390,7 @@ export default function CareerPathSection() {
             </div>
 
             <div className="benefit-item flex items-start space-x-4">
-              <div className={`benefit-icon w-12 h-12 border-2 rounded-xl flex items-center justify-center flex-shrink-0 ${
+              <div className={`benefit-icon w-12 h-12 border-2 rounded-xl flex items-center justify-center shrink-0 ${
                 isDark 
                   ? 'bg-dark-surface border-lime' 
                   : 'bg-white border-asu-maroon'

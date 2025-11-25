@@ -297,7 +297,7 @@ export default function PostEventForm({ onClose, onSuccess, fullPage = false }: 
                 ? "bg-red-500/10 border-red-500/20"
                 : "bg-red-50 border-red-200"
             )}>
-              <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
               <p className={cn(
                 "text-sm font-medium",
                 isDark ? "text-red-400" : "text-red-600"
@@ -348,7 +348,7 @@ export default function PostEventForm({ onClose, onSuccess, fullPage = false }: 
                 'w-full px-4 py-3 rounded-2xl border transition-all duration-200',
                 isDark
                   ? 'bg-zinc-900 border-white/10 text-white placeholder-gray-500 focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20'
-                  : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-lime-500 focus:ring-2 focus:ring-lime-500/20 shadow-sm'
+                  : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-lime-500 focus:ring-2 focus:ring-lime-500/20 shadow-xs'
               )}
             />
             <p className={cn(
@@ -374,7 +374,7 @@ export default function PostEventForm({ onClose, onSuccess, fullPage = false }: 
                 'w-full px-4 py-3 rounded-2xl border transition-all duration-200 resize-none',
                 isDark
                   ? 'bg-zinc-900 border-white/10 text-white placeholder-gray-500 focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20'
-                  : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-lime-500 focus:ring-2 focus:ring-lime-500/20 shadow-sm'
+                  : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-lime-500 focus:ring-2 focus:ring-lime-500/20 shadow-xs'
               )}
             />
             <p className={cn(
@@ -455,7 +455,7 @@ export default function PostEventForm({ onClose, onSuccess, fullPage = false }: 
                   'w-full px-4 py-3 rounded-2xl border transition-all duration-200',
                   isDark
                     ? 'bg-zinc-900 border-white/10 text-white focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20'
-                    : 'bg-white border-gray-200 text-gray-900 focus:border-lime-500 focus:ring-2 focus:ring-lime-500/20 shadow-sm'
+                    : 'bg-white border-gray-200 text-gray-900 focus:border-lime-500 focus:ring-2 focus:ring-lime-500/20 shadow-xs'
                 )}
               />
             </div>
@@ -473,7 +473,7 @@ export default function PostEventForm({ onClose, onSuccess, fullPage = false }: 
                   'w-full px-4 py-3 rounded-2xl border transition-all duration-200',
                   isDark
                     ? 'bg-zinc-900 border-white/10 text-white focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20'
-                    : 'bg-white border-gray-200 text-gray-900 focus:border-lime-500 focus:ring-2 focus:ring-lime-500/20 shadow-sm'
+                    : 'bg-white border-gray-200 text-gray-900 focus:border-lime-500 focus:ring-2 focus:ring-lime-500/20 shadow-xs'
                 )}
               />
             </div>
@@ -495,7 +495,7 @@ export default function PostEventForm({ onClose, onSuccess, fullPage = false }: 
                   'w-full px-4 py-3 rounded-2xl border transition-all duration-200',
                   isDark
                     ? 'bg-zinc-900 border-white/10 text-white focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20'
-                    : 'bg-white border-gray-200 text-gray-900 focus:border-lime-500 focus:ring-2 focus:ring-lime-500/20 shadow-sm'
+                    : 'bg-white border-gray-200 text-gray-900 focus:border-lime-500 focus:ring-2 focus:ring-lime-500/20 shadow-xs'
                 )}
               />
             </div>
@@ -513,7 +513,7 @@ export default function PostEventForm({ onClose, onSuccess, fullPage = false }: 
                   'w-full px-4 py-3 rounded-2xl border transition-all duration-200',
                   isDark
                     ? 'bg-zinc-900 border-white/10 text-white focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20'
-                    : 'bg-white border-gray-200 text-gray-900 focus:border-lime-500 focus:ring-2 focus:ring-lime-500/20 shadow-sm'
+                    : 'bg-white border-gray-200 text-gray-900 focus:border-lime-500 focus:ring-2 focus:ring-lime-500/20 shadow-xs'
                 )}
               />
             </div>
@@ -555,7 +555,7 @@ export default function PostEventForm({ onClose, onSuccess, fullPage = false }: 
                     'w-full px-4 py-3 rounded-2xl border transition-all duration-200',
                     isDark
                       ? 'bg-zinc-900 border-white/10 text-white placeholder-gray-500 focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20'
-                      : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-lime-500 focus:ring-2 focus:ring-lime-500/20 shadow-sm'
+                      : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-lime-500 focus:ring-2 focus:ring-lime-500/20 shadow-xs'
                   )}
                 />
               </div>
@@ -575,7 +575,7 @@ export default function PostEventForm({ onClose, onSuccess, fullPage = false }: 
                     'w-full px-4 py-3 rounded-2xl border transition-all duration-200',
                     isDark
                       ? 'bg-zinc-900 border-white/10 text-white placeholder-gray-500 focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20'
-                      : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-lime-500 focus:ring-2 focus:ring-lime-500/20 shadow-sm'
+                      : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-lime-500 focus:ring-2 focus:ring-lime-500/20 shadow-xs'
                   )}
                 />
               </div>
@@ -599,7 +599,7 @@ export default function PostEventForm({ onClose, onSuccess, fullPage = false }: 
                 'w-full px-4 py-3 rounded-2xl border transition-all duration-200',
                 isDark
                   ? 'bg-zinc-900 border-white/10 text-white placeholder-gray-500 focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20'
-                  : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-lime-500 focus:ring-2 focus:ring-lime-500/20 shadow-sm'
+                  : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-lime-500 focus:ring-2 focus:ring-lime-500/20 shadow-xs'
               )}
             />
           </div>
@@ -620,7 +620,7 @@ export default function PostEventForm({ onClose, onSuccess, fullPage = false }: 
                   'flex-1 px-4 py-3 rounded-2xl border transition-all duration-200',
                   isDark
                     ? 'bg-zinc-900 border-white/10 text-white placeholder-gray-500 focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20'
-                    : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-lime-500 focus:ring-2 focus:ring-lime-500/20 shadow-sm'
+                    : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-lime-500 focus:ring-2 focus:ring-lime-500/20 shadow-xs'
                 )}
               />
               <button

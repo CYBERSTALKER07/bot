@@ -157,7 +157,7 @@ export default function EmployerJobsManagement() {
       {error && (
         <div className={`border-b p-4 ${isDark ? 'border-gray-800 bg-red-900/20' : 'border-gray-200 bg-red-50'}`}>
           <div className="flex items-start space-x-3">
-            <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+            <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
             <p className="text-red-700 dark:text-red-200">{error}</p>
           </div>
         </div>
@@ -166,7 +166,7 @@ export default function EmployerJobsManagement() {
       {success && (
         <div className={`border-b p-4 ${isDark ? 'border-gray-800 bg-green-900/20' : 'border-gray-200 bg-green-50'}`}>
           <div className="flex items-start space-x-3">
-            <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+            <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
             <p className="text-green-700 dark:text-green-200">{success}</p>
           </div>
         </div>
@@ -280,7 +280,7 @@ export default function EmployerJobsManagement() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="flex items-center gap-2 shrink-0">
                   <div className="relative group">
                     <button
                       className={`p-2 rounded-full ${

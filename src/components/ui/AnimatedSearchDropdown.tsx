@@ -147,7 +147,7 @@ export const AnimatedSearchDropdown: React.FC<AnimatedSearchDropdownProps> = ({
                 >
                   {/* Icon */}
                   <span className={cn(
-                    'flex-shrink-0',
+                    'shrink-0',
                     getTypeColor(suggestion.type)
                   )}>
                     {getIcon(suggestion.type)}
@@ -177,7 +177,7 @@ export const AnimatedSearchDropdown: React.FC<AnimatedSearchDropdownProps> = ({
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.1 }}
                     className={cn(
-                      'text-xs px-2 py-1 rounded-full flex-shrink-0',
+                      'text-xs px-2 py-1 rounded-full shrink-0',
                       suggestion.type === 'trending'
                         ? isDark
                           ? 'bg-red-500/20 text-red-400'

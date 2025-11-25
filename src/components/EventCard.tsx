@@ -107,7 +107,7 @@ export default function EventCard({
           {/* Left: Date Column */}
           <div className={cn(
             'w-20 sm:w-24 flex flex-col rounded-tr-3xl rounded-br-3xl rounded-tl-3xl  rounded-bl-3xl border-r-0 border-l border-t border-b  border-r-none items-center justify-center py-4 sm:py-6 ',
-            isDark ? 'bg-black  ' : 'bg-gradient-to-b from-gray-50 to-white border border-gray-200'
+            isDark ? 'bg-black  ' : 'bg-linear-to-b from-gray-50 to-white border border-gray-200'
           )}>
             <div className="text-center">
               <div className={cn(
@@ -134,7 +134,7 @@ export default function EventCard({
           {/* Right: Banner Image or Fallback Gradient */}
           <div className={cn(
             'flex-1 overflow-hidden relative border-t borrder-l border-b rounded-tl-3xl rounded-bl-3xl rounded-br-3xl',
-            !banner_image_url || imageError ? `bg-gradient-to-br ${getGradientBg(event_type)}` : 'bg-gradient-to-br from-gray-300 to-gray-400'
+            !banner_image_url || imageError ? `bg-linear-to-br ${getGradientBg(event_type)}` : 'bg-linear-to-br from-gray-300 to-gray-400'
           )}>
             {banner_image_url && !imageError ? (
               <>
@@ -191,7 +191,7 @@ export default function EventCard({
           {location && (
             <div className="flex items-start gap-2 mb-3">
               <MapPin className={cn(
-                'h-4 w-4 mt-0.5 flex-shrink-0',
+                'h-4 w-4 mt-0.5 shrink-0',
                 isDark ? 'text-gray-500' : 'text-gray-600'
               )} />
               <p className={cn(
@@ -210,7 +210,7 @@ export default function EventCard({
                 <img
                   src={employer.avatar_url}
                   alt={employer.name}
-                  className="h-6 w-6 rounded-full object-cover flex-shrink-0"
+                  className="h-6 w-6 rounded-full object-cover shrink-0"
                 />
               )}
               <div className="flex-1 min-w-0">

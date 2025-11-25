@@ -203,8 +203,8 @@ export default function CompanyLogosFlowSection({ companyLogosRef }: CompanyLogo
             {splitTextToChars('Almost ')}
             <span className={`bg-clip-text text-transparent ${
               isDark 
-                ? 'bg-gradient-to-r from-lime via-dark-accent to-lime' 
-                : 'bg-gradient-to-r from-asu-maroon via-asu-gold to-asu-maroon'
+                ? 'bg-linear-to-r from-lime via-dark-accent to-lime' 
+                : 'bg-linear-to-r from-asu-maroon via-asu-gold to-asu-maroon'
             }`}>
               {splitTextToChars('1M+')}
             </span>

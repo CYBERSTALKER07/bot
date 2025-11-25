@@ -74,7 +74,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
                             className="absolute inset-0 w-full h-full object-cover rounded-3xl"
                         />
                     ) : (
-                        <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-info-600 rounded-3xl" />
+                        <div className="absolute inset-0 bg-linear-to-r from-gray-900 to-info-600 rounded-3xl" />
                     )}
 
                     {/* Dark overlay for better text readability */}
@@ -169,7 +169,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
                 {/* Matched Jobs */}
                 <div className={cn(
                     "rounded-3xl border overflow-hidden",
-                    isDark ? 'bg-black border-[#1C1F20] text-white' : 'bg-white border-gray-200 text-black shadow-sm'
+                    isDark ? 'bg-black border-[#1C1F20] text-white' : 'bg-white border-gray-200 text-black shadow-xs'
                 )}>
                     <div className={cn("p-4 border-b", isDark ? "border-[#1C1F20]" : "border-gray-200")}>
                         <h3 className="font-bold text-xl">Jobs for you</h3>

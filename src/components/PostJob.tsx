@@ -262,7 +262,7 @@ export default function PostJob() {
       {error && (
         <div className={cn("border-b p-4", isDark ? 'border-white/10 bg-red-500/10' : 'border-red-200 bg-red-50')}>
           <div className="flex items-start space-x-3 max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
-            <AlertCircle className={cn("h-5 w-5 flex-shrink-0 mt-0.5", isDark ? 'text-red-400' : 'text-red-600')} />
+            <AlertCircle className={cn("h-5 w-5 shrink-0 mt-0.5", isDark ? 'text-red-400' : 'text-red-600')} />
             <div className="flex-1">
               <p className={cn("font-semibold text-sm sm:text-base", isDark ? 'text-red-400' : 'text-red-700')}>{error}</p>
             </div>
@@ -273,7 +273,7 @@ export default function PostJob() {
       {success && (
         <div className={cn("border-b p-4", isDark ? 'border-white/10 bg-lime-400/10' : 'border-lime-200 bg-lime-50')}>
           <div className="flex items-start space-x-3 max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
-            <CheckCircle className={cn("h-5 w-5 flex-shrink-0 mt-0.5", isDark ? 'text-lime-400' : 'text-lime-600')} />
+            <CheckCircle className={cn("h-5 w-5 shrink-0 mt-0.5", isDark ? 'text-lime-400' : 'text-lime-600')} />
             <div className="flex-1">
               <p className={cn("font-semibold text-sm sm:text-base", isDark ? 'text-lime-400' : 'text-lime-700')}>{success}</p>
             </div>
@@ -346,7 +346,7 @@ export default function PostJob() {
                       src={user?.profile.avatar_url || ''}
                       alt={user?.profile.full_name || 'User'}
                       size="lg"
-                      className="flex-shrink-0"
+                      className="shrink-0"
                     />
                     <div className="flex-1">
                       <div className={cn("font-bold text-lg", isDark ? 'text-white' : 'text-black')}>{user?.profile?.full_name || 'Your Company'}</div>
@@ -364,7 +364,7 @@ export default function PostJob() {
                       onChange={handleInputChange}
                       placeholder="e.g., Senior Product Manager, Frontend Engineer..."
                       rows={2}
-                      className={cn("w-full text-lg font-semibold bg-transparent border rounded-2xl px-4 py-3 outline-none focus:border-2 resize-none transition-all", isDark ? 'border-white/10 placeholder-gray-500 text-white focus:border-lime-400' : 'border-gray-200 placeholder-gray-400 text-gray-900 focus:border-lime-500 shadow-sm')}
+                      className={cn("w-full text-lg font-semibold bg-transparent border rounded-2xl px-4 py-3 outline-hidden focus:border-2 resize-none transition-all", isDark ? 'border-white/10 placeholder-gray-500 text-white focus:border-lime-400' : 'border-gray-200 placeholder-gray-400 text-gray-900 focus:border-lime-500 shadow-xs')}
                     />
                     {validationErrors.title && (
                       <p className="text-red-600 text-sm">{validationErrors.title}</p>
@@ -383,7 +383,7 @@ export default function PostJob() {
                         value={formData.company}
                         onChange={handleInputChange}
                         placeholder="Company name"
-                        className={cn("w-full border rounded-2xl px-4 py-2 outline-none focus:border-2 transition-all", isDark ? 'bg-zinc-900 border-white/10 text-white focus:border-lime-400' : 'bg-white border-gray-200 text-gray-900 focus:border-lime-500 shadow-sm')}
+                        className={cn("w-full border rounded-2xl px-4 py-2 outline-hidden focus:border-2 transition-all", isDark ? 'bg-zinc-900 border-white/10 text-white focus:border-lime-400' : 'bg-white border-gray-200 text-gray-900 focus:border-lime-500 shadow-xs')}
                       />
                       {validationErrors.company && (
                         <p className="text-red-600 text-sm">{validationErrors.company}</p>
@@ -400,7 +400,7 @@ export default function PostJob() {
                         value={formData.location}
                         onChange={handleInputChange}
                         placeholder="City, State or Remote"
-                        className={cn("w-full border rounded-2xl px-4 py-2 outline-none focus:border-2 transition-all", isDark ? 'bg-zinc-900 border-white/10 text-white focus:border-lime-400' : 'bg-white border-gray-200 text-gray-900 focus:border-lime-500 shadow-sm')}
+                        className={cn("w-full border rounded-2xl px-4 py-2 outline-hidden focus:border-2 transition-all", isDark ? 'bg-zinc-900 border-white/10 text-white focus:border-lime-400' : 'bg-white border-gray-200 text-gray-900 focus:border-lime-500 shadow-xs')}
                       />
                       {validationErrors.location && (
                         <p className="text-red-600 text-sm">{validationErrors.location}</p>
@@ -418,7 +418,7 @@ export default function PostJob() {
                         name="type"
                         value={formData.type}
                         onChange={handleInputChange}
-                        className={cn("w-full border rounded-lg px-4 py-2 outline-none focus:border-2", isDark ? 'bg-black border-gray-700 text-white focus:border-info-500' : 'bg-white border-gray-300 text-black focus:bg-white focus:border-black')}
+                        className={cn("w-full border rounded-lg px-4 py-2 outline-hidden focus:border-2", isDark ? 'bg-black border-gray-700 text-white focus:border-info-500' : 'bg-white border-gray-300 text-black focus:bg-white focus:border-black')}
                       >
                         <option value="full-time">Full-time</option>
                         <option value="part-time">Part-time</option>
@@ -437,7 +437,7 @@ export default function PostJob() {
                         value={formData.salary}
                         onChange={handleInputChange}
                         placeholder="e.g., $60k-80k or $25/hour"
-                        className={cn("w-full border rounded-lg px-4 py-2 outline-none focus:border-2", isDark ? 'bg-black border-gray-700 text-white focus:border-info-500' : 'bg-white border-gray-300 text-black focus:bg-white focus:border-black')}
+                        className={cn("w-full border rounded-lg px-4 py-2 outline-hidden focus:border-2", isDark ? 'bg-black border-gray-700 text-white focus:border-info-500' : 'bg-white border-gray-300 text-black focus:bg-white focus:border-black')}
                       />
                     </div>
                   </div>
@@ -478,7 +478,7 @@ export default function PostJob() {
                       onChange={handleInputChange}
                       placeholder="Describe the role, responsibilities, and what makes this opportunity exciting..."
                       rows={5}
-                      className={cn("w-full border rounded-2xl px-4 py-2 outline-none focus:border-2 resize-none transition-all", isDark ? 'bg-zinc-900 border-white/10 text-white focus:border-lime-400' : 'bg-white border-gray-200 text-gray-900 focus:border-lime-500 shadow-sm')}
+                      className={cn("w-full border rounded-2xl px-4 py-2 outline-hidden focus:border-2 resize-none transition-all", isDark ? 'bg-zinc-900 border-white/10 text-white focus:border-lime-400' : 'bg-white border-gray-200 text-gray-900 focus:border-lime-500 shadow-xs')}
                     />
                     {validationErrors.description && (
                       <p className="text-red-600 text-sm">{validationErrors.description}</p>
@@ -558,7 +558,7 @@ export default function PostJob() {
                       onChange={handleInputChange}
                       placeholder="Health insurance, flexible hours, learning opportunities, stock options..."
                       rows={3}
-                      className={cn("w-full border rounded-lg px-4 py-2 outline-none focus:border-2 resize-none", isDark ? 'bg-black border-gray-700 text-white focus:border-info-500' : 'bg-white border-gray-300 text-black focus:bg-white focus:border-black')}
+                      className={cn("w-full border rounded-lg px-4 py-2 outline-hidden focus:border-2 resize-none", isDark ? 'bg-black border-gray-700 text-white focus:border-info-500' : 'bg-white border-gray-300 text-black focus:bg-white focus:border-black')}
                     />
                   </div>
                 </div>
@@ -587,7 +587,7 @@ export default function PostJob() {
                       onChange={handleInputChange}
                       placeholder="List the required qualifications, skills, and experience (one per line)..."
                       rows={4}
-                      className={cn("w-full border rounded-lg px-4 py-2 outline-none focus:border-2 resize-none", isDark ? 'bg-black border-gray-700 text-white focus:border-info-500' : 'bg-white border-gray-300 text-black focus:bg-white focus:border-black')}
+                      className={cn("w-full border rounded-lg px-4 py-2 outline-hidden focus:border-2 resize-none", isDark ? 'bg-black border-gray-700 text-white focus:border-info-500' : 'bg-white border-gray-300 text-black focus:bg-white focus:border-black')}
                     />
                     {validationErrors.requirements && (
                       <p className="text-red-600 text-sm">{validationErrors.requirements}</p>
@@ -612,7 +612,7 @@ export default function PostJob() {
                           }
                         }}
                         placeholder="Add a skill..."
-                        className={cn("flex-1 border rounded-lg px-4 py-2 outline-none focus:border-2", isDark ? 'bg-black border-gray-700 text-white focus:border-info-500' : 'bg-white border-gray-300 text-black focus:bg-white focus:border-black')}
+                        className={cn("flex-1 border rounded-lg px-4 py-2 outline-hidden focus:border-2", isDark ? 'bg-black border-gray-700 text-white focus:border-info-500' : 'bg-white border-gray-300 text-black focus:bg-white focus:border-black')}
                       />
                       <button
                         type="button"
@@ -668,7 +668,7 @@ export default function PostJob() {
                         name="deadline"
                         value={formData.deadline}
                         onChange={handleInputChange}
-                        className={cn("w-full border rounded-lg px-4 py-2 outline-none focus:border-2", isDark ? 'bg-black border-gray-700 text-white focus:border-info-500' : 'bg-white border-gray-300 text-black focus:bg-white focus:border-black')}
+                        className={cn("w-full border rounded-lg px-4 py-2 outline-hidden focus:border-2", isDark ? 'bg-black border-gray-700 text-white focus:border-info-500' : 'bg-white border-gray-300 text-black focus:bg-white focus:border-black')}
                       />
                       {validationErrors.deadline && (
                         <p className="text-red-600 text-sm">{validationErrors.deadline}</p>
@@ -685,7 +685,7 @@ export default function PostJob() {
                         value={formData.contact_email}
                         onChange={handleInputChange}
                         placeholder="hiring@company.com"
-                        className={cn("w-full border rounded-lg px-4 py-2 outline-none focus:border-2", isDark ? 'bg-black border-gray-700 text-white focus:border-info-500' : 'bg-white border-gray-300 text-black focus:bg-white focus:border-black')}
+                        className={cn("w-full border rounded-lg px-4 py-2 outline-hidden focus:border-2", isDark ? 'bg-black border-gray-700 text-white focus:border-info-500' : 'bg-white border-gray-300 text-black focus:bg-white focus:border-black')}
                       />
                       {validationErrors.contact_email && (
                         <p className="text-red-600 text-sm">{validationErrors.contact_email}</p>

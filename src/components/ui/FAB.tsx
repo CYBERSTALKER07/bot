@@ -75,7 +75,7 @@ const FAB: React.FC<FABProps> = ({
   const baseClasses = `
     inline-flex items-center justify-center rounded-full font-medium
     transition-all duration-200 ease-material-standard
-    focus:outline-none focus:ring-4 focus:ring-offset-2
+    focus:outline-hidden focus:ring-4 focus:ring-offset-2
     disabled:opacity-50 disabled:cursor-not-allowed
     hover:shadow-elevation-3 active:shadow-elevation-1
     ${extended ? 'gap-2' : ''}

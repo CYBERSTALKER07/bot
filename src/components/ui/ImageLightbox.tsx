@@ -272,7 +272,7 @@ export default function ImageLightbox({
                 <ZoomOut className="w-4 h-4 text-white" />
               </button>
               
-              <span className="text-white text-sm font-medium min-w-[3rem] text-center">
+              <span className="text-white text-sm font-medium min-w-12 text-center">
                 {Math.round(scale * 100)}%
               </span>
               
@@ -453,7 +453,7 @@ export default function ImageLightbox({
                   title={`View image ${index + 1}`}
                   aria-label={`View image ${index + 1}`}
                   className={cn(
-                    'relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 transition-all',
+                    'relative w-16 h-16 rounded-lg overflow-hidden shrink-0 transition-all',
                     index === currentIndex
                       ? 'ring-2 ring-white scale-110'
                       : 'opacity-60 hover:opacity-100 hover:scale-105'

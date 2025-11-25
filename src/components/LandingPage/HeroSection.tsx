@@ -192,8 +192,8 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
   return (
     <section ref={heroRef} className={`relative min-h-screen flex items-center justify-center overflow-hidden transition-colors duration-300 ${
       isDark 
-        ? 'bg-gradient-to-br from-dark-bg via-dark-surface to-gray-900' 
-        : 'bg-gradient-to-br from-asu-maroon via-asu-maroon-dark to-gray-900'
+        ? 'bg-linear-to-br from-dark-bg via-dark-surface to-gray-900' 
+        : 'bg-linear-to-br from-asu-maroon via-asu-maroon-dark to-gray-900'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div ref={heroContentRef} className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -206,8 +206,8 @@ export default function HeroSection({ heroRef }: HeroSectionProps) {
               Your Career
               <span className={`block bg-clip-text text-transparent ${
                 isDark 
-                  ? 'bg-gradient-to-r from-lime via-dark-accent to-lime' 
-                  : 'bg-gradient-to-r from-asu-gold via-yellow-300 to-asu-gold'
+                  ? 'bg-linear-to-r from-lime via-dark-accent to-lime' 
+                  : 'bg-linear-to-r from-asu-gold via-yellow-300 to-asu-gold'
               }`}>
                 Starts Here
               </span>

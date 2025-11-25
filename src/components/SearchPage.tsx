@@ -371,7 +371,7 @@ export default function SearchPage() {
             <div className="max-w-2xl mx-auto w-full px-4 py-3">
               {/* Search Bar Container */}
               <div className={cn(
-                'flex items-center gap-3 px-4 py-3 rounded-full transition-all duration-200 shadow-sm',
+                'flex items-center gap-3 px-4 py-3 rounded-full transition-all duration-200 shadow-xs',
                 isSearchFocused
                   ? isDark
                     ? 'bg-black border-2 border-[#BCE953] ring-2 ring-[#BCE953]/20'
@@ -390,7 +390,7 @@ export default function SearchPage() {
                 </button>
 
                 <SearchIcon className={cn(
-                  'w-5 h-5 flex-shrink-0 transition-colors',
+                  'w-5 h-5 shrink-0 transition-colors',
                   isSearchFocused
                     ? 'text-[#BCE953]'
                     : isDark ? 'text-gray-500' : 'text-gray-400'
@@ -405,7 +405,7 @@ export default function SearchPage() {
                   onBlur={() => setIsSearchFocused(false)}
                   placeholder="Search by name or type @ for username"
                   className={cn(
-                    'flex-1 bg-transparent outline-none text-base search-input placeholder:text-gray-500',
+                    'flex-1 bg-transparent outline-hidden text-base search-input placeholder:text-gray-500',
                     isDark ? 'text-white' : 'text-black'
                   )}
                 />
@@ -431,7 +431,7 @@ export default function SearchPage() {
                     onClick={handleClearSearch}
                     title="Clear search"
                     className={cn(
-                      'p-1 rounded-full transition-colors flex-shrink-0',
+                      'p-1 rounded-full transition-colors shrink-0',
                       isDark
                         ? 'text-gray-500 hover:text-white hover:bg-gray-800'
                         : 'text-gray-400 hover:text-black hover:bg-gray-200'
@@ -473,7 +473,7 @@ export default function SearchPage() {
                       className={cn(
                         "px-4 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap border",
                         activeTab === tab.id
-                          ? "bg-[#BCE953] text-black border-[#BCE953] shadow-sm"
+                          ? "bg-[#BCE953] text-black border-[#BCE953] shadow-xs"
                           : isDark
                             ? "bg-transparent text-gray-400 border-gray-800 hover:border-gray-700 hover:text-white"
                             : "bg-transparent text-gray-600 border-gray-200 hover:border-gray-300 hover:text-gray-900"
@@ -517,7 +517,7 @@ export default function SearchPage() {
                           <img
                             src={post.author?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.author?.username}`}
                             alt={post.author?.name}
-                            className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                            className="w-10 h-10 rounded-full object-cover shrink-0"
                           />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-1.5">
@@ -713,7 +713,7 @@ export default function SearchPage() {
                       >
                         <div className="flex gap-3">
                           {/* Avatar/Icon */}
-                          <div className="flex-shrink-0">
+                          <div className="shrink-0">
                             {result.avatar ? (
                               <img
                                 src={result.avatar}
@@ -749,7 +749,7 @@ export default function SearchPage() {
                                   {result.title}
                                 </h3>
                                 {result.verified && (
-                                  <Verified className="w-3.5 h-3.5 text-[#BCE953] fill-current flex-shrink-0" />
+                                  <Verified className="w-3.5 h-3.5 text-[#BCE953] fill-current shrink-0" />
                                 )}
                                 <span className={cn(
                                   "text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded-md font-medium ml-1",
@@ -818,7 +818,7 @@ export default function SearchPage() {
                       <img
                         src={employer.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${employer.company_name}`}
                         alt={employer.company_name}
-                        className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+                        className="w-12 h-12 rounded-lg object-cover shrink-0"
                       />
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-sm truncate">{employer.company_name}</p>
@@ -861,7 +861,7 @@ export default function SearchPage() {
                       <img
                         src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`}
                         alt={user.full_name}
-                        className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                        className="w-12 h-12 rounded-full object-cover shrink-0"
                       />
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-sm truncate">{user.full_name}</p>

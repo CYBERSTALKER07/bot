@@ -196,7 +196,7 @@ export default function Comments({ postId, currentUserId }: CommentsProps) {
   const CommentItem = ({ comment, isReply = false }: { comment: Comment; isReply?: boolean }) => (
     <div className={`flex space-x-3 ${isReply ? 'ml-12 mt-3' : 'py-3'} border-b border-gray-100 last:border-b-0`}>
       {/* Avatar */}
-      <div className="flex-shrink-0">
+      <div className="shrink-0">
         <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
           {comment.profiles.avatar_url ? (
             <img
@@ -205,7 +205,7 @@ export default function Comments({ postId, currentUserId }: CommentsProps) {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-blue-400 to-info-600 flex items-center justify-center text-white font-semibold">
+            <div className="w-full h-full bg-linear-to-br from-blue-400 to-info-600 flex items-center justify-center text-white font-semibold">
               {comment.profiles.full_name?.charAt(0).toUpperCase()}
             </div>
           )}
@@ -296,7 +296,7 @@ export default function Comments({ postId, currentUserId }: CommentsProps) {
         {replyTo === comment.id && (
           <form onSubmit={handleSubmitReply} className="mt-3">
             <div className="flex space-x-3">
-              <div className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0"></div>
+              <div className="w-8 h-8 rounded-full bg-gray-200 shrink-0"></div>
               <div className="flex-1">
                 <textarea
                   value={replyText}
@@ -361,13 +361,13 @@ export default function Comments({ postId, currentUserId }: CommentsProps) {
       <div className="border-b border-gray-100 p-4">
         <form onSubmit={handleSubmitComment}>
           <div className="flex space-x-3">
-            <div className="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0"></div>
+            <div className="w-10 h-10 rounded-full bg-gray-200 shrink-0"></div>
             <div className="flex-1">
               <textarea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Post your reply"
-                className="w-full p-3 text-lg border-none resize-none focus:ring-0 focus:outline-none placeholder-gray-500"
+                className="w-full p-3 text-lg border-none resize-none focus:ring-0 focus:outline-hidden placeholder-gray-500"
                 rows={3}
                 maxLength={280}
               />

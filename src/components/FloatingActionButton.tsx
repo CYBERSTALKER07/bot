@@ -257,9 +257,9 @@ export function FloatingActionButton({ onAddEntry }: FloatingActionButtonProps) 
                 {...mouseProps}
                 className={`
                   absolute w-14 h-14 rounded-full shadow-xl flex items-center justify-center
-                  transition-all duration-300 ease-out text-white border-1 ${isDark ? 'border-white/20' : 'border-white/20'}
+                  transition-all duration-300 ease-out text-white border ${isDark ? 'border-white/20' : 'border-white/20'}
                   ${isFabOpen ? 'opacity-100 scale-100 pointer-events-auto visible' : 'opacity-0 scale-0 pointer-events-none invisible'}
-                  ${action.color} touch-manipulation select-none z-[61]
+                  ${action.color} touch-manipulation select-none z-61
                   ${isPressed ? 'scale-150 h-16 w-16 brightness-125 shadow-2xl ring-4 ring-white/30' : 
                     isHovered ? 'scale-125  w-[70px] h-[70px] brightness-110 shadow-xl' : 
                     'scale-100 brightness-100'}
@@ -304,14 +304,14 @@ export function FloatingActionButton({ onAddEntry }: FloatingActionButtonProps) 
           }}
           className={`
             relative w-14 h-14 rounded-full flex items-center justify-center
-            shadow-2xl transition-all duration-300 ease-out focus:outline-none focus:ring-4 focus:ring-white/20
+            shadow-2xl transition-all duration-300 ease-out focus:outline-hidden focus:ring-4 focus:ring-white/20
             ${isFabOpen 
               ? 'bg-white text-black rotate-45 scale-110 shadow-white/20'
               : isFabPressed 
                 ? 'bg-white text-black scale-125 shadow-white/40 ring-4 ring-white/30'
                 : 'bg-white text-black hover:scale-105 hover:shadow-white/30'
             }
-            touch-manipulation z-[55]
+            touch-manipulation z-55
           `}
           aria-label={isFabOpen ? 'Close menu' : 'Open quick actions'}
         >

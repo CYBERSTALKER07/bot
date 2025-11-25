@@ -601,7 +601,7 @@ export default function ResumeBuilder() {
               )}>
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-br from-purple-500 to-info-600 rounded-xl">
+                    <div className="p-2 bg-linear-to-br from-purple-500 to-info-600 rounded-xl">
                       <Sparkles className="h-5 w-5 text-white" />
                     </div>
                     <div>
@@ -617,7 +617,7 @@ export default function ResumeBuilder() {
                   </div>
                   <Button
                     onClick={() => setShowAIBuilder(true)}
-                    className="bg-gradient-to-r from-purple-500 to-info-600 text-white px-6 py-3 rounded-xl font-medium flex items-center gap-2 hover:from-purple-600 hover:to-blue-700 transition-all duration-200"
+                    className="bg-linear-to-r from-purple-500 to-info-600 text-white px-6 py-3 rounded-xl font-medium flex items-center gap-2 hover:from-purple-600 hover:to-blue-700 transition-all duration-200"
                   >
                     <Wand2 className="h-4 w-4" />
                     Generate with AI

@@ -479,7 +479,7 @@ export default function CareerTipsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-white to-blue-50">
       {/* Navigation */}
       <nav className="fixed top-0 w-full backdrop-blur-sm z-50 bg-white/90 border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -507,7 +507,7 @@ export default function CareerTipsPage() {
               <Link to="/login" className="px-6 py-2 text-gray-700 hover:text-purple-600 font-medium transition-colors">
                 Sign in
               </Link>
-              <Link to="/register" className="magnetic-button px-8 py-3 bg-gradient-to-r from-purple-600 to-purple-800 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-purple-900 transition-all duration-200 shadow-lg hover:shadow-xl">
+              <Link to="/register" className="magnetic-button px-8 py-3 bg-linear-to-r from-purple-600 to-purple-800 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-purple-900 transition-all duration-200 shadow-lg hover:shadow-xl">
                 Get Started
               </Link>
             </div>
@@ -589,7 +589,7 @@ export default function CareerTipsPage() {
             <Link
               to="/career-tips"
               onClick={() => setShowMobileMenu(false)}
-              className="flex items-center space-x-3 px-3 py-3 rounded-xl bg-purple-600/10 text-purple-600 shadow-sm"
+              className="flex items-center space-x-3 px-3 py-3 rounded-xl bg-purple-600/10 text-purple-600 shadow-xs"
             >
               <BookOpen className="h-5 w-5" />
               <span className="font-medium">Career Tips</span>
@@ -608,7 +608,7 @@ export default function CareerTipsPage() {
               <Link
                 to="/register"
                 onClick={() => setShowMobileMenu(false)}
-                className="flex items-center space-x-3 px-3 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-purple-800 text-white shadow-sm mt-2 hover:from-purple-700 hover:to-purple-900 transition-all duration-200"
+                className="flex items-center space-x-3 px-3 py-3 rounded-xl bg-linear-to-r from-purple-600 to-purple-800 text-white shadow-xs mt-2 hover:from-purple-700 hover:to-purple-900 transition-all duration-200"
               >
                 <span className="font-medium">Get Started</span>
               </Link>
@@ -618,7 +618,7 @@ export default function CareerTipsPage() {
       </div>
 
       {/* Enhanced Hero Section with Advanced Search */}
-      <section ref={heroRef} className="pt-32 pb-20 px-6 lg:px-8 bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 relative overflow-hidden">
+      <section ref={heroRef} className="pt-32 pb-20 px-6 lg:px-8 bg-linear-to-br from-purple-900 via-purple-800 to-indigo-900 relative overflow-hidden">
         {/* Enhanced floating decorative elements */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="floating-element hero-bg-element absolute top-20 left-20 w-6 h-6 bg-yellow-400 rounded-full opacity-60"></div>
@@ -628,9 +628,9 @@ export default function CareerTipsPage() {
           <div className="floating-element hero-bg-element absolute bottom-40 right-40 w-5 h-5 bg-purple-400 rounded-full opacity-45"></div>
           
           {/* Enhanced gradient orbs with animations */}
-          <div className="hero-bg-element absolute top-10 right-10 w-80 h-80 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
-          <div className="hero-bg-element absolute bottom-10 left-10 w-96 h-96 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 rounded-full blur-3xl"></div>
-          <div className="hero-bg-element absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-yellow-400/10 to-orange-400/10 rounded-full blur-2xl"></div>
+          <div className="hero-bg-element absolute top-10 right-10 w-80 h-80 bg-linear-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
+          <div className="hero-bg-element absolute bottom-10 left-10 w-96 h-96 bg-linear-to-r from-blue-400/20 to-cyan-400/20 rounded-full blur-3xl"></div>
+          <div className="hero-bg-element absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-linear-to-r from-yellow-400/10 to-orange-400/10 rounded-full blur-2xl"></div>
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10">
@@ -666,13 +666,13 @@ export default function CareerTipsPage() {
                       placeholder="Search career tips, interview advice, resume help..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 text-lg border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
+                      className="w-full pl-12 pr-4 py-4 text-lg border-0 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500 bg-white"
                     />
                   </div>
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="lg:w-64 px-4 py-4 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white text-gray-900"
+                    className="lg:w-64 px-4 py-4 border-0 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500 bg-white text-gray-900"
                   >
                     <option value="all">All Categories</option>
                     {categories.map(category => (
@@ -681,7 +681,7 @@ export default function CareerTipsPage() {
                       </option>
                     ))}
                   </select>
-                  <button className="magnetic-button px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-xl">
+                  <button className="magnetic-button px-8 py-4 bg-linear-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-xl">
                     Search
                   </button>
                 </div>
@@ -719,7 +719,7 @@ export default function CareerTipsPage() {
                     <select
                       value={selectedDifficulty}
                       onChange={(e) => setSelectedDifficulty(e.target.value)}
-                      className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500"
                     >
                       <option value="all">All Levels</option>
                       <option value="beginner">Beginner</option>
@@ -729,7 +729,7 @@ export default function CareerTipsPage() {
                     <select
                       value={selectedReadTime}
                       onChange={(e) => setSelectedReadTime(e.target.value)}
-                      className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500"
                     >
                       <option value="all">Any Read Time</option>
                       {/* <option value="quick">Quick Read (&lt; 5 min)</option> */}
@@ -753,7 +753,7 @@ export default function CareerTipsPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="stats-item text-center group">
-                <div className={`w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r ${stat.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                <div className={`w-20 h-20 mx-auto mb-6 rounded-2xl bg-linear-to-r ${stat.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                   <div className="text-white">
                     {stat.icon}
                   </div>
@@ -774,7 +774,7 @@ export default function CareerTipsPage() {
       </section>
 
       {/* Enhanced Featured Articles */}
-      <section ref={featuredRef} className="py-32 px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-white">
+      <section ref={featuredRef} className="py-32 px-6 lg:px-8 bg-linear-to-br from-gray-50 to-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-8">
@@ -795,7 +795,7 @@ export default function CareerTipsPage() {
                       alt={article.title}
                       className={`w-full object-cover group-hover:scale-110 transition-transform duration-500 ${index === 0 ? 'h-80' : 'h-48'}`}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+                    <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent"></div>
                     
                     <div className="absolute top-4 left-4 flex gap-2">
                       <Badge className={`${categories.find(cat => cat.name === article.category)?.color || 'bg-gray-100 text-gray-800'}`}>
@@ -838,7 +838,7 @@ export default function CareerTipsPage() {
                     
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-purple-800 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                        <div className="w-8 h-8 bg-linear-to-br from-purple-600 to-purple-800 rounded-full flex items-center justify-center text-white text-sm font-bold">
                           {article.author.charAt(0)}
                         </div>
                         <div>
@@ -900,7 +900,7 @@ export default function CareerTipsPage() {
               return (
                 <div key={index} className="category-card group cursor-pointer">
                   <div className="bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-4 border border-gray-100 h-full">
-                    <div className={`w-20 h-20 bg-gradient-to-br ${category.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                    <div className={`w-20 h-20 bg-linear-to-br ${category.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
                       <IconComponent className="h-10 w-10 text-white" />
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-purple-600 transition-colors">
@@ -926,7 +926,7 @@ export default function CareerTipsPage() {
       </section>
 
       {/* Trending Topics Sidebar */}
-      <section ref={trendsRef} className="py-32 px-6 lg:px-8 bg-gradient-to-br from-purple-50 to-indigo-50">
+      <section ref={trendsRef} className="py-32 px-6 lg:px-8 bg-linear-to-br from-purple-50 to-indigo-50">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2">
@@ -938,7 +938,7 @@ export default function CareerTipsPage() {
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500"
                   >
                     <option value="newest">Newest First</option>
                     <option value="popular">Most Popular</option>
@@ -1000,7 +1000,7 @@ export default function CareerTipsPage() {
                             </p>
                             <div className="flex items-center justify-between mb-4">
                               <div className="flex items-center space-x-2">
-                                <div className="w-6 h-6 bg-gradient-to-br from-purple-600 to-purple-800 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                <div className="w-6 h-6 bg-linear-to-br from-purple-600 to-purple-800 rounded-full flex items-center justify-center text-white text-xs font-bold">
                                   {article.author.charAt(0)}
                                 </div>
                                 <span className="text-sm font-medium text-gray-700">{article.author}</span>
@@ -1036,7 +1036,7 @@ export default function CareerTipsPage() {
                           <img 
                             src={article.image} 
                             alt={article.title}
-                            className="w-32 h-24 object-cover rounded-xl flex-shrink-0"
+                            className="w-32 h-24 object-cover rounded-xl shrink-0"
                           />
                           <div className="flex-1">
                             <div className="flex items-center space-x-2 mb-2">
@@ -1079,7 +1079,7 @@ export default function CareerTipsPage() {
                 <Button 
                   variant="contained" 
                   size="large"
-                  className="px-12 py-4 bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold text-lg rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105"
+                  className="px-12 py-4 bg-linear-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold text-lg rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105"
                 >
                   Load More Articles
                 </Button>
@@ -1140,8 +1140,8 @@ export default function CareerTipsPage() {
       </section>
 
       {/* Enhanced Newsletter CTA with Modal */}
-      <section className="py-32 px-6 lg:px-8 bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/50 to-indigo-900/50"></div>
+      <section className="py-32 px-6 lg:px-8 bg-linear-to-br from-purple-900 via-purple-800 to-indigo-900 relative overflow-hidden">
+        <div className="absolute inset-0 bg-linear-to-r from-purple-900/50 to-indigo-900/50"></div>
         <div className="absolute top-0 left-0 w-full h-full opacity-10">
           <div className="absolute top-8 left-8 w-2 h-2 bg-white rounded-full animate-pulse"></div>
           <div className="absolute top-16 left-32 w-1 h-1 bg-white rounded-full animate-pulse delay-1000"></div>
@@ -1153,7 +1153,7 @@ export default function CareerTipsPage() {
         
         <div className="max-w-5xl mx-auto text-center relative z-10">
           <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-16 border border-white/20 shadow-2xl">
-            <div className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl hover:scale-110 transition-transform duration-300">
+            <div className="w-24 h-24 bg-linear-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl hover:scale-110 transition-transform duration-300">
               <Mail className="h-12 w-12 text-white" />
             </div>
             
@@ -1169,9 +1169,9 @@ export default function CareerTipsPage() {
                 <input
                   type="email"
                   placeholder="Enter your email address"
-                  className="flex-1 px-6 py-4 text-lg text-white placeholder-white/60 border-0 bg-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-white/30"
+                  className="flex-1 px-6 py-4 text-lg text-white placeholder-white/60 border-0 bg-transparent rounded-xl focus:outline-hidden focus:ring-2 focus:ring-white/30"
                 />
-                <button className="magnetic-button px-8 py-4 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black font-bold rounded-xl transition-all shadow-lg hover:shadow-xl">
+                <button className="magnetic-button px-8 py-4 bg-linear-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black font-bold rounded-xl transition-all shadow-lg hover:shadow-xl">
                   Subscribe
                 </button>
               </div>
@@ -1205,7 +1205,7 @@ export default function CareerTipsPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
             <div className="md:col-span-1">
               <div className="flex items-center space-x-3 mb-6">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-purple-600 to-purple-800">
+                <div className="p-2 rounded-xl bg-linear-to-br from-purple-600 to-purple-800">
                   <GraduationCap className="h-6 w-6 text-white" />
                 </div>
                 <span className="text-xl font-bold text-white">CareerConnect</span>
@@ -1294,7 +1294,7 @@ export default function CareerTipsPage() {
                   <input
                     type="email"
                     placeholder="Your email"
-                    className="flex-1 px-3 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+                    className="flex-1 px-3 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 focus:outline-hidden focus:ring-2 focus:ring-purple-500 text-sm"
                   />
                   <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm">
                     Join

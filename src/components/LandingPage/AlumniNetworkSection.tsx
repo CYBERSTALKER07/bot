@@ -108,8 +108,8 @@ export default function AlumniNetworkSection({ alumniRef }: AlumniNetworkSection
           >
             Join Our <span className={`bg-clip-text text-transparent ${
               isDark 
-                ? 'bg-gradient-to-r from-lime to-dark-accent' 
-                : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
+                ? 'bg-linear-to-r from-lime to-dark-accent' 
+                : 'bg-linear-to-r from-asu-maroon to-asu-maroon-dark'
             }`}>Global Alumni Network</span>
           </Typography>
           <Typography 

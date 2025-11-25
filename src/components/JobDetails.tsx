@@ -167,7 +167,7 @@ export default function JobDetails() {
                 : 'bg-gray-50 border border-gray-200'
             )}>
               <MapPin className={cn(
-                'h-6 w-6 flex-shrink-0 mt-1',
+                'h-6 w-6 shrink-0 mt-1',
                 isDark ? 'text-red-400' : 'text-red-500'
               )} />
               <div>
@@ -184,7 +184,7 @@ export default function JobDetails() {
                 : 'bg-gray-50 border border-gray-200'
             )}>
               <DollarSign className={cn(
-                'h-6 w-6 flex-shrink-0 mt-1',
+                'h-6 w-6 shrink-0 mt-1',
                 isDark ? 'text-green-400' : 'text-green-500'
               )} />
               <div>
@@ -201,7 +201,7 @@ export default function JobDetails() {
                 : 'bg-gray-50 border border-gray-200'
             )}>
               <Calendar className={cn(
-                'h-6 w-6 flex-shrink-0 mt-1',
+                'h-6 w-6 shrink-0 mt-1',
                 isDark ? 'text-yellow-400' : 'text-yellow-500'
               )} />
               <div>
@@ -218,7 +218,7 @@ export default function JobDetails() {
                 : 'bg-gray-50 border border-gray-200'
             )}>
               <Clock className={cn(
-                'h-6 w-6 flex-shrink-0 mt-1',
+                'h-6 w-6 shrink-0 mt-1',
                 isDark ? 'text-info-400' : 'text-info-500'
               )} />
               <div>
@@ -313,7 +313,7 @@ export default function JobDetails() {
                   {job.requirements.map((req, idx) => (
                     <li key={idx} className="flex items-start gap-3">
                       <CheckCircle className={cn(
-                        'h-5 w-5 mt-1 flex-shrink-0',
+                        'h-5 w-5 mt-1 shrink-0',
                         isDark ? 'text-green-400' : 'text-green-600'
                       )} />
                       <span className={cn(
@@ -370,7 +370,7 @@ export default function JobDetails() {
                   {Array.isArray(job.benefits) ? job.benefits.map((benefit, idx) => (
                     <li key={idx} className="flex items-start gap-3">
                       <Heart className={cn(
-                        'h-5 w-5 mt-1 flex-shrink-0',
+                        'h-5 w-5 mt-1 shrink-0',
                         isDark ? 'text-pink-400' : 'text-pink-600'
                       )} />
                       <span className={cn(
@@ -383,7 +383,7 @@ export default function JobDetails() {
                   )) : (
                     <li className="flex items-start gap-3">
                       <Heart className={cn(
-                        'h-5 w-5 mt-1 flex-shrink-0',
+                        'h-5 w-5 mt-1 shrink-0',
                         isDark ? 'text-pink-400' : 'text-pink-600'
                       )} />
                       <span className={cn(
@@ -423,8 +423,8 @@ export default function JobDetails() {
                     <div className={cn(
                       'w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mb-4 border-4',
                       isDark
-                        ? 'bg-gradient-to-br from-info-600 to-purple-600 text-white border-info-500'
-                        : 'bg-gradient-to-br from-blue-400 to-purple-500 text-white border-info-400'
+                        ? 'bg-linear-to-br from-info-600 to-purple-600 text-white border-info-500'
+                        : 'bg-linear-to-br from-blue-400 to-purple-500 text-white border-info-400'
                     )}>
                       {job.employer.name?.charAt(0).toUpperCase()}
                     </div>
@@ -572,7 +572,7 @@ export default function JobDetails() {
                   value={coverLetter}
                   onChange={(e) => setCoverLetter(e.target.value)}
                   className={cn(
-                    'w-full p-3 border rounded-lg focus:ring-2 focus:ring-info-500 focus:border-transparent outline-none',
+                    'w-full p-3 border rounded-lg focus:ring-2 focus:ring-info-500 focus:border-transparent outline-hidden',
                     isDark
                       ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'

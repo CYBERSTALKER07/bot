@@ -447,15 +447,15 @@ export default function ForEmployersPage() {
 
       {/* Enhanced Hero Section */}
       <section ref={heroRef} className={`pt-24 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden ${
-        isDark ? 'bg-gradient-to-br from-dark-surface via-dark-bg to-dark-surface' : 'bg-gradient-to-br from-white via-gray-50 to-white'
+        isDark ? 'bg-linear-to-br from-dark-surface via-dark-bg to-dark-surface' : 'bg-linear-to-br from-white via-gray-50 to-white'
       }`}>
         {/* Animated background elements */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className={`floating-element absolute top-20 left-10 w-32 h-32 rounded-full opacity-20 ${
-            isDark ? 'bg-gradient-to-br from-lime to-dark-accent' : 'bg-gradient-to-br from-asu-maroon to-asu-gold'
+            isDark ? 'bg-linear-to-br from-lime to-dark-accent' : 'bg-linear-to-br from-asu-maroon to-asu-gold'
           }`} />
           <div className={`floating-element absolute top-40 right-20 w-24 h-24 rounded-full opacity-15 ${
-            isDark ? 'bg-gradient-to-br from-dark-accent to-lime' : 'bg-gradient-to-br from-asu-gold to-asu-maroon'
+            isDark ? 'bg-linear-to-br from-dark-accent to-lime' : 'bg-linear-to-br from-asu-gold to-asu-maroon'
           }`} style={{ animationDelay: '2s' }} />
           <div className={`floating-element absolute bottom-32 left-1/4 w-16 h-16 rounded-full opacity-25 ${
             isDark ? 'bg-lime' : 'bg-asu-maroon'
@@ -484,8 +484,8 @@ export default function ForEmployersPage() {
                 Hire Tomorrow's 
                 <span className={`block bg-clip-text text-transparent ${
                   isDark 
-                    ? 'bg-gradient-to-r from-lime to-dark-accent' 
-                    : 'bg-gradient-to-r from-asu-maroon to-asu-gold'
+                    ? 'bg-linear-to-r from-lime to-dark-accent' 
+                    : 'bg-linear-to-r from-asu-maroon to-asu-gold'
                 }`}>
                   Tech Leaders
                 </span>
@@ -549,7 +549,7 @@ export default function ForEmployersPage() {
                     alt="AUT Students"
                     className="w-full h-96 object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+                  <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent"></div>
                   <div className="absolute bottom-6 left-6 right-6">
                     <Typography variant="h6" className="text-white font-bold mb-2">
                       Meet AUT's Top Talent
@@ -620,8 +620,8 @@ export default function ForEmployersPage() {
                     variant="h2" 
                     className={`text-4xl font-bold mb-2 ${
                       isDark 
-                        ? 'bg-gradient-to-r from-lime to-dark-accent bg-clip-text text-transparent' 
-                        : 'bg-gradient-to-r from-asu-maroon to-asu-gold bg-clip-text text-transparent'
+                        ? 'bg-linear-to-r from-lime to-dark-accent bg-clip-text text-transparent' 
+                        : 'bg-linear-to-r from-asu-maroon to-asu-gold bg-clip-text text-transparent'
                     }`}
                   >
                     {stat.number}
@@ -687,7 +687,7 @@ export default function ForEmployersPage() {
               }`}>
                 <div className={index % 2 === 1 ? 'lg:col-start-2' : ''}>
                   <Card className="feature-card p-8" elevation={2}>
-                    <div className={`inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br ${feature.color} mb-8 shadow-lg`}>
+                    <div className={`inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-linear-to-br ${feature.color} mb-8 shadow-lg`}>
                       <div className="text-white">
                         {feature.icon}
                       </div>
@@ -726,7 +726,7 @@ export default function ForEmployersPage() {
                         alt={feature.title}
                         className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                      <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent"></div>
                     </div>
                   </Card>
                 </div>
@@ -844,7 +844,7 @@ export default function ForEmployersPage() {
                 <ul className="space-y-4 mb-8">
                   {plan.features.map((feature, idx) => (
                     <li key={idx} className="flex items-center">
-                      <CheckCircle className={`h-5 w-5 mr-3 flex-shrink-0 ${
+                      <CheckCircle className={`h-5 w-5 mr-3 shrink-0 ${
                         isDark ? 'text-lime' : 'text-asu-maroon'
                       }`} />
                       <Typography variant="body2" className={isDark ? 'text-dark-text' : 'text-gray-900'}>
@@ -950,10 +950,10 @@ export default function ForEmployersPage() {
 
       {/* Enhanced CTA Section */}
       <section ref={ctaRef} className={`py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden ${
-        isDark ? 'bg-gradient-to-br from-dark-surface to-dark-bg' : 'bg-gradient-to-br from-gray-900 to-gray-800'
+        isDark ? 'bg-linear-to-br from-dark-surface to-dark-bg' : 'bg-linear-to-br from-gray-900 to-gray-800'
       }`}>
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent transform -skew-y-12"></div>
+          <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent transform -skew-y-12"></div>
         </div>
         
         <div className="max-w-4xl mx-auto text-center relative z-10">

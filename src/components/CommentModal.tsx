@@ -60,7 +60,7 @@ export default function CommentModal({ isOpen, onClose, post, currentUserId }: C
           <div className="border-b border-gray-100 p-4">
             <div className="flex space-x-3">
               {/* Avatar */}
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden">
                   {post.profiles.avatar_url ? (
                     <img
@@ -69,7 +69,7 @@ export default function CommentModal({ isOpen, onClose, post, currentUserId }: C
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-blue-400 to-info-600 flex items-center justify-center text-white font-semibold">
+                    <div className="w-full h-full bg-linear-to-br from-blue-400 to-info-600 flex items-center justify-center text-white font-semibold">
                       {post.profiles.full_name?.charAt(0).toUpperCase()}
                     </div>
                   )}

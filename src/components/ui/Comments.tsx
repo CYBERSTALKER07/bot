@@ -447,7 +447,7 @@ export default function Comments({ postId, className }: CommentsProps) {
             alt={comment.author.name}
             name={comment.author.name}
             size="sm"
-            className="flex-shrink-0"
+            className="shrink-0"
           />
           
           <div className="flex-1 min-w-0">
@@ -611,7 +611,7 @@ export default function Comments({ postId, className }: CommentsProps) {
                     src={user?.profile?.avatar_url}
                     alt={user?.profile?.full_name || 'You'}
                     size="sm"
-                    className="flex-shrink-0"
+                    className="shrink-0"
                   />
                   <div className="flex-1">
                     <textarea
@@ -695,7 +695,7 @@ export default function Comments({ postId, className }: CommentsProps) {
             src={user?.profile?.avatar_url}
             alt={user?.profile?.full_name || 'You'}
             size="md"
-            className="flex-shrink-0"
+            className="shrink-0"
           />
           <div className="flex-1">
             <textarea

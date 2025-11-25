@@ -462,7 +462,7 @@ export default function SkillsAuditSystem() {
 
               <div className={`w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-4`}>
                 <div 
-                  className={`h-3 rounded-full bg-gradient-to-r ${
+                  className={`h-3 rounded-full bg-linear-to-r ${
                     isDark ? 'from-lime to-green-400' : 'from-asu-maroon to-red-600'
                   }`}
                   style={{ width: `${(skill.score / 5) * 100}%` }}

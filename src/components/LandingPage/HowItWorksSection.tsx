@@ -112,8 +112,8 @@ export default function HowItWorksSection({ howItWorksRef }: HowItWorksSectionPr
   return (
     <section ref={howItWorksRef} className={`py-24 relative overflow-hidden transition-colors duration-300 ${
       isDark 
-        ? 'bg-gradient-to-b from-dark-surface to-dark-bg' 
-        : 'bg-gradient-to-b from-gray-50 to-white'
+        ? 'bg-linear-to-b from-dark-surface to-dark-bg' 
+        : 'bg-linear-to-b from-gray-50 to-white'
     }`}>
       <div className="absolute inset-0">
         <div className={`absolute top-10 left-10 w-20 h-20 rounded-full blur-xl ${
@@ -175,7 +175,7 @@ export default function HowItWorksSection({ howItWorksRef }: HowItWorksSectionPr
           ].map((step, index) => (
             <div key={index} className="step-card text-center group relative">
               <div className="relative mb-10">
-                <div className={`step-icon mx-auto w-40 h-40 bg-gradient-to-br ${step.gradient} rounded-3xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-2xl`}>
+                <div className={`step-icon mx-auto w-40 h-40 bg-linear-to-br ${step.gradient} rounded-3xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-2xl`}>
                   {step.icon}
                 </div>
                 <div className={`step-number absolute -top-6 -right-6 border-4 w-16 h-16 rounded-full flex items-center justify-center font-bold text-xl shadow-lg ${
@@ -189,8 +189,8 @@ export default function HowItWorksSection({ howItWorksRef }: HowItWorksSectionPr
                 {index < 2 && (
                   <div className={`connection-line hidden md:block absolute top-1/2 -right-8 w-16 h-0.5 ${
                     isDark 
-                      ? 'bg-gradient-to-r from-lime to-transparent' 
-                      : 'bg-gradient-to-r from-asu-maroon to-transparent'
+                      ? 'bg-linear-to-r from-lime to-transparent' 
+                      : 'bg-linear-to-r from-asu-maroon to-transparent'
                   }`}></div>
                 )}
               </div>

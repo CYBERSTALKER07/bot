@@ -184,7 +184,7 @@ export default function CreatePostPage() {
                         src={(user as any)?.user_metadata?.avatar_url}
                         alt={(user as any)?.user_metadata?.full_name}
                         size="lg"
-                        className="flex-shrink-0"
+                        className="shrink-0"
                     />
 
                     {/* Post Creation Area */}
@@ -219,7 +219,7 @@ export default function CreatePostPage() {
                                 placeholder="What's on your mind?"
                                 className={cn(
                                     'relative w-full px-3 py-2 text-xl bg-transparent border-none resize-none',
-                                    'focus:outline-none min-h-[200px] placeholder-gray-500',
+                                    'focus:outline-hidden min-h-[200px] placeholder-gray-500',
                                     'caret-info-500 leading-relaxed',
                                     isDark ? 'text-white' : 'text-black'
                                 )}
@@ -317,7 +317,7 @@ export default function CreatePostPage() {
                                     value={visibility}
                                     onChange={(e) => setVisibility(e.target.value as any)}
                                     className={cn(
-                                        'px-4 py-2 rounded-full text-sm font-medium border-none outline-none cursor-pointer',
+                                        'px-4 py-2 rounded-full text-sm font-medium border-none outline-hidden cursor-pointer',
                                         isDark
                                             ? 'bg-gray-800 text-gray-300'
                                             : 'bg-white text-gray-700 border border-gray-300'

@@ -257,7 +257,7 @@ export default function EmployerDashboard() {
                   key={i}
                   className={cn(
                     "p-5 rounded-2xl lg:rounded-3xl",
-                    isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-sm"
+                    isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-xs"
                   )}
                 >
                   <div className="flex justify-between items-start mb-6">
@@ -289,7 +289,7 @@ export default function EmployerDashboard() {
                 {/* Jobs Section Skeleton */}
                 <div className={cn(
                   "lg:col-span-2 p-5 lg:p-6 rounded-2xl lg:rounded-3xl",
-                  isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-sm"
+                  isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-xs"
                 )}>
                   <div className="flex items-center justify-between mb-5">
                     <div className={cn(
@@ -349,7 +349,7 @@ export default function EmployerDashboard() {
                 {/* Applicants Skeleton */}
                 <div className={cn(
                   "p-5 lg:p-6 rounded-2xl lg:rounded-3xl",
-                  isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-sm"
+                  isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-xs"
                 )}>
                   <div className="flex items-center justify-between mb-5">
                     <div className={cn(
@@ -396,7 +396,7 @@ export default function EmployerDashboard() {
                 {/* Events Skeleton */}
                 <div className={cn(
                   "p-5 lg:p-6 rounded-2xl lg:rounded-3xl",
-                  isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-sm"
+                  isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-xs"
                 )}>
                   <div className="flex items-center justify-between mb-5">
                     <div className={cn(
@@ -451,8 +451,8 @@ export default function EmployerDashboard() {
                 <div className={cn(
                   "p-5 lg:p-6 rounded-2xl lg:rounded-3xl",
                   isDark
-                    ? "bg-gradient-to-br from-lime-400/20 to-lime-600/20"
-                    : "bg-gradient-to-br from-lime-500/20 to-lime-600/20"
+                    ? "bg-linear-to-br from-lime-400/20 to-lime-600/20"
+                    : "bg-linear-to-br from-lime-500/20 to-lime-600/20"
                 )}>
                   <div className={cn(
                     "h-6 w-28 rounded animate-pulse mb-4",
@@ -473,7 +473,7 @@ export default function EmployerDashboard() {
                 {/* Followers Skeleton */}
                 <div className={cn(
                   "p-5 lg:p-6 rounded-2xl lg:rounded-3xl",
-                  isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-sm"
+                  isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-xs"
                 )}>
                   <div className="flex items-center justify-between mb-5">
                     <div className={cn(
@@ -582,7 +582,7 @@ export default function EmployerDashboard() {
                   "px-5 py-2.5 rounded-2xl font-medium transition-all duration-300",
                   isDark
                     ? "bg-zinc-900 border border-zinc-800 text-white hover:border-lime-400/50"
-                    : "bg-white border border-gray-200 text-gray-900 hover:border-lime-500/50 shadow-sm"
+                    : "bg-white border border-gray-200 text-gray-900 hover:border-lime-500/50 shadow-xs"
                 )}
                 onClick={() => setShowPostEventModal(true)}
               >
@@ -619,11 +619,11 @@ export default function EmployerDashboard() {
                   "group relative p-5 rounded-2xl lg:rounded-3xl transition-all duration-300 overflow-hidden",
                   isDark
                     ? "bg-zinc-900/50 border border-white/5 hover:border-lime-400/30"
-                    : "bg-white border border-gray-200 hover:border-lime-500/30 shadow-sm hover:shadow-md"
+                    : "bg-white border border-gray-200 hover:border-lime-500/30 shadow-xs hover:shadow-md"
                 )}
               >
                 <div className={cn(
-                  "absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500",
+                  "absolute inset-0 bg-linear-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500",
                   isDark ? "from-lime-400/5 via-transparent to-transparent" : "from-lime-500/5 via-transparent to-transparent"
                 )} />
 
@@ -673,7 +673,7 @@ export default function EmployerDashboard() {
               {/* Active Jobs Section */}
               <div className={cn(
                 "lg:col-span-2 p-5 lg:p-6 rounded-2xl lg:rounded-3xl",
-                isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-sm"
+                isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-xs"
               )}>
                 <div className="flex items-center justify-between mb-5">
                   <h2 className={cn(
@@ -783,7 +783,7 @@ export default function EmployerDashboard() {
               {/* Recent Applicants */}
               <div className={cn(
                 "p-5 lg:p-6 rounded-2xl lg:rounded-3xl h-full",
-                isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-sm"
+                isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-xs"
               )}>
                 <div className="flex items-center justify-between mb-5">
                   <h2 className={cn(
@@ -872,7 +872,7 @@ export default function EmployerDashboard() {
               {/* Upcoming Events */}
               <div className={cn(
                 "p-5 lg:p-6 rounded-2xl lg:rounded-3xl h-full",
-                isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-sm"
+                isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-xs"
               )}>
                 <div className="flex items-center justify-between mb-5">
                   <h2 className={cn(
@@ -953,8 +953,8 @@ export default function EmployerDashboard() {
               <div className={cn(
                 "p-5 lg:p-6 rounded-2xl lg:rounded-3xl",
                 isDark
-                  ? "bg-gradient-to-br from-lime-400 to-lime-600 text-black"
-                  : "bg-gradient-to-br from-lime-500 to-lime-600 text-white shadow-lg shadow-lime-500/30"
+                  ? "bg-linear-to-br from-lime-400 to-lime-600 text-black"
+                  : "bg-linear-to-br from-lime-500 to-lime-600 text-white shadow-lg shadow-lime-500/30"
               )}>
                 <h3 className="text-lg font-bold mb-4">Quick Actions</h3>
                 <div className="space-y-2">
@@ -978,7 +978,7 @@ export default function EmployerDashboard() {
               {/* Followers */}
               <div className={cn(
                 "p-5 lg:p-6 rounded-2xl lg:rounded-3xl",
-                isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-sm"
+                isDark ? "bg-zinc-900/50 border border-white/5" : "bg-white border border-gray-200 shadow-xs"
               )}>
                 <div className="flex items-center justify-between mb-5">
                   <h2 className={cn(
@@ -1037,7 +1037,7 @@ export default function EmployerDashboard() {
       {/* Modals */}
       {showPostJobModal && (
         <div className={cn(
-          "fixed inset-0 z-[9999] flex items-center justify-center backdrop-blur-sm p-4",
+          "fixed inset-0 z-9999 flex items-center justify-center backdrop-blur-sm p-4",
           isDark ? "bg-black/80" : "bg-black/60"
         )}>
           <div className={cn(
@@ -1062,7 +1062,7 @@ export default function EmployerDashboard() {
 
       {showPostEventModal && (
         <div className={cn(
-          "fixed inset-0 z-[9999] flex items-center justify-center backdrop-blur-sm p-4",
+          "fixed inset-0 z-9999 flex items-center justify-center backdrop-blur-sm p-4",
           isDark ? "bg-black/80" : "bg-black/60"
         )}>
           <div className={cn(

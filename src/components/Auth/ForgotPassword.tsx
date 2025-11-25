@@ -78,7 +78,7 @@ export default function ForgotPassword() {
                     isDark
                       ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-[#BCE953]'
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#BCE953]'
-                  } focus:outline-none focus:ring-2 focus:ring-[#BCE953]/20`}
+                  } focus:outline-hidden focus:ring-2 focus:ring-[#BCE953]/20`}
                 />
                 <Mail className={`absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 ${
                   isDark ? 'text-gray-400' : 'text-gray-500'

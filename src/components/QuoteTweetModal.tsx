@@ -130,7 +130,7 @@ export default function QuoteTweetModal({
                 placeholder="Add a comment..."
                 disabled={isSubmitting}
                 className={cn(
-                  'w-full resize-none border-none outline-none text-lg placeholder-gray-500 bg-transparent min-h-[100px]',
+                  'w-full resize-none border-none outline-hidden text-lg placeholder-gray-500 bg-transparent min-h-[100px]',
                   isDark ? 'text-white' : 'text-gray-900'
                 )}
                 maxLength={maxCharacters + 50} // Allow typing over limit but show error

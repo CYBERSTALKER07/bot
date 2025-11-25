@@ -279,7 +279,7 @@ function StepIndicator({ step, currentStep, onClickStep, disableStepIndicators =
   return (
     <motion.div
       onClick={handleClick}
-      className="relative cursor-pointer outline-none focus:outline-none"
+      className="relative cursor-pointer outline-hidden focus:outline-hidden"
       animate={status}
       initial={false}
     >

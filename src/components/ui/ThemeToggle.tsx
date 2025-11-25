@@ -31,7 +31,7 @@ export default function ThemeToggle({
     return (
       <button
         onClick={toggleTheme}
-        className={`relative inline-flex items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+        className={`relative inline-flex items-center rounded-full transition-all duration-300 focus:outline-hidden focus:ring-2 focus:ring-offset-2 ${
           isDark
             ? 'bg-lime focus:ring-lime'
             : 'bg-lime focus:ring-lime'
@@ -62,7 +62,7 @@ export default function ThemeToggle({
   return (
     <button
       onClick={toggleTheme}
-      className={`${sizes[size]} rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+      className={`${sizes[size]} rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-hidden focus:ring-2 focus:ring-offset-2 ${
         isDark
           ? 'bg-lime/20 text-lime hover:bg-lime/30 focus:ring-lime'
           : 'bg-lime/20 text-lime hover:bg-lime/30 focus:ring-lime'

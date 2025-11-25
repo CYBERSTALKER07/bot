@@ -487,7 +487,7 @@ export default function ResumeBuilder() {
           value={resumeData.personalInfo.fullName}
           onChange={(e) => updatePersonalInfo('fullName', e.target.value)}
           className={cn(
-            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
+            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-info-500",
             isDark
               ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400'
               : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -499,7 +499,7 @@ export default function ResumeBuilder() {
           value={resumeData.personalInfo.email}
           onChange={(e) => updatePersonalInfo('email', e.target.value)}
           className={cn(
-            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
+            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-info-500",
             isDark
               ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400'
               : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -511,7 +511,7 @@ export default function ResumeBuilder() {
           value={resumeData.personalInfo.phone}
           onChange={(e) => updatePersonalInfo('phone', e.target.value)}
           className={cn(
-            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
+            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-info-500",
             isDark
               ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400'
               : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -523,7 +523,7 @@ export default function ResumeBuilder() {
           value={resumeData.personalInfo.location}
           onChange={(e) => updatePersonalInfo('location', e.target.value)}
           className={cn(
-            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
+            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-info-500",
             isDark
               ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400'
               : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -535,7 +535,7 @@ export default function ResumeBuilder() {
           value={resumeData.personalInfo.website}
           onChange={(e) => updatePersonalInfo('website', e.target.value)}
           className={cn(
-            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
+            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-info-500",
             isDark
               ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400'
               : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -547,7 +547,7 @@ export default function ResumeBuilder() {
           value={resumeData.personalInfo.linkedin}
           onChange={(e) => updatePersonalInfo('linkedin', e.target.value)}
           className={cn(
-            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
+            "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-info-500",
             isDark
               ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400'
               : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -560,7 +560,7 @@ export default function ResumeBuilder() {
         onChange={(e) => updatePersonalInfo('summary', e.target.value)}
         rows={4}
         className={cn(
-          "w-full px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500 resize-none",
+          "w-full px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-info-500 resize-none",
           isDark
             ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400'
             : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -591,7 +591,7 @@ export default function ResumeBuilder() {
                 value={exp.company}
                 onChange={(e) => updateExperience(exp.id, 'company', e.target.value)}
                 className={cn(
-                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
+                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-info-500",
                   isDark
                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -603,7 +603,7 @@ export default function ResumeBuilder() {
                 value={exp.position}
                 onChange={(e) => updateExperience(exp.id, 'position', e.target.value)}
                 className={cn(
-                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
+                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-info-500",
                   isDark
                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -615,7 +615,7 @@ export default function ResumeBuilder() {
                 value={exp.startDate}
                 onChange={(e) => updateExperience(exp.id, 'startDate', e.target.value)}
                 className={cn(
-                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
+                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-info-500",
                   isDark
                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -629,7 +629,7 @@ export default function ResumeBuilder() {
                   onChange={(e) => updateExperience(exp.id, 'endDate', e.target.value)}
                   disabled={exp.current}
                   className={cn(
-                    "flex-1 px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
+                    "flex-1 px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-info-500",
                     exp.current && "opacity-50",
                     isDark
                       ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
@@ -662,7 +662,7 @@ export default function ResumeBuilder() {
             onChange={(e) => updateExperience(exp.id, 'description', e.target.value)}
             rows={4}
             className={cn(
-              "w-full px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500 resize-none",
+              "w-full px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-info-500 resize-none",
               isDark
                 ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                 : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -706,7 +706,7 @@ export default function ResumeBuilder() {
                 value={edu.institution}
                 onChange={(e) => updateEducation(edu.id, 'institution', e.target.value)}
                 className={cn(
-                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
+                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-info-500",
                   isDark
                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -718,7 +718,7 @@ export default function ResumeBuilder() {
                 value={edu.degree}
                 onChange={(e) => updateEducation(edu.id, 'degree', e.target.value)}
                 className={cn(
-                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
+                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-info-500",
                   isDark
                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -730,7 +730,7 @@ export default function ResumeBuilder() {
                 value={edu.field}
                 onChange={(e) => updateEducation(edu.id, 'field', e.target.value)}
                 className={cn(
-                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
+                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-info-500",
                   isDark
                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -742,7 +742,7 @@ export default function ResumeBuilder() {
                 value={edu.gpa}
                 onChange={(e) => updateEducation(edu.id, 'gpa', e.target.value)}
                 className={cn(
-                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
+                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-info-500",
                   isDark
                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -754,7 +754,7 @@ export default function ResumeBuilder() {
                 value={edu.startDate}
                 onChange={(e) => updateEducation(edu.id, 'startDate', e.target.value)}
                 className={cn(
-                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
+                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-info-500",
                   isDark
                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -766,7 +766,7 @@ export default function ResumeBuilder() {
                 value={edu.endDate}
                 onChange={(e) => updateEducation(edu.id, 'endDate', e.target.value)}
                 className={cn(
-                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
+                  "px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-info-500",
                   isDark
                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -819,7 +819,7 @@ export default function ResumeBuilder() {
               value={skill.category}
               onChange={(e) => updateSkillCategory(skill.id, e.target.value)}
               className={cn(
-                "flex-1 px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500",
+                "flex-1 px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-info-500",
                 isDark
                   ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                   : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -840,7 +840,7 @@ export default function ResumeBuilder() {
             onChange={(e) => updateSkillItems(skill.id, e.target.value)}
             rows={3}
             className={cn(
-              "w-full px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-info-500 resize-none",
+              "w-full px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-info-500 resize-none",
               isDark
                 ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                 : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'
@@ -1165,7 +1165,7 @@ export default function ResumeBuilder() {
           <div className="space-y-3 text-sm">
             {resumeData.personalInfo.location && (
               <div className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
                 <div>
                   <div className="font-medium">Address</div>
                   <div className="text-gray-300">{resumeData.personalInfo.location}</div>
@@ -1174,7 +1174,7 @@ export default function ResumeBuilder() {
             )}
             {resumeData.personalInfo.phone && (
               <div className="flex items-start gap-3">
-                <Phone className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <Phone className="w-4 h-4 mt-0.5 shrink-0" />
                 <div>
                   <div className="font-medium">Phone</div>
                   <div className="text-gray-300">{resumeData.personalInfo.phone}</div>
@@ -1183,7 +1183,7 @@ export default function ResumeBuilder() {
             )}
             {resumeData.personalInfo.email && (
               <div className="flex items-start gap-3">
-                <Mail className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <Mail className="w-4 h-4 mt-0.5 shrink-0" />
                 <div>
                   <div className="font-medium">Web</div>
                   <div className="text-gray-300">{resumeData.personalInfo.email}</div>
@@ -1545,9 +1545,9 @@ export default function ResumeBuilder() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 shadow-xs border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
@@ -1556,7 +1556,7 @@ export default function ResumeBuilder() {
               </h1>
               <button
                 onClick={() => setShowAIBuilder(!showAIBuilder)}
-                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-info-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-200"
+                className="flex items-center space-x-2 px-4 py-2 bg-linear-to-r from-purple-600 to-info-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-200"
               >
                 <Sparkles className="w-4 h-4" />
                 <span>AI Builder</span>

@@ -243,7 +243,7 @@ export default function DigitalLearningPassport() {
           }`}>
             <div 
               className={`h-3 rounded-full transition-all duration-1000 ${
-                isDark ? 'bg-gradient-to-r from-lime to-green-400' : 'bg-gradient-to-r from-asu-maroon to-red-600'
+                isDark ? 'bg-linear-to-r from-lime to-green-400' : 'bg-linear-to-r from-asu-maroon to-red-600'
               }`}
               style={{ width: `${passportStats.overallProgress}%` }}
             ></div>

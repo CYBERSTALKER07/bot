@@ -318,7 +318,7 @@ export default function Login() {
                   placeholder=" "
                   required
                   className={cn(
-                    'peer w-full px-4 pt-6 pb-2 text-base border rounded outline-none transition-all',
+                    'peer w-full px-4 pt-6 pb-2 text-base border rounded outline-hidden transition-all',
                     isDark
                       ? 'bg-black border-neutral-700 text-white focus:border-info-500'
                       : 'bg-white border-neutral-300 text-black focus:border-info-500'
@@ -344,7 +344,7 @@ export default function Login() {
                   placeholder=" "
                   required
                   className={cn(
-                    'peer w-full px-4 pt-6 pb-2 text-base border rounded outline-none transition-all pr-12',
+                    'peer w-full px-4 pt-6 pb-2 text-base border rounded outline-hidden transition-all pr-12',
                     isDark
                       ? 'bg-black border-neutral-700 text-white focus:border-info-500'
                       : 'bg-white border-neutral-300 text-black focus:border-info-500'
@@ -376,7 +376,7 @@ export default function Login() {
             {error && (
               <div className="bg-red-500/10 border border-red-500 text-red-500 rounded-lg p-4">
                 <div className="flex items-center gap-2">
-                  <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                  <AlertCircle className="h-5 w-5 shrink-0" />
                   <span className="text-sm">{error}</span>
                 </div>
               </div>
@@ -507,7 +507,7 @@ export default function Login() {
                   placeholder=" "
                   required
                   className={cn(
-                    'peer w-full px-4 pt-6 pb-2 text-base border rounded outline-none transition-all',
+                    'peer w-full px-4 pt-6 pb-2 text-base border rounded outline-hidden transition-all',
                     isDark
                       ? 'bg-black border-neutral-700 text-white focus:border-info-500'
                       : 'bg-white border-neutral-300 text-black focus:border-info-500'
@@ -533,7 +533,7 @@ export default function Login() {
                   placeholder=" "
                   required
                   className={cn(
-                    'peer w-full px-4 pt-6 pb-2 text-base border rounded outline-none transition-all',
+                    'peer w-full px-4 pt-6 pb-2 text-base border rounded outline-hidden transition-all',
                     isDark
                       ? 'bg-black border-neutral-700 text-white focus:border-info-500'
                       : 'bg-white border-neutral-300 text-black focus:border-info-500'
@@ -560,7 +560,7 @@ export default function Login() {
                 placeholder=" "
                 required
                 className={cn(
-                  'peer w-full px-4 pt-6 pb-2 text-base border rounded outline-none transition-all',
+                  'peer w-full px-4 pt-6 pb-2 text-base border rounded outline-hidden transition-all',
                   isDark
                     ? 'bg-black border-neutral-700 text-white focus:border-info-500'
                     : 'bg-white border-neutral-300 text-black focus:border-info-500'
@@ -586,7 +586,7 @@ export default function Login() {
                 placeholder=" "
                 required
                 className={cn(
-                  'peer w-full px-4 pt-6 pb-2 text-base border rounded outline-none transition-all pr-12',
+                  'peer w-full px-4 pt-6 pb-2 text-base border rounded outline-hidden transition-all pr-12',
                   isDark
                     ? 'bg-black border-neutral-700 text-white focus:border-info-500'
                     : 'bg-white border-neutral-300 text-black focus:border-info-500'
@@ -618,7 +618,7 @@ export default function Login() {
           {error && (
             <div className="bg-red-500/10 border border-red-500 text-red-500 rounded-lg p-4">
               <div className="flex items-center gap-2">
-                <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                <AlertCircle className="h-5 w-5 shrink-0" />
                 <span className="text-sm">{error}</span>
               </div>
             </div>

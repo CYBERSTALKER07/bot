@@ -142,7 +142,7 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
         variants[toast.type]
       )}
     >
-      <Icon className={cn('w-5 h-5 flex-shrink-0 mt-0.5', iconColors[toast.type])} />
+      <Icon className={cn('w-5 h-5 shrink-0 mt-0.5', iconColors[toast.type])} />
       
       <div className="flex-1 min-w-0">
         <div className="font-semibold text-sm">{toast.title}</div>
@@ -162,7 +162,7 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
 
       <button
         onClick={() => onRemove(toast.id)}
-        className="flex-shrink-0 p-1 rounded-md hover:bg-black/10 transition-colors"
+        className="shrink-0 p-1 rounded-md hover:bg-black/10 transition-colors"
         aria-label="Close notification"
         title="Close notification"
       >

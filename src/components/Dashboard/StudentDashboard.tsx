@@ -284,7 +284,7 @@ export default function StudentDashboard() {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className={cn(
-                      'w-full pl-12 pr-4 py-3 rounded-2xl bg-transparent border-none outline-none',
+                      'w-full pl-12 pr-4 py-3 rounded-2xl bg-transparent border-none outline-hidden',
                       isDark ? 'text-white placeholder-gray-400' : 'text-black placeholder-gray-600'
                     )}
                   />
@@ -646,7 +646,7 @@ const MainContent = ({ isDark, jobs, filteredJobs, recentActivity, applicationsS
               >
                 <div className="flex items-center space-x-3 flex-1 min-w-0">
                   <div className={cn(
-                    'w-2 h-2 rounded-full flex-shrink-0',
+                    'w-2 h-2 rounded-full shrink-0',
                     activity.type === 'application' ? isDark ? 'bg-white' : 'bg-black' :
                     activity.type === 'saved' ? isDark ? 'bg-white' : 'bg-black' : 'bg-gray-500'
                   )} />
@@ -664,7 +664,7 @@ const MainContent = ({ isDark, jobs, filteredJobs, recentActivity, applicationsS
                   </div>
                 </div>
                 <span className={cn(
-                  'text-xs sm:text-sm flex-shrink-0',
+                  'text-xs sm:text-sm shrink-0',
                   isDark ? 'text-gray-400' : 'text-gray-600'
                 )}>
                   {activity.time}
@@ -820,7 +820,7 @@ const DesktopSidebar = ({ isDark, searchTerm, setSearchTerm, trendingTopics, sug
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className={cn(
-            'w-full pl-12 pr-4 py-3 rounded-2xl bg-transparent border-none outline-none text-lg',
+            'w-full pl-12 pr-4 py-3 rounded-2xl bg-transparent border-none outline-hidden text-lg',
             isDark ? 'text-white placeholder-gray-400' : 'text-black placeholder-gray-600'
           )}
         />

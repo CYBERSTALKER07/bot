@@ -29,8 +29,8 @@ export default function ExploreFeed({
             <div className={cn(
                 "rounded-3xl p-8 relative overflow-hidden",
                 isDark
-                    ? "bg-gradient-to-br from-info-900/40 via-purple-900/40 to-black border border-[#1C1F20]"
-                    : "bg-gradient-to-br from-info-50 via-purple-50 to-white border border-gray-200"
+                    ? "bg-linear-to-br from-info-900/40 via-purple-900/40 to-black border border-[#1C1F20]"
+                    : "bg-linear-to-br from-info-50 via-purple-50 to-white border border-gray-200"
             )}>
                 <div className="relative z-10">
                     <h1 className={cn(
@@ -103,7 +103,7 @@ export default function ExploreFeed({
                             <div className="flex items-start justify-between mb-3">
                                 <div className={cn(
                                     "w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-white",
-                                    "bg-gradient-to-br from-info-600 to-purple-600"
+                                    "bg-linear-to-br from-info-600 to-purple-600"
                                 )}>
                                     {job.company?.charAt(0) || '💼'}
                                 </div>
@@ -226,7 +226,7 @@ export default function ExploreFeed({
                         >
                             <div className={cn(
                                 "w-16 h-16 mx-auto rounded-2xl flex items-center justify-center text-2xl mb-3",
-                                "bg-gradient-to-br from-gray-700 to-gray-900 text-white shadow-lg"
+                                "bg-linear-to-br from-gray-700 to-gray-900 text-white shadow-lg"
                             )}>
                                 {company.logo_url ? (
                                     <img src={company.logo_url} alt={company.name} className="w-full h-full object-cover rounded-2xl" />
@@ -270,8 +270,8 @@ export default function ExploreFeed({
                             )}
                         >
                             <div className={cn(
-                                "w-12 h-12 rounded-xl flex items-center justify-center font-bold text-white flex-shrink-0",
-                                "bg-gradient-to-br from-info-500 to-indigo-600"
+                                "w-12 h-12 rounded-xl flex items-center justify-center font-bold text-white shrink-0",
+                                "bg-linear-to-br from-info-500 to-indigo-600"
                             )}>
                                 {job.company?.charAt(0) || 'J'}
                             </div>

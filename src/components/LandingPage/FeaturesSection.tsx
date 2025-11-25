@@ -111,8 +111,8 @@ export default function FeaturesSection({ featuresRef }: FeaturesSectionProps) {
     }`}>
       <div className={`absolute inset-0 ${
         isDark 
-          ? 'bg-gradient-to-b from-dark-surface/50 to-dark-bg' 
-          : 'bg-gradient-to-b from-gray-50/50 to-white'
+          ? 'bg-linear-to-b from-dark-surface/50 to-dark-bg' 
+          : 'bg-linear-to-b from-gray-50/50 to-white'
       }`}></div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-20">
@@ -121,8 +121,8 @@ export default function FeaturesSection({ featuresRef }: FeaturesSectionProps) {
           }`}>
             Everything You Need to <span className={`bg-clip-text text-transparent ${
               isDark 
-                ? 'bg-gradient-to-r from-lime to-dark-accent' 
-                : 'bg-gradient-to-r from-aut-maroon to-aut-maroon-dark'
+                ? 'bg-linear-to-r from-lime to-dark-accent' 
+                : 'bg-linear-to-r from-aut-maroon to-aut-maroon-dark'
             }`}>Succeed</span>
           </h2>
           <p className={`text-reveal text-xl max-w-4xl mx-auto leading-relaxed transition-colors duration-300 ${
@@ -189,9 +189,9 @@ export default function FeaturesSection({ featuresRef }: FeaturesSectionProps) {
                 ? 'bg-dark-surface border-lime/20 hover:border-lime/40' 
                 : 'bg-white border-gray-200 hover:border-asu-maroon/30 '
             } ${feature.size === 'large' ? 'lg:p-8' : feature.size === 'medium' ? 'lg:p-7' : 'lg:p-6'}`}>
-              <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-5 rounded-2xl transition-opacity duration-500`}></div>
+              <div className={`absolute inset-0 bg-linear-to-br ${feature.gradient} opacity-0 group-hover:opacity-5 rounded-2xl transition-opacity duration-500`}></div>
               <div className="relative z-10">
-                <div className={`feature-icon mb-4 w-16 h-16 bg-gradient-to-br ${feature.gradient} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500 shadow-lg ${
+                <div className={`feature-icon mb-4 w-16 h-16 bg-linear-to-br ${feature.gradient} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500 shadow-lg ${
                   !isDark && (feature.gradient.includes('from-asu-maroon/10') || feature.gradient.includes('to-asu-gold/10')) 
                     ? 'border-2 border-asu-maroon/20' 
                     : ''
@@ -209,7 +209,7 @@ export default function FeaturesSection({ featuresRef }: FeaturesSectionProps) {
                     <li key={idx} className={`feature-item flex items-center text-xs transition-colors duration-300 ${
                       isDark ? 'text-dark-muted' : 'text-gray-500'
                     }`}>
-                      <CheckCircle className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                      <CheckCircle className="h-3 w-3 text-green-500 mr-2 shrink-0" />
                       {item}
                     </li>
                   ))}
@@ -222,8 +222,8 @@ export default function FeaturesSection({ featuresRef }: FeaturesSectionProps) {
         {/* Additional Benefits Section */}
         <div className={`rounded-3xl p-12 text-center transition-colors duration-300 ${
           isDark 
-            ? 'bg-gradient-to-r from-lime/5 to-dark-accent/5' 
-            : 'bg-gradient-to-r from-asu-maroon/5 to-asu-gold/5'
+            ? 'bg-linear-to-r from-lime/5 to-dark-accent/5' 
+            : 'bg-linear-to-r from-asu-maroon/5 to-asu-gold/5'
         }`}>
           <h3 className={`text-3xl font-bold mb-8 transition-colors duration-300 ${
             isDark ? 'text-dark-text' : 'text-gray-900'

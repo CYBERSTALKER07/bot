@@ -98,7 +98,7 @@ const Chip: React.FC<ChipProps> = ({
 
   const baseClasses = `
     inline-flex items-center justify-center rounded-full font-medium
-    focus:outline-none focus:ring-2 focus:ring-offset-1
+    focus:outline-hidden focus:ring-2 focus:ring-offset-1
     disabled:opacity-50 disabled:cursor-not-allowed
     ${clickable || variant === 'filter' ? 'cursor-pointer' : ''}
     ${getSizeClasses()}

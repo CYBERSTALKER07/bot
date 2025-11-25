@@ -1,64 +1,774 @@
 /* Enhanced Global Styles for Professional Design */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap') layer(base);
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap') layer(base);
+@import 'tailwindcss';
+@import "@openai/apps-sdk-ui/css";
 
-/* CSS Variables for consistent theming */
-:root {
-  /* Light theme */
-  --color-primary: 188 233 83;
-  /* #BCE953 instead of Lime */
-  --color-secondary: 255 198 39;
-  /* ASU Gold */
-  --color-accent: 140 29 64;
-  /* ASU Maroon as accent */
+/* Required for Tailwind to find class references in Apps SDK UI components. */
+@source "../node_modules/@openai/apps-sdk-ui";
 
-  --color-background: 255 255 255;
-  --color-foreground: 24 24 27;
-  --color-muted: 113 113 122;
-  --color-muted-foreground: 161 161 170;
+@config '../tailwind.config.js';
 
-  --color-border: 120 122 122;
-  --color-input: 228 228 231;
-  --color-ring: 188 233 83;
-  /* #BCE953 ring color */
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
 
-  --color-success: 34 197 94;
-  --color-warning: 245 158 11;
-  --color-error: 239 68 68;
-  --color-info: 250 70 23;
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
 
-  --radius: 0.5rem;
-  --shadow-color: 0 0 0;
-  --shadow-elevation-low: 0 1px 2px 0 rgb(var(--shadow-color) / 0.05);
-  --shadow-elevation-medium: 0 4px 6px -1px rgb(var(--shadow-color) / 0.1), 0 2px 4px -2px rgb(var(--shadow-color) / 0.1);
-  --shadow-elevation-high: 0 20px 25px -5px rgb(var(--shadow-color) / 0.1), 0 8px 10px -6px rgb(var(--shadow-color) / 0.1);
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
 }
 
-.dark {
-  /* X (Twitter) Dark theme */
-  --color-background: 0 0 0;
-  /* Pure Black */
-  --color-foreground: 231 233 234;
-  /* #e7e9ea */
-  --color-muted: 113 118 123;
-  /* #71767b */
-  --color-muted-foreground: 113 118 123;
-  /* #71767b */
-
-  --color-border: 47 51 54;
-  /* #2f3336 */
-  --color-input: 32 35 39;
-  /* #202327 */
-  --color-ring: 29 155 240;
-  /* #1d9bf0 (Twitter Blue) */
-
-  --shadow-color: 255 255 255;
+/* Component layer enhancements */
+@utility btn {
+  /* Professional button base */
+  @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors duration-200 focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50;
 }
 
-/* Base layer enhancements */
+@utility btn-primary {
+  @apply bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 active:bg-primary/80;
+}
+
+@utility btn-secondary {
+  @apply bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/90 active:bg-secondary/80;
+}
+
+@utility btn-outline {
+  @apply border border-input bg-background shadow-xs hover:bg-accent hover:text-accent-foreground;
+}
+
+@utility btn-ghost {
+  @apply hover:bg-accent hover:text-accent-foreground;
+}
+
+@utility card {
+  /* Card component */
+  @apply rounded-lg border bg-card text-card-foreground shadow-xs;
+}
+
+@utility card-header {
+  @apply flex flex-col space-y-1.5 p-6;
+}
+
+@utility card-title {
+  @apply text-2xl font-semibold leading-none tracking-tight;
+}
+
+@utility card-description {
+  @apply text-sm text-muted-foreground;
+}
+
+@utility card-content {
+  @apply p-6 pt-0;
+}
+
+@utility card-footer {
+  @apply flex items-center p-6 pt-0;
+}
+
+@utility form-input {
+  /* Form elements */
+  @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+@utility form-textarea {
+  @apply flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+@utility form-label {
+  @apply text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70;
+}
+
+@utility nav-link {
+  /* Navigation styles */
+  @apply flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-hidden;
+
+  &.active {
+    @apply bg-accent text-accent-foreground;
+  }
+}
+
+@utility active {
+  &.nav-link {
+    @apply bg-accent text-accent-foreground;
+  }
+}
+
+@utility container {
+  /* Layout utilities */
+  @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+
+@utility section {
+  @apply py-12 sm:py-16 lg:py-20;
+}
+
+@utility prose {
+  @apply max-w-none text-foreground;
+
+  & h1 {
+    @apply text-foreground;
+  }
+
+  & h2 {
+    @apply text-foreground;
+  }
+
+  & h3 {
+    @apply text-foreground;
+  }
+
+  & h4 {
+    @apply text-foreground;
+  }
+
+  & h5 {
+    @apply text-foreground;
+  }
+
+  & h6 {
+    @apply text-foreground;
+  }
+
+  & p {
+    @apply text-muted-foreground;
+  }
+}
+
+@utility animate-in {
+  /* Animation classes */
+  @apply animate-fade-in;
+}
+
+@utility animate-out {
+  @apply animate-fade-out;
+}
+
+@utility glass {
+  /* Glass morphism effect */
+  @apply bg-white/10 backdrop-blur-md border border-white/20;
+
+  &.dark {
+    @apply bg-black/10 border-white/10;
+  }
+}
+
+@utility dark {
+  &.glass {
+    @apply bg-black/10 border-white/10;
+  }
+
+  & ::selection {
+    @apply bg-primary/20 text-primary-foreground;
+  }
+
+  & .ios-bottom-nav {
+    background: rgba(0, 0, 0, 0.8);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  & .ios-header {
+    background: rgba(0, 0, 0, 0.95);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  & .ios-sidebar-fix {
+    background: rgb(0, 0, 0) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding-top: max(env(safe-area-inset-top), 44px) !important;
+    min-height: max(env(safe-area-inset-top), 44px) !important;
+  }
+
+  & .animate-shimmer {
+    background: linear-gradient(to right,
+        #1f2937 0%,
+        #374151 50%,
+        #1f2937 100%);
+    background-size: 2000px 100%;
+  }
+
+  & .skeleton-wave::after {
+    background: linear-gradient(90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0) 100%);
+  }
+}
+
+@utility gradient-primary {
+  /* Gradient backgrounds */
+  background: linear-gradient(135deg,
+      rgb(140, 29, 64) 0%,
+      rgb(255, 198, 39) 100%);
+}
+
+@utility gradient-accent {
+  background: linear-gradient(135deg,
+      rgb(227, 255, 112) 0%,
+      rgb(140, 29, 64) 100%);
+}
+
+@utility space-section {
+  /* Professional spacing */
+  @apply space-y-16 lg:space-y-24;
+}
+
+@utility space-content {
+  @apply space-y-8 lg:space-y-12;
+}
+
+@utility space-items {
+  @apply space-y-4 lg:space-y-6;
+}
+
+@utility scrollbar-hide {
+  /* Hide scrollbar but keep functionality */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility text-balance {
+  /* Text utilities */
+  text-wrap: balance;
+}
+
+@utility text-pretty {
+  text-wrap: pretty;
+}
+
+@utility sr-only {
+  /* Accessibility */
+  @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
+}
+
+@utility focus-ring {
+  /* Focus utilities */
+  @apply focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+}
+
+@utility safe-top {
+  /* Safe area utilities for mobile */
+  padding-top: env(safe-area-inset-top);
+}
+
+@utility safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@utility safe-left {
+  padding-left: env(safe-area-inset-left);
+}
+
+@utility safe-right {
+  padding-right: env(safe-area-inset-right);
+}
+
+@utility ios-safe-top {
+  /* Enhanced iOS-specific safe area utilities */
+  padding-top: max(env(safe-area-inset-top), 100px);
+  /* Increased from 20px */
+}
+
+@utility ios-safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom), 100px);
+}
+
+@utility ios-header-safe {
+  /* Dynamic Island and Notch support - Enhanced */
+  padding-top: max(env(safe-area-inset-top), 54px);
+  /* Increased from 44px */
+  min-height: max(env(safe-area-inset-top), 54px);
+  /* Increased from 44px */
+}
+
+@utility ios-bottom-safe {
+  padding-bottom: max(env(safe-area-inset-bottom), 34px);
+  margin-bottom: env(safe-area-inset-bottom);
+}
+
+@utility ios-home-indicator-safe {
+  /* Home indicator area protection - Enhanced */
+  padding-bottom: max(env(safe-area-inset-bottom), 34px);
+  min-height: 64px;
+  /* Ensure minimum touch target */
+}
+
+@utility ios-safe-area {
+  /* Full safe area for iOS */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+@utility ios-pro-max-adjust {
+  @media screen and (max-width: 430px) and (max-height: 932px) {
+    /* iPhone 14 Pro Max specific adjustments */
+    padding-top: max(env(safe-area-inset-top), 69px);
+    /* Increased from 59px */
+  }
+}
+
+@utility ios-pro-max-bottom {
+  @media screen and (max-width: 430px) and (max-height: 932px) {
+    padding-bottom: max(env(safe-area-inset-bottom), 34px);
+    margin-bottom: max(env(safe-area-inset-bottom), 8px);
+  }
+}
+
+@utility ios-pro-adjust {
+  @media screen and (max-width: 393px) and (max-height: 852px) {
+    /* iPhone 14 Pro specific adjustments */
+    padding-top: max(env(safe-area-inset-top), 69px);
+    /* Increased from 59px */
+  }
+}
+
+@utility ios-pro-bottom {
+  @media screen and (max-width: 393px) and (max-height: 852px) {
+    padding-bottom: max(env(safe-area-inset-bottom), 34px);
+    margin-bottom: max(env(safe-area-inset-bottom), 8px);
+  }
+}
+
+@utility ios-standard-adjust {
+  @media screen and (max-width: 390px) and (max-height: 844px) {
+    /* iPhone 12/13/14 standard specific adjustments */
+    padding-top: max(env(safe-area-inset-top), 57px);
+    /* Increased from 47px */
+  }
+}
+
+@utility ios-standard-bottom {
+  @media screen and (max-width: 390px) and (max-height: 844px) {
+    padding-bottom: max(env(safe-area-inset-bottom), 34px);
+  }
+}
+
+@utility ios-x-adjust {
+  @media screen and (max-width: 375px) and (max-height: 812px) {
+    /* iPhone X/XS/11 Pro specific adjustments */
+    padding-top: max(env(safe-area-inset-top), 54px);
+    /* Increased from 44px */
+  }
+}
+
+@utility ios-x-bottom {
+  @media screen and (max-width: 375px) and (max-height: 812px) {
+    padding-bottom: max(env(safe-area-inset-bottom), 34px);
+  }
+}
+
+@utility ios-se-adjust {
+  @media screen and (max-width: 375px) and (max-height: 667px) {
+    /* iPhone SE 2nd/3rd gen adjustments */
+    padding-top: max(env(safe-area-inset-top), 30px);
+    /* Increased from 20px */
+  }
+}
+
+@utility ios-se-bottom {
+  @media screen and (max-width: 375px) and (max-height: 667px) {
+    padding-bottom: max(env(safe-area-inset-bottom), 16px);
+  }
+}
+
+@utility ios-landscape-safe {
+  @media screen and (orientation: landscape) {
+    padding-left: max(env(safe-area-inset-left), 44px);
+    padding-right: max(env(safe-area-inset-right), 44px);
+  }
+}
+
+@utility ios-landscape-header {
+  @media screen and (orientation: landscape) {
+    padding-top: max(env(safe-area-inset-top), 0px);
+    padding-left: max(env(safe-area-inset-left), 44px);
+    padding-right: max(env(safe-area-inset-right), 44px);
+  }
+}
+
+@utility ios-landscape-bottom {
+  @media screen and (orientation: landscape) {
+    padding-bottom: max(env(safe-area-inset-bottom), 21px);
+    padding-left: max(env(safe-area-inset-left), 44px);
+    padding-right: max(env(safe-area-inset-right), 44px);
+  }
+}
+
+@utility ios-touch-target {
+  /* iOS-specific responsive breakpoints - Enhanced */
+
+  /* Landscape safe areas - Enhanced */
+
+  /* Touch-friendly utilities for iOS */
+  min-height: 44px;
+  min-width: 44px;
+}
+
+@utility ios-touch-target-large {
+  min-height: 48px;
+  min-width: 48px;
+}
+
+@utility ios-scroll {
+  /* iOS-style scroll behavior */
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+@utility ios-momentum-scroll {
+  /* iOS momentum scrolling */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+@utility ios-backdrop {
+  /* iOS-style backdrop blur */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+@utility ios-rounded {
+  /* iOS-style border radius */
+  border-radius: 12px;
+}
+
+@utility ios-rounded-lg {
+  border-radius: 16px;
+}
+
+@utility ios-no-bounce {
+  /* Prevent bounce scrolling on iOS */
+  overscroll-behavior: contain;
+}
+
+@utility ios-nav-spacing {
+  /* Enhanced iOS navigation spacing */
+  padding: 12px 16px;
+}
+
+@utility ios-nav-item {
+  padding: 12px 16px;
+  min-height: 48px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+
+  &:active {
+    transform: scale(0.98);
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+}
+
+@utility ios-bottom-nav {
+  /* iOS-specific bottom navigation */
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+
+  .dark & {
+    background: rgba(0, 0, 0, 0.8);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+@utility ios-header {
+  /* iOS-specific header */
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+  .dark & {
+    background: rgba(0, 0, 0, 0.95);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+@utility ios-sidebar-fix {
+  /* Fix for mobile sidebar - ensure solid backgrounds on iOS */
+  background: rgb(255, 255, 255) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding-top: max(env(safe-area-inset-top), 44px) !important;
+  min-height: max(env(safe-area-inset-top), 44px) !important;
+
+  .dark & {
+    background: rgb(0, 0, 0) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding-top: max(env(safe-area-inset-top), 44px) !important;
+    min-height: max(env(safe-area-inset-top), 44px) !important;
+  }
+}
+
+@utility ios-only {
+  /* iOS-specific elements - only show on iOS */
+  display: block !important;
+  padding-top: 20px !important;
+
+  @supports (-webkit-touch-callout: none) {
+    display: block !important;
+    padding-top: 20px !important;
+  }
+}
+
+@utility animate-shimmer {
+  /* Show iOS-specific elements only on iOS devices */
+
+  /* Shimmer animation for skeletons */
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(to right, #f0f0f0 0%, #f8f8f8 50%, #f0f0f0 100%);
+  background-size: 2000px 100%;
+
+  .dark & {
+    background: linear-gradient(to right,
+        #1f2937 0%,
+        #374151 50%,
+        #1f2937 100%);
+    background-size: 2000px 100%;
+  }
+}
+
+@utility skeleton-wave {
+  /* Enhanced skeleton wave effect */
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0) 100%);
+    animation: skeleton-wave 1.5s ease-in-out infinite;
+  }
+
+  .dark &::after {
+    background: linear-gradient(90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0) 100%);
+  }
+}
+
+@utility progress-bar {
+  /* Video player progress bar */
+  background: linear-gradient(to right,
+      white 0%,
+      white var(--progress-percent, 0%),
+      rgba(255, 255, 255, 0.3) var(--progress-percent, 0%),
+      rgba(255, 255, 255, 0.3) 100%);
+
+  &[data-progress='0'] {
+    --progress-percent: 0%;
+  }
+
+  &[data-progress='1'] {
+    --progress-percent: 1%;
+  }
+
+  &[data-progress='2'] {
+    --progress-percent: 2%;
+  }
+
+  &[data-progress='3'] {
+    --progress-percent: 3%;
+  }
+
+  &[data-progress='4'] {
+    --progress-percent: 4%;
+  }
+
+  &[data-progress='5'] {
+    --progress-percent: 5%;
+  }
+
+  &[data-progress='10'] {
+    --progress-percent: 10%;
+  }
+
+  &[data-progress='15'] {
+    --progress-percent: 15%;
+  }
+
+  &[data-progress='20'] {
+    --progress-percent: 20%;
+  }
+
+  &[data-progress='25'] {
+    --progress-percent: 25%;
+  }
+
+  &[data-progress='30'] {
+    --progress-percent: 30%;
+  }
+
+  &[data-progress='35'] {
+    --progress-percent: 35%;
+  }
+
+  &[data-progress='40'] {
+    --progress-percent: 40%;
+  }
+
+  &[data-progress='45'] {
+    --progress-percent: 45%;
+  }
+
+  &[data-progress='50'] {
+    --progress-percent: 50%;
+  }
+
+  &[data-progress='55'] {
+    --progress-percent: 55%;
+  }
+
+  &[data-progress='60'] {
+    --progress-percent: 60%;
+  }
+
+  &[data-progress='65'] {
+    --progress-percent: 65%;
+  }
+
+  &[data-progress='70'] {
+    --progress-percent: 70%;
+  }
+
+  &[data-progress='75'] {
+    --progress-percent: 75%;
+  }
+
+  &[data-progress='80'] {
+    --progress-percent: 80%;
+  }
+
+  &[data-progress='85'] {
+    --progress-percent: 85%;
+  }
+
+  &[data-progress='90'] {
+    --progress-percent: 90%;
+  }
+
+  &[data-progress='95'] {
+    --progress-percent: 95%;
+  }
+
+  &[data-progress='100'] {
+    --progress-percent: 100%;
+  }
+}
+
+@utility lazy-image {
+  /* Lazy load image fade-in */
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+
+  &.loaded {
+    opacity: 1;
+  }
+}
+
+@utility loaded {
+  &.lazy-image {
+    opacity: 1;
+  }
+}
+
+@utility line-clamp-3 {
+  /* Line clamp utility */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+@layer utilities {
+
+  /* CSS Variables for consistent theming */
+  :root {
+    /* Light theme */
+    --color-primary: 188 233 83;
+    /* #BCE953 instead of Lime */
+    --color-secondary: 255 198 39;
+    /* ASU Gold */
+    --color-accent: 140 29 64;
+    /* ASU Maroon as accent */
+
+    --color-background: 255 255 255;
+    --color-foreground: 24 24 27;
+    --color-muted: 113 113 122;
+    --color-muted-foreground: 161 161 170;
+
+    --color-border: 120 122 122;
+    --color-input: 228 228 231;
+    --color-ring: 188 233 83;
+    /* #BCE953 ring color */
+
+    --color-success: 34 197 94;
+    --color-warning: 245 158 11;
+    --color-error: 239 68 68;
+    --color-info: 250 70 23;
+
+    --radius: 0.5rem;
+    --shadow-color: 0 0 0;
+    --shadow-elevation-low: 0 1px 2px 0 rgb(var(--shadow-color) / 0.05);
+    --shadow-elevation-medium:
+      0 4px 6px -1px rgb(var(--shadow-color) / 0.1),
+      0 2px 4px -2px rgb(var(--shadow-color) / 0.1);
+    --shadow-elevation-high:
+      0 20px 25px -5px rgb(var(--shadow-color) / 0.1),
+      0 8px 10px -6px rgb(var(--shadow-color) / 0.1);
+  }
+
+  .dark {
+    /* X (Twitter) Dark theme */
+    --color-background: 0 0 0;
+    /* Pure Black */
+    --color-foreground: 231 233 234;
+    /* #e7e9ea */
+    --color-muted: 113 118 123;
+    /* #71767b */
+    --color-muted-foreground: 113 118 123;
+    /* #71767b */
+
+    --color-border: 47 51 54;
+    /* #2f3336 */
+    --color-input: 32 35 39;
+    /* #202327 */
+    --color-ring: 29 155 240;
+    /* #1d9bf0 (Twitter Blue) */
+
+    --shadow-color: 255 255 255;
+  }
+
+  /* Base layer enhancements */
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -95,19 +805,19 @@
 
   /* Remove all focus-visible styles */
   *:focus-visible {
-    @apply outline-none;
+    @apply outline-hidden;
   }
 
   /* Remove default button styles */
   button {
-    @apply outline-none;
+    @apply outline-hidden;
   }
 
   /* Remove focus from input elements */
   input:focus,
   textarea:focus,
   select:focus {
-    @apply outline-none;
+    @apply outline-hidden;
   }
 
   /* Custom scrollbar */
@@ -128,144 +838,6 @@
   }
 }
 
-/* Component layer enhancements */
-@layer components {
-
-  /* Professional button base */
-  .btn {
-    @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50;
-  }
-
-  .btn-primary {
-    @apply bg-primary text-primary-foreground shadow hover:bg-primary/90 active:bg-primary/80;
-  }
-
-  .btn-secondary {
-    @apply bg-secondary text-secondary-foreground shadow hover:bg-secondary/90 active:bg-secondary/80;
-  }
-
-  .btn-outline {
-    @apply border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground;
-  }
-
-  .btn-ghost {
-    @apply hover:bg-accent hover:text-accent-foreground;
-  }
-
-  /* Card component */
-  .card {
-    @apply rounded-lg border bg-card text-card-foreground shadow-sm;
-  }
-
-  .card-header {
-    @apply flex flex-col space-y-1.5 p-6;
-  }
-
-  .card-title {
-    @apply text-2xl font-semibold leading-none tracking-tight;
-  }
-
-  .card-description {
-    @apply text-sm text-muted-foreground;
-  }
-
-  .card-content {
-    @apply p-6 pt-0;
-  }
-
-  .card-footer {
-    @apply flex items-center p-6 pt-0;
-  }
-
-  /* Form elements */
-  .form-input {
-    @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50;
-  }
-
-  .form-textarea {
-    @apply flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50;
-  }
-
-  .form-label {
-    @apply text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70;
-  }
-
-  /* Navigation styles */
-  .nav-link {
-    @apply flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none;
-  }
-
-  .nav-link.active {
-    @apply bg-accent text-accent-foreground;
-  }
-
-  /* Layout utilities */
-  .container {
-    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
-  }
-
-  .section {
-    @apply py-12 sm:py-16 lg:py-20;
-  }
-
-  .prose {
-    @apply max-w-none text-foreground;
-  }
-
-  .prose h1,
-  .prose h2,
-  .prose h3,
-  .prose h4,
-  .prose h5,
-  .prose h6 {
-    @apply text-foreground;
-  }
-
-  .prose p {
-    @apply text-muted-foreground;
-  }
-
-  /* Animation classes */
-  .animate-in {
-    @apply animate-fade-in;
-  }
-
-  .animate-out {
-    @apply animate-fade-out;
-  }
-
-  /* Glass morphism effect */
-  .glass {
-    @apply bg-white/10 backdrop-blur-md border border-white/20;
-  }
-
-  .glass.dark {
-    @apply bg-black/10 border-white/10;
-  }
-
-  /* Gradient backgrounds */
-  .gradient-primary {
-    background: linear-gradient(135deg, rgb(140, 29, 64) 0%, rgb(255, 198, 39) 100%);
-  }
-
-  .gradient-accent {
-    background: linear-gradient(135deg, rgb(227, 255, 112) 0%, rgb(140, 29, 64) 100%);
-  }
-
-  /* Professional spacing */
-  .space-section {
-    @apply space-y-16 lg:space-y-24;
-  }
-
-  .space-content {
-    @apply space-y-8 lg:space-y-12;
-  }
-
-  .space-items {
-    @apply space-y-4 lg:space-y-6;
-  }
-}
-
 /* Utility layer enhancements */
 @layer utilities {
 
@@ -274,301 +846,6 @@
     @apply bg-primary/20 text-primary;
   }
 
-  .dark ::selection {
-    @apply bg-primary/20 text-primary-foreground;
-  }
-
-  /* Hide scrollbar but keep functionality */
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Text utilities */
-  .text-balance {
-    text-wrap: balance;
-  }
-
-  .text-pretty {
-    text-wrap: pretty;
-  }
-
-  /* Accessibility */
-  .sr-only {
-    @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
-  }
-
-  /* Focus utilities */
-  .focus-ring {
-    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background;
-  }
-
-  /* Safe area utilities for mobile */
-  .safe-top {
-    padding-top: env(safe-area-inset-top);
-  }
-
-  .safe-bottom {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-
-  .safe-left {
-    padding-left: env(safe-area-inset-left);
-  }
-
-  .safe-right {
-    padding-right: env(safe-area-inset-right);
-  }
-
-  /* Enhanced iOS-specific safe area utilities */
-  .ios-safe-top {
-    padding-top: max(env(safe-area-inset-top), 100px);
-    /* Increased from 20px */
-  }
-
-  .ios-safe-bottom {
-    padding-bottom: max(env(safe-area-inset-bottom), 100px);
-  }
-
-  /* Dynamic Island and Notch support - Enhanced */
-  .ios-header-safe {
-    padding-top: max(env(safe-area-inset-top), 54px);
-    /* Increased from 44px */
-    min-height: max(env(safe-area-inset-top), 54px);
-    /* Increased from 44px */
-  }
-
-  .ios-bottom-safe {
-    padding-bottom: max(env(safe-area-inset-bottom), 34px);
-    margin-bottom: env(safe-area-inset-bottom);
-  }
-
-  /* Home indicator area protection - Enhanced */
-  .ios-home-indicator-safe {
-    padding-bottom: max(env(safe-area-inset-bottom), 34px);
-    min-height: 64px;
-    /* Ensure minimum touch target */
-  }
-
-  /* Full safe area for iOS */
-  .ios-safe-area {
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-  }
-
-  /* iOS-specific responsive breakpoints - Enhanced */
-  @media screen and (max-width: 430px) and (max-height: 932px) {
-
-    /* iPhone 14 Pro Max specific adjustments */
-    .ios-pro-max-adjust {
-      padding-top: max(env(safe-area-inset-top), 69px);
-      /* Increased from 59px */
-    }
-
-    .ios-pro-max-bottom {
-      padding-bottom: max(env(safe-area-inset-bottom), 34px);
-      margin-bottom: max(env(safe-area-inset-bottom), 8px);
-    }
-  }
-
-  @media screen and (max-width: 393px) and (max-height: 852px) {
-
-    /* iPhone 14 Pro specific adjustments */
-    .ios-pro-adjust {
-      padding-top: max(env(safe-area-inset-top), 69px);
-      /* Increased from 59px */
-    }
-
-    .ios-pro-bottom {
-      padding-bottom: max(env(safe-area-inset-bottom), 34px);
-      margin-bottom: max(env(safe-area-inset-bottom), 8px);
-    }
-  }
-
-  @media screen and (max-width: 390px) and (max-height: 844px) {
-
-    /* iPhone 12/13/14 standard specific adjustments */
-    .ios-standard-adjust {
-      padding-top: max(env(safe-area-inset-top), 57px);
-      /* Increased from 47px */
-    }
-
-    .ios-standard-bottom {
-      padding-bottom: max(env(safe-area-inset-bottom), 34px);
-    }
-  }
-
-  @media screen and (max-width: 375px) and (max-height: 812px) {
-
-    /* iPhone X/XS/11 Pro specific adjustments */
-    .ios-x-adjust {
-      padding-top: max(env(safe-area-inset-top), 54px);
-      /* Increased from 44px */
-    }
-
-    .ios-x-bottom {
-      padding-bottom: max(env(safe-area-inset-bottom), 34px);
-    }
-  }
-
-  @media screen and (max-width: 375px) and (max-height: 667px) {
-
-    /* iPhone SE 2nd/3rd gen adjustments */
-    .ios-se-adjust {
-      padding-top: max(env(safe-area-inset-top), 30px);
-      /* Increased from 20px */
-    }
-
-    .ios-se-bottom {
-      padding-bottom: max(env(safe-area-inset-bottom), 16px);
-    }
-  }
-
-  /* Landscape safe areas - Enhanced */
-  @media screen and (orientation: landscape) {
-    .ios-landscape-safe {
-      padding-left: max(env(safe-area-inset-left), 44px);
-      padding-right: max(env(safe-area-inset-right), 44px);
-    }
-
-    .ios-landscape-header {
-      padding-top: max(env(safe-area-inset-top), 0px);
-      padding-left: max(env(safe-area-inset-left), 44px);
-      padding-right: max(env(safe-area-inset-right), 44px);
-    }
-
-    .ios-landscape-bottom {
-      padding-bottom: max(env(safe-area-inset-bottom), 21px);
-      padding-left: max(env(safe-area-inset-left), 44px);
-      padding-right: max(env(safe-area-inset-right), 44px);
-    }
-  }
-
-  /* Touch-friendly utilities for iOS */
-  .ios-touch-target {
-    min-height: 44px;
-    min-width: 44px;
-  }
-
-  .ios-touch-target-large {
-    min-height: 48px;
-    min-width: 48px;
-  }
-
-  /* iOS-style scroll behavior */
-  .ios-scroll {
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-  }
-
-  /* iOS momentum scrolling */
-  .ios-momentum-scroll {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-  }
-
-  /* iOS-style backdrop blur */
-  .ios-backdrop {
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-  }
-
-  /* iOS-style border radius */
-  .ios-rounded {
-    border-radius: 12px;
-  }
-
-  .ios-rounded-lg {
-    border-radius: 16px;
-  }
-
-  /* Prevent bounce scrolling on iOS */
-  .ios-no-bounce {
-    overscroll-behavior: contain;
-  }
-
-  /* Enhanced iOS navigation spacing */
-  .ios-nav-spacing {
-    padding: 12px 16px;
-  }
-
-  .ios-nav-item {
-    padding: 12px 16px;
-    min-height: 48px;
-    border-radius: 12px;
-    transition: all 0.2s ease;
-  }
-
-  .ios-nav-item:active {
-    transform: scale(0.98);
-    background-color: rgba(0, 0, 0, 0.05);
-  }
-
-  /* iOS-specific bottom navigation */
-  .ios-bottom-nav {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-  }
-
-  .dark .ios-bottom-nav {
-    background: rgba(0, 0, 0, 0.8);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  /* iOS-specific header */
-  .ios-header {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  }
-
-  .dark .ios-header {
-    background: rgba(0, 0, 0, 0.95);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  /* Fix for mobile sidebar - ensure solid backgrounds on iOS */
-  .ios-sidebar-fix {
-    background: rgb(255, 255, 255) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    padding-top: max(env(safe-area-inset-top), 44px) !important;
-    min-height: max(env(safe-area-inset-top), 44px) !important;
-  }
-
-  .dark .ios-sidebar-fix {
-    background: rgb(0, 0, 0) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    padding-top: max(env(safe-area-inset-top), 44px) !important;
-    min-height: max(env(safe-area-inset-top), 44px) !important;
-  }
-
-  /* iOS-specific elements - only show on iOS */
-  .ios-only {
-    display: block !important;
-    padding-top: 20px !important;
-  }
-
-  /* Show iOS-specific elements only on iOS devices */
-  @supports (-webkit-touch-callout: none) {
-    .ios-only {
-      display: block !important;
-      padding-top: 20px !important;
-    }
-  }
-
-  /* Shimmer animation for skeletons */
   @keyframes shimmer {
     0% {
       background-position: -1000px 0;
@@ -579,24 +856,6 @@
     }
   }
 
-  .animate-shimmer {
-    animation: shimmer 2s infinite linear;
-    background: linear-gradient(to right,
-        #f0f0f0 0%,
-        #f8f8f8 50%,
-        #f0f0f0 100%);
-    background-size: 2000px 100%;
-  }
-
-  .dark .animate-shimmer {
-    background: linear-gradient(to right,
-        #1f2937 0%,
-        #374151 50%,
-        #1f2937 100%);
-    background-size: 2000px 100%;
-  }
-
-  /* Enhanced skeleton wave effect */
   @keyframes skeleton-wave {
     0% {
       transform: translateX(-100%);
@@ -605,160 +864,6 @@
     100% {
       transform: translateX(100%);
     }
-  }
-
-  .skeleton-wave {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .skeleton-wave::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    transform: translateX(-100%);
-    background: linear-gradient(90deg,
-        rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 0.3) 50%,
-        rgba(255, 255, 255, 0) 100%);
-    animation: skeleton-wave 1.5s ease-in-out infinite;
-  }
-
-  .dark .skeleton-wave::after {
-    background: linear-gradient(90deg,
-        rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 0.1) 50%,
-        rgba(255, 255, 255, 0) 100%);
-  }
-
-  /* Video player progress bar */
-  .progress-bar {
-    background: linear-gradient(to right,
-        white 0%,
-        white var(--progress-percent, 0%),
-        rgba(255, 255, 255, 0.3) var(--progress-percent, 0%),
-        rgba(255, 255, 255, 0.3) 100%);
-  }
-
-  .progress-bar[data-progress="0"] {
-    --progress-percent: 0%;
-  }
-
-  .progress-bar[data-progress="1"] {
-    --progress-percent: 1%;
-  }
-
-  .progress-bar[data-progress="2"] {
-    --progress-percent: 2%;
-  }
-
-  .progress-bar[data-progress="3"] {
-    --progress-percent: 3%;
-  }
-
-  .progress-bar[data-progress="4"] {
-    --progress-percent: 4%;
-  }
-
-  .progress-bar[data-progress="5"] {
-    --progress-percent: 5%;
-  }
-
-  .progress-bar[data-progress="10"] {
-    --progress-percent: 10%;
-  }
-
-  .progress-bar[data-progress="15"] {
-    --progress-percent: 15%;
-  }
-
-  .progress-bar[data-progress="20"] {
-    --progress-percent: 20%;
-  }
-
-  .progress-bar[data-progress="25"] {
-    --progress-percent: 25%;
-  }
-
-  .progress-bar[data-progress="30"] {
-    --progress-percent: 30%;
-  }
-
-  .progress-bar[data-progress="35"] {
-    --progress-percent: 35%;
-  }
-
-  .progress-bar[data-progress="40"] {
-    --progress-percent: 40%;
-  }
-
-  .progress-bar[data-progress="45"] {
-    --progress-percent: 45%;
-  }
-
-  .progress-bar[data-progress="50"] {
-    --progress-percent: 50%;
-  }
-
-  .progress-bar[data-progress="55"] {
-    --progress-percent: 55%;
-  }
-
-  .progress-bar[data-progress="60"] {
-    --progress-percent: 60%;
-  }
-
-  .progress-bar[data-progress="65"] {
-    --progress-percent: 65%;
-  }
-
-  .progress-bar[data-progress="70"] {
-    --progress-percent: 70%;
-  }
-
-  .progress-bar[data-progress="75"] {
-    --progress-percent: 75%;
-  }
-
-  .progress-bar[data-progress="80"] {
-    --progress-percent: 80%;
-  }
-
-  .progress-bar[data-progress="85"] {
-    --progress-percent: 85%;
-  }
-
-  .progress-bar[data-progress="90"] {
-    --progress-percent: 90%;
-  }
-
-  .progress-bar[data-progress="95"] {
-    --progress-percent: 95%;
-  }
-
-  .progress-bar[data-progress="100"] {
-    --progress-percent: 100%;
-  }
-
-  /* Lazy load image fade-in */
-  .lazy-image {
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-  }
-
-  .lazy-image.loaded {
-    opacity: 1;
-  }
-
-  /* Line clamp utility */
-  .line-clamp-3 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
   }
 
   /* Event card progress bar - dynamic width based on data attribute */

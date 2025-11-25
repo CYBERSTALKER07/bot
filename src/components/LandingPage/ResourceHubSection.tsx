@@ -128,8 +128,8 @@ export default function ResourceHubSection({ resourcesRef }: ResourceHubSectionP
           >
             Career <span className={`bg-clip-text text-transparent ${
               isDark 
-                ? 'bg-gradient-to-r from-lime to-dark-accent' 
-                : 'bg-gradient-to-r from-asu-maroon to-asu-maroon-dark'
+                ? 'bg-linear-to-r from-lime to-dark-accent' 
+                : 'bg-linear-to-r from-asu-maroon to-asu-maroon-dark'
             }`}>Resource Hub</span>
           </Typography>
           <Typography 
@@ -162,7 +162,7 @@ export default function ResourceHubSection({ resourcesRef }: ResourceHubSectionP
               >
                 <div className="relative">
                   {/* Thumbnail placeholder */}
-                  <div className={`h-48 bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center ${
+                  <div className={`h-48 bg-linear-to-br from-gray-300 to-gray-400 flex items-center justify-center ${
                     isDark ? 'from-dark-surface to-dark-bg' : 'from-gray-200 to-gray-300'
                   }`}>
                     <PlayArrow className="h-12 w-12 text-white" />
@@ -226,12 +226,12 @@ export default function ResourceHubSection({ resourcesRef }: ResourceHubSectionP
               elevation={3}
             >
               {/* Gradient overlay */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${resource.color} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
+              <div className={`absolute inset-0 bg-linear-to-br ${resource.color} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
               
               <div className="relative p-6">
                 {/* Icon and type */}
                 <div className="flex items-center justify-between mb-4">
-                  <div className={`p-3 rounded-xl bg-gradient-to-br ${resource.color}`}>
+                  <div className={`p-3 rounded-xl bg-linear-to-br ${resource.color}`}>
                     <div className="text-white">{resource.icon}</div>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${

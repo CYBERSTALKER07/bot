@@ -125,8 +125,8 @@ export default function StatsSection({ statsRef }: StatsSectionProps) {
   return (
     <section ref={statsRef} className={`py-20 relative overflow-hidden transition-colors duration-300 ${
       isDark 
-        ? 'bg-gradient-to-b from-dark-surface to-dark-bg' 
-        : 'bg-gradient-to-b from-gray-50 to-white'
+        ? 'bg-linear-to-b from-dark-surface to-dark-bg' 
+        : 'bg-linear-to-b from-gray-50 to-white'
     }`}>
       {/* Decorative background elements */}
       <div className="absolute inset-0">
@@ -150,8 +150,8 @@ export default function StatsSection({ statsRef }: StatsSectionProps) {
             Trusted by Thousands of
             <span className={`block bg-clip-text text-transparent ${
               isDark 
-                ? 'bg-gradient-to-r from-lime to-dark-accent' 
-                : 'bg-gradient-to-r from-asu-maroon to-asu-gold'
+                ? 'bg-linear-to-r from-lime to-dark-accent' 
+                : 'bg-linear-to-r from-asu-maroon to-asu-gold'
             }`}>
               Successful Students 
             </span>

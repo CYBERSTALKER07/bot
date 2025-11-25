@@ -909,7 +909,7 @@ export default function Profile() {
                 className="absolute inset-0 w-full h-full object-cover rounded-2xl"
               />
             ) : (
-              <div className="absolute inset-0 bg-gradient-to-r from-info-500 to-purple-600 rounded-2xl" />
+              <div className="absolute inset-0 bg-linear-to-r from-info-500 to-purple-600 rounded-2xl" />
             )}
 
             {/* Dark overlay for better text readability */}
@@ -1077,7 +1077,7 @@ export default function Profile() {
           </div>
 
           {/* Cover Photo */}
-          <div className={cn("relative h-48 bg-gradient-to-r from-blue-400 to-purple-500")}>
+          <div className={cn("relative h-48 bg-linear-to-r from-blue-400 to-purple-500")}>
             {profileData.cover_image_url ? (
               <img
                 src={profileData.cover_image_url}
@@ -1085,7 +1085,7 @@ export default function Profile() {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-blue-400 via-purple-500 to-pink-400" />
+              <div className="w-full h-full bg-linear-to-br from-blue-400 via-purple-500 to-pink-400" />
             )}
           </div>
 
@@ -1285,7 +1285,7 @@ export default function Profile() {
               posts.map((post) => (
                 <div key={post.id} className={cn("border-b p-4 transition-colors cursor-pointer", isDark ? "border-gray-800 hover:bg-black" : "border-gray-200 hover:bg-gray-50")} onClick={() => navigate(`/post/${post.id}`)}>
                   <div className="flex gap-3">
-                    <div className={cn("w-10 h-10 rounded-full flex items-center justify-center font-bold flex-shrink-0", isDark ? "bg-gray-900" : "bg-white")}>
+                    <div className={cn("w-10 h-10 rounded-full flex items-center justify-center font-bold shrink-0", isDark ? "bg-gray-900" : "bg-white")}>
                       {post.author?.avatar_url ? (
                         <img
                           src={post.author.avatar_url}
@@ -1398,12 +1398,12 @@ export default function Profile() {
             <input
               type="text"
               placeholder="Search"
-              className={cn("w-full py-2 pl-10 pr-4 rounded-full focus:outline-none border-1 border-white", isDark ? "bg-black text-white placeholder-white focus:bg-black" : "bg-white text-gray-900 placeholder-gray-400 focus:bg-gray-100")}
+              className={cn("w-full py-2 pl-10 pr-4 rounded-full focus:outline-hidden border border-white", isDark ? "bg-black text-white placeholder-white focus:bg-black" : "bg-white text-gray-900 placeholder-gray-400 focus:bg-gray-100")}
             />
           </div>
 
           {/* You might like */}
-          <div className={cn("rounded-2xl overflow-hidden border shadow-sm", isDark ? "bg-black border-gray-800" : "bg-white border-gray-200")}>
+          <div className={cn("rounded-2xl overflow-hidden border shadow-xs", isDark ? "bg-black border-gray-800" : "bg-white border-gray-200")}>
             <div className={cn("p-4 border-b", isDark ? "border-gray-800" : "border-gray-200")}>
               <h2 className="text-xl font-serif">You might like</h2>
             </div>
@@ -1440,7 +1440,7 @@ export default function Profile() {
           </div>
 
           {/* What's happening */}
-          <div className={cn("rounded-2xl overflow-hidden border shadow-sm", isDark ? "bg-black border-gray-800" : "bg-white border-gray-200")}>
+          <div className={cn("rounded-2xl overflow-hidden border shadow-xs", isDark ? "bg-black border-gray-800" : "bg-white border-gray-200")}>
             <div className={cn("p-4 border-b", isDark ? "border-gray-800" : "border-gray-200")}>
               <h2 className="text-xl font-extralight ">What's happening</h2>
             </div>

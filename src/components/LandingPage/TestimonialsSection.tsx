@@ -431,8 +431,8 @@ export default function TestimonialsSection({ testimonialsRef }: TestimonialsSec
   return (
     <section ref={testimonialsRef} className={`py-24 transition-colors duration-300 overflow-hidden ${
       isDark 
-        ? 'bg-gradient-to-br from-black via-black to-purple-900' 
-        : 'bg-gradient-to-br from-black via-black to-purple-900'
+        ? 'bg-linear-to-br from-black via-black to-purple-900' 
+        : 'bg-linear-to-br from-black via-black to-purple-900'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
@@ -538,7 +538,7 @@ export default function TestimonialsSection({ testimonialsRef }: TestimonialsSec
                   className="w-full h-auto rounded-2xl shadow-2xl"
                 />
                 {/* Optional overlay for better integration */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent rounded-2xl"></div>
+                <div className="absolute inset-0 bg-linear-to-t from-black/10 to-transparent rounded-2xl"></div>
               </div>
             </div>
           </div>

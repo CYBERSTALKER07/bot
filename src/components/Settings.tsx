@@ -298,7 +298,7 @@ export default function SettingsPage() {
               isDark 
                 ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-info-500' 
                 : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-info-500'
-            } focus:ring-2 focus:ring-info-500/20 outline-none transition-colors`}
+            } focus:ring-2 focus:ring-info-500/20 outline-hidden transition-colors`}
           />
         </div>
       </Card>
@@ -521,7 +521,7 @@ export default function SettingsPage() {
                       : 'hover:bg-gray-100/50 text-gray-700'
                 )}
               >
-                <Icon className="h-5 w-5 flex-shrink-0" />
+                <Icon className="h-5 w-5 shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">{section.title}</p>
                   <p className={`text-xs mt-1 truncate ${

@@ -277,7 +277,7 @@ export function FloatingActionMenu({
           aria-expanded={isOpen ? 'true' : 'false'}
           className={`
             relative w-16 h-16 rounded-full flex items-center justify-center
-            shadow-2xl transition-all duration-300 ease-out focus:outline-none focus:ring-4 focus:ring-blue-300
+            shadow-2xl transition-all duration-300 ease-out focus:outline-hidden focus:ring-4 focus:ring-blue-300
             ${isOpen 
               ? 'bg-info-700 text-white rotate-45 scale-110 shadow-blue-400/30' 
               : 'bg-info-600 text-white hover:bg-info-700 hover:scale-105 hover:shadow-blue-400/20'

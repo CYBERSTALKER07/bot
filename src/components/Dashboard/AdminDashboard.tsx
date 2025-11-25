@@ -278,7 +278,7 @@ export default function AdminDashboard() {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2 flex-shrink-0">
+                <div className="flex items-center space-x-2 shrink-0">
                   <span className={cn("px-2 py-1 rounded-full text-xs font-medium", getStatusColor(user.status))}>
                     {user.status}
                   </span>
@@ -361,7 +361,7 @@ export default function AdminDashboard() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center justify-between sm:justify-end space-x-3 flex-shrink-0">
+              <div className="flex items-center justify-between sm:justify-end space-x-3 shrink-0">
                 <span className={cn("px-3 py-1 rounded-full text-xs sm:text-sm font-medium", getStatusColor(user.status))}>
                   {user.status}
                 </span>

@@ -213,7 +213,7 @@ export default function ExplorePage() {
                     {/* Card Header */}
                     <div className="flex items-start gap-3 mb-3">
                       <div className={cn(
-                        'w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center font-bold flex-shrink-0',
+                        'w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center font-bold shrink-0',
                         isDark ? 'bg-white text-black' : 'bg-black text-white'
                       )}>
                         {job.company.charAt(0)}
@@ -360,7 +360,7 @@ export default function ExplorePage() {
                         isDark ? 'bg-black border-gray-800 hover:border-gray-600 hover:shadow-lg' : 'bg-white border-gray-200 hover:border-gray-400 hover:shadow-lg'
                       )} onClick={() => navigate(`/company/${company.id}`)}>
                         <div className="flex items-start gap-3">
-                          <div className="flex-shrink-0">
+                          <div className="shrink-0">
                             {company.logo_url ? (
                               <img src={company.logo_url} alt={company.name} className="w-12 h-12 rounded-xl object-cover grayscale" />
                             ) : (
@@ -438,7 +438,7 @@ export default function ExplorePage() {
                         isDark ? 'bg-black border-gray-800 hover:border-gray-600 hover:shadow-lg' : 'bg-white border-gray-200 hover:border-gray-400 hover:shadow-lg'
                       )} onClick={() => navigate(`/event/${event.id}`)}>
                         <div className="flex items-start gap-3">
-                          <div className="flex-shrink-0">
+                          <div className="shrink-0">
                             {event.employer?.avatar_url ? (
                               <img src={event.employer.avatar_url} alt={event.employer.name} className="w-10 h-10 rounded-xl object-cover grayscale" />
                             ) : (
@@ -539,7 +539,7 @@ export default function ExplorePage() {
                           <h3 className="font-bold text-sm truncate">{profile.full_name}</h3>
                           {profile.verified && (
                             <div className={cn(
-                              'w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0',
+                              'w-4 h-4 rounded-full flex items-center justify-center shrink-0',
                               isDark ? 'bg-white' : 'bg-black'
                             )} title="Verified user">
                               <span className={cn('text-xs font-bold', isDark ? 'text-black' : 'text-white')}>✓</span>

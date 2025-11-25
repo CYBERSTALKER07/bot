@@ -67,7 +67,7 @@ export default function CompanyDetailPage({ id: propId }: CompanyDetailsPageProp
       {/* Hero Section */}
       <div className={cn(
         'relative overflow-hidden py-16 px-4 md:px-8',
-        isDark ? 'bg-gradient-to-br from-black via-gray-900 to-black' : 'bg-gradient-to-br from-white via-gray-50 to-white'
+        isDark ? 'bg-linear-to-br from-black via-gray-900 to-black' : 'bg-linear-to-br from-white via-gray-50 to-white'
       )}>
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start mb-12">
@@ -171,8 +171,8 @@ export default function CompanyDetailPage({ id: propId }: CompanyDetailsPageProp
             <div className={cn(
               'md:col-span-2 md:row-span-2 rounded-3xl p-8 flex flex-col justify-center',
               isDark
-                ? 'bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700'
-                : 'bg-gradient-to-br from-gray-50 to-white border border-gray-200'
+                ? 'bg-linear-to-br from-gray-900 to-gray-800 border border-gray-700'
+                : 'bg-linear-to-br from-gray-50 to-white border border-gray-200'
             )}>
               <div className="text-6xl mb-4">{company.benefits[0].icon}</div>
               <h3 className="text-3xl font-bold mb-3">{company.benefits[0].title}</h3>

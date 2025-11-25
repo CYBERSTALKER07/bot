@@ -498,7 +498,7 @@ export default function Profile() {
       onClick={onClick}
       className={cn(
         'relative px-4 py-4 text-center font-medium transition-colors whitespace-nowrap',
-        isMobile ? 'px-3 py-3 text-sm min-w-0 flex-shrink-0 snap-center' : 'px-6',
+        isMobile ? 'px-3 py-3 text-sm min-w-0 shrink-0 snap-center' : 'px-6',
         isActive
           ? 'text-gray-900 dark:text-white'
           : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
@@ -517,13 +517,13 @@ export default function Profile() {
   // Post Card Component
   const PostCard = ({ post }: { post: any }) => (
     <div className={cn(
-      'border-b border-gray-200 dark:border-gray-800 px-4 py-3 hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition-colors cursor-pointer',
+      'border-b border-gray-200 dark:border-gray-800 px-4 py-3 hover:bg-gray-50/50 dark:hover:bg-white/2 transition-colors cursor-pointer',
       isMobile ? 'px-4 py-3' : 'px-6 py-4'
     )}>
       <div className="flex space-x-3">
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <div className={cn(
-            'w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold',
+            'w-10 h-10 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold',
             isDark ? 'border-black' : 'border-white',
             isMobile ? 'w-8 h-8 text-sm' : 'w-10 h-10'
           )}>
@@ -694,9 +694,9 @@ export default function Profile() {
           <div className="grid grid-cols-12 gap-6">
             {/* Left Sidebar - Profile Info */}
             <div className="col-span-3">
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden sticky top-6">
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-200 dark:border-gray-700 overflow-hidden sticky top-6">
                 {/* Cover Photo */}
-                <div className="relative h-32 bg-gradient-to-r from-blue-500 to-purple-600">
+                <div className="relative h-32 bg-linear-to-r from-blue-500 to-purple-600">
                   {profileData.cover_image_url && (
                     <img
                       src={profileData.cover_image_url}
@@ -841,7 +841,7 @@ export default function Profile() {
             {/* Main Content - Activity Feed */}
             <div className="col-span-6">
               {/* Tab Navigation */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-200 dark:border-gray-700 mb-6">
                 <div className="flex border-b border-gray-200 dark:border-gray-700">
                   {[
                     { key: 'posts', label: 'Activity', icon: MessageCircle },
@@ -868,9 +868,9 @@ export default function Profile() {
               {activeTab === 'posts' && (
                 <div className="space-y-4">
                   {activityPosts.map((post) => (
-                    <div key={post.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                    <div key={post.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                       <div className="flex items-start gap-4">
-                        <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center shrink-0">
                           {profileData.avatar_url ? (
                             <img 
                               src={profileData.avatar_url} 
@@ -958,7 +958,7 @@ export default function Profile() {
                 <div className="space-y-4">
                   {profileData.skills && profileData.skills.length > 0 ? (
                     profileData.skills.map((skill, index) => (
-                      <div key={index} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                      <div key={index} className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
                             <Target className="w-6 h-6 text-white" />
@@ -1001,7 +1001,7 @@ export default function Profile() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {profileData.skills && profileData.skills.length > 0 ? (
                     profileData.skills.slice(0, 6).map((skill, index) => (
-                      <div key={index} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                      <div key={index} className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                         <div className="flex items-center gap-3 mb-3">
                           <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center">
                             <Trophy className="w-5 h-5 text-white" />
@@ -1038,7 +1038,7 @@ export default function Profile() {
             <div className="col-span-3">
               <div className="space-y-6">
                 {/* Progress Overview */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                   <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Average Progress</h3>
                   <div className="flex items-center justify-center">
                     <div className="relative w-32 h-32">
@@ -1076,7 +1076,7 @@ export default function Profile() {
                 </div>
 
                 {/* Top Skills */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                   <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Top Skills</h3>
                   <div className="space-y-3">
                     {profileData.skills && profileData.skills.length > 0 ? (
@@ -1102,7 +1102,7 @@ export default function Profile() {
                 </div>
 
                 {/* Recent Activity */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                   <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Recent Activity</h3>
                   <div className="space-y-3">
                     {activityPosts.slice(0, 5).map((post) => (
@@ -1199,8 +1199,8 @@ export default function Profile() {
               <div className={cn(
                 'absolute inset-0',
                 isDark 
-                  ? 'bg-gradient-to-br from-gray-800 via-gray-700 to-gray-600' 
-                  : 'bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500'
+                  ? 'bg-linear-to-br from-gray-800 via-gray-700 to-gray-600' 
+                  : 'bg-linear-to-br from-blue-400 via-purple-500 to-pink-500'
               )}></div>
             )}
             
@@ -1251,7 +1251,7 @@ export default function Profile() {
                   />
                 ) : (
                   <div className={cn(
-                    'rounded-full border-4 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold',
+                    'rounded-full border-4 bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold',
                     isDark ? 'border-black' : 'border-white',
                     screenSize === 'xs' ? 'w-24 h-24 text-2xl' :
                     screenSize === 'sm' ? 'w-28 h-28 text-3xl' :

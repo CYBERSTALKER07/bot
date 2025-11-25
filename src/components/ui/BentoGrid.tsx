@@ -38,7 +38,7 @@ export function BentoCard({
       <div className="relative z-10">
         <div className="flex items-start justify-between mb-4">
           {Icon && (
-            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-info-500/20 to-purple-500/20 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-lg bg-linear-to-br from-info-500/20 to-purple-500/20 flex items-center justify-center">
               <Icon className="w-6 h-6 text-info-600 dark:text-info-400" />
             </div>
           )}

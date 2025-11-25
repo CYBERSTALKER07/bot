@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from "@openai/apps-sdk-ui/components/Button";
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useFollowUser, useUnfollowUser, useFollowStatus } from '../hooks/useOptimizedQuery';
@@ -62,7 +63,7 @@ export default function WhoToFollowCard({ user }: WhoToFollowCardProps) {
         <button
             onClick={() => navigate(`/profile/${user.id}`)}
             className={cn(
-                'flex-shrink-0 w-48 p-4 rounded-2xl text-center transition-all border group relative',
+                'shrink-0 w-48 p-4 rounded-2xl text-center transition-all border group relative',
                 isDark ? 'bg-gray-900 hover:bg-gray-800 border-gray-800' : 'bg-gray-50 hover:bg-gray-100 border-gray-200'
             )}
         >
@@ -87,20 +88,18 @@ export default function WhoToFollowCard({ user }: WhoToFollowCardProps) {
                     {user.bio}
                 </p>
             )}
-            <div
+            <Button
                 onClick={handleFollowClick}
                 onMouseEnter={() => setHoveredFollow(true)}
                 onMouseLeave={() => setHoveredFollow(false)}
+                color={isFollowing ? "secondary" : "primary"}
+                size="sm"
+                variant={isFollowing ? "soft" : "solid"}
+                block
+                disabled={processing || statusLoading}
                 className={cn(
-                    'text-xs px-3 py-1.5 rounded-full font-medium transition-all duration-200',
-                    isFollowing
-                        ? isDark
-                            ? 'bg-transparent border border-gray-600 text-white hover:border-red-500 hover:text-red-500'
-                            : 'bg-transparent border border-gray-300 text-black hover:border-red-500 hover:text-red-500'
-                        : isDark
-                            ? 'bg-white text-black hover:bg-gray-200'
-                            : 'bg-black text-white hover:bg-gray-800',
-                    processing || statusLoading && 'opacity-50 cursor-not-allowed'
+                    'text-xs',
+                    isFollowing && hoveredFollow && 'hover:!bg-red-500 hover:!text-white'
                 )}
             >
                 {processing || statusLoading
@@ -108,7 +107,7 @@ export default function WhoToFollowCard({ user }: WhoToFollowCardProps) {
                     : isFollowing
                         ? (hoveredFollow ? 'Unfollow' : 'Following')
                         : 'Follow'}
-            </div>
+            </Button>
         </button>
     );
 }

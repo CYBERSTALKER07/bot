@@ -732,7 +732,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white overflow-x-hidden">
       {/* Splash Screen */}
       {showSplash && (
-        <div ref={splashRef} className="fixed inset-0 z-[100] bg-gradient-to-br from-asu-maroon via-asu-maroon-dark to-gray-900 flex items-center justify-center">
+        <div ref={splashRef} className="fixed inset-0 z-[100] bg-linear-to-br from-asu-maroon via-asu-maroon-dark to-gray-900 flex items-center justify-center">
           <div className="splash-container text-center relative">
             {/* Background Elements */}
             <div className="absolute inset-0 pointer-events-none">
@@ -769,7 +769,7 @@ export default function LandingPage() {
             {/* Loading indicator */}
             <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2">
               <div className="w-16 h-1 bg-white/20 rounded-full overflow-hidden">
-                <div className="w-full h-full bg-gradient-to-r from-asu-gold to-yellow-300 rounded-full animate-pulse"></div>
+                <div className="w-full h-full bg-linear-to-r from-asu-gold to-yellow-300 rounded-full animate-pulse"></div>
               </div>
             </div>
           </div>
@@ -792,7 +792,7 @@ export default function LandingPage() {
               <button onClick={() => scrollToSection(howItWorksRef)} className="text-gray-600 hover:text-asu-maroon transition-all duration-300 hover:scale-105">How it Works</button>
               <button onClick={() => scrollToSection(demoRef)} className="text-gray-600 hover:text-asu-maroon transition-all duration-300 hover:scale-105">Demo</button>
               <Link to="/login" className="text-gray-600 hover:text-asu-maroon transition-all duration-300 hover:scale-105">Sign In</Link>
-              <Link to="/register" className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark text-white px-6 py-2 rounded-full hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1">
+              <Link to="/register" className="bg-linear-to-r from-asu-maroon to-asu-maroon-dark text-white px-6 py-2 rounded-full hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1">
                 Get Started
               </Link>
             </div>
@@ -801,7 +801,7 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-asu-maroon via-asu-maroon-dark to-gray-900 overflow-hidden">
+      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center bg-linear-to-br from-asu-maroon via-asu-maroon-dark to-gray-900 overflow-hidden">
         {/* Enhanced animated background elements */}
         <div className="absolute inset-0">
           <div className="float-1 floating-element absolute top-20 left-10 w-24 h-24 bg-asu-gold/20 rounded-full blur-xl"></div>
@@ -817,7 +817,7 @@ export default function LandingPage() {
             <div className="text-white">
               <h1 className="hero-title text-5xl md:text-7xl font-bold mb-6 leading-tight">
                 Your Career
-                <span className="block bg-gradient-to-r from-asu-gold via-yellow-300 to-asu-gold bg-clip-text text-transparent animate-pulse">
+                <span className="block bg-linear-to-r from-asu-gold via-yellow-300 to-asu-gold bg-clip-text text-transparent animate-pulse">
                   Starts Here
                 </span>
               </h1>
@@ -825,7 +825,7 @@ export default function LandingPage() {
                 Connect with top employers, find your dream internship, and launch your career at Aristotle University of Thessaloniki's premier job platform.
               </p>
               <div className="hero-buttons flex flex-col sm:flex-row gap-4">
-                <Link to="/register?role=student" className="group bg-gradient-to-r from-asu-gold to-yellow-300 text-asu-maroon px-8 py-4 rounded-full font-semibold text-lg hover:from-yellow-300 hover:to-asu-gold transition-all duration-500 transform hover:scale-110 hover:shadow-2xl flex items-center justify-center relative overflow-hidden">
+                <Link to="/register?role=student" className="group bg-linear-to-r from-asu-gold to-yellow-300 text-asu-maroon px-8 py-4 rounded-full font-semibold text-lg hover:from-yellow-300 hover:to-asu-gold transition-all duration-500 transform hover:scale-110 hover:shadow-2xl flex items-center justify-center relative overflow-hidden">
                   <span className="relative z-10">Find Opportunities</span>
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-2 transition-transform duration-300 relative z-10" />
                   <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -833,7 +833,7 @@ export default function LandingPage() {
                 <Link to="/register?role=employer" className="group border-2 border-white text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white hover:text-asu-maroon transition-all duration-500 transform hover:scale-110 hover:shadow-2xl flex items-center justify-center relative overflow-hidden">
                   <span className="relative z-10">Post Jobs</span>
                   <Building2 className="ml-2 h-5 w-5 group-hover:rotate-12 transition-transform duration-300 relative z-10" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 bg-linear-to-r from-white/10 to-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </Link>
               </div>
             </div>
@@ -843,7 +843,7 @@ export default function LandingPage() {
               {/* Student Success Image */}
               <div className="relative z-10 bg-white/10 backdrop-blur-2xl rounded-3xl p-8 border border-white/20 shadow-2xl">
                 {/* Student Image Container */}
-                <div className="relative w-full h-96 bg-gradient-to-br from-white/20 to-white/5 rounded-2xl overflow-hidden flex items-center justify-center">
+                <div className="relative w-full h-96 bg-linear-to-br from-white/20 to-white/5 rounded-2xl overflow-hidden flex items-center justify-center">
                   {/* Student Illustration */}
                   <div className="text-center">
                     <div className="text-9xl mb-4 animate-pulse">🎓</div>
@@ -867,7 +867,7 @@ export default function LandingPage() {
               </div>
 
               {/* Background decoration */}
-              <div className="absolute inset-0 bg-gradient-to-t from-asu-maroon/20 to-transparent rounded-3xl transform rotate-3 scale-105 blur-sm"></div>
+              <div className="absolute inset-0 bg-linear-to-t from-asu-maroon/20 to-transparent rounded-3xl transform rotate-3 scale-105 blur-xs"></div>
               
               {/* Success Metrics Overlay */}
               <div className="absolute bottom-4 left-4 success-metric bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-lg">
@@ -897,7 +897,7 @@ export default function LandingPage() {
       </section>
 
       {/* Enhanced Company Logos Section */}
-      <section ref={companiesRef} className="py-20 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
+      <section ref={companiesRef} className="py-20 bg-linear-to-b from-gray-50 to-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-16">
           <h2 className="text-reveal text-4xl md:text-5xl font-bold text-gray-900 mb-6">Trusted by Industry Leaders</h2>
           <p className="text-reveal text-xl text-gray-600 max-w-2xl mx-auto">Join thousands of students who've found their dream jobs with top companies</p>
@@ -905,7 +905,7 @@ export default function LandingPage() {
         <div className="relative">
           <div className="company-scroll flex space-x-16 items-center">
             {[...companyLogos, ...companyLogos].map((company, index) => (
-              <div key={index} className="company-logo flex-shrink-0 bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-110 hover:-translate-y-2 border border-gray-100">
+              <div key={index} className="company-logo shrink-0 bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-110 hover:-translate-y-2 border border-gray-100">
                 <div className="flex items-center space-x-4">
                   <img 
                     src={company.logo} 
@@ -920,30 +920,30 @@ export default function LandingPage() {
           </div>
           
           {/* Gradient overlays */}
-          <div className="absolute left-0 top-0 w-32 h-full bg-gradient-to-r from-white to-transparent z-10"></div>
-          <div className="absolute right-0 top-0 w-32 h-full bg-gradient-to-l from-white to-transparent z-10"></div>
+          <div className="absolute left-0 top-0 w-32 h-full bg-linear-to-r from-white to-transparent z-10"></div>
+          <div className="absolute right-0 top-0 w-32 h-full bg-linear-to-l from-white to-transparent z-10"></div>
         </div>
       </section>
 
       {/* Enhanced Stats Section */}
-      <section className="py-24 bg-gradient-to-r from-asu-maroon via-asu-maroon-dark to-asu-maroon relative overflow-hidden">
+      <section className="py-24 bg-linear-to-r from-asu-maroon via-asu-maroon-dark to-asu-maroon relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center text-white">
             <div className="space-y-4 transform hover:scale-105 transition-transform duration-300">
-              <div className="stat-number text-5xl md:text-6xl font-bold bg-gradient-to-b from-white to-asu-gold bg-clip-text text-transparent" data-target="15000">0</div>
+              <div className="stat-number text-5xl md:text-6xl font-bold bg-linear-to-b from-white to-asu-gold bg-clip-text text-transparent" data-target="15000">0</div>
               <div className="stat-label text-asu-gold font-bold text-lg">Active Students</div>
             </div>
             <div className="space-y-4 transform hover:scale-105 transition-transform duration-300">
-              <div className="stat-number text-5xl md:text-6xl font-bold bg-gradient-to-b from-white to-asu-gold bg-clip-text text-transparent" data-target="500">0</div>
+              <div className="stat-number text-5xl md:text-6xl font-bold bg-linear-to-b from-white to-asu-gold bg-clip-text text-transparent" data-target="500">0</div>
               <div className="stat-label text-asu-gold font-bold text-lg">Partner Companies</div>
             </div>
             <div className="space-y-4 transform hover:scale-105 transition-transform duration-300">
-              <div className="stat-number text-5xl md:text-6xl font-bold bg-gradient-to-b from-white to-asu-gold bg-clip-text text-transparent" data-target="2000">0</div>
+              <div className="stat-number text-5xl md:text-6xl font-bold bg-linear-to-b from-white to-asu-gold bg-clip-text text-transparent" data-target="2000">0</div>
               <div className="stat-label text-asu-gold font-bold text-lg">Job Postings</div>
             </div>
             <div className="space-y-4 transform hover:scale-105 transition-transform duration-300">
-              <div className="stat-number text-5xl md:text-6xl font-bold bg-gradient-to-b from-white to-asu-gold bg-clip-text text-transparent" data-target="95">0</div>
+              <div className="stat-number text-5xl md:text-6xl font-bold bg-linear-to-b from-white to-asu-gold bg-clip-text text-transparent" data-target="95">0</div>
               <div className="stat-label text-asu-gold font-bold text-lg">% Success Rate</div>
             </div>
           </div>
@@ -952,11 +952,11 @@ export default function LandingPage() {
 
       {/* Enhanced Features Section */}
       <section ref={featuresRef} className="py-24 bg-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-50/50 to-white"></div>
+        <div className="absolute inset-0 bg-linear-to-b from-gray-50/50 to-white"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-20">
             <h2 className="text-reveal text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-              Everything You Need to <span className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark bg-clip-text text-transparent">Succeed</span>
+              Everything You Need to <span className="bg-linear-to-r from-asu-maroon to-asu-maroon-dark bg-clip-text text-transparent">Succeed</span>
             </h2>
             <p className="text-reveal text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
               Our comprehensive platform provides all the tools, resources, and connections you need to launch your dream career at AUTh.
@@ -1016,9 +1016,9 @@ export default function LandingPage() {
               }
             ].map((feature, index) => (
               <div key={index} className={`feature-card group relative bg-white rounded-2xl p-6 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 hover:border-asu-maroon/20 break-inside-avoid mb-6 ${feature.size === 'large' ? 'lg:p-8' : feature.size === 'medium' ? 'lg:p-7' : 'lg:p-6'}`}>
-                <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-5 rounded-2xl transition-opacity duration-500`}></div>
+                <div className={`absolute inset-0 bg-linear-to-br ${feature.gradient} opacity-0 group-hover:opacity-5 rounded-2xl transition-opacity duration-500`}></div>
                 <div className="relative z-10">
-                  <div className={`feature-icon mb-4 w-16 h-16 bg-gradient-to-br ${feature.gradient === "from-white to-gray-100" ? "from-asu-maroon to-asu-maroon-dark" : feature.gradient} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500 shadow-lg`}>
+                  <div className={`feature-icon mb-4 w-16 h-16 bg-linear-to-br ${feature.gradient === "from-white to-gray-100" ? "from-asu-maroon to-asu-maroon-dark" : feature.gradient} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500 shadow-lg`}>
                     {feature.icon}
                   </div>
                   <h3 className="feature-title text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
@@ -1026,7 +1026,7 @@ export default function LandingPage() {
                   <ul className="space-y-1">
                     {feature.features.map((item, idx) => (
                       <li key={idx} className="feature-item flex items-center text-xs text-gray-500">
-                        <CheckCircle className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                        <CheckCircle className="h-3 w-3 text-green-500 mr-2 shrink-0" />
                         {item}
                       </li>
                     ))}
@@ -1037,7 +1037,7 @@ export default function LandingPage() {
           </div>
 
           {/* Additional Benefits Section */}
-          <div className="bg-gradient-to-r from-asu-maroon/5 to-asu-gold/5 rounded-3xl p-12 text-center">
+          <div className="bg-linear-to-r from-asu-maroon/5 to-asu-gold/5 rounded-3xl p-12 text-center">
             <h3 className="text-3xl font-bold text-gray-900 mb-8">Plus So Much More</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               {[
@@ -1060,7 +1060,7 @@ export default function LandingPage() {
       </section>
 
       {/* Enhanced How It Works Section */}
-      <section ref={howItWorksRef} className="py-24 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+      <section ref={howItWorksRef} className="py-24 bg-linear-to-b from-gray-50 to-white relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-10 left-10 w-20 h-20 bg-asu-maroon/5 rounded-full blur-xl"></div>
           <div className="absolute bottom-10 right-10 w-32 h-32 bg-asu-gold/5 rounded-full blur-2xl"></div>
@@ -1104,7 +1104,7 @@ export default function LandingPage() {
             ].map((step, index) => (
               <div key={index} className="step-card text-center group relative">
                 <div className="relative mb-10">
-                  <div className={`step-number mx-auto w-40 h-40 bg-gradient-to-br ${step.gradient} rounded-3xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-2xl`}>
+                  <div className={`step-number mx-auto w-40 h-40 bg-linear-to-br ${step.gradient} rounded-3xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-2xl`}>
                     {step.icon}
                   </div>
                   <div className="absolute -top-6 -right-6 bg-white border-4 border-asu-gold text-asu-maroon w-16 h-16 rounded-full flex items-center justify-center font-bold text-xl shadow-lg">
@@ -1112,7 +1112,7 @@ export default function LandingPage() {
                   </div>
                   {/* Connection line */}
                   {index < 2 && (
-                    <div className="hidden md:block absolute top-1/2 -right-8 w-16 h-0.5 bg-gradient-to-r from-asu-maroon to-transparent"></div>
+                    <div className="hidden md:block absolute top-1/2 -right-8 w-16 h-0.5 bg-linear-to-r from-asu-maroon to-transparent"></div>
                   )}
                 </div>
                 <h3 className="text-3xl font-bold text-gray-900 mb-6">{step.title}</h3>
@@ -1124,11 +1124,11 @@ export default function LandingPage() {
       </section>
 
       {/* New Career Path Section */}
-      <section className="py-24 bg-gradient-to-br from-asu-maroon/5 to-asu-gold/5 relative overflow-hidden">
+      <section className="py-24 bg-linear-to-br from-asu-maroon/5 to-asu-gold/5 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
             <h2 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-              Your Career <span className="bg-gradient-to-r from-asu-maroon to-asu-maroon-dark bg-clip-text text-transparent">Journey</span>
+              Your Career <span className="bg-linear-to-r from-asu-maroon to-asu-maroon-dark bg-clip-text text-transparent">Journey</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Follow the path from ASU student to industry professional with our comprehensive career support system
@@ -1138,7 +1138,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* Career Path Visualization */}
             <div className="relative bg-white rounded-3xl p-8 shadow-2xl border border-gray-100">
-              <div className="relative w-full h-96 bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 overflow-hidden">
+              <div className="relative w-full h-96 bg-linear-to-br from-gray-50 to-white rounded-2xl p-6 overflow-hidden">
                 {/* Background Pattern */}
                 <div className="absolute inset-0 opacity-10">
                   <div className="grid grid-cols-8 grid-rows-8 h-full w-full">
@@ -1152,7 +1152,7 @@ export default function LandingPage() {
                 <div className="relative z-10 h-full flex flex-col justify-between">
                   {/* Step 4: Career Success */}
                   <div className="flex items-center justify-center">
-                    <div className="bg-gradient-to-r from-asu-gold to-yellow-300 rounded-2xl p-4 shadow-lg">
+                    <div className="bg-linear-to-r from-asu-gold to-yellow-300 rounded-2xl p-4 shadow-lg">
                       <div className="flex items-center space-x-3">
                         <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center">
                           <Award className="h-7 w-7 text-asu-maroon" />
@@ -1236,7 +1236,7 @@ export default function LandingPage() {
             {/* Career Path Benefits */}
             <div className="space-y-8">
               <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-asu-maroon to-asu-maroon-dark rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-linear-to-r from-asu-maroon to-asu-maroon-dark rounded-xl flex items-center justify-center shrink-0">
                   <User className="h-6 w-6 text-white" />
                 </div>
                 <div>
@@ -1246,7 +1246,7 @@ export default function LandingPage() {
               </div>
 
               <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-white border-2 border-asu-maroon rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-white border-2 border-asu-maroon rounded-xl flex items-center justify-center shrink-0">
                   <Search className="h-6 w-6 text-asu-maroon" />
                 </div>
                 <div>
@@ -1256,7 +1256,7 @@ export default function LandingPage() {
               </div>
 
               <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-asu-maroon to-asu-maroon-dark rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-linear-to-r from-asu-maroon to-asu-maroon-dark rounded-xl flex items-center justify-center shrink-0">
                   <Target className="h-6 w-6 text-white" />
                 </div>
                 <div>
@@ -1266,7 +1266,7 @@ export default function LandingPage() {
               </div>
 
               <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-white border-2 border-asu-maroon rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-white border-2 border-asu-maroon rounded-xl flex items-center justify-center shrink-0">
                   <Award className="h-6 w-6 text-asu-maroon" />
                 </div>
                 <div>
@@ -1281,7 +1281,7 @@ export default function LandingPage() {
 
       {/* Enhanced Testimonials Section */}
       <section ref={testimonialsRef} className="py-24 bg-gray-900 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-800 to-gray-900"></div>
+        <div className="absolute inset-0 bg-linear-to-b from-gray-800 to-gray-900"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-20">
             <h2 className="text-reveal text-5xl md:text-6xl font-bold text-white mb-6">
@@ -1320,7 +1320,7 @@ export default function LandingPage() {
               }
             ].map((testimonial, index) => (
               <div key={index} className="testimonial-card group relative bg-white rounded-3xl p-10 text-center transform hover:scale-105 hover:-translate-y-2 transition-all duration-500 shadow-2xl">
-                <div className={`absolute inset-0 bg-gradient-to-br ${testimonial.gradient} opacity-0 group-hover:opacity-5 rounded-3xl transition-opacity duration-500`}></div>
+                <div className={`absolute inset-0 bg-linear-to-br ${testimonial.gradient} opacity-0 group-hover:opacity-5 rounded-3xl transition-opacity duration-500`}></div>
                 <div className="relative z-10">
                   <div className="text-8xl mb-6 transform group-hover:scale-110 transition-transform duration-300">{testimonial.image}</div>
                   <div className="flex justify-center mb-6">
@@ -1341,7 +1341,7 @@ export default function LandingPage() {
       </section>
 
       {/* Enhanced Demo Section with Real Image */}
-      <section ref={demoRef} className="relative py-24 bg-gradient-to-r from-asu-maroon via-asu-maroon-dark to-asu-maroon overflow-hidden">
+      <section ref={demoRef} className="relative py-24 bg-linear-to-r from-asu-maroon via-asu-maroon-dark to-asu-maroon overflow-hidden">
         <div className="demo-bg absolute inset-0 bg-black/20"></div>
         <div className="absolute inset-0">
           <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-asu-gold/10 rounded-full blur-3xl"></div>
@@ -1447,7 +1447,7 @@ export default function LandingPage() {
                   {/* Sidebar */}
                   <div className="space-y-6">
                     {/* Profile Completion */}
-                    <div className="bg-gradient-to-br from-asu-maroon to-asu-maroon-dark rounded-xl p-6 text-white">
+                    <div className="bg-linear-to-br from-asu-maroon to-asu-maroon-dark rounded-xl p-6 text-white">
                       <h3 className="font-bold mb-3">Profile Strength</h3>
                       <div className="w-full bg-white/20 rounded-full h-2 mb-3">
                         <div className="bg-asu-gold h-2 rounded-full" style={{ width: '85%' }}></div>

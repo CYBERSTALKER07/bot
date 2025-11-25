@@ -96,7 +96,7 @@ export default function CompaniesPage() {
       ) : (
         <div className={cn(
           'p-8 text-center max-w-2xl mx-auto rounded-lg',
-          isDark ? 'bg-black border-b' : 'bg-white shadow'
+          isDark ? 'bg-black border-b' : 'bg-white shadow-sm'
         )}>
           <Building2 className={cn(
             'h-12 w-12 mx-auto mb-4',

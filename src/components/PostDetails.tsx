@@ -252,7 +252,7 @@ export default function PostDetails() {
                     alt={post.author.full_name}
                     name={post.author.full_name}
                     size="lg"
-                    className="flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                    className="shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
                   />
                 </Link>
                 

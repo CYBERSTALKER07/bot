@@ -352,7 +352,7 @@ export default function LinkedInJobManager() {
                 className={cn(
                   'flex items-center space-x-2 px-4 py-2 rounded-md transition-all duration-200',
                   activeTab === tab.key
-                    ? 'bg-white dark:bg-gray-700 text-info-600 dark:text-info-400 shadow-sm'
+                    ? 'bg-white dark:bg-gray-700 text-info-600 dark:text-info-400 shadow-xs'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                 )}
               >
