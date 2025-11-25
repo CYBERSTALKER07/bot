@@ -13,9 +13,9 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { 
-  useRecommendedUsers, 
-  useRecommendedCompanies, 
+import {
+  useRecommendedUsers,
+  useRecommendedCompanies,
   useEmployerEvents,
   useFollowUser,
   useUnfollowUser
@@ -146,7 +146,7 @@ export default function ExplorePage() {
     const now = new Date();
     const diff = now.getTime() - date.getTime();
     const hours = Math.floor(diff / (1000 * 60 * 60));
-    
+
     if (hours < 1) return 'now';
     if (hours < 24) return `${hours}h`;
     const days = Math.floor(hours / 24);
@@ -154,7 +154,7 @@ export default function ExplorePage() {
   };
 
   return (
-    <PageLayout 
+    <PageLayout
       className={cn(isDark ? 'bg-black text-white' : 'bg-white text-black')}
       maxWidth="full"
       padding="none"
@@ -166,12 +166,12 @@ export default function ExplorePage() {
       )}>
         <main className={cn('max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8')}>
           {/* Header */}
-          <div className="mb-8">
+          {/* <div className="mb-8">
             <h1 className="text-3xl font-bold mb-2">Discover</h1>
             <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>
               Find opportunities, companies, people and events all in one place
             </p>
-          </div>
+          </div> */}
 
           {/* Jobs For You - Grid Layout */}
           <div className={cn(
@@ -200,14 +200,14 @@ export default function ExplorePage() {
             ) : jobPosts.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {jobPosts.slice(0, 6).map((job) => (
-                  <div 
-                    key={job.id} 
+                  <div
+                    key={job.id}
                     className={cn(
                       'rounded-xl p-3 sm:p-4 border transition-all cursor-pointer',
-                      isDark 
-                        ? 'bg-black border-gray-800 hover:border-gray-600 hover:shadow-lg' 
+                      isDark
+                        ? 'bg-black border-gray-800 hover:border-gray-600 hover:shadow-lg'
                         : 'bg-white border-gray-200 hover:border-gray-400 hover:shadow-lg'
-                    )} 
+                    )}
                     onClick={() => navigate(`/job/${job.id}`)}
                   >
                     {/* Card Header */}
@@ -273,11 +273,11 @@ export default function ExplorePage() {
 
                     {/* Action Buttons */}
                     <div className="flex gap-2 pt-2 sm:pt-3 border-t" style={{ borderColor: isDark ? 'rgb(31, 41, 55)' : 'rgb(229, 231, 235)' }}>
-                      <Button 
-                        variant="text" 
-                        size="small" 
-                        onClick={(e: React.MouseEvent) => e.stopPropagation()} 
-                        title="Like this job" 
+                      <Button
+                        variant="text"
+                        size="small"
+                        onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                        title="Like this job"
                         className={cn(
                           'flex-1 flex items-center justify-center gap-1 rounded-lg text-xs transition-colors',
                           isDark ? 'text-gray-400 hover:text-white hover:bg-gray-900' : 'text-gray-600 hover:text-black hover:bg-gray-100'
@@ -285,11 +285,11 @@ export default function ExplorePage() {
                       >
                         <Heart className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
-                      <Button 
-                        variant="text" 
-                        size="small" 
-                        onClick={(e: React.MouseEvent) => e.stopPropagation()} 
-                        title="Bookmark" 
+                      <Button
+                        variant="text"
+                        size="small"
+                        onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                        title="Bookmark"
                         className={cn(
                           'flex-1 flex items-center justify-center gap-1 rounded-lg text-xs transition-colors',
                           isDark ? 'text-gray-400 hover:text-white hover:bg-gray-900' : 'text-gray-600 hover:text-black hover:bg-gray-100'
@@ -297,12 +297,12 @@ export default function ExplorePage() {
                       >
                         <Bookmark className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
-                      <Button 
+                      <Button
                         className={cn(
                           'flex-1 text-xs px-2 sm:px-3 py-1 sm:py-2 rounded-full font-bold transition-colors',
                           isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-900'
-                        )} 
-                        onClick={(e: React.MouseEvent) => { e.stopPropagation(); navigate(`/job/${job.id}`); }} 
+                        )}
+                        onClick={(e: React.MouseEvent) => { e.stopPropagation(); navigate(`/job/${job.id}`); }}
                         title="View job details"
                       >
                         Apply
@@ -515,8 +515,8 @@ export default function ExplorePage() {
                   renderItem={(profile: ProfileData) => (
                     <div className={cn(
                       'p-4 border-b transition-all cursor-pointer flex flex-col items-center text-center',
-                      isDark 
-                        ? 'border-gray-800 hover:bg-gray-900' 
+                      isDark
+                        ? 'border-gray-800 hover:bg-gray-900'
                         : 'border-gray-200 hover:bg-gray-50'
                     )}>
                       {/* Profile Avatar */}
@@ -532,7 +532,7 @@ export default function ExplorePage() {
                           </div>
                         )}
                       </div>
-                      
+
                       {/* Profile Info */}
                       <div className="w-full mb-3 flex-1">
                         <div className="flex items-center justify-center gap-1 mb-1">
@@ -569,8 +569,8 @@ export default function ExplorePage() {
                         title={profile.is_following ? 'Unfollow this user' : 'Follow this user'}
                         className={cn(
                           'w-full px-3 py-2 rounded-full font-bold text-sm transition-colors',
-                          profile.is_following 
-                            ? isDark ? 'bg-transparent text-white border border-gray-700 hover:bg-gray-900' : 'bg-transparent text-black border border-gray-300 hover:bg-gray-100' 
+                          profile.is_following
+                            ? isDark ? 'bg-transparent text-white border border-gray-700 hover:bg-gray-900' : 'bg-transparent text-black border border-gray-300 hover:bg-gray-100'
                             : isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-900'
                         )}
                       >

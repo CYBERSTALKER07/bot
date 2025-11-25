@@ -1,18 +1,18 @@
 import React from 'react';
-import { 
-  Clock, 
-  Eye, 
-  MessageSquare, 
-  CheckCircle, 
-  XCircle, 
+import {
+  Clock,
+  Eye,
+  MessageSquare,
+  CheckCircle,
+  XCircle,
   AlertCircle,
   Users,
   Star,
   Calendar,
-  LucideIcon 
+  LucideIcon
 } from 'lucide-react';
 
-type Status = 'pending' | 'reviewed' | 'interview' | 'accepted' | 'rejected' | 'hired' | 'shortlisted' | 'active' | 'inactive' | 'expired';
+type Status = 'pending' | 'reviewed' | 'interview' | 'accepted' | 'rejected' | 'hired' | 'shortlisted' | 'active' | 'inactive' | 'expired' | 'looking' | 'interviewing';
 
 interface StatusBadgeProps {
   status: Status;
@@ -94,6 +94,20 @@ const statusConfig = {
     icon: Calendar,
     colors: 'bg-red-100 text-red-800 border-red-200',
     darkColors: 'bg-red-500 text-white'
+  },
+  looking: {
+    label: 'Looking',
+    emoji: '🔍',
+    icon: Eye,
+    colors: 'bg-blue-100 text-blue-800 border-blue-200',
+    darkColors: 'bg-blue-500 text-white'
+  },
+  interviewing: {
+    label: 'Interviewing',
+    emoji: '🗣️',
+    icon: MessageSquare,
+    colors: 'bg-purple-100 text-purple-800 border-purple-200',
+    darkColors: 'bg-purple-500 text-white'
   }
 };
 
@@ -110,7 +124,7 @@ export default function StatusBadge({
   const Icon = config.icon;
 
   const baseClasses = "inline-flex items-center font-medium border backdrop-blur-sm transition-all duration-200";
-  
+
   const sizeClasses = {
     sm: "px-2 py-1 text-xs gap-1",
     md: "px-3 py-1.5 text-sm gap-1.5",

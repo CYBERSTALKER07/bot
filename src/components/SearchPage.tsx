@@ -9,15 +9,17 @@ import {
   Briefcase,
   Calendar,
   MapPin,
-  Clock
+  Clock,
+  Hash,
+  Verified
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { cn } from '../lib/cva';
-import { useSearch, useMostFollowedUsers, useFollowUser, useUnfollowUser, useMostLikedPosts, useMatchedJobs } from '../hooks/useOptimizedQuery';
+import { useSearch, useMostFollowedUsers, useMostLikedPosts, useMatchedJobs } from '../hooks/useOptimizedQuery';
 import { useDebounce } from '../hooks/useDebounce';
 import { useAuth } from '../context/AuthContext';
-import WhoToFollowItem from './WhoToFollowItem';
-import { SearchResultsListSkeleton, SearchPageSidebarSkeleton } from './ui/Skeleton';
+import WhoToFollowCard from './WhoToFollowCard';
+import { SearchResultsListSkeleton } from './ui/Skeleton';
 import { supabase } from '../lib/supabase';
 
 interface SearchResult {
@@ -107,6 +109,15 @@ export default function SearchPage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [searchInput, setSearchInput] = useState(searchParams.get('q') || '');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [activeTab, setActiveTab] = useState('Top');
+
+  const tabs = [
+    { id: 'Top', label: 'Top' },
+    { id: 'People', label: 'People' },
+    { id: 'Jobs', label: 'Jobs' },
+    { id: 'Posts', label: 'Posts' },
+    { id: 'Companies', label: 'Companies' }
+  ];
 
   // Parse search input to detect @ symbol
   const isUsernameSearch = searchInput.startsWith('@');
@@ -116,9 +127,7 @@ export default function SearchPage() {
   const { data: searchResults, isLoading: loading } = useSearch(debouncedQuery);
 
   // Fetch most followed users for sidebar
-  const { data: mostFollowedUsers = [], isLoading: isLoadingMostFollowed } = useMostFollowedUsers(5);
-  const followUserMutation = useFollowUser();
-  const unfollowUserMutation = useUnfollowUser();
+  const { data: mostFollowedUsers = [] } = useMostFollowedUsers(5);
 
   // Fallback: Fetch regular users if mostFollowedUsers is empty
   const [suggestedUsers, setSuggestedUsers] = useState<any[]>([]);
@@ -294,13 +303,40 @@ export default function SearchPage() {
     return results;
   }, [searchResults, isUsernameSearch, cleanSearchQuery]);
 
+  const filteredResults = useMemo(() => {
+    if (activeTab === 'Top') return allResults;
+    if (activeTab === 'People') return allResults.filter(r => r.type === 'user');
+    if (activeTab === 'Jobs') return allResults.filter(r => r.type === 'job');
+    if (activeTab === 'Posts') return allResults.filter(r => r.type === 'post' || r.type === 'hashtag');
+    if (activeTab === 'Companies') return allResults.filter(r => r.type === 'company');
+    return allResults;
+  }, [allResults, activeTab]);
+
   const handleClearSearch = () => {
     setSearchInput('');
     inputRef.current?.focus();
   };
 
   const handleResultClick = (result: SearchResult) => {
-    navigate(`/profile/${result.id}`);
+    switch (result.type) {
+      case 'user':
+        navigate(`/profile/${result.id}`);
+        break;
+      case 'job':
+        navigate(`/jobs/${result.id}`);
+        break;
+      case 'post':
+        navigate(`/post/${result.id}`);
+        break;
+      case 'company':
+        navigate(`/company/${result.id}`);
+        break;
+      case 'hashtag':
+        navigate(`/hashtag/${result.title.replace('#', '')}`);
+        break;
+      default:
+        console.warn('Unknown result type:', result.type);
+    }
   };
 
   const handleAtSymbolClick = () => {
@@ -329,20 +365,20 @@ export default function SearchPage() {
         )}>
           {/* Search Header - Fixed/Sticky */}
           <div className={cn(
-            'sticky top-0 z-49 border-b backdrop-blur-xl transition-colors',
-            isDark ? 'bg-black/95 border-gray-800' : 'bg-white/95 border-gray-100'
+            'sticky top-0 z-49 border-b backdrop-blur-xl transition-colors ios-header-safe',
+            isDark ? 'bg-black/85 border-gray-800' : 'bg-white/85 border-gray-100'
           )}>
             <div className="max-w-2xl mx-auto w-full px-4 py-3">
               {/* Search Bar Container */}
               <div className={cn(
-                'flex items-center gap-3 px-4 py-3 rounded-full transition-all duration-200',
+                'flex items-center gap-3 px-4 py-3 rounded-full transition-all duration-200 shadow-sm',
                 isSearchFocused
                   ? isDark
-                    ? 'bg-black border-2 border-white'
-                    : 'bg-gray-50 border-2 border-white'
+                    ? 'bg-black border-2 border-[#BCE953] ring-2 ring-[#BCE953]/20'
+                    : 'bg-white border-2 border-[#BCE953] ring-2 ring-[#BCE953]/20'
                   : isDark
-                    ? 'bg-black border border-gray-700'
-                    : 'bg-gray-100 border border-gray-300'
+                    ? 'bg-gray-900/50 border border-gray-800 hover:border-gray-700'
+                    : 'bg-gray-100/50 border border-gray-200 hover:border-gray-300'
               )}>
                 {/* Mobile Back Button */}
                 <button
@@ -356,8 +392,8 @@ export default function SearchPage() {
                 <SearchIcon className={cn(
                   'w-5 h-5 flex-shrink-0 transition-colors',
                   isSearchFocused
-                    ? 'text-white'
-                    : isDark ? 'text-gray-600' : 'text-gray-500'
+                    ? 'text-[#BCE953]'
+                    : isDark ? 'text-gray-500' : 'text-gray-400'
                 )} />
 
                 <input
@@ -369,7 +405,7 @@ export default function SearchPage() {
                   onBlur={() => setIsSearchFocused(false)}
                   placeholder="Search by name or type @ for username"
                   className={cn(
-                    'flex-1 bg-transparent outline-none text-base search-input',
+                    'flex-1 bg-transparent outline-none text-base search-input placeholder:text-gray-500',
                     isDark ? 'text-white' : 'text-black'
                   )}
                 />
@@ -382,8 +418,8 @@ export default function SearchPage() {
                     className={cn(
                       'p-2 rounded-full transition-all',
                       isDark
-                        ? 'text-gray-500 hover:text-info-400 hover:bg-info-500/10'
-                        : 'text-gray-500 hover:text-info-600 hover:bg-info-500/10'
+                        ? 'text-gray-500 hover:text-[#BCE953] hover:bg-[#BCE953]/10'
+                        : 'text-gray-400 hover:text-[#BCE953] hover:bg-[#BCE953]/10'
                     )}
                   >
                     <AtSign className="w-5 h-5" />
@@ -398,7 +434,7 @@ export default function SearchPage() {
                       'p-1 rounded-full transition-colors flex-shrink-0',
                       isDark
                         ? 'text-gray-500 hover:text-white hover:bg-gray-800'
-                        : 'text-gray-500 hover:text-black hover:bg-gray-200'
+                        : 'text-gray-400 hover:text-black hover:bg-gray-200'
                     )}
                   >
                     <XIcon className="w-5 h-5" />
@@ -409,14 +445,14 @@ export default function SearchPage() {
               {/* Search Mode Indicator */}
               {searchInput && (
                 <div className={cn(
-                  'mt-2 px-4 text-xs font-medium flex items-center gap-2',
+                  'mt-2 px-4 text-xs font-medium flex items-center gap-2 animate-in fade-in slide-in-from-top-1',
                   isUsernameSearch
-                    ? isDark ? 'text-info-400' : 'text-info-600'
-                    : isDark ? 'text-gray-500' : 'text-gray-600'
+                    ? 'text-[#BCE953]'
+                    : isDark ? 'text-gray-500' : 'text-gray-500'
                 )}>
                   {isUsernameSearch ? (
                     <>
-                      <AtSign className="w-4 h-4" />
+                      <AtSign className="w-3 h-3" />
                       <span>Searching by username</span>
                     </>
                   ) : (
@@ -425,10 +461,34 @@ export default function SearchPage() {
                 </div>
               )}
             </div>
+
+            {/* Filter Tabs */}
+            {searchInput && (
+              <div className="max-w-2xl mx-auto w-full px-4 pb-3">
+                <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={cn(
+                        "px-4 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap border",
+                        activeTab === tab.id
+                          ? "bg-[#BCE953] text-black border-[#BCE953] shadow-sm"
+                          : isDark
+                            ? "bg-transparent text-gray-400 border-gray-800 hover:border-gray-700 hover:text-white"
+                            : "bg-transparent text-gray-600 border-gray-200 hover:border-gray-300 hover:text-gray-900"
+                      )}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Results Area */}
-          <div className="flex-1 overflow-y-auto w-full pb-20 lg:pb-0">
+          <div className="flex-1 overflow-y-auto w-full pb-20 lg:pb-0 scrollbar-hide">
             {!searchInput && !isSearchFocused ? (
               // Full Post Cards Display
               <div className="w-full max-w-2xl mx-auto">
@@ -442,13 +502,14 @@ export default function SearchPage() {
                     ))}
                   </div>
                 ) : trendingPosts.length > 0 ? (
-                  <div className="space-y-0">
+                  <div className="divide-y border-b" style={{ borderColor: isDark ? 'rgb(31 41 55)' : 'rgb(229 231 235)' }}>
                     {trendingPosts.map((post: any) => (
                       <div
                         key={post.id}
+                        onClick={() => navigate(`/post/${post.id}`)}
                         className={cn(
-                          'p-4 border-b transition-colors',
-                          isDark ? 'border-gray-800 hover:bg-gray-900/50' : 'border-gray-200 hover:bg-gray-50'
+                          'p-4 transition-colors cursor-pointer',
+                          isDark ? 'hover:bg-gray-900/30' : 'hover:bg-gray-50'
                         )}
                       >
                         {/* Post Header */}
@@ -456,51 +517,48 @@ export default function SearchPage() {
                           <img
                             src={post.author?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.author?.username}`}
                             alt={post.author?.name}
-                            className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                            className="w-10 h-10 rounded-full object-cover flex-shrink-0"
                           />
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <p className="font-semibold text-base truncate">{post.author?.name}</p>
+                            <div className="flex items-center gap-1.5">
+                              <p className={cn("font-bold text-sm truncate", isDark ? "text-white" : "text-gray-900")}>
+                                {post.author?.name}
+                              </p>
                               {post.author?.verified && (
-                                <svg className="w-4 h-4 text-info-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-                                </svg>
+                                <Verified className="w-3.5 h-3.5 text-[#BCE953] fill-current" />
                               )}
+                              <span className={cn('text-sm', isDark ? 'text-gray-500' : 'text-gray-500')}>
+                                @{post.author?.username} · {new Date(post.created_at).toLocaleDateString()}
+                              </span>
                             </div>
-                            <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>
-                              @{post.author?.username} • {new Date(post.created_at).toLocaleDateString()}
-                            </p>
                           </div>
                         </div>
 
                         {/* Post Content */}
-                        <div className="mb-3">
-                          <p className={cn('text-base whitespace-pre-wrap', isDark ? 'text-white' : 'text-black')}>
+                        <div className="pl-[52px]">
+                          <p className={cn('text-base whitespace-pre-wrap mb-3', isDark ? 'text-white' : 'text-black')}>
                             {post.content}
                           </p>
+
+                          {/* Post Media */}
+                          {post.media && post.media.length > 0 && (
+                            <div className="mb-3 rounded-2xl overflow-hidden border" style={{ borderColor: isDark ? 'rgb(55 65 81)' : 'rgb(229 231 235)' }}>
+                              {post.media[0].type === 'image' ? (
+                                <img
+                                  src={post.media[0].url}
+                                  alt={post.media[0].alt || 'Post image'}
+                                  className="w-full max-h-[500px] object-cover"
+                                />
+                              ) : (
+                                <video
+                                  src={post.media[0].url}
+                                  controls
+                                  className="w-full max-h-[500px]"
+                                />
+                              )}
+                            </div>
+                          )}
                         </div>
-
-                        {/* Post Media */}
-                        {post.media && post.media.length > 0 && (
-                          <div className="mb-3 rounded-xl overflow-hidden">
-                            {post.media[0].type === 'image' ? (
-                              <img
-                                src={post.media[0].url}
-                                alt={post.media[0].alt || 'Post image'}
-                                className="w-full max-h-96 object-cover"
-                              />
-                            ) : (
-                              <video
-                                src={post.media[0].url}
-                                controls
-                                className="w-full max-h-96"
-                              />
-                            )}
-                          </div>
-                        )}
-
-                        {/* Engagement Stats (no interactions) */}
-
                       </div>
                     ))}
                   </div>
@@ -510,43 +568,13 @@ export default function SearchPage() {
                 {suggestedUsers.length > 0 && (
                   <div className={cn('border-t border-b py-6', isDark ? 'border-gray-800' : 'border-gray-200')}>
                     <div className="px-4">
-                      <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+                      <h2 className={cn("text-xl font-bold mb-4 flex items-center gap-2", isDark ? "text-white" : "text-gray-900")}>
                         <UsersIcon className="w-5 h-5" />
                         Who to Follow
                       </h2>
-                      <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+                      <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
                         {suggestedUsers.map((user: any) => (
-                          <button
-                            key={user.id}
-                            onClick={() => navigate(`/profile/${user.id}`)}
-                            className={cn(
-                              'flex-shrink-0 w-48 p-4 rounded-2xl text-center transition-all border',
-                              isDark ? 'bg-gray-900 hover:bg-gray-800 border-gray-800' : 'bg-gray-50 hover:bg-gray-100 border-gray-200'
-                            )}
-                          >
-                            <img
-                              src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`}
-                              alt={user.full_name}
-                              className="w-16 h-16 rounded-full object-cover mx-auto mb-3"
-                            />
-                            <div className="mb-2">
-                              <p className="font-bold text-sm truncate">{user.full_name}</p>
-                              <p className={cn('text-xs truncate', isDark ? 'text-gray-400' : 'text-gray-600')}>
-                                @{user.username}
-                              </p>
-                            </div>
-                            {user.bio && (
-                              <p className={cn('text-xs line-clamp-2 mb-3', isDark ? 'text-gray-500' : 'text-gray-600')}>
-                                {user.bio}
-                              </p>
-                            )}
-                            <div className={cn(
-                              'text-xs px-3 py-1.5 rounded-full font-medium',
-                              isDark ? 'bg-white text-black' : 'bg-black text-white'
-                            )}>
-                              Follow
-                            </div>
-                          </button>
+                          <WhoToFollowCard key={user.id} user={user} />
                         ))}
                       </div>
                     </div>
@@ -557,7 +585,7 @@ export default function SearchPage() {
                 {recentJobs.length > 0 && (
                   <div className={cn('border-t', isDark ? 'border-gray-800' : 'border-gray-200')}>
                     <div className="p-4">
-                      <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+                      <h2 className={cn("text-xl font-bold mb-4 flex items-center gap-2", isDark ? "text-white" : "text-gray-900")}>
                         <Briefcase className="w-5 h-5" />
                         Recent Jobs
                       </h2>
@@ -567,16 +595,20 @@ export default function SearchPage() {
                             key={job.id}
                             onClick={() => navigate(`/jobs/${job.id}`)}
                             className={cn(
-                              'w-full p-4 rounded-xl text-left transition-all border',
-                              isDark ? 'bg-gray-900 hover:bg-gray-800 border-gray-800' : 'bg-white hover:bg-gray-50 border-gray-200'
+                              'w-full p-4 rounded-2xl text-left transition-all border group',
+                              isDark
+                                ? 'bg-gray-900/50 hover:bg-gray-900 border-gray-800 hover:border-gray-700'
+                                : 'bg-white hover:bg-gray-50 border-gray-200 hover:border-gray-300'
                             )}
                           >
-                            <h3 className="font-bold text-base mb-2">{job.title}</h3>
+                            <h3 className={cn("font-bold text-base mb-1 group-hover:text-[#BCE953] transition-colors", isDark ? "text-white" : "text-gray-900")}>
+                              {job.title}
+                            </h3>
                             <p className={cn('text-sm mb-2', isDark ? 'text-gray-400' : 'text-gray-600')}>
                               {job.company}
                             </p>
                             <div className="flex items-center gap-2 text-xs text-gray-500">
-                              <MapPin className="w-3 h-3" />
+                              <MapPin className="w-3.5 h-3.5" />
                               <span>{job.location}</span>
                               {job.type && (
                                 <>
@@ -596,7 +628,7 @@ export default function SearchPage() {
                 {upcomingEvents.length > 0 && (
                   <div className={cn('border-t', isDark ? 'border-gray-800' : 'border-gray-200')}>
                     <div className="p-4">
-                      <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+                      <h2 className={cn("text-xl font-bold mb-4 flex items-center gap-2", isDark ? "text-white" : "text-gray-900")}>
                         <Calendar className="w-5 h-5" />
                         Upcoming Events
                       </h2>
@@ -604,13 +636,17 @@ export default function SearchPage() {
                         {upcomingEvents.map((event: any) => (
                           <button
                             key={event.id}
-                            onClick={() => navigate(`/events/${event.id}`)}
+                            onClick={() => navigate(`/event/${event.id}`)}
                             className={cn(
-                              'w-full p-4 rounded-xl text-left transition-all border',
-                              isDark ? 'bg-gray-900 hover:bg-gray-800 border-gray-800' : 'bg-white hover:bg-gray-50 border-gray-200'
+                              'w-full p-4 rounded-2xl text-left transition-all border group',
+                              isDark
+                                ? 'bg-gray-900/50 hover:bg-gray-900 border-gray-800 hover:border-gray-700'
+                                : 'bg-white hover:bg-gray-50 border-gray-200 hover:border-gray-300'
                             )}
                           >
-                            <h3 className="font-bold text-base mb-2">{event.title}</h3>
+                            <h3 className={cn("font-bold text-base mb-1 group-hover:text-[#BCE953] transition-colors", isDark ? "text-white" : "text-gray-900")}>
+                              {event.title}
+                            </h3>
                             <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
                               <Clock className="w-4 h-4" />
                               <span>{new Date(event.event_date).toLocaleDateString()}</span>
@@ -618,7 +654,7 @@ export default function SearchPage() {
                             {event.location && (
                               <div className="flex items-center gap-2 text-sm text-gray-500">
                                 <MapPin className="w-4 h-4" />
-                                <span>{event.location}</span>
+                                <span className="truncate">{event.location}</span>
                               </div>
                             )}
                           </button>
@@ -630,105 +666,115 @@ export default function SearchPage() {
               </div>
             ) : searchInput && loading ? (
               // Loading State
-              <div className="max-w-2xl mx-auto">
+              <div className="max-w-2xl mx-auto pt-4">
                 <SearchResultsListSkeleton />
               </div>
             ) : (
               // Results List
-              <div className="max-w-2xl mx-auto w-full">
-                {allResults.length === 0 && searchInput ? (
+              <div className="max-w-2xl mx-auto w-full pb-20">
+                {filteredResults.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-64 px-4 py-12 text-center">
-                    <SearchIcon className="w-16 h-16 text-gray-500 mb-4 opacity-50" />
-                    <h2 className="text-xl font-bold mb-2">
-                      No results for "{searchInput}"
+                    <div className={cn(
+                      "w-16 h-16 mb-4 rounded-full flex items-center justify-center",
+                      isDark ? "bg-gray-900" : "bg-gray-100"
+                    )}>
+                      <SearchIcon className={cn("w-8 h-8", isDark ? "text-gray-700" : "text-gray-400")} />
+                    </div>
+                    <h2 className={cn("text-xl font-bold mb-2", isDark ? "text-white" : "text-gray-900")}>
+                      No results found
                     </h2>
-                    <p className={cn('text-sm mb-4', isDark ? 'text-gray-500' : 'text-gray-600')}>
-                      {isUsernameSearch
-                        ? 'Try searching for a different username'
-                        : 'Try searching for a different name'}
+                    <p className={cn('text-sm mb-6', isDark ? 'text-gray-500' : 'text-gray-600')}>
+                      We couldn't find anything matching "{searchInput}"
                     </p>
-
-                    {isUsernameSearch && (
-                      <button
-                        onClick={() => setSearchInput('')}
-                        className={cn(
-                          'text-sm px-4 py-2 rounded-full transition-colors',
-                          isDark
-                            ? 'bg-black hover:bg-gray-700 text-white'
-                            : 'bg-gray-100 hover:bg-gray-200 text-black'
-                        )}
-                      >
-                        Clear search
-                      </button>
-                    )}
+                    <button
+                      onClick={() => setSearchInput('')}
+                      className={cn(
+                        'text-sm px-6 py-2.5 rounded-full font-medium transition-all',
+                        isDark
+                          ? 'bg-white text-black hover:bg-gray-200'
+                          : 'bg-black text-white hover:bg-gray-800'
+                      )}
+                    >
+                      Clear search
+                    </button>
                   </div>
                 ) : (
-                  <div className={cn(
-                    'divide-y',
-                    isDark ? 'divide-gray-800' : 'divide-gray-200'
-                  )}>
-                    {allResults.map((result: SearchResult) => (
-                      <button
-                        key={result.id}
+                  <div className="divide-y" style={{ borderColor: isDark ? 'rgb(31 41 55)' : 'rgb(229 231 235)' }}>
+                    {filteredResults.map((result) => (
+                      <div
+                        key={`${result.type}-${result.id}`}
                         onClick={() => handleResultClick(result)}
                         className={cn(
-                          'search-result w-full text-left p-4 transition-colors',
-                          isDark ? 'hover:bg-gray-900/50' : 'hover:bg-gray-50'
+                          "p-4 transition-all cursor-pointer group hover:bg-opacity-50",
+                          isDark
+                            ? "hover:bg-gray-900"
+                            : "hover:bg-gray-50"
                         )}
                       >
-                        <div className="flex gap-4">
-                          {/* Avatar */}
-                          {result.avatar ? (
-                            <img
-                              src={result.avatar}
-                              alt={result.title}
-                              className="w-14 h-14 rounded-full object-cover flex-shrink-0"
-                            />
-                          ) : (
-                            <div className={cn(
-                              'w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 text-lg font-bold',
-                              isDark ? 'bg-black' : 'bg-gray-200',
-                              result.type === 'hashtag' && (isDark ? 'text-info-400' : 'text-info-600')
-                            )}>
-                              {result.type === 'hashtag' ? (
-                                <Hash className="w-6 h-6" />
-                              ) : (
-                                result.title.charAt(0).toUpperCase()
-                              )}
-                            </div>
-                          )}
+                        <div className="flex gap-3">
+                          {/* Avatar/Icon */}
+                          <div className="flex-shrink-0">
+                            {result.avatar ? (
+                              <img
+                                src={result.avatar}
+                                alt={result.title}
+                                className={cn(
+                                  "object-cover transition-colors",
+                                  result.type === 'company' ? "w-12 h-12 rounded-lg" : "w-10 h-10 rounded-full"
+                                )}
+                              />
+                            ) : (
+                              <div className={cn(
+                                "w-10 h-10 flex items-center justify-center transition-colors",
+                                result.type === 'company' ? "rounded-lg" : "rounded-full",
+                                isDark ? "bg-gray-900 text-gray-400 group-hover:bg-gray-800" : "bg-gray-100 text-gray-500 group-hover:bg-gray-200"
+                              )}>
+                                {result.type === 'user' && <UsersIcon className="w-5 h-5" />}
+                                {result.type === 'job' && <Briefcase className="w-5 h-5" />}
+                                {result.type === 'company' && <Briefcase className="w-5 h-5" />}
+                                {result.type === 'hashtag' && <Hash className="w-5 h-5" />}
+                                {result.type === 'post' && <AtSign className="w-5 h-5" />}
+                              </div>
+                            )}
+                          </div>
 
                           {/* Content */}
-                          <div className="flex-1 min-w-0 py-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className="font-bold text-base truncate">{result.title}</h3>
-                              {result.verified && (
-                                <svg className="w-4 h-4 text-info-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-                                </svg>
-                              )}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-0.5">
+                              <div className="flex items-center gap-1.5 min-w-0">
+                                <h3 className={cn(
+                                  "font-bold text-base truncate",
+                                  isDark ? "text-white" : "text-gray-900"
+                                )}>
+                                  {result.title}
+                                </h3>
+                                {result.verified && (
+                                  <Verified className="w-3.5 h-3.5 text-[#BCE953] fill-current flex-shrink-0" />
+                                )}
+                                <span className={cn(
+                                  "text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded-md font-medium ml-1",
+                                  isDark ? "bg-gray-900 text-gray-500" : "bg-gray-100 text-gray-500"
+                                )}>
+                                  {result.type}
+                                </span>
+                              </div>
                             </div>
 
-                            <p className={cn(
-                              'text-sm truncate mb-1.5 font-medium',
-                              isUsernameSearch
-                                ? isDark ? 'text-info-400' : 'text-info-600'
-                                : isDark ? 'text-gray-500' : 'text-gray-600'
-                            )}>
+                            <p className={cn("text-sm mb-1 truncate", isDark ? "text-gray-500" : "text-gray-600")}>
                               {result.subtitle}
                             </p>
 
                             {result.description && (
                               <p className={cn(
-                                'text-sm line-clamp-2',
-                                isDark ? 'text-gray-400' : 'text-gray-700'
+                                "text-sm line-clamp-2",
+                                isDark ? "text-gray-400" : "text-gray-500"
                               )}>
                                 {result.description}
                               </p>
                             )}
                           </div>
                         </div>
-                      </button>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -739,7 +785,7 @@ export default function SearchPage() {
 
         {/* Right Sidebar - Desktop Only */}
         <div className={cn(
-          'search-sidebar hidden lg:block w-80 border-l overflow-y-auto',
+          'search-sidebar hidden mr-24 lg:block w-100 border-l overflow-y-auto',
           isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-100'
         )}>
           <div className="p-4 space-y-6">

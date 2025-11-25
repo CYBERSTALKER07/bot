@@ -16,6 +16,8 @@ interface UserProfile {
   verified?: boolean;
   created_at: string;
   updated_at: string;
+  university_id?: string;
+  subscription_tier?: 'free' | 'student_premium' | 'university_premium';
 }
 
 interface User {
@@ -256,8 +258,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const signUp = async (
-    email: string, 
-    password: string, 
+    email: string,
+    password: string,
     options?: { full_name?: string; username?: string; role?: 'student' | 'employer' }
   ): Promise<{ error: Error | null }> => {
     try {

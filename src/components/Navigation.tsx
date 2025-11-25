@@ -13,7 +13,11 @@ import {
   Users,
   LogOut,
   Feather,
-  X as XIcon
+  Menu,
+  X as XIcon,
+  GraduationCap,
+  Sparkles,
+  MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -87,14 +91,31 @@ export default function Navigation() {
         { icon: Users, label: 'Applicants', path: '/applicants' },
         { icon: User, label: 'Profile', path: '/profile' }
       ];
-    } else {
-      return [
+    } else { // admin role
+      const adminItems: NavigationItem[] = [
         ...baseItems,
         { icon: BarChart3, label: 'Admin', path: '/admin' },
+      ];
+
+      // Add University Dashboard if admin belongs to a university
+      if (user?.profile?.university_id) {
+        adminItems.push({
+          icon: GraduationCap,
+          label: 'University',
+          path: '/university-dashboard'
+        });
+      }
+
+      adminItems.push(
         { icon: Users, label: 'Users', path: '/users' },
+        { icon: Briefcase, label: 'Jobs', path: '/jobs' },
+        { icon: MessageSquare, label: 'Messages', path: '/messages' },
+        { icon: Sparkles, label: 'Premium', path: '/premium-upgrade' },
         // { icon: Settings, label: 'Settings', path: '/settings' },
         { icon: User, label: 'Profile', path: '/profile' }
-      ];
+      );
+
+      return adminItems;
     }
   };
 

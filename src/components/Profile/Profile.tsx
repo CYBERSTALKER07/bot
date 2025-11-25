@@ -215,12 +215,19 @@ export default function Profile() {
   useEffect(() => {
     if (isOwnProfile && user) {
       loadProfileData();
-      fetchUserPosts();
     } else if (userId) {
       loadOtherUserProfile(userId);
-      fetchUserPosts(userId);
     }
-  }, [user?.id, userId]);
+  }, [user?.id, userId, isOwnProfile]);
+
+  // Fetch posts when user ID or active tab changes
+  useEffect(() => {
+    if (userId) {
+      fetchUserPosts(userId, activeTab);
+    } else if (user?.id) {
+      fetchUserPosts(user.id, activeTab);
+    }
+  }, [userId, user?.id, activeTab]);
 
   // Fetch follower/following counts
   useEffect(() => {
@@ -329,12 +336,13 @@ export default function Profile() {
     }
   };
 
-  const fetchUserPosts = async (targetUserId?: string) => {
+  const fetchUserPosts = async (targetUserId?: string, tab: string = activeTab) => {
     const userIdToFetch = targetUserId || user?.id;
     if (!userIdToFetch) return;
 
     try {
       setPostsLoading(true);
+      setPosts([]); // Clear current posts to show loading state
 
       // First, check if user is authenticated
       const { data: { user: currentUser } } = await supabase.auth.getUser();
@@ -344,68 +352,178 @@ export default function Profile() {
         return;
       }
 
-      // Fetch posts for the user with proper error handling
-      const { data: postsData, error: postsError } = await supabase
-        .from('posts')
-        .select(`
-          id,
-          content,
-          user_id,
-          created_at,
-          likes_count,
-          comments_count,
-          shares_count,
-          media_type,
-          image_url,
-          video_url,
-          visibility
-        `)
-        .eq('user_id', userIdToFetch)
-        .order('created_at', { ascending: false })
-        .limit(50);
+      let postsData: any[] = [];
+      let postsError = null;
+
+      if (tab === 'likes') {
+        // Fetch liked posts
+        const { data: likesData, error: likesError } = await supabase
+          .from('likes')
+          .select('post_id')
+          .eq('user_id', userIdToFetch);
+
+        if (likesError) {
+          console.error('Error fetching likes:', likesError);
+          setPosts([]);
+          return;
+        }
+
+        const postIds = likesData.map(l => l.post_id);
+
+        if (postIds.length > 0) {
+          const result = await supabase
+            .from('posts')
+            .select(`
+              id,
+              content,
+              user_id,
+              created_at,
+              likes_count,
+              comments_count,
+              shares_count,
+              media_type,
+              image_url,
+              video_url,
+              visibility
+            `)
+            .in('id', postIds)
+            .order('created_at', { ascending: false });
+
+          postsData = result.data || [];
+          postsError = result.error;
+        }
+      } else if (tab === 'replies') {
+        // Fetch comments/replies
+        // Note: We're mapping comments to the Post structure for display
+        const { data: commentsData, error: commentsError } = await supabase
+          .from('comments')
+          .select('*')
+          .eq('user_id', userIdToFetch)
+          .order('created_at', { ascending: false });
+
+        if (commentsError) {
+          console.error('Error fetching replies:', commentsError);
+          setPosts([]);
+          return;
+        }
+
+        // Transform comments to look like posts
+        postsData = (commentsData || []).map(comment => ({
+          id: comment.id,
+          content: comment.content,
+          user_id: comment.user_id,
+          created_at: comment.created_at,
+          likes_count: comment.like_count || 0,
+          comments_count: 0,
+          shares_count: 0,
+          media_type: 'text',
+          visibility: 'public',
+          is_reply: true // Flag to indicate this is a reply
+        }));
+
+      } else {
+        // Standard posts query with filters
+        let query = supabase
+          .from('posts')
+          .select(`
+            id,
+            content,
+            user_id,
+            created_at,
+            likes_count,
+            comments_count,
+            shares_count,
+            media_type,
+            image_url,
+            video_url,
+            visibility,
+            is_pinned,
+            post_type
+          `)
+          .eq('user_id', userIdToFetch);
+
+        // Apply tab-specific filters
+        if (tab === 'articles') {
+          query = query.eq('post_type', 'article');
+        } else if (tab === 'highlights') {
+          query = query.eq('is_pinned', true);
+        } else if (tab === 'media') {
+          query = query.in('media_type', ['image', 'video']);
+        }
+
+        const result = await query.order('created_at', { ascending: false });
+        postsData = result.data || [];
+        postsError = result.error;
+      }
 
       if (postsError) {
         console.error('Error fetching posts:', postsError);
-        // Don't throw error, just log it and show empty state
         setPosts([]);
         return;
       }
 
-      // Fetch profile data for the user with better error handling
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('id, full_name, username, avatar_url, verified')
-        .eq('id', userIdToFetch)
-        .single();
+      // Fetch profile data for the user
+      // For 'likes' tab, we might have different authors, so we need to fetch them
+      // For other tabs, it's the same user
 
-      if (profileError) {
-        console.warn('Error fetching profile for posts:', profileError);
-        // Use fallback data if profile fetch fails
+      let transformedPosts: Post[] = [];
+
+      if (tab === 'likes') {
+        // For likes, we need to fetch authors for each post
+        const userIds = [...new Set(postsData.map(p => p.user_id))];
+
+        const { data: authorsData } = await supabase
+          .from('profiles')
+          .select('id, full_name, username, avatar_url, verified')
+          .in('id', userIds);
+
+        const authorsMap = (authorsData || []).reduce((acc, author) => {
+          acc[author.id] = author;
+          return acc;
+        }, {} as Record<string, any>);
+
+        transformedPosts = postsData.map(post => ({
+          ...post,
+          author: {
+            id: post.user_id,
+            name: authorsMap[post.user_id]?.full_name || 'User',
+            username: authorsMap[post.user_id]?.username || 'user',
+            avatar_url: authorsMap[post.user_id]?.avatar_url,
+            verified: authorsMap[post.user_id]?.verified || false
+          }
+        }));
+      } else {
+        // For user's own posts/replies
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('id, full_name, username, avatar_url, verified')
+          .eq('id', userIdToFetch)
+          .single();
+
+        transformedPosts = postsData.map(post => ({
+          ...post,
+          author: {
+            id: userIdToFetch,
+            name: profileData?.full_name || user?.user_metadata?.full_name || 'User',
+            username: profileData?.username || user?.user_metadata?.username || 'user',
+            avatar_url: profileData?.avatar_url,
+            verified: profileData?.verified || false
+          }
+        }));
       }
-
-      // Transform posts with author information
-      const transformedPosts: Post[] = (postsData || []).map(post => ({
-        ...post,
-        author: {
-          id: userIdToFetch,
-          name: profileData?.full_name || user?.user_metadata?.full_name || 'User',
-          username: profileData?.username || user?.user_metadata?.username || 'user',
-          avatar_url: profileData?.avatar_url,
-          verified: profileData?.verified || false
-        }
-      }));
 
       setPosts(transformedPosts);
 
-      // Update profile stats with actual post count
-      setProfileStats(prev => ({
-        ...prev,
-        posts: transformedPosts.length
-      }));
+      // Only update stats if we're on the main posts tab
+      if (tab === 'posts') {
+        setProfileStats(prev => ({
+          ...prev,
+          posts: transformedPosts.length
+        }));
+      }
 
     } catch (error) {
       console.error('Error in fetchUserPosts:', error);
-      // Set empty posts array on error instead of crashing
       setPosts([]);
     } finally {
       setPostsLoading(false);
@@ -1107,44 +1225,19 @@ export default function Profile() {
                 </button>
               </div>
             </div>
-
-            {/* Verification Banner */}
-            <div className={cn("rounded-xl p-4 mb-4 border", isDark ? "bg-black border-gray-700" : "bg-[#BCE953]/10 border-[#BCE953]")}>
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className={cn("font-bold", isDark ? "text-gray-300" : "text-[#7BA805]")}>You aren't verified yet</span>
-                    <Verified className={cn("w-5 h-5", isDark ? "text-gray-400" : "text-[#7BA805]")} />
-                  </div>
-                  <p className={cn("text-sm mb-3", isDark ? "text-gray-400" : "text-gray-700")}>
-                    Get verified for boosted replies, analytics, ad-free browsing, and more.
-                    Upgrade your profile now.
-                  </p>
-                  <Button
-                    variant="filled"
-                    className="bg-[#BCE953] hover:bg-[#A8D543] text-black font-bold px-4 py-1.5 rounded-full text-sm"
-                  >
-                    Get verified
-                  </Button>
-                </div>
-                <button className={cn("transition-colors", isDark ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900")}>
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
           </div>
 
           {/* Navigation Tabs */}
           <div className={cn("border-b", isDark ? "bg-black border-gray-800" : "bg-white border-gray-200")}>
             <div className="flex">
               {[
-                { id: 'posts', label: 'Posts' },
-                { id: 'replies', label: 'Replies' },
-                { id: 'highlights', label: 'Highlights' },
                 { id: 'articles', label: 'Articles' },
+                { id: 'highlights', label: 'Highlights' },
+                { id: 'likes', label: 'Likes' },
                 { id: 'media', label: 'Media' },
-                { id: 'likes', label: 'Likes' }
-              ].map(tab => (
+                { id: 'posts', label: 'Posts' },
+                { id: 'replies', label: 'Replies' }
+              ].sort((a, b) => a.label.localeCompare(b.label)).map(tab => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}

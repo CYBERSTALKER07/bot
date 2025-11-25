@@ -76,6 +76,8 @@ const SearchDemoPage = lazy(() => import('./components/SearchDemoPage'));
 const SearchPage = lazy(() => import('./components/SearchPage'));
 const ExplorePage = lazy(() => import('./components/ExplorePage'));
 const PostEventPage = lazy(() => import('./pages/PostEventPage'));
+const UniversityDashboard = lazy(() => import('./pages/UniversityDashboard'));
+const PremiumUpgrade = lazy(() => import('./pages/PremiumUpgrade'));
 
 // LinkedIn Integration
 const LinkedInJobImport = lazy(() => import('./components/LinkedIn/LinkedInJobImport'));
@@ -161,7 +163,9 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     '/search',
     '/linkedin-job-manager',
     '/ai-job-recommendations',
-    '/explore'
+    '/explore',
+    '/university-dashboard',
+    '/premium-upgrade'
   ];
 
   // Check if current path is a protected route
@@ -360,6 +364,20 @@ function AppContent() {
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <DashboardRouter />
+            </ProtectedRoute>
+          } />
+          <Route path="/university-dashboard" element={
+            <ProtectedRoute>
+              <Suspense fallback={<LoadingFallback message="Loading university dashboard..." />}>
+                <UniversityDashboard />
+              </Suspense>
+            </ProtectedRoute>
+          } />
+          <Route path="/premium-upgrade" element={
+            <ProtectedRoute>
+              <Suspense fallback={<LoadingFallback message="Loading premium features..." />}>
+                <PremiumUpgrade />
+              </Suspense>
             </ProtectedRoute>
           } />
           <Route path="/profile-setup" element={

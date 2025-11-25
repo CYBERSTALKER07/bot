@@ -5,6 +5,18 @@ export interface User {
   name?: string;
   company?: string;
   profile?: StudentProfile | EmployerProfile | AdminProfile;
+  university_id?: string;
+  subscription_tier?: 'free' | 'student_premium' | 'university_premium';
+}
+
+export interface University {
+  id: string;
+  name: string;
+  domain: string;
+  logo_url?: string;
+  location?: string;
+  subscription_tier: 'free' | 'premium' | 'enterprise';
+  created_at: string;
 }
 
 export interface StudentProfile {
@@ -20,6 +32,8 @@ export interface StudentProfile {
   resume_url?: string;
   created_at: string;
   updated_at: string;
+  university_id?: string;
+  subscription_tier?: 'free' | 'student_premium';
 }
 
 export interface EmployerProfile {
@@ -48,6 +62,7 @@ export interface AdminProfile {
   permissions?: string[];
   created_at: string;
   updated_at: string;
+  university_id?: string;
 }
 
 export interface Job {

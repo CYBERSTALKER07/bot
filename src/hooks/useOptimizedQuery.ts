@@ -2208,6 +2208,8 @@ function getTimeAgo(dateString: string): string {
   }
 }
 
+
+
 // Helper function to format engagement count (e.g., 1234 -> "1.2K")
 function formatEngagementCount(count: number): string {
   if (count >= 1000000) {
@@ -2217,4 +2219,26 @@ function formatEngagementCount(count: number): string {
   } else {
     return count.toString();
   }
+}
+
+// Hook for updating application status
+export function useUpdateApplicationStatus() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ applicationId, status }: { applicationId: string; status: string }) => {
+      const { data, error } = await supabase
+        .from('applications')
+        .update({ status })
+        .eq('id', applicationId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['applicants'] });
+    },
+  });
 }

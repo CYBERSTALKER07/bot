@@ -1,8 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import {
   Search,
-  Filter,
   Eye,
   MessageCircle,
   CheckCircle,
@@ -10,27 +8,20 @@ import {
   Clock,
   Calendar,
   MapPin,
-  Building2,
   Star,
-  Heart,
   Download,
   ExternalLink,
   Mail,
   Phone,
   FileText,
   Award,
-  TrendingUp,
   Users,
   Briefcase,
   GraduationCap,
   X as XIcon,
   ThumbsUp,
   ThumbsDown,
-  StarIcon,
   MoreHorizontal,
-  UserCheck,
-  UserX,
-  Bookmark,
   Send
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -39,7 +30,7 @@ import Button from './ui/Button';
 import { Card } from './ui/Card';
 import PageLayout from './ui/PageLayout';
 import { cn } from '../lib/cva';
-import { useApplicants } from '../hooks/useOptimizedQuery';
+import { useApplicants, useUpdateApplicationStatus } from '../hooks/useOptimizedQuery';
 import { PostCardSkeleton } from './ui/Skeleton';
 
 interface Applicant {
@@ -73,6 +64,8 @@ export default function Applicants() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [jobFilter, setJobFilter] = useState('all');
+  const [universityFilter, setUniversityFilter] = useState('all');
+  const [majorFilter, setMajorFilter] = useState('all');
   const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState<'name' | 'date' | 'rating'>('date');
@@ -117,24 +110,37 @@ export default function Applicants() {
     return Array.from(uniqueJobs.values());
   }, [applicantsData]);
 
+  // Extract unique universities and majors for filters
+  const universities = React.useMemo(() => {
+    const unique = new Set(applicants.map(a => a.university).filter(Boolean));
+    return Array.from(unique);
+  }, [applicants]);
+
+  const majors = React.useMemo(() => {
+    const unique = new Set(applicants.map(a => a.major).filter(Boolean));
+    return Array.from(unique);
+  }, [applicants]);
+
   const filteredApplicants = applicants.filter(applicant => {
     const matchesSearch = applicant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         applicant.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         applicant.job_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         applicant.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()));
+      applicant.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      applicant.job_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      applicant.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesStatus = statusFilter === 'all' || applicant.status === statusFilter;
     const matchesJob = jobFilter === 'all' || applicant.job_id === jobFilter;
-    
-    return matchesSearch && matchesStatus && matchesJob;
+    const matchesUniversity = universityFilter === 'all' || applicant.university === universityFilter;
+    const matchesMajor = majorFilter === 'all' || applicant.major === majorFilter;
+
+    return matchesSearch && matchesStatus && matchesJob && matchesUniversity && matchesMajor;
   }).sort((a, b) => {
     switch (sortBy) {
       case 'name':
         return a.name.localeCompare(b.name);
       case 'rating':
-        return (b.rating || 0) - (a.rating || 0);
+        return (b.rating || 0)-(a.rating || 0);
       case 'date':
       default:
-        return new Date(b.applied_date).getTime() - new Date(a.applied_date).getTime();
+        return new Date(b.applied_date).getTime()-new Date(a.applied_date).getTime();
     }
   });
 
@@ -169,9 +175,19 @@ export default function Applicants() {
     }
   };
 
-  const handleStatusUpdate = (applicantId: string, newStatus: string) => {
-    // In a real app, this would make an API call
-    console.log(`Updating applicant ${applicantId} status to ${newStatus}`);
+  const updateStatusMutation = useUpdateApplicationStatus();
+
+  const handleStatusUpdate = async (applicantId: string, newStatus: string) => {
+    try {
+      await updateStatusMutation.mutateAsync({ applicationId: applicantId, status: newStatus });
+      // Optimistic update or wait for refetch (handled by query invalidation)
+      if (selectedApplicant && selectedApplicant.id === applicantId) {
+        setSelectedApplicant(prev => prev ? { ...prev, status: newStatus as any } : null);
+      }
+    } catch (error) {
+      console.error('Error updating status:', error);
+      alert('Failed to update status');
+    }
   };
 
   if (loading) {
@@ -198,14 +214,14 @@ export default function Applicants() {
   }
 
   return (
-    <PageLayout 
+    <PageLayout
       className={isDark ? 'bg-black text-white' : 'bg-white text-black'}
       maxWidth="7xl"
     >
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Applicant Management</h1>
-        <p className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+        <p className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-600'} `}>
           Review and manage job applications from talented students
         </p>
       </div>
@@ -215,19 +231,17 @@ export default function Applicants() {
         {Object.entries(statusCounts).map(([status, count]) => (
           <div
             key={status}
-            className={`p-4 text-center hover:shadow-lg transition-all duration-200 cursor-pointer border-b ${
-              statusFilter === status 
-                ? (isDark ? 'bg-info-900 border-info-700' : 'bg-info-50 border-info-200')
-                : (isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200')
-            }`}
+            className={`p-4 text-center hover: shadow-lg transition-all duration-200 cursor-pointer border-b ${statusFilter === status
+              ? (isDark ? 'bg-info-900 border-info-700' : 'bg-info-50 border-info-200')
+              : (isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200')
+              } `}
             onClick={() => setStatusFilter(status)}
           >
             <div className="text-2xl font-bold mb-1">
               {count}
             </div>
-            <div className={`text-sm capitalize ${
-              isDark ? 'text-gray-400' : 'text-gray-600'
-            }`}>
+            <div className={`text-sm capitalize ${isDark ? 'text-gray-400' : 'text-gray-600'
+              } `}>
               {status === 'all' ? 'Total' : status}
             </div>
           </div>
@@ -235,7 +249,7 @@ export default function Applicants() {
       </div>
 
       {/* Search and Filters */}
-      <div className={`p-6 mb-8 border-b ${isDark ? 'border-gray-800' : 'border-gray-200'}`}>
+      <div className={`p-6 mb-8 border-b ${isDark ? 'border-gray-800' : 'border-gray-200'} `}>
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
@@ -245,24 +259,22 @@ export default function Applicants() {
                 placeholder="Search applicants by name, email, skills..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className={`w-full pl-10 pr-4 py-3 rounded-lg border ${
-                  isDark 
-                    ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-400' 
-                    : 'bg-white border-gray-300 text-black placeholder-gray-500'
-                }`}
+                className={`w-full pl-10 pr-4 py-3 rounded-lg border ${isDark
+                  ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-400'
+                  : 'bg-white border-gray-300 text-black placeholder-gray-500'
+                  } `}
               />
             </div>
           </div>
-          
+
           <div className="flex flex-wrap gap-3">
             <select
               value={jobFilter}
               onChange={(e) => setJobFilter(e.target.value)}
-              className={`px-4 py-3 rounded-lg border ${
-                isDark 
-                  ? 'bg-gray-900 border-gray-700 text-white' 
-                  : 'bg-white border-gray-300 text-black'
-              }`}
+              className={`px-4 py-3 rounded-lg border ${isDark
+                ? 'bg-gray-900 border-gray-700 text-white'
+                : 'bg-white border-gray-300 text-black'
+                } `}
             >
               <option value="all">All Jobs</option>
               {jobs.map(job => (
@@ -271,13 +283,40 @@ export default function Applicants() {
             </select>
 
             <select
+              value={universityFilter}
+              onChange={(e) => setUniversityFilter(e.target.value)}
+              className={`px-4 py-3 rounded-lg border ${isDark
+                ? 'bg-gray-900 border-gray-700 text-white'
+                : 'bg-white border-gray-300 text-black'
+                } `}
+            >
+              <option value="all">All Universities</option>
+              {universities.map((uni, i) => (
+                <option key={i} value={uni}>{uni}</option>
+              ))}
+            </select>
+
+            <select
+              value={majorFilter}
+              onChange={(e) => setMajorFilter(e.target.value)}
+              className={`px-4 py-3 rounded-lg border ${isDark
+                ? 'bg-gray-900 border-gray-700 text-white'
+                : 'bg-white border-gray-300 text-black'
+                } `}
+            >
+              <option value="all">All Majors</option>
+              {majors.map((major, i) => (
+                <option key={i} value={major}>{major}</option>
+              ))}
+            </select>
+
+            <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as 'name' | 'date' | 'rating')}
-              className={`px-4 py-3 rounded-lg border ${
-                isDark 
-                  ? 'bg-gray-900 border-gray-700 text-white' 
-                  : 'bg-white border-gray-300 text-black'
-              }`}
+              className={`px-4 py-3 rounded-lg border ${isDark
+                ? 'bg-gray-900 border-gray-700 text-white'
+                : 'bg-white border-gray-300 text-black'
+                } `}
             >
               <option value="date">Sort by Date</option>
               <option value="name">Sort by Name</option>
@@ -287,11 +326,10 @@ export default function Applicants() {
             <div className="flex border rounded-lg overflow-hidden">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`px-4 py-3 transition-colors ${
-                  viewMode === 'grid' 
-                    ? (isDark ? 'bg-info-600 text-white' : 'bg-info-500 text-white')
-                    : (isDark ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')
-                }`}
+                className={`px-4 py-3 transition-colors ${viewMode === 'grid'
+                  ? (isDark ? 'bg-info-600 text-white' : 'bg-info-500 text-white')
+                  : (isDark ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')
+                  } `}
               >
                 <div className="grid grid-cols-2 gap-1">
                   <div className="w-2 h-2 bg-current rounded"></div>
@@ -302,11 +340,10 @@ export default function Applicants() {
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`px-4 py-3 transition-colors ${
-                  viewMode === 'list' 
-                    ? (isDark ? 'bg-info-600 text-white' : 'bg-info-500 text-white')
-                    : (isDark ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')
-                }`}
+                className={`px-4 py-3 transition-colors ${viewMode === 'list'
+                  ? (isDark ? 'bg-info-600 text-white' : 'bg-info-500 text-white')
+                  : (isDark ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')
+                  } `}
               >
                 <div className="space-y-1">
                   <div className="w-4 h-0.5 bg-current"></div>
@@ -325,20 +362,18 @@ export default function Applicants() {
           {filteredApplicants.map((applicant) => (
             <div
               key={applicant.id}
-              className={`p-6 hover:bg-gray-50/50 transition-all duration-300 cursor-pointer border-b ${
-                isDark ? 'bg-black border-gray-800 hover:bg-gray-950/50' : 'bg-white border-gray-200 hover:bg-gray-50/50'
-              }`}
+              className={`p-6 hover: bg-gray-50/50 transition-all duration-300 cursor-pointer border-b ${isDark ? 'bg-black border-gray-800 hover:bg-gray-950/50' : 'bg-white border-gray-200 hover:bg-gray-50/50'
+                } `}
               onClick={() => setSelectedApplicant(applicant)}
             >
               {/* Profile Header */}
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-3">
-                  <div className={`w-12 h-12 rounded-full overflow-hidden ${
-                    isDark ? 'bg-gray-800' : 'bg-gray-200'
-                  }`}>
+                  <div className={`w-12 h-12 rounded-full overflow-hidden ${isDark ? 'bg-gray-800' : 'bg-gray-200'
+                    } `}>
                     {applicant.avatar ? (
-                      <img 
-                        src={applicant.avatar} 
+                      <img
+                        src={applicant.avatar}
                         alt={applicant.name}
                         className="w-full h-full object-cover"
                       />
@@ -350,21 +385,20 @@ export default function Applicants() {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold">{applicant.name}</h3>
-                    <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'} `}>
                       {applicant.major} • {applicant.university}
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-1">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`h-4 w-4 ${
-                        i < Math.floor(applicant.rating || 0) 
-                          ? 'text-yellow-400 fill-current' 
-                          : (isDark ? 'text-gray-600' : 'text-gray-300')
-                      }`}
+                      className={`h-4 w-4 ${i < Math.floor(applicant.rating || 0)
+                        ? 'text-yellow-400 fill-current'
+                        : (isDark ? 'text-gray-600' : 'text-gray-300')
+                        } `}
                     />
                   ))}
                 </div>
@@ -382,7 +416,7 @@ export default function Applicants() {
                     {applicant.status.charAt(0).toUpperCase() + applicant.status.slice(1)}
                   </span>
                 </div>
-                
+
                 <div className="flex items-center justify-between text-sm text-gray-500">
                   <div className="flex items-center space-x-1">
                     <MapPin className="h-4 w-4" />
@@ -401,18 +435,16 @@ export default function Applicants() {
                   {applicant.skills.slice(0, 4).map((skill, index) => (
                     <span
                       key={index}
-                      className={`px-2 py-1 rounded text-xs font-medium ${
-                        isDark ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-700'
-                      }`}
+                      className={`px-2 py-1 rounded text-xs font-medium ${isDark ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-700'
+                        } `}
                     >
                       {skill}
                     </span>
                   ))}
                   {applicant.skills.length > 4 && (
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      isDark ? 'bg-gray-700 text-gray-400' : 'bg-gray-200 text-gray-600'
-                    }`}>
-                      +{applicant.skills.length - 4}
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${isDark ? 'bg-gray-700 text-gray-400' : 'bg-gray-200 text-gray-600'
+                      } `}>
+                      +{applicant.skills.length-4}
                     </span>
                   )}
                 </div>
@@ -442,6 +474,18 @@ export default function Applicants() {
                 <Button
                   variant="ghost"
                   size="sm"
+                  className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleStatusUpdate(applicant.id, 'hired');
+                  }}
+                  title="Hire Applicant"
+                >
+                  <CheckCircle className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <MoreHorizontal className="h-4 w-4" />
@@ -455,7 +499,7 @@ export default function Applicants() {
         <div className="overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className={`border-b ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-gray-50 border-gray-200'}`}>
+              <thead className={`border-b ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-gray-50 border-gray-200'} `}>
                 <tr>
                   <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">
                     Applicant
@@ -477,23 +521,21 @@ export default function Applicants() {
                   </th>
                 </tr>
               </thead>
-              <tbody className={`divide-y ${isDark ? 'divide-gray-800' : 'divide-gray-200'}`}>
+              <tbody className={`divide-y ${isDark ? 'divide-gray-800' : 'divide-gray-200'} `}>
                 {filteredApplicants.map((applicant) => (
-                  <tr 
-                    key={applicant.id} 
-                    className={`hover:${isDark ? 'bg-gray-950/50' : 'bg-gray-50/50'} transition-colors cursor-pointer border-b ${
-                      isDark ? 'border-gray-800' : 'border-gray-200'
-                    }`}
+                  <tr
+                    key={applicant.id}
+                    className={`hover:${isDark ? 'bg-gray-950/50' : 'bg-gray-50/50'} transition-colors cursor-pointer border-b ${isDark ? 'border-gray-800' : 'border-gray-200'
+                      } `}
                     onClick={() => setSelectedApplicant(applicant)}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className={`w-10 h-10 rounded-full overflow-hidden ${
-                          isDark ? 'bg-gray-800' : 'bg-gray-200'
-                        }`}>
+                        <div className={`w-10 h-10 rounded-full overflow-hidden ${isDark ? 'bg-gray-800' : 'bg-gray-200'
+                          } `}>
                           {applicant.avatar ? (
-                            <img 
-                              src={applicant.avatar} 
+                            <img
+                              src={applicant.avatar}
                               alt={applicant.name}
                               className="w-full h-full object-cover"
                             />
@@ -505,7 +547,7 @@ export default function Applicants() {
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium">{applicant.name}</div>
-                          <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                          <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} `}>
                             {applicant.email}
                           </div>
                         </div>
@@ -531,11 +573,10 @@ export default function Applicants() {
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
-                            className={`h-4 w-4 ${
-                              i < Math.floor(applicant.rating || 0) 
-                                ? 'text-yellow-400 fill-current' 
-                                : (isDark ? 'text-gray-600' : 'text-gray-300')
-                            }`}
+                            className={`h-4 w-4 ${i < Math.floor(applicant.rating || 0)
+                              ? 'text-yellow-400 fill-current'
+                              : (isDark ? 'text-gray-600' : 'text-gray-300')
+                              } `}
                           />
                         ))}
                         <span className="ml-2 text-sm">{applicant.rating}</span>
@@ -580,14 +621,13 @@ export default function Applicants() {
       {/* Empty State */}
       {filteredApplicants.length === 0 && (
         <Card className="text-center py-12">
-          <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
-            isDark ? 'bg-gray-800' : 'bg-gray-100'
-          }`}>
+          <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${isDark ? 'bg-gray-800' : 'bg-gray-100'
+            } `}>
             <Users className="h-8 w-8 text-gray-400" />
           </div>
           <h3 className="text-xl font-semibold mb-2">No applicants found</h3>
-          <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-            {searchTerm || statusFilter !== 'all' || jobFilter !== 'all' 
+          <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'} `}>
+            {searchTerm || statusFilter !== 'all' || jobFilter !== 'all'
               ? 'Try adjusting your search or filters'
               : 'No applications have been received yet'
             }
@@ -608,18 +648,16 @@ export default function Applicants() {
       {selectedApplicant && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <Card className="max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            
+
             {/* Modal Header */}
-            <div className={`sticky top-0 z-10 backdrop-blur-xl border-b px-6 py-4 flex items-center justify-between ${
-              isDark ? 'bg-gray-900/80 border-gray-700' : 'bg-white/80 border-gray-200'
-            }`}>
+            <div className={`sticky top-0 z-10 backdrop-blur-xl border-b px-6 py-4 flex items-center justify-between ${isDark ? 'bg-gray-900/80 border-gray-700' : 'bg-white/80 border-gray-200'
+              } `}>
               <div className="flex items-center space-x-4">
-                <div className={`w-16 h-16 rounded-full overflow-hidden ${
-                  isDark ? 'bg-gray-800' : 'bg-gray-200'
-                }`}>
+                <div className={`w-16 h-16 rounded-full overflow-hidden ${isDark ? 'bg-gray-800' : 'bg-gray-200'
+                  } `}>
                   {selectedApplicant.avatar ? (
-                    <img 
-                      src={selectedApplicant.avatar} 
+                    <img
+                      src={selectedApplicant.avatar}
                       alt={selectedApplicant.name}
                       className="w-full h-full object-cover"
                     />
@@ -637,11 +675,10 @@ export default function Applicants() {
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
-                          className={`h-4 w-4 ${
-                            i < Math.floor(selectedApplicant.rating || 0) 
-                              ? 'text-yellow-400 fill-current' 
-                              : (isDark ? 'text-gray-600' : 'text-gray-300')
-                          }`}
+                          className={`h-4 w-4 ${i < Math.floor(selectedApplicant.rating || 0)
+                            ? 'text-yellow-400 fill-current'
+                            : (isDark ? 'text-gray-600' : 'text-gray-300')
+                            } `}
                         />
                       ))}
                       <span className="ml-2 text-sm">{selectedApplicant.rating}/5</span>
@@ -668,17 +705,17 @@ export default function Applicants() {
             {/* Modal Content */}
             <div className="p-6">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                
+
                 {/* Main Content */}
                 <div className="lg:col-span-2 space-y-6">
-                  
+
                   {/* Cover Letter */}
                   <div>
                     <h3 className="text-lg font-semibold mb-3 flex items-center">
                       <FileText className="h-5 w-5 mr-2" />
                       Cover Letter
                     </h3>
-                    <div className={`p-4 rounded-lg ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
+                    <div className={`p-4 rounded-lg ${isDark ? 'bg-gray-900' : 'bg-gray-50'} `}>
                       <p className="leading-relaxed">{selectedApplicant.cover_letter}</p>
                     </div>
                   </div>
@@ -693,9 +730,8 @@ export default function Applicants() {
                       {selectedApplicant.skills.map((skill, index) => (
                         <span
                           key={index}
-                          className={`px-3 py-1 rounded-full text-sm font-medium ${
-                            isDark ? 'bg-info-900 text-info-200' : 'bg-info-100 text-info-800'
-                          }`}
+                          className={`px-3 py-1 rounded-full text-sm font-medium ${isDark ? 'bg-info-900 text-info-200' : 'bg-info-100 text-info-800'
+                            } `}
                         >
                           {skill}
                         </span>
@@ -710,7 +746,14 @@ export default function Applicants() {
                       onClick={() => handleStatusUpdate(selectedApplicant.id, 'shortlisted')}
                     >
                       <ThumbsUp className="h-4 w-4 mr-2" />
-                      Accept
+                      Shortlist
+                    </Button>
+                    <Button
+                      className="flex-1 bg-green-600 text-white hover:bg-green-700"
+                      onClick={() => handleStatusUpdate(selectedApplicant.id, 'hired')}
+                    >
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Hire Now
                     </Button>
                     <Button
                       variant="outlined"
@@ -725,7 +768,7 @@ export default function Applicants() {
 
                 {/* Sidebar */}
                 <div className="space-y-6">
-                  
+
                   {/* Contact Info */}
                   <div>
                     <h4 className="font-semibold mb-3 flex items-center">
@@ -735,14 +778,14 @@ export default function Applicants() {
                     <div className="space-y-2">
                       <div className="flex items-center space-x-2 text-sm">
                         <Mail className="h-4 w-4 text-gray-400" />
-                        <a href={`mailto:${selectedApplicant.email}`} className="text-info-500 hover:underline">
+                        <a href={`mailto:${selectedApplicant.email} `} className="text-info-500 hover:underline">
                           {selectedApplicant.email}
                         </a>
                       </div>
                       {selectedApplicant.phone && (
                         <div className="flex items-center space-x-2 text-sm">
                           <Phone className="h-4 w-4 text-gray-400" />
-                          <a href={`tel:${selectedApplicant.phone}`} className="text-info-500 hover:underline">
+                          <a href={`tel:${selectedApplicant.phone} `} className="text-info-500 hover:underline">
                             {selectedApplicant.phone}
                           </a>
                         </div>
