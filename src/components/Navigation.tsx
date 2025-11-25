@@ -150,39 +150,25 @@ export default function Navigation() {
       <>
         {/* Mobile Top Bar */}
 
-        <header className={`fixed top-0 left-0 right-0 z-50 border-none ${isDark ? 'bg-black/95 backdrop-blur-xl border-gray-800' : 'bg-white/95 backdrop-blur-xl border-gray-200'
-          }`}>
+        <header className={cn(
+          "fixed top-0 left-0 right-0 z-50 border-b transition-transform duration-300",
+          isDark ? 'bg-black/80 backdrop-blur-xl border-gray-800' : 'bg-white/80 backdrop-blur-xl border-gray-200',
+          !isBottomNavVisible ? '-translate-y-full' : 'translate-y-0'
+        )}>
           {/* iOS Status Bar Safe Area */}
-          {/* <div className="h-5 bg-black ios-only" />
-          <div className="h-5 bg-black ios-only" /> */}
+          {/* <div className="h-5 bg-black ios-only" /> */}
 
-          <div className="flex items-center justify-between px-4 py-3">
-            {/* <div className="flex items-center space-x-3">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                isDark ? 'bg-white' : 'bg-black'
-              }`}>
-                <Sparkles className={`size-4 ${isDark ? 'text-black' : 'text-white'}`} />
-              </div>
-              <span className={`font-light text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                AUT Handshake
-              </span>
-            </div> */}
-
-            <Button
-              variant="ghost"
-              size="small"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className={cn(
-                "p-2 rounded-full transition-colors duration-200",
-                isDark ? 'hover:bg-black text-white' : 'hover:bg-gray-100'
-              )}
-              aria-expanded={isMobileMenuOpen}
-              aria-label="Toggle menu"
-            >
-              {isMobileMenuOpen ? (
-                <XIcon className="size-5" />
-              ) : (
-                <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-normal overflow-hidden border border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-700">
+          <div className="flex items-center justify-between px-4 h-[53px]">
+            {/* Left: Avatar (Menu) */}
+            <div className="flex-1 flex justify-start">
+              <Button
+                variant="ghost"
+                size="small"
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="p-0 rounded-full"
+                aria-label="Open menu"
+              >
+                <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700">
                   {user?.profile?.avatar_url ? (
                     <img
                       src={user.profile.avatar_url}
@@ -190,13 +176,39 @@ export default function Navigation() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <span className="text-gray-700 dark:text-gray-200 font-semibold">
-                      {user?.profile?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
-                    </span>
+                    <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                      <span className="text-xs font-bold text-gray-500 dark:text-gray-400">
+                        {user?.profile?.full_name?.charAt(0)?.toUpperCase() || 'U'}
+                      </span>
+                    </div>
                   )}
                 </div>
-              )}
-            </Button>
+              </Button>
+            </div>
+
+            {/* Center: Logo */}
+            <div className="flex-1 flex justify-center">
+              <div className={cn(
+                "w-8 h-8 rounded-full flex items-center justify-center",
+                isDark ? 'bg-white text-black' : 'bg-black text-white'
+              )}>
+                <Sparkles className="size-5" />
+              </div>
+            </div>
+
+            {/* Right: Settings/Action (Placeholder for now, maybe Settings or nothing) */}
+            <div className="flex-1 flex justify-end">
+              <Button
+                variant="ghost"
+                size="small"
+                className={cn(
+                  "rounded-full",
+                  isDark ? 'text-white hover:bg-gray-800' : 'text-black hover:bg-gray-100'
+                )}
+              >
+                <Sparkles className="size-5" />
+              </Button>
+            </div>
           </div>
         </header>
 

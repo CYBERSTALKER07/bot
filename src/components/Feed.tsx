@@ -16,6 +16,7 @@ import Button from './ui/Button';
 import Avatar from './ui/Avatar';
 import PageLayout from './ui/PageLayout';
 import { cn } from '../lib/cva';
+import SegmentedControl from './ui/SegmentedControl';
 import { usePosts, useCreatePost, useProfile, useRecommendedUsers, useRecommendedCompanies, useLikePost, useMatchedJobs, useMostLikedPosts, useBookmarkPost, useSearch } from '../hooks/useOptimizedQuery';
 import { useJobs } from '../hooks/useJobs';
 import { useCreateRetweet } from '../hooks/useRetweet';
@@ -430,31 +431,15 @@ export default function Feed() {
             isDark ? 'bg-black/80 border-[#1C1F20] ' : 'bg-white/80 border-gray-200',
             isMobile ? 'top-16' : 'top-0'
           )}>
-            <div className="flex items-center justify-around h-[53px]">
-              <button
-                onClick={() => setActiveTab('for-you')}
-                className={cn(
-                  'flex-1 h-full flex items-center justify-center relative hover:bg-gray-200/10 transition-colors',
-                  activeTab === 'for-you' ? 'font-bold' : 'font-medium text-gray-500'
-                )}
+            <div className="p-2">
+              <SegmentedControl
+                value={activeTab}
+                onChange={(val) => setActiveTab(val as 'for-you' | 'explore')}
+                className="w-full"
               >
-                <span>For you</span>
-                {activeTab === 'for-you' && (
-                  <div className="absolute bottom-0 w-14 h-1 bg-info-500 rounded-full" />
-                )}
-              </button>
-              <button
-                onClick={() => setActiveTab('explore')}
-                className={cn(
-                  'flex-1 h-full flex items-center justify-center relative hover:bg-gray-200/10 transition-colors',
-                  activeTab === 'explore' ? 'font-bold' : 'font-medium text-gray-500'
-                )}
-              >
-                <span>Explore</span>
-                {activeTab === 'explore' && (
-                  <div className="absolute bottom-0 w-16 h-1 bg-info-500 rounded-full" />
-                )}
-              </button>
+                <SegmentedControl.Option value="for-you">For you</SegmentedControl.Option>
+                <SegmentedControl.Option value="explore">Explore</SegmentedControl.Option>
+              </SegmentedControl>
             </div>
           </div>
 

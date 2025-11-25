@@ -34,14 +34,15 @@ import Button from '../ui/Button';
 import { Card } from '../ui/Card';
 import PageLayout from '../ui/PageLayout';
 import { cn } from '../../lib/cva';
-import { 
-  linkedInService, 
-  LinkedInJob, 
-  JobImportSettings, 
+import {
+  linkedInService,
+  LinkedInJob,
+  JobImportSettings,
   LinkedInProfile,
   LinkedInUtils
 } from '../../lib/linkedin-service';
 import { Job } from '../../types';
+import SegmentedControl from '../ui/SegmentedControl';
 
 interface ImportProgress {
   current: number;
@@ -54,7 +55,7 @@ interface ImportProgress {
 export default function LinkedInJobImport() {
   const { isDark } = useTheme();
   const { user } = useAuth();
-  
+
   const [isConnected, setIsConnected] = useState(false);
   const [linkedInProfile, setLinkedInProfile] = useState<LinkedInProfile | null>(null);
   const [importSettings, setImportSettings] = useState<JobImportSettings>({
@@ -88,7 +89,7 @@ export default function LinkedInJobImport() {
     try {
       const connected = linkedInService.isAuthenticated();
       setIsConnected(connected);
-      
+
       if (connected) {
         const profile = await linkedInService.getUserProfile();
         setLinkedInProfile(profile);
@@ -157,7 +158,7 @@ export default function LinkedInJobImport() {
     if (!isConnected || selectedJobs.size === 0) return;
 
     const jobsToImport = previewJobs.filter(job => selectedJobs.has(job.id));
-    
+
     setImportProgress({
       current: 0,
       total: jobsToImport.length,
@@ -226,11 +227,11 @@ export default function LinkedInJobImport() {
               <Linkedin className="h-16 w-16 text-info-600" />
             </div>
           </div>
-          
+
           <div className="space-y-4">
             <h1 className="text-3xl font-bold">Connect with LinkedIn</h1>
             <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              Import jobs from LinkedIn and allow candidates to apply through your platform. 
+              Import jobs from LinkedIn and allow candidates to apply through your platform.
               Connect your LinkedIn account to get started with job importing and application management.
             </p>
           </div>
@@ -243,7 +244,7 @@ export default function LinkedInJobImport() {
               <Linkedin className="h-5 w-5 mr-2" />
               Connect LinkedIn Account
             </Button>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-12">
               <Card className="p-6 text-center">
                 <Download className="h-8 w-8 mx-auto mb-4 text-info-500" />
@@ -252,7 +253,7 @@ export default function LinkedInJobImport() {
                   Automatically import job postings from LinkedIn with advanced filtering
                 </p>
               </Card>
-              
+
               <Card className="p-6 text-center">
                 <Users className="h-8 w-8 mx-auto mb-4 text-green-500" />
                 <h3 className="font-semibold mb-2">Manage Applications</h3>
@@ -260,7 +261,7 @@ export default function LinkedInJobImport() {
                   Let candidates apply through your platform with integrated tracking
                 </p>
               </Card>
-              
+
               <Card className="p-6 text-center">
                 <BarChart3 className="h-8 w-8 mx-auto mb-4 text-purple-500" />
                 <h3 className="font-semibold mb-2">Analytics & Insights</h3>
@@ -278,9 +279,8 @@ export default function LinkedInJobImport() {
   return (
     <PageLayout className={isDark ? 'bg-black text-white' : 'bg-white text-black'} maxWidth="full" padding="none">
       {/* Header */}
-      <div className={`sticky top-0 z-10 backdrop-blur-xl border-b ${
-        isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
-      }`}>
+      <div className={`sticky top-0 z-10 backdrop-blur-xl border-b ${isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
+        }`}>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -294,7 +294,7 @@ export default function LinkedInJobImport() {
                 </p>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               {linkedInProfile && (
                 <div className="flex items-center space-x-2 text-sm">
@@ -302,7 +302,7 @@ export default function LinkedInJobImport() {
                   <span>Connected as {LinkedInUtils.formatProfileName(linkedInProfile)}</span>
                 </div>
               )}
-              
+
               <Button
                 onClick={disconnectFromLinkedIn}
                 variant="outlined"
@@ -333,7 +333,7 @@ export default function LinkedInJobImport() {
                   {showSettings ? <X className="h-4 w-4" /> : <Settings className="h-4 w-4" />}
                 </Button>
               </div>
-              
+
               {showSettings && (
                 <div className="space-y-4">
                   {/* Keywords */}
@@ -395,24 +395,24 @@ export default function LinkedInJobImport() {
                   {/* Experience Levels */}
                   <div>
                     <label className="block text-sm font-medium mb-2">Experience Level</label>
-                    <select
-                      className={cn(
-                        'w-full p-2 rounded-lg border',
-                        isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'
-                      )}
-                      onChange={(e) => setImportSettings(prev => ({
-                        ...prev,
-                        experienceLevels: e.target.value ? [e.target.value] : []
-                      }))}
-                    >
-                      <option value="">All Levels</option>
-                      <option value="INTERNSHIP">Internship</option>
-                      <option value="ENTRY_LEVEL">Entry Level</option>
-                      <option value="ASSOCIATE">Associate</option>
-                      <option value="MID_SENIOR_LEVEL">Mid-Senior Level</option>
-                      <option value="DIRECTOR">Director</option>
-                      <option value="EXECUTIVE">Executive</option>
-                    </select>
+                    <div className="overflow-x-auto">
+                      <SegmentedControl
+                        value={importSettings.experienceLevels?.[0] || ''}
+                        onChange={(val) => setImportSettings(prev => ({
+                          ...prev,
+                          experienceLevels: val ? [val] : []
+                        }))}
+                        aria-label="Experience level"
+                      >
+                        <SegmentedControl.Option value="">All</SegmentedControl.Option>
+                        <SegmentedControl.Option value="INTERNSHIP">Intern</SegmentedControl.Option>
+                        <SegmentedControl.Option value="ENTRY_LEVEL">Entry</SegmentedControl.Option>
+                        <SegmentedControl.Option value="ASSOCIATE">Assoc</SegmentedControl.Option>
+                        <SegmentedControl.Option value="MID_SENIOR_LEVEL">Mid-Sr</SegmentedControl.Option>
+                        <SegmentedControl.Option value="DIRECTOR">Dir</SegmentedControl.Option>
+                        <SegmentedControl.Option value="EXECUTIVE">Exec</SegmentedControl.Option>
+                      </SegmentedControl>
+                    </div>
                   </div>
 
                   {/* Remote Work */}
@@ -434,43 +434,41 @@ export default function LinkedInJobImport() {
                   {/* Date Posted */}
                   <div>
                     <label className="block text-sm font-medium mb-2">Date Posted</label>
-                    <select
-                      className={cn(
-                        'w-full p-2 rounded-lg border',
-                        isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'
-                      )}
-                      value={importSettings.datePosted}
-                      onChange={(e) => setImportSettings(prev => ({
-                        ...prev,
-                        datePosted: e.target.value as any
-                      }))}
-                    >
-                      <option value="past24Hours">Past 24 hours</option>
-                      <option value="pastWeek">Past week</option>
-                      <option value="pastMonth">Past month</option>
-                      <option value="anytime">Any time</option>
-                    </select>
+                    <div className="overflow-x-auto">
+                      <SegmentedControl
+                        value={importSettings.datePosted}
+                        onChange={(val) => setImportSettings(prev => ({
+                          ...prev,
+                          datePosted: val as any
+                        }))}
+                        aria-label="Date posted"
+                      >
+                        <SegmentedControl.Option value="past24Hours">24h</SegmentedControl.Option>
+                        <SegmentedControl.Option value="pastWeek">Week</SegmentedControl.Option>
+                        <SegmentedControl.Option value="pastMonth">Month</SegmentedControl.Option>
+                        <SegmentedControl.Option value="anytime">Any</SegmentedControl.Option>
+                      </SegmentedControl>
+                    </div>
                   </div>
 
                   {/* Limit */}
                   <div>
                     <label className="block text-sm font-medium mb-2">Import Limit</label>
-                    <select
-                      className={cn(
-                        'w-full p-2 rounded-lg border',
-                        isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'
-                      )}
-                      value={importSettings.limit}
-                      onChange={(e) => setImportSettings(prev => ({
-                        ...prev,
-                        limit: parseInt(e.target.value)
-                      }))}
-                    >
-                      <option value={25}>25 jobs</option>
-                      <option value={50}>50 jobs</option>
-                      <option value={100}>100 jobs</option>
-                      <option value={200}>200 jobs</option>
-                    </select>
+                    <div className="overflow-x-auto">
+                      <SegmentedControl
+                        value={String(importSettings.limit)}
+                        onChange={(val) => setImportSettings(prev => ({
+                          ...prev,
+                          limit: parseInt(val)
+                        }))}
+                        aria-label="Import limit"
+                      >
+                        <SegmentedControl.Option value="25">25</SegmentedControl.Option>
+                        <SegmentedControl.Option value="50">50</SegmentedControl.Option>
+                        <SegmentedControl.Option value="100">100</SegmentedControl.Option>
+                        <SegmentedControl.Option value="200">200</SegmentedControl.Option>
+                      </SegmentedControl>
+                    </div>
                   </div>
                 </div>
               )}
@@ -483,17 +481,17 @@ export default function LinkedInJobImport() {
                   <RefreshCw className="h-5 w-5 mr-2 animate-spin" />
                   <h3 className="font-semibold">Importing Jobs</h3>
                 </div>
-                
+
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Progress</span>
                     <span>{importProgress.current} / {importProgress.total}</span>
                   </div>
                   <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-info-500 h-2 rounded-full transition-all duration-300"
-                      style={{ 
-                        width: `${(importProgress.current / importProgress.total) * 100}%` 
+                      style={{
+                        width: `${(importProgress.current / importProgress.total) * 100}%`
                       }}
                     />
                   </div>
@@ -508,7 +506,7 @@ export default function LinkedInJobImport() {
                   <CheckCircle className="h-5 w-5 mr-2 text-green-500" />
                   <h3 className="font-semibold">Import Complete</h3>
                 </div>
-                
+
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>Jobs Imported:</span>
@@ -546,7 +544,7 @@ export default function LinkedInJobImport() {
                   <Search className="h-4 w-4" />
                   <span>{isLoadingPreview ? 'Searching...' : 'Preview Jobs'}</span>
                 </Button>
-                
+
                 {previewJobs.length > 0 && (
                   <>
                     <Button
@@ -556,7 +554,7 @@ export default function LinkedInJobImport() {
                     >
                       Select All ({previewJobs.length})
                     </Button>
-                    
+
                     <Button
                       onClick={deselectAllJobs}
                       variant="outlined"
@@ -567,7 +565,7 @@ export default function LinkedInJobImport() {
                   </>
                 )}
               </div>
-              
+
               {selectedJobs.size > 0 && (
                 <Button
                   onClick={startImport}
@@ -636,7 +634,7 @@ const LinkedInJobCard: React.FC<{
             onChange={onToggleSelection}
             className="mt-1 rounded"
           />
-          
+
           <div className="flex-1">
             <div className="flex items-center space-x-3 mb-2">
               <h3 className="text-xl font-bold">{job.title}</h3>
@@ -646,7 +644,7 @@ const LinkedInJobCard: React.FC<{
                 </span>
               )}
             </div>
-            
+
             <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400 mb-3">
               <span className="flex items-center">
                 <Building2 className="h-4 w-4 mr-1" />
@@ -708,12 +706,12 @@ const LinkedInJobCard: React.FC<{
               Remote Friendly
             </span>
           )}
-          
+
           <span className="text-sm text-gray-500">
             {job.experienceLevel.replace('_', ' ')}
           </span>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           {job.applicationUrl && (
             <Button
@@ -725,7 +723,7 @@ const LinkedInJobCard: React.FC<{
               View on LinkedIn
             </Button>
           )}
-          
+
           <Button
             size="sm"
             onClick={onApply}

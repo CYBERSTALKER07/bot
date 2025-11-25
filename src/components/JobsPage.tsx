@@ -14,18 +14,18 @@ export default function JobsPage() {
   const { isDark } = useTheme();
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
-  
+
   const { jobs: jobsData = [], loading, error } = useJobs();
 
   // Filter jobs based on search and type
   const filteredJobs = (jobsData || []).filter(job => {
-    const matchesSearch = 
+    const matchesSearch =
       (job.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (job.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (job.company || '').toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesType = typeFilter === 'all' || job.type === typeFilter;
-    
+
     return matchesSearch && matchesType;
   });
 
@@ -49,8 +49,8 @@ export default function JobsPage() {
             {/* Cards Grid Skeleton */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
-                <div 
-                  key={i} 
+                <div
+                  key={i}
                   className={cn(
                     'h-80 rounded-3xl animate-pulse',
                     isDark ? 'bg-gray-800' : 'bg-gray-200'
@@ -74,7 +74,7 @@ export default function JobsPage() {
           <div className="text-center py-12">
             <Briefcase className="h-16 w-16 mx-auto mb-4 opacity-30" />
             <p className="text-red-500 mb-4 text-lg font-semibold">Failed to load jobs: {error instanceof Error ? error.message : 'Unknown error'}</p>
-            <Button 
+            <Button
               className="rounded-full"
               onClick={() => window.location.reload()}
             >
@@ -95,7 +95,7 @@ export default function JobsPage() {
         <div className="py-8 sm:py-12">
           {/* Search and Filter Section */}
           <div className="mb-10 space-y-4">
-            
+
             {/* Search Bar */}
             <div className="relative ">
               <Search className={cn(
@@ -131,8 +131,8 @@ export default function JobsPage() {
                   className={cn(
                     'px-4 py-2.5 rounded-full text-sm font-semibold transition-all duration-200',
                     typeFilter === value
-                      ? isDark 
-                        ? 'bg-black text-white shadow-lg shadow-info-600' 
+                      ? isDark
+                        ? 'bg-black text-white shadow-lg shadow-info-600'
                         : 'bg-info-600 text-white shadow-lg shadow-info-600/30'
                       : isDark
                         ? 'bg-black text-gray-300 hover:bg-gray-700'
@@ -162,7 +162,7 @@ export default function JobsPage() {
               )}>
                 Try adjusting your search or filters
               </p>
-              <Button 
+              <Button
                 className="rounded-full"
                 onClick={() => {
                   setSearchTerm('');

@@ -21,12 +21,10 @@ import Button from '../ui/Button';
 import { Card } from '../ui/Card';
 import PageLayout from '../ui/PageLayout';
 import { cn } from '../../lib/cva';
-import { 
-  linkedInJobService, 
-  LinkedInJobPost, 
-  LinkedInApplication, 
+LinkedInApplication,
   LinkedInCompany 
 } from '../../lib/linkedin-job-service';
+import SegmentedControl from '../ui/SegmentedControl';
 
 interface ImportStats {
   total: number;
@@ -38,7 +36,7 @@ interface ImportStats {
 export default function LinkedInJobManager() {
   const { isDark } = useTheme();
   const { user } = useAuth();
-  
+
   // State management
   const [isConnected, setIsConnected] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
@@ -47,12 +45,12 @@ export default function LinkedInJobManager() {
   const [linkedinJobs, setLinkedinJobs] = useState<LinkedInJobPost[]>([]);
   const [applications, setApplications] = useState<LinkedInApplication[]>([]);
   const [importStats, setImportStats] = useState<ImportStats>({ total: 0, successful: 0, failed: 0, skipped: 0 });
-  
+
   // Loading states
   const [isLoading, setIsLoading] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
-  
+
   // Filters and search
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilters, setSelectedFilters] = useState({
@@ -60,7 +58,7 @@ export default function LinkedInJobManager() {
     experienceLevel: 'all',
     datePosted: 'all'
   });
-  
+
   // UI states
   const [activeTab, setActiveTab] = useState<'jobs' | 'applications' | 'analytics'>('jobs');
   const [selectedJobs, setSelectedJobs] = useState<Set<string>>(new Set());
@@ -83,11 +81,11 @@ export default function LinkedInJobManager() {
         linkedInJobService.setAccessToken(token);
         const profile = await linkedInJobService.getUserProfile();
         const userCompanies = await linkedInJobService.getUserOrganizations();
-        
+
         setUserProfile(profile);
         setCompanies(userCompanies);
         setIsConnected(true);
-        
+
         if (userCompanies.length > 0) {
           setSelectedCompany(userCompanies[0].id);
         }
@@ -107,7 +105,7 @@ export default function LinkedInJobManager() {
 
   const loadCompanyJobs = async () => {
     if (!selectedCompany) return;
-    
+
     try {
       setIsLoading(true);
       const jobs = await linkedInJobService.getCompanyJobs(selectedCompany, 100);
@@ -121,14 +119,14 @@ export default function LinkedInJobManager() {
 
   const handleImportJobs = async () => {
     if (selectedJobs.size === 0) return;
-    
+
     try {
       setIsImporting(true);
       const jobsToImport = linkedinJobs.filter(job => selectedJobs.has(job.id));
-      
+
       let successful = 0;
       let failed = 0;
-      
+
       for (const job of jobsToImport) {
         try {
           await linkedInJobService.importJobsToPlatform([job]);
@@ -138,17 +136,17 @@ export default function LinkedInJobManager() {
           console.error(`Failed to import job ${job.id}:`, error);
         }
       }
-      
+
       setImportStats({
         total: jobsToImport.length,
         successful,
         failed,
         skipped: 0
       });
-      
+
       // Clear selection after import
       setSelectedJobs(new Set());
-      
+
       // Show success message
       alert(`Import completed! ${successful} jobs imported successfully, ${failed} failed.`);
     } catch (error) {
@@ -162,14 +160,14 @@ export default function LinkedInJobManager() {
     try {
       setIsImporting(true);
       const allJobs = await linkedInJobService.importJobsToPlatform(linkedinJobs);
-      
+
       setImportStats({
         total: linkedinJobs.length,
         successful: allJobs.length,
         failed: linkedinJobs.length - allJobs.length,
         skipped: 0
       });
-      
+
       alert(`Bulk import completed! ${allJobs.length} jobs imported successfully.`);
     } catch (error) {
       console.error('Error bulk importing jobs:', error);
@@ -182,11 +180,11 @@ export default function LinkedInJobManager() {
     try {
       setIsSyncing(true);
       await linkedInJobService.syncApplications(jobId);
-      
+
       // Reload applications
       const apps = await linkedInJobService.getJobApplications(jobId);
       setApplications(apps);
-      
+
       alert('Applications synced successfully!');
     } catch (error) {
       console.error('Error syncing applications:', error);
@@ -214,17 +212,17 @@ export default function LinkedInJobManager() {
   };
 
   const filteredJobs = linkedinJobs.filter(job => {
-    const matchesSearch = searchTerm === '' || 
+    const matchesSearch = searchTerm === '' ||
       job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
       job.location.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesEmploymentType = selectedFilters.employmentType === 'all' || 
+
+    const matchesEmploymentType = selectedFilters.employmentType === 'all' ||
       job.employmentType === selectedFilters.employmentType;
-    
-    const matchesExperience = selectedFilters.experienceLevel === 'all' || 
+
+    const matchesExperience = selectedFilters.experienceLevel === 'all' ||
       job.seniorityLevel === selectedFilters.experienceLevel;
-    
+
     return matchesSearch && matchesEmploymentType && matchesExperience;
   });
 
@@ -256,9 +254,8 @@ export default function LinkedInJobManager() {
   return (
     <PageLayout className={isDark ? 'bg-black text-white' : 'bg-white text-black'} maxWidth="full" padding="none">
       {/* Header */}
-      <div className={`sticky top-0 z-10 backdrop-blur-xl border-b ${
-        isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
-      }`}>
+      <div className={`sticky top-0 z-10 backdrop-blur-xl border-b ${isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
+        }`}>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -272,7 +269,7 @@ export default function LinkedInJobManager() {
                 </p>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-3">
               <Button
                 onClick={loadCompanyJobs}
@@ -284,7 +281,7 @@ export default function LinkedInJobManager() {
                 <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} />
                 <span>Refresh</span>
               </Button>
-              
+
               {selectedJobs.size > 0 && (
                 <Button
                   onClick={handleImportJobs}
@@ -297,7 +294,7 @@ export default function LinkedInJobManager() {
               )}
             </div>
           </div>
-          
+
           {/* User Profile Banner */}
           {userProfile && (
             <div className="mt-4 flex items-center justify-between p-3 bg-info-50 dark:bg-info-900/20 rounded-lg">
@@ -314,7 +311,7 @@ export default function LinkedInJobManager() {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <select
                   value={selectedCompany}
@@ -338,29 +335,29 @@ export default function LinkedInJobManager() {
 
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Tabs */}
-        <div className="flex space-x-1 mb-6 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
-          {[
-            { key: 'jobs', label: 'Job Postings', icon: Briefcase },
-            { key: 'applications', label: 'Applications', icon: Users },
-            { key: 'analytics', label: 'Analytics', icon: TrendingUp }
-          ].map(tab => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key as any)}
-                className={cn(
-                  'flex items-center space-x-2 px-4 py-2 rounded-md transition-all duration-200',
-                  activeTab === tab.key
-                    ? 'bg-white dark:bg-gray-700 text-info-600 dark:text-info-400 shadow-xs'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                )}
-              >
-                <Icon className="h-4 w-4" />
-                <span className="font-medium">{tab.label}</span>
-              </button>
-            );
-          })}
+        {/* Tabs */}
+        <div className="mb-6 overflow-x-auto">
+          <SegmentedControl
+            value={activeTab}
+            onChange={(val) => setActiveTab(val as any)}
+            aria-label="View tabs"
+          >
+            {[
+              { key: 'jobs', label: 'Job Postings', icon: Briefcase },
+              { key: 'applications', label: 'Applications', icon: Users },
+              { key: 'analytics', label: 'Analytics', icon: TrendingUp }
+            ].map(tab => {
+              const Icon = tab.icon;
+              return (
+                <SegmentedControl.Option key={tab.key} value={tab.key}>
+                  <div className="flex items-center gap-2">
+                    <Icon className="h-4 w-4" />
+                    <span>{tab.label}</span>
+                  </div>
+                </SegmentedControl.Option>
+              );
+            })}
+          </SegmentedControl>
         </div>
 
         {/* Job Postings Tab */}
@@ -382,23 +379,22 @@ export default function LinkedInJobManager() {
                     )}
                   />
                 </div>
-                
-                <select
-                  value={selectedFilters.employmentType}
-                  onChange={(e) => setSelectedFilters(prev => ({ ...prev, employmentType: e.target.value }))}
-                  className={cn(
-                    'px-3 py-2 rounded-lg border',
-                    isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'
-                  )}
-                >
-                  <option value="all">All Types</option>
-                  <option value="FULL_TIME">Full Time</option>
-                  <option value="PART_TIME">Part Time</option>
-                  <option value="CONTRACT">Contract</option>
-                  <option value="INTERNSHIP">Internship</option>
-                </select>
+
+                <div className="overflow-x-auto">
+                  <SegmentedControl
+                    value={selectedFilters.employmentType}
+                    onChange={(val) => setSelectedFilters(prev => ({ ...prev, employmentType: val }))}
+                    aria-label="Employment type filter"
+                  >
+                    <SegmentedControl.Option value="all">All Types</SegmentedControl.Option>
+                    <SegmentedControl.Option value="FULL_TIME">Full Time</SegmentedControl.Option>
+                    <SegmentedControl.Option value="PART_TIME">Part Time</SegmentedControl.Option>
+                    <SegmentedControl.Option value="CONTRACT">Contract</SegmentedControl.Option>
+                    <SegmentedControl.Option value="INTERNSHIP">Internship</SegmentedControl.Option>
+                  </SegmentedControl>
+                </div>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Button
                   onClick={handleSelectAllJobs}
@@ -407,7 +403,7 @@ export default function LinkedInJobManager() {
                 >
                   {selectedJobs.size === filteredJobs.length ? 'Deselect All' : 'Select All'}
                 </Button>
-                
+
                 <Button
                   onClick={handleBulkImport}
                   disabled={isImporting || filteredJobs.length === 0}
@@ -429,7 +425,7 @@ export default function LinkedInJobManager() {
                   <Briefcase className="h-8 w-8 text-info-500" />
                 </div>
               </Card>
-              
+
               <Card className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -439,7 +435,7 @@ export default function LinkedInJobManager() {
                   <CheckCircle className="h-8 w-8 text-green-500" />
                 </div>
               </Card>
-              
+
               <Card className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -449,7 +445,7 @@ export default function LinkedInJobManager() {
                   <Download className="h-8 w-8 text-purple-500" />
                 </div>
               </Card>
-              
+
               <Card className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -527,7 +523,7 @@ export default function LinkedInJobManager() {
                   </div>
                 </div>
               </Card>
-              
+
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Job Distribution</h3>
                 <div className="space-y-3">
@@ -601,10 +597,10 @@ const LinkedInJobCard: React.FC<{
             onChange={(e) => onSelect(e.target.checked)}
             className="mt-2 h-4 w-4 text-info-600 rounded border-gray-300 focus:ring-info-500"
           />
-          
+
           <div className="flex-1">
             <h3 className="text-xl font-bold mb-2">{job.title}</h3>
-            
+
             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-3">
               <span className="flex items-center space-x-1">
                 <Building2 className="h-4 w-4" />
@@ -625,7 +621,7 @@ const LinkedInJobCard: React.FC<{
                 </span>
               )}
             </div>
-            
+
             <div className="flex flex-wrap gap-2 mb-4">
               <span className={cn(
                 'px-2 py-1 rounded-full text-xs font-medium',
@@ -637,11 +633,11 @@ const LinkedInJobCard: React.FC<{
                 {job.seniorityLevel.replace('_', ' ')}
               </span>
             </div>
-            
+
             <p className="text-gray-700 dark:text-gray-300 mb-4 line-clamp-3">
               {job.description}
             </p>
-            
+
             {job.skills.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-4">
                 {job.skills.slice(0, 6).map((skill, index) => (
@@ -661,7 +657,7 @@ const LinkedInJobCard: React.FC<{
             )}
           </div>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           <Button
             onClick={onSync}
@@ -673,7 +669,7 @@ const LinkedInJobCard: React.FC<{
             <RefreshCw className={cn("h-4 w-4", isSyncing && "animate-spin")} />
             <span>Sync</span>
           </Button>
-          
+
           {job.applicationMethod.url && (
             <Button
               as="a"
@@ -690,7 +686,7 @@ const LinkedInJobCard: React.FC<{
           )}
         </div>
       </div>
-      
+
       {job.salaryRange && (
         <div className="flex items-center space-x-2 text-sm">
           <DollarSign className="h-4 w-4 text-green-600" />
