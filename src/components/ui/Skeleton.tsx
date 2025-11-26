@@ -1269,3 +1269,41 @@ export function CompactPostDetailsSkeleton() {
     </div>
   );
 }
+// Post Sidebar Skeletons
+export function PostSidebarUserSkeleton() {
+  return (
+    <div className="space-y-3">
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="p-3 rounded-xl border border-gray-200 dark:border-gray-800">
+          <div className="flex items-center gap-3">
+            <Skeleton variant="circular" width={48} height={48} />
+            <div className="flex-1 space-y-2">
+              <Skeleton width="70%" height={16} />
+              <Skeleton width="50%" height={12} />
+            </div>
+            <Skeleton width={80} height={32} className="rounded-full" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function PostSidebarCompanySkeleton() {
+  return (
+    <div className="space-y-3">
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="p-3 rounded-xl border border-gray-200 dark:border-gray-800">
+          <div className="flex items-center gap-3">
+            <Skeleton variant="rectangular" width={48} height={48} className="rounded-lg" />
+            <div className="flex-1 space-y-2">
+              <Skeleton width="60%" height={16} />
+              <Skeleton width="40%" height={12} />
+            </div>
+            <Skeleton width={80} height={32} className="rounded-full" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}

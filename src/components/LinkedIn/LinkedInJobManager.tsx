@@ -21,8 +21,9 @@ import Button from '../ui/Button';
 import { Card } from '../ui/Card';
 import PageLayout from '../ui/PageLayout';
 import { cn } from '../../lib/cva';
-LinkedInApplication,
-  LinkedInCompany 
+import {
+  LinkedInApplication,
+  LinkedInCompany
 } from '../../lib/linkedin-job-service';
 import SegmentedControl from '../ui/SegmentedControl';
 

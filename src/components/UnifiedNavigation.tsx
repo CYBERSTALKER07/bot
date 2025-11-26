@@ -10,21 +10,12 @@ import {
   User,
   LogOut,
   Bell,
-  Menu,
   X,
-  ChevronLeft,
-  ChevronRight,
-  Home,
-  Briefcase,
-  Users,
-  Settings,
-  FileText,
   BarChart3,
   Rss,
-  ChevronDown,
   Smartphone
 } from 'lucide-react';
-import { School } from '@mui/icons-material';
+
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useScrollDirection } from '../hooks/useScrollDirection';
@@ -130,8 +121,8 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
       <>
         {/* Landing Page Navigation */}
         <nav className={`fixed top-0 w-full z-50 border-b transition-colors duration-300 ${isDark
-            ? 'bg-dark-surface/95 backdrop-blur-sm border-gray-700'
-            : 'bg-white/95 backdrop-blur-sm border-gray-200'
+          ? 'bg-dark-surface/95 backdrop-blur-sm border-gray-700'
+          : 'bg-white/95 backdrop-blur-sm border-gray-200'
           }`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
@@ -151,8 +142,8 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                     <button
                       onClick={() => onScrollToSection('features')}
                       className={`text-sm font-medium transition-colors duration-200 ${isDark
-                          ? 'text-dark-muted hover:text-dark-text'
-                          : 'text-gray-600 hover:text-gray-900'
+                        ? 'text-dark-muted hover:text-dark-text'
+                        : 'text-gray-600 hover:text-gray-900'
                         }`}
                     >
                       Features
@@ -160,8 +151,8 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                     <button
                       onClick={() => onScrollToSection('howItWorks')}
                       className={`text-sm font-medium transition-colors duration-200 ${isDark
-                          ? 'text-dark-muted hover:text-dark-text'
-                          : 'text-gray-600 hover:text-gray-900'
+                        ? 'text-dark-muted hover:text-dark-text'
+                        : 'text-gray-600 hover:text-gray-900'
                         }`}
                     >
                       How it Works
@@ -171,8 +162,8 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                 <Link
                   to="/for-students"
                   className={`text-sm font-medium transition-colors duration-200 ${isDark
-                      ? 'text-dark-muted hover:text-dark-text'
-                      : 'text-gray-600 hover:text-gray-900'
+                    ? 'text-dark-muted hover:text-dark-text'
+                    : 'text-gray-600 hover:text-gray-900'
                     }`}
                 >
                   For Students
@@ -180,8 +171,8 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                 <Link
                   to="/for-employers"
                   className={`text-sm font-medium transition-colors duration-200 ${isDark
-                      ? 'text-dark-muted hover:text-dark-text'
-                      : 'text-gray-600 hover:text-gray-900'
+                    ? 'text-dark-muted hover:text-dark-text'
+                    : 'text-gray-600 hover:text-gray-900'
                     }`}
                 >
                   For Employers
@@ -189,8 +180,8 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                 <Link
                   to="/career-tips"
                   className={`text-sm font-medium transition-colors duration-200 ${isDark
-                      ? 'text-dark-muted hover:text-dark-text'
-                      : 'text-gray-600 hover:text-gray-900'
+                    ? 'text-dark-muted hover:text-dark-text'
+                    : 'text-gray-600 hover:text-gray-900'
                     }`}
                 >
                   Career Tips
@@ -198,8 +189,8 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                 <Link
                   to="/whos-hiring"
                   className={`text-sm font-medium transition-colors duration-200 ${isDark
-                      ? 'text-dark-muted hover:text-dark-text'
-                      : 'text-gray-600 hover:text-gray-900'
+                    ? 'text-dark-muted hover:text-dark-text'
+                    : 'text-gray-600 hover:text-gray-900'
                     }`}
                 >
                   Who's Hiring
@@ -208,8 +199,8 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                   <button
                     onClick={() => onScrollToSection('demo')}
                     className={`text-sm font-medium transition-colors duration-200 ${isDark
-                        ? 'text-dark-muted hover:text-dark-text'
-                        : 'text-gray-600 hover:text-gray-900'
+                      ? 'text-dark-muted hover:text-dark-text'
+                      : 'text-gray-600 hover:text-gray-900'
                       }`}
                   >
                     Demo
@@ -228,8 +219,8 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                       <Link
                         to="/dashboard"
                         className={`text-sm font-medium transition-colors duration-200 ${isDark
-                            ? 'text-dark-muted hover:text-dark-text'
-                            : 'text-gray-600 hover:text-gray-900'
+                          ? 'text-dark-muted hover:text-dark-text'
+                          : 'text-gray-600 hover:text-gray-900'
                           }`}
                       >
                         Dashboard
@@ -243,8 +234,8 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                       <Link
                         to="/login"
                         className={`text-sm font-medium transition-colors duration-200 ${isDark
-                            ? 'text-dark-muted hover:text-dark-text'
-                            : 'text-gray-600 hover:text-gray-900'
+                          ? 'text-dark-muted hover:text-dark-text'
+                          : 'text-gray-600 hover:text-gray-900'
                           }`}
                       >
                         Sign In
@@ -252,8 +243,8 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                       <Link
                         to="/register"
                         className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${isDark
-                            ? 'bg-lime text-dark-surface hover:bg-lime/90'
-                            : 'bg-asu-maroon text-white hover:bg-asu-maroon-dark'
+                          ? 'bg-lime text-dark-surface hover:bg-lime/90'
+                          : 'bg-asu-maroon text-white hover:bg-asu-maroon-dark'
                           }`}
                       >
                         Sign Up
@@ -731,29 +722,32 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                   key={index}
                   to={item.path}
                   className={cn(
-                    'flex flex-col items-center justify-center py-2 transition-all duration-200 relative ios-touch-target',
+                    'flex flex-col items-center justify-center py-2 transition-all duration-200 relative ios-touch-target active:scale-90',
                     isActive
                       ? isDark ? 'text-white' : 'text-black'
-                      : isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-800'
+                      : isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'
                   )}
                 >
-                  <div className="relative">
-                    <Icon className="h-6 w-6" />
+                  <div className={cn(
+                    "relative p-1 rounded-xl transition-all duration-200",
+                    isActive && (isDark ? "bg-white/10" : "bg-black/5")
+                  )}>
+                    <Icon className={cn(
+                      "transition-all duration-200",
+                      isActive ? "h-6 w-6 stroke-[2.5px]" : "h-6 w-6 stroke-[1.5px]"
+                    )} />
                     {item.badge && item.badge > 0 && (
-                      <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                      <span className="absolute -top-1 -right-1 w-4 h-4 bg-error text-white text-[10px] font-bold rounded-full flex items-center justify-center ring-2 ring-background">
                         {item.badge > 9 ? '9+' : item.badge}
                       </span>
                     )}
                   </div>
-                  <span className="text-xs mt-1 truncate">{item.label}</span>
+                  <span className={cn(
+                    "text-[10px] mt-0.5 font-medium transition-all duration-200",
+                    isActive ? "opacity-100" : "opacity-0 scale-0 hidden"
+                  )}>{item.label}</span>
 
-                  {/* Active indicator */}
-                  {isActive && (
-                    <div className={cn(
-                      "absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 rounded-full",
-                      isDark ? 'bg-white' : 'bg-black'
-                    )} />
-                  )}
+                  {/* Active indicator dot - removed in favor of background highlight */}
                 </Link>
               );
             })}

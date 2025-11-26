@@ -4,30 +4,20 @@ import {
   ArrowLeft,
   Calendar,
   MapPin,
-  Mail,
   MoreHorizontal,
   MessageCircle,
-  Bell,
-  User,
   TrendingUp,
   Heart,
   Share,
   Search,
-  X,
   Verified,
   BarChart3,
-  Home,
-  Hash,
-  Bookmark,
-  Users,
-  Settings,
-  LogOut,
   Plus,
-  Briefcase,
-  Award,
   Target,
   Repeat2,
-  Feather
+  Feather,
+  Settings,
+  LogOut
 } from 'lucide-react';
 import gsap from 'gsap';
 import { useAuth } from '../../context/AuthContext';
@@ -60,14 +50,6 @@ interface ProfileStats {
   following: number;
   followers: number;
   posts: number;
-}
-
-interface SuggestedUser {
-  id: string;
-  name: string;
-  username: string;
-  avatar?: string;
-  verified?: boolean;
 }
 
 interface TrendingTopic {
@@ -138,13 +120,13 @@ export default function Profile() {
   });
 
   // Track follow status for recommended users - now with processing state
-  const [followStatus, setFollowStatus] = useState<Record<string, boolean>>({});
-  const [processingFollowId, setProcessingFollowId] = useState<string | null>(null);
-  const [hoveredFollowId, setHoveredFollowId] = useState<string | null>(null);
+  // const [followStatus, setFollowStatus] = useState<Record<string, boolean>>({});
+  // const [processingFollowId, setProcessingFollowId] = useState<string | null>(null);
+  // const [hoveredFollowId, setHoveredFollowId] = useState<string | null>(null);
 
   // Profile data
   const [profileData, setProfileData] = useState<ProfileData>({
-    full_name: user?.name || 'User',
+    full_name: user?.profile?.full_name || 'User',
     bio: '',
     location: '',
     avatar_url: '',
@@ -159,7 +141,7 @@ export default function Profile() {
   const [postsLoading, setPostsLoading] = useState(true);
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  // const [error, setError] = useState('');
 
   // Suggested users data
   const { data: recommendedUsers } = useRecommendedUsers(user?.id);
@@ -169,32 +151,32 @@ export default function Profile() {
 
   // Trending topics data - now dynamic
   const [trendingTopics, setTrendingTopics] = useState<TrendingTopic[]>([]);
-  const [trendingLoading, setTrendingLoading] = useState(true);
+  // const [trendingLoading, setTrendingLoading] = useState(true);
 
   // Industry insights data - now dynamic
   const [industryInsights, setIndustryInsights] = useState<IndustryInsight[]>([]);
-  const [insightsLoading, setInsightsLoading] = useState(true);
+  // const [insightsLoading, setInsightsLoading] = useState(true);
 
   // Navigation items for left sidebar
-  const navigationItems = [
-    { id: 'home', label: 'Home', icon: Home, path: '/dashboard' },
-    { id: 'explore', label: 'Explore', icon: Hash, path: '/explore' },
-    { id: 'notifications', label: 'Notifications', icon: Bell, path: '/notifications' },
-    { id: 'messages', label: 'Messages', icon: Mail, path: '/messages' },
-    { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark, path: '/bookmarks' },
-    { id: 'jobs', label: 'Jobs', icon: Briefcase, path: '/jobs' },
-    { id: 'communities', label: 'Communities', icon: Users, path: '/communities' },
-    { id: 'profile', label: 'Profile', icon: User, path: '/profile' },
-    { id: 'more', label: 'More', icon: MoreHorizontal, path: '#' }
-  ];
+  // const navigationItems = [
+  //   { id: 'home', label: 'Home', icon: Home, path: '/dashboard' },
+  //   { id: 'explore', label: 'Explore', icon: Hash, path: '/explore' },
+  //   { id: 'notifications', label: 'Notifications', icon: Bell, path: '/notifications' },
+  //   { id: 'messages', label: 'Messages', icon: Mail, path: '/messages' },
+  //   { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark, path: '/bookmarks' },
+  //   { id: 'jobs', label: 'Jobs', icon: Briefcase, path: '/jobs' },
+  //   { id: 'communities', label: 'Communities', icon: Users, path: '/communities' },
+  //   { id: 'profile', label: 'Profile', icon: User, path: '/profile' },
+  //   { id: 'more', label: 'More', icon: MoreHorizontal, path: '#' }
+  // ];
 
   // Quick stats for left sidebar
-  const quickStats = [
-    { label: 'Profile Views', value: '1,247', icon: Target },
-    { label: 'Applications', value: '23', icon: Briefcase },
-    { label: 'Connections', value: '589', icon: Users },
-    { label: 'Achievements', value: '12', icon: Award }
-  ];
+  // const quickStats = [
+  //   { label: 'Profile Views', value: '1,247', icon: Target },
+  //   { label: 'Applications', value: '23', icon: Briefcase },
+  //   { label: 'Connections', value: '589', icon: Users },
+  //   { label: 'Achievements', value: '12', icon: Award }
+  // ];
 
   // Handle responsive resize
   useEffect(() => {
@@ -270,7 +252,7 @@ export default function Profile() {
       }
     } catch (error) {
       console.error('Error loading profile:', error);
-      setError('Failed to load profile data');
+      // setError('Failed to load profile data');
     } finally {
       setLoading(false);
     }
@@ -504,8 +486,8 @@ export default function Profile() {
           ...post,
           author: {
             id: userIdToFetch,
-            name: profileData?.full_name || user?.user_metadata?.full_name || 'User',
-            username: profileData?.username || user?.user_metadata?.username || 'user',
+            name: profileData?.full_name || user?.profile?.full_name || 'User',
+            username: profileData?.username || user?.profile?.username || 'user',
             avatar_url: profileData?.avatar_url,
             verified: profileData?.verified || false
           }
@@ -532,7 +514,7 @@ export default function Profile() {
 
   const fetchTrendingTopics = async () => {
     try {
-      setTrendingLoading(true);
+      // setTrendingLoading(true);
 
       // Fetch recent posts with tags (last 7 days for relevance)
       const sevenDaysAgo = new Date();
@@ -568,7 +550,7 @@ export default function Profile() {
       });
 
       // Sort by engagement and post count
-      const sortedTopics = Array.from(hashtagStats.entries())
+      const sortedTopics: TrendingTopic[] = Array.from(hashtagStats.entries())
         .sort((a, b) => {
           const scoreA = a[1].engagement * 2 + a[1].count;
           const scoreB = b[1].engagement * 2 + b[1].count;
@@ -629,16 +611,16 @@ export default function Profile() {
       console.error('Error in fetchTrendingTopics:', error);
       setTrendingTopics([]);
     } finally {
-      setTrendingLoading(false);
+      // setTrendingLoading(false);
     }
   };
 
   const fetchIndustryInsights = async () => {
     try {
-      setInsightsLoading(true);
+      // setInsightsLoading(true);
 
       // Get current date and 30 days ago for comparison
-      const now = new Date();
+      // const now = new Date();
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       const sixtyDaysAgo = new Date();
@@ -784,7 +766,7 @@ export default function Profile() {
       console.error('Error in fetchIndustryInsights:', error);
       setIndustryInsights([]);
     } finally {
-      setInsightsLoading(false);
+      // setInsightsLoading(false);
     }
   };
 
@@ -824,15 +806,15 @@ export default function Profile() {
   };
 
   // Sample post data
-  const samplePost = {
-    id: '1',
-    content: 'Just shipped a new feature for our automation platform! Excited to see how it helps businesses streamline their workflows. 🚀 #automation #business',
-    timestamp: 'Aug 28',
-    likes: 12,
-    retweets: 3,
-    replies: 5,
-    image: '/api/placeholder/400/300'
-  };
+  // const samplePost = {
+  //   id: '1',
+  //   content: 'Just shipped a new feature for our automation platform! Excited to see how it helps businesses streamline their workflows. 🚀 #automation #business',
+  //   timestamp: 'Aug 28',
+  //   likes: 12,
+  //   retweets: 3,
+  //   replies: 5,
+  //   image: '/api/placeholder/400/300'
+  // };
 
   if (loading) {
     return (
@@ -926,12 +908,12 @@ export default function Profile() {
                   />
                 ) : (
                   <div className="w-12 h-12 rounded-full border-2 border-white bg-white/20 flex items-center justify-center text-white font-bold">
-                    {(profileData.full_name || user?.name || 'U').charAt(0)}
+                    {(profileData.full_name || user?.profile?.full_name || 'U').charAt(0)}
                   </div>
                 )}
                 <div className="flex-1">
                   <h3 className="font-bold text-sm">
-                    {profileData.full_name || user?.name || 'User'}
+                    {profileData.full_name || user?.profile?.full_name || 'User'}
                   </h3>
                   <p className="text-white/80 text-xs">
                     @{profileData.username || 'username'}
@@ -1052,9 +1034,13 @@ export default function Profile() {
         </div>
 
         {/* Main Content */}
-        <div className={cn('flex-1 max-w-2xl border-x', isDark ? "bg-black border-gray-800" : "bg-gray-50 border-gray-200")}>
+        <div className={cn('flex-1 max-w-2xl border-x min-h-screen', isDark ? "bg-black border-gray-800" : "bg-gray-50 border-gray-200")}>
           {/* Header */}
-          <div className={cn("sticky top-0 backdrop-blur-md z-20 border-b", isDark ? "bg-black/80 border-gray-800" : "bg-white/80 border-gray-200")}>
+          <div className={cn(
+            "sticky top-0 backdrop-blur-md z-20 border-b transition-all duration-300",
+            isDark ? "bg-black/80 border-gray-800" : "bg-white/80 border-gray-200",
+            isMobile ? "top-[max(env(safe-area-inset-top),54px)]" : "top-0"
+          )}>
             <div className="flex items-center py-3 px-4">
               <button
                 onClick={() => navigate(-1)}
@@ -1064,7 +1050,7 @@ export default function Profile() {
               </button>
               <div className="flex-1">
                 <h1 className="font-bold text-xl">
-                  {profileData.full_name || user?.name || 'User'}
+                  {profileData.full_name || user?.profile?.full_name || 'User'}
                 </h1>
                 <p className={cn("text-sm", isDark ? "text-gray-400" : "text-gray-600")}>
                   {profileStats.posts} posts
@@ -1077,7 +1063,7 @@ export default function Profile() {
           </div>
 
           {/* Cover Photo */}
-          <div className={cn("relative h-48 bg-linear-to-r from-blue-400 to-purple-500")}>
+          <div className={cn("relative h-32 md:h-48 bg-linear-to-r from-blue-400 to-purple-500")}>
             {profileData.cover_image_url ? (
               <img
                 src={profileData.cover_image_url}
@@ -1091,18 +1077,18 @@ export default function Profile() {
 
           {/* Profile Info */}
           <div className={cn("px-4 pb-4", isDark ? "bg-black" : "bg-white")}>
-            <div className="flex justify-between items-start -mt-16 mb-4">
+            <div className="flex justify-between items-start -mt-12 md:-mt-16 mb-4">
               {/* Avatar */}
               <div className="relative">
                 {profileData.avatar_url ? (
                   <img
                     src={profileData.avatar_url}
                     alt="Profile"
-                    className="w-32 h-32 rounded-full border-4 border-black object-cover shadow-lg"
+                    className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-black object-cover shadow-lg"
                   />
                 ) : (
-                  <div className={cn("w-32 h-32 rounded-full border-4 flex items-center justify-center font-bold text-4xl shadow-lg", isDark ? "bg-gray-900 border-black text-gray-400" : "bg-gray-300 border-white text-gray-700")}>
-                    {(profileData.full_name || user?.name || 'U').charAt(0)}
+                  <div className={cn("w-24 h-24 md:w-32 md:h-32 rounded-full border-4 flex items-center justify-center font-bold text-3xl md:text-4xl shadow-lg", isDark ? "bg-gray-900 border-black text-gray-400" : "bg-gray-300 border-white text-gray-700")}>
+                    {(profileData.full_name || user?.profile?.full_name || 'U').charAt(0)}
                   </div>
                 )}
               </div>
@@ -1114,7 +1100,7 @@ export default function Profile() {
                     variant="outlined"
                     onClick={handleEditProfile}
                     className={cn(
-                      "rounded-3xl px-6 py-1.5 font-thin transition-all duration-300 flex items-center gap-2 overflow-hidden relative",
+                      "rounded-3xl px-4 md:px-6 py-1.5 font-thin transition-all duration-300 flex items-center gap-2 overflow-hidden relative text-sm md:text-base",
                       isDark
                         ? "border-none text-white hover:bg-black/90 bg-black"
                         : "border-none text-black hover:bg-gray-100 hover:border-gray-400"
@@ -1173,20 +1159,20 @@ export default function Profile() {
             {/* User Info */}
             <div className="mb-4">
               <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-2xl font-bold">
-                  {profileData.full_name || user?.name || 'User'}
+                <h1 className="text-xl md:text-2xl font-bold">
+                  {profileData.full_name || user?.profile?.full_name || 'User'}
                 </h1>
                 {user?.profile?.verified && (
                   <Verified className="w-5 h-5 text-info-500" />
                 )}
               </div>
-              <p className={cn("text-base mb-3", isDark ? "text-gray-400" : "text-gray-600")}>
-                @{(profileData.username || (profileData.full_name || user?.name || 'user').toLowerCase().replace(/\s/g, ''))}
+              <p className={cn("text-sm md:text-base mb-3", isDark ? "text-gray-400" : "text-gray-600")}>
+                @{(profileData.username || (profileData.full_name || user?.profile?.full_name || 'user').toLowerCase().replace(/\s/g, ''))}
               </p>
 
               {/* Bio */}
               <div className="mb-3">
-                <p className={cn("leading-relaxed", isDark ? "text-gray-300" : "text-gray-900")}>
+                <p className={cn("leading-relaxed text-sm md:text-base", isDark ? "text-gray-300" : "text-gray-900")}>
                   {profileData.bio || 'The Lab Business automation company'}
                 </p>
               </div>
@@ -1206,7 +1192,7 @@ export default function Profile() {
               </div>
 
               {/* Following/Followers */}
-              <div className="flex gap-5">
+              <div className="flex gap-5 text-sm">
                 <button className={cn("hover:underline", isDark ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900")}>
                   <span className={cn("font-bold", isDark ? "text-white" : "text-gray-900")}>
                     {profileStats.following}
@@ -1228,8 +1214,8 @@ export default function Profile() {
           </div>
 
           {/* Navigation Tabs */}
-          <div className={cn("border-b", isDark ? "bg-black border-gray-800" : "bg-white border-gray-200")}>
-            <div className="flex">
+          <div className={cn("border-b sticky top-[calc(max(env(safe-area-inset-top),54px)+53px)] z-10 backdrop-blur-md", isDark ? "bg-black/80 border-gray-800" : "bg-white/80 border-gray-200")}>
+            <div className="flex overflow-x-auto no-scrollbar">
               {[
                 { id: 'articles', label: 'Articles' },
                 { id: 'highlights', label: 'Highlights' },
@@ -1242,7 +1228,7 @@ export default function Profile() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
                   className={cn(
-                    'relative px-4 py-4 text-center font-medium transition-colors flex-1',
+                    'relative px-4 py-4 text-center font-medium transition-colors whitespace-nowrap flex-none',
                     activeTab === tab.id
                       ? isDark ? "text-white" : "text-gray-900"
                       : isDark ? "text-gray-400 hover:text-gray-300" : "text-gray-600 hover:text-gray-900"
@@ -1258,7 +1244,7 @@ export default function Profile() {
           </div>
 
           {/* Posts Content */}
-          <div className={cn("min-h-screen", isDark ? "bg-black" : "bg-gray-50")}>
+          <div className={cn("min-h-screen pb-20", isDark ? "bg-black" : "bg-gray-50")}>
             {postsLoading ? (
               <div className="flex justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#BCE953]"></div>
@@ -1389,7 +1375,7 @@ export default function Profile() {
         </div>
 
         {/* Right Sidebar */}
-        <div className={cn("w-80 p-4 space-y-4", isDark ? "bg-black" : "bg-gray-50")}>
+        <div className={cn("hidden lg:block w-80 p-4 space-y-4", isDark ? "bg-black" : "bg-gray-50")}>
           {/* Search Bar */}
           <div className={cn("relative rounded-full overflow-hidden", isDark ? "bg-black border-white" : "bg-white border border-gray-300")}>
             <div className={cn("absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none", isDark ? "text-gray-400" : "text-gray-500")}>

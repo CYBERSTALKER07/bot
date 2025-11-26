@@ -30,6 +30,8 @@ import ExploreFeed from './ExploreFeed';
 import LeftSidebar from './LeftSidebar';
 import RightSidebar from './RightSidebar';
 import { useInfiniteScroll, usePullToRefresh } from '../hooks/useScrollOptimizations';
+import { useScrollDirection } from '../hooks/useScrollDirection';
+import Animate from './ui/Animate';
 
 
 interface Post {
@@ -111,6 +113,7 @@ export default function Feed() {
   const { isDark } = useTheme();
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  const { isVisible: isHeaderVisible } = useScrollDirection({ threshold: 3 });
 
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -427,9 +430,11 @@ export default function Feed() {
         )}>
           {/* Header */}
           <div className={cn(
-            'sticky top-0 z-10 backdrop-blur-xl border-b transition-colors duration-200',
+            'sticky z-10 backdrop-blur-xl border-b transition-all duration-300',
             isDark ? 'bg-black/80 border-[#1C1F20] ' : 'bg-white/80 border-gray-200',
-            isMobile ? 'top-16' : 'top-0'
+            isMobile
+              ? (isHeaderVisible ? 'top-[calc(max(env(safe-area-inset-top),54px)+50px)]' : 'top-[max(env(safe-area-inset-top),54px)]')
+              : 'top-0'
           )}>
             <div className="p-2">
               <SegmentedControl
@@ -475,7 +480,7 @@ export default function Feed() {
                     </div>
                     <Button
                       onClick={() => navigate('/create-post')}
-                      className="bg-[#  D3FB52] hover:bg-[#D3FB52]/80 text-black font-bold rounded-full px-5 py-1.5"
+                      className="bg-[#D3FB52] hover:bg-[#D3FB52]/80 text-black font-bold rounded-full px-5 py-1.5"
                     >
                       Post
                     </Button>
@@ -489,8 +494,13 @@ export default function Feed() {
           <div ref={timelineRef} className="pb-20 min-h-screen">
             {/* Pull to Refresh Indicator */}
             {isPulling && (
-              <div className="flex justify-center py-4">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-info-500"></div>
+              <div className="flex justify-center py-6 animate-fade-in-up">
+                <div className="relative">
+                  <div className="animate-spin rounded-full h-8 w-8 border-2 border-info-500 border-t-transparent"></div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="h-2 w-2 bg-info-500 rounded-full animate-pulse"></div>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -504,191 +514,185 @@ export default function Feed() {
               />
             ) : (
               <div>
-                {allPosts.map((post: Post) => (
-                  <div
+                {allPosts.map((post: Post, index: number) => (
+                  <Animate
                     key={post.id}
-                    className={cn(
-                      'border-b hover:bg-[#1C1F20]/30 transition-colors cursor-pointer',
-                      isDark ? 'border-[#1C1F20]' : 'border-gray-200 shadow-xs hover:shadow-md'
-                    )}
-                    onClick={() => navigate(`/post/${post.id}`)}
+                    initial={{ opacity: 0, y: 20 }}
+                    enter={{ opacity: 1, y: 0, duration: 400, delay: index * 50 }}
+                    exit={{ opacity: 0, y: -20, duration: 300 }}
                   >
-                    {/* Retweet Header */}
-                    {post.is_retweet && post.retweeted_by && (
-                      <RetweetHeader
-                        retweetedByName={post.retweeted_by.name}
-                        retweetedById={post.retweeted_by.id}
-                        isMobile={isMobile}
-                      />
-                    )}
-
-                    <div className="p-4 flex gap-3">
-                      {/* Author Avatar */}
-                      <div className="shrink-0" onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/profile/${post.author.id}`);
-                      }}>
-                        <Avatar
-                          src={post.author.avatar_url}
-                          alt={post.author.name}
-                          size="md"
-                          className="hover:opacity-90 transition-opacity"
+                    <div
+                      className={cn(
+                        'border-b hover:bg-[#1C1F20]/30 transition-colors cursor-pointer',
+                        isDark ? 'border-[#1C1F20]' : 'border-gray-200 shadow-xs hover:shadow-md'
+                      )}
+                      onClick={() => navigate(`/post/${post.id}`)}
+                    >
+                      {/* Retweet Header */}
+                      {post.is_retweet && post.retweeted_by && (
+                        <RetweetHeader
+                          retweetedByName={post.retweeted_by.name}
+                          retweetedById={post.retweeted_by.id}
+                          isMobile={isMobile}
                         />
-                      </div>
+                      )}
 
-                      {/* Post Content */}
-                      <div className="flex-1 min-w-0">
-                        {/* Header: Name, Username, Time, More */}
-                        <div className="flex items-center justify-between mb-1">
-                          <div className="flex items-center gap-1 overflow-hidden">
-                            <Link
-                              to={`/profile/${post.author.id}`}
-                              className="font-bold hover:underline truncate text-base"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              {post.author.name}
-                            </Link>
-                            {post.author.verified && (
-                              <span className="text-info-500 shrink-0">
-                                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><g><path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .495.083.965.238 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z" /></g></svg>
-                              </span>
-                            )}
-                            <span className="text-gray-500 text-sm truncate">@{post.author.username}</span>
-                            <span className="text-gray-500 text-sm">·</span>
-                            <span className="text-gray-500 text-sm hover:underline">{formatTime(post.created_at)}</span>
-                          </div>
-                          <button className="text-gray-500 hover:text-info-500 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
-                            <span className="sr-only">More</span>
-                            <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><g><path d="M3 12c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm9 2c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm7 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"></path></g></svg>
-                          </button>
+                      <div className="p-4 flex gap-3">
+                        {/* Author Avatar */}
+                        <div className="shrink-0" onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/profile/${post.author.id}`);
+                        }}>
+                          <Avatar
+                            src={post.author.avatar_url}
+                            alt={post.author.name}
+                            size="md"
+                            className="hover:opacity-90 transition-opacity"
+                          />
                         </div>
 
-                        {/* Text Content */}
-                        {post.content && (
-                          <div
-                            className={cn(
-                              'text-[15px] leading-normal mb-3 whitespace-pre-wrap wrap-break-word',
-                              isDark ? 'text-white' : 'text-gray-900'
-                            )}
-                          >
-                            {post.content.split(/(\s+)/).map((word, index) => {
-                              // Check if word is a hashtag
-                              const hashtagMatch = word.match(/^#(\w+)/);
-                              if (hashtagMatch) {
-                                const hashtagName = hashtagMatch[1];
-                                return (
-                                  <span key={index}>
-                                    <Link
-                                      to={`/hashtag/${hashtagName}`}
-                                      className="text-info-500 hover:underline font-medium"
-                                      onClick={(e) => e.stopPropagation()}
-                                    >
-                                      #{hashtagName}
-                                    </Link>
-                                    {word.substring(hashtagMatch[0].length)}
-                                  </span>
-                                );
-                              }
-
-                              // Check if word is a mention
-                              const mentionMatch = word.match(/^@(\w+)/);
-                              if (mentionMatch) {
-                                const username = mentionMatch[1];
-                                return (
-                                  <span key={index}>
-                                    <Link
-                                      to={`/profile/${username}`} // Note: This assumes we can route by username or we need to look up ID. 
-                                      // If routing by username is not supported, we might need a different approach or just link to search.
-                                      // However, usually mentions link to profile. Let's assume /profile/username or search.
-                                      // Given the current app structure, /profile/:id is used. 
-                                      // We might not have the ID here easily unless we parse it from a rich text format or look it up.
-                                      // For now, let's link to a search for that username or a specific route if it exists.
-                                      // Actually, better to link to a search page or handle it if we can't resolve ID.
-                                      // But wait, we stored mentions as UUIDs in the DB. 
-                                      // The frontend text just has @username. 
-                                      // To link correctly to ID, we'd need the ID.
-                                      // But for now, let's link to /profile/username and ensure the router handles it or use search.
-                                      // Let's try linking to search for now as a safe fallback if we don't have ID map.
-                                      to={`/search?q=@${username}`}
-                                      className="text-info-500 hover:underline font-medium"
-                                      onClick={(e) => e.stopPropagation()}
-                                    >
-                                      @{username}
-                                    </Link>
-                                    {word.substring(mentionMatch[0].length)}
-                                  </span>
-                                );
-                              }
-
-                              return <span key={index}>{word}</span>;
-                            })}
-                          </div>
-                        )}
-
-                        {/* Quote Retweet: Show original post in container */}
-                        {post.is_quote_retweet && post.original_post && (
-                          <QuoteTweetCard
-                            post={post.original_post}
-                            isDark={isDark}
-                            onClick={() => navigate(`/post/${post.original_post?.id}`)}
-                          />
-                        )}
-
-                        {/* Media Content - Only for non-quote retweets */}
-                        {!post.is_quote_retweet && post.media && post.media.length > 0 && (
-                          <div className={cn(
-                            "grid gap-1 rounded-2xl overflow-hidden mb-3 border",
-                            isDark ? 'border-[#1C1F20]' : 'border-gray-200',
-                            post.media.length === 1 ? 'grid-cols-1' : 'grid-cols-2'
-                          )}>
-                            {post.media.map((media: { type: 'image' | 'video'; url: string; alt?: string }, index: number) => (
-                              <div
-                                key={index}
-                                className="relative cursor-pointer"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  if (media.type === 'image') {
-                                    setLightboxImages(post.media || []);
-                                    setSelectedImageIndex(index);
-                                    setLightboxOpen(true);
-                                  }
-                                }}
+                        {/* Post Content */}
+                        <div className="flex-1 min-w-0">
+                          {/* Header: Name, Username, Time, More */}
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="flex items-center gap-1 overflow-hidden">
+                              <Link
+                                to={`/profile/${post.author.id}`}
+                                className="font-bold hover:underline truncate text-base"
+                                onClick={(e) => e.stopPropagation()}
                               >
-                                {media.type === 'image' ? (
-                                  <img
-                                    src={media.url}
-                                    alt={media.alt || ''}
-                                    className="w-full h-full object-cover max-h-[500px]"
-                                  />
-                                ) : (
-                                  <EnhancedVideoPlayer
-                                    src={media.url}
-                                    className="w-full h-full max-h-[500px]"
-                                  />
-                                )}
-                              </div>
-                            ))}
+                                {post.author.name}
+                              </Link>
+                              {post.author.verified && (
+                                <span className="text-info-500 shrink-0">
+                                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><g><path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .495.083.965.238 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z" /></g></svg>
+                                </span>
+                              )}
+                              <span className="text-gray-500 text-sm truncate">@{post.author.username}</span>
+                              <span className="text-gray-500 text-sm">·</span>
+                              <span className="text-gray-500 text-sm hover:underline">{formatTime(post.created_at)}</span>
+                            </div>
+                            <button className="text-gray-500 hover:text-info-500 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
+                              <span className="sr-only">More</span>
+                              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><g><path d="M3 12c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm9 2c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm7 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"></path></g></svg>
+                            </button>
                           </div>
-                        )}
 
-                        {/* Post Actions */}
-                        <EnhancedPostCardInteractions
-                          postId={post.id}
-                          initialLikes={post.likes_count}
-                          initialRetweets={post.retweets_count}
-                          initialReplies={post.replies_count}
-                          isLiked={post.has_liked}
-                          isRetweeted={post.has_retweeted}
-                          isBookmarked={post.has_bookmarked}
-                          onLike={() => handleLike(post.id)}
-                          onRetweet={() => handleRetweet(post.id)}
-                          onReply={() => navigate(`/post/${post.id}`)}
-                          onShare={() => handleShare(post)}
-                          onBookmark={() => handleBookmark(post.id)}
-                        />
+                          {/* Text Content */}
+                          {post.content && (
+                            <div
+                              className={cn(
+                                'text-[15px] leading-normal mb-3 whitespace-pre-wrap wrap-break-word',
+                                isDark ? 'text-white' : 'text-gray-900'
+                              )}
+                            >
+                              {post.content.split(/(\s+)/).map((word, index) => {
+                                // Check if word is a hashtag
+                                const hashtagMatch = word.match(/^#(\w+)/);
+                                if (hashtagMatch) {
+                                  const hashtagName = hashtagMatch[1];
+                                  return (
+                                    <span key={index}>
+                                      <Link
+                                        to={`/hashtag/${hashtagName}`}
+                                        className="text-info-500 hover:underline font-medium"
+                                        onClick={(e) => e.stopPropagation()}
+                                      >
+                                        #{hashtagName}
+                                      </Link>
+                                      {word.substring(hashtagMatch[0].length)}
+                                    </span>
+                                  );
+                                }
+
+                                // Check if word is a mention
+                                const mentionMatch = word.match(/^@(\w+)/);
+                                if (mentionMatch) {
+                                  const username = mentionMatch[1];
+                                  return (
+                                    <span key={index}>
+                                      <Link
+                                        to={`/search?q=@${username}`}
+                                        className="text-info-500 hover:underline font-medium"
+                                        onClick={(e) => e.stopPropagation()}
+                                      >
+                                        @{username}
+                                      </Link>
+                                      {word.substring(mentionMatch[0].length)}
+                                    </span>
+                                  );
+                                }
+
+                                return <span key={index}>{word}</span>;
+                              })}
+                            </div>
+                          )}
+
+                          {/* Quote Retweet: Show original post in container */}
+                          {post.is_quote_retweet && post.original_post && (
+                            <QuoteTweetCard
+                              post={post.original_post}
+                              isDark={isDark}
+                              onClick={() => navigate(`/post/${post.original_post?.id}`)}
+                            />
+                          )}
+
+                          {/* Media Content - Only for non-quote retweets */}
+                          {!post.is_quote_retweet && post.media && post.media.length > 0 && (
+                            <div className={cn(
+                              "grid gap-1 rounded-2xl overflow-hidden mb-3 border",
+                              isDark ? 'border-[#1C1F20]' : 'border-gray-200',
+                              post.media.length === 1 ? 'grid-cols-1' : 'grid-cols-2'
+                            )}>
+                              {post.media.map((media: { type: 'image' | 'video'; url: string; alt?: string }, index: number) => (
+                                <div
+                                  key={index}
+                                  className="relative cursor-pointer"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (media.type === 'image') {
+                                      setLightboxImages(post.media || []);
+                                      setSelectedImageIndex(index);
+                                      setLightboxOpen(true);
+                                    }
+                                  }}
+                                >
+                                  {media.type === 'image' ? (
+                                    <img
+                                      src={media.url}
+                                      alt={media.alt || ''}
+                                      className="w-full h-full object-cover max-h-[500px]"
+                                    />
+                                  ) : (
+                                    <EnhancedVideoPlayer
+                                      src={media.url}
+                                      className="w-full h-full max-h-[500px]"
+                                    />
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Post Actions */}
+                          <EnhancedPostCardInteractions
+                            postId={post.id}
+                            initialLikes={post.likes_count}
+                            initialRetweets={post.retweets_count}
+                            initialReplies={post.replies_count}
+                            isLiked={post.has_liked}
+                            isRetweeted={post.has_retweeted}
+                            isBookmarked={post.has_bookmarked}
+                            onLike={() => handleLike(post.id)}
+                            onRetweet={() => handleRetweet(post.id)}
+                            onReply={() => navigate(`/post/${post.id}`)}
+                            onShare={() => handleShare(post)}
+                            onBookmark={() => handleBookmark(post.id)}
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </Animate>
                 ))}
               </div>
             )}

@@ -111,6 +111,91 @@ export function parseContentWithHashtags(content: string): Array<{
 }
 
 // ============================================================================
+// MENTION EXTRACTION & PARSING
+// ============================================================================
+
+/**
+ * Extracts mentions from text content
+ * @param content - Text content to extract mentions from
+ * @returns Array of mention strings (without @ symbol)
+ */
+export function extractMentions(content: string): string[] {
+    if (!content) return [];
+
+    // Regex pattern: @ followed by letters, numbers, underscores
+    // Matches: @username, @john_doe, @user123
+    // Doesn't match: @123 (numbers only), @ (just symbol)
+    const mentionRegex = /@([A-Za-z][A-Za-z0-9_]*)/g;
+    const matches = content.match(mentionRegex);
+
+    if (!matches) return [];
+
+    // Remove @ symbol and remove duplicates using Set
+    const mentions = [...new Set(matches.map(mention => mention.slice(1)))];
+
+    return mentions;
+}
+
+/**
+ * Parses content with both hashtags and mentions for highlighting
+ * Returns array of text segments, hashtag objects, and mention objects for rendering
+ * @param content - Text content with hashtags and mentions
+ * @returns Array of content segments
+ */
+export function parseContentWithHashtagsAndMentions(content: string): Array<{
+    type: 'text' | 'hashtag' | 'mention';
+    value: string;
+    hashtag?: string;
+    mention?: string;
+}> {
+    if (!content) return [];
+
+    const segments: Array<{ type: 'text' | 'hashtag' | 'mention'; value: string; hashtag?: string; mention?: string }> = [];
+    // Combined regex to match both hashtags and mentions
+    const combinedRegex = /(#[A-Za-z][A-Za-z0-9_]*|@[A-Za-z][A-Za-z0-9_]*)/g;
+
+    let lastIndex = 0;
+    let match;
+
+    while ((match = combinedRegex.exec(content)) !== null) {
+        // Add text before hashtag/mention
+        if (match.index > lastIndex) {
+            segments.push({
+                type: 'text',
+                value: content.slice(lastIndex, match.index)
+            });
+        }
+
+        // Determine if it's a hashtag or mention
+        if (match[0].startsWith('#')) {
+            segments.push({
+                type: 'hashtag',
+                value: match[0],
+                hashtag: match[0].slice(1) // Without # symbol
+            });
+        } else if (match[0].startsWith('@')) {
+            segments.push({
+                type: 'mention',
+                value: match[0],
+                mention: match[0].slice(1) // Without @ symbol
+            });
+        }
+
+        lastIndex = match.index + match[0].length;
+    }
+
+    // Add remaining text
+    if (lastIndex < content.length) {
+        segments.push({
+            type: 'text',
+            value: content.slice(lastIndex)
+        });
+    }
+
+    return segments;
+}
+
+// ============================================================================
 // TRENDING CALCULATIONS
 // ============================================================================
 

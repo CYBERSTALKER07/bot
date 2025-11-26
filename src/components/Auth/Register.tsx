@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { 
-  User, 
-  Building2, 
+import {
+  User,
+  Building2,
   Mail,
   Eye,
   EyeOff,
@@ -32,7 +32,7 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-  
+
   const { signUp } = useAuth();
   const { isDark } = useTheme();
   const navigate = useNavigate();
@@ -51,7 +51,7 @@ export default function Register() {
   ) => {
     const value = field === 'agreeToTerms' ? e.target.checked : e.target.value;
     setFormData(prev => ({ ...prev, [field]: value }));
-    
+
     // Clear validation error for this field
     if (validationErrors[field]) {
       setValidationErrors(prev => ({ ...prev, [field]: '' }));
@@ -113,21 +113,21 @@ export default function Register() {
     setLoading(true);
     try {
       const fullName = `${formData.firstName.trim()} ${formData.lastName.trim()}`;
-      
+
       const { error } = await signUp(formData.email, formData.password, {
         full_name: fullName,
         username: formData.email.split('@')[0],
         role: formData.role
       });
-      
+
       if (error) {
         setError(error.message);
         setLoading(false);
         return;
       }
-      
+
       setSuccess('Registration successful! Please check your email to confirm your account before signing in.');
-      
+
       // Redirect to login after a delay
       setTimeout(() => {
         navigate(`/login?role=${formData.role}`);
@@ -140,16 +140,15 @@ export default function Register() {
   };
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-black text-white' : 'bg-white text-black'}`}>
+    <div className={`min-h-screen ${isDark ? 'bg-black text-white' : 'bg-white text-black'} ios-safe-top ios-bottom-safe`}>
       <div className="min-h-screen flex">
         {/* Left Side - Form */}
         <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24 max-w-2xl mx-auto lg:max-w-none">
           <div className="mx-auto w-full max-w-md lg:w-full">
             {/* Logo */}
             <div className="text-center mb-8">
-              <div className={`w-12 h-12 rounded-full mx-auto mb-6 flex items-center justify-center ${
-                isDark ? 'bg-[#BCE953]' : 'bg-[#BCE953]'
-              }`}>
+              <div className={`w-12 h-12 rounded-full mx-auto mb-6 flex items-center justify-center ${isDark ? 'bg-[#BCE953]' : 'bg-[#BCE953]'
+                }`}>
                 <GraduationCap className="h-6 w-6 text-black" />
               </div>
               <h1 className="text-3xl font-bold mb-2">Create your account</h1>
@@ -167,28 +166,26 @@ export default function Register() {
                   <button
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, role: 'student' }))}
-                    className={`p-4 rounded-lg border-2 transition-all duration-200 flex items-center justify-center space-x-3 ${
-                      formData.role === 'student'
+                    className={`p-4 rounded-lg border-2 transition-all duration-200 flex items-center justify-center space-x-3 ${formData.role === 'student'
                         ? 'border-[#BCE953] bg-[#BCE953] text-black'
                         : isDark
                           ? 'border-gray-600 text-gray-300 hover:border-gray-500'
                           : 'border-gray-300 text-gray-700 hover:border-gray-400'
-                    }`}
+                      }`}
                   >
                     <User className="h-5 w-5" />
                     <span className="font-medium">Student</span>
                   </button>
-                  
+
                   <button
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, role: 'employer' }))}
-                    className={`p-4 rounded-lg border-2 transition-all duration-200 flex items-center justify-center space-x-3 ${
-                      formData.role === 'employer'
+                    className={`p-4 rounded-lg border-2 transition-all duration-200 flex items-center justify-center space-x-3 ${formData.role === 'employer'
                         ? 'border-[#BCE953] bg-[#BCE953] text-black'
                         : isDark
                           ? 'border-gray-600 text-gray-300 hover:border-gray-500'
                           : 'border-gray-300 text-gray-700 hover:border-gray-400'
-                    }`}
+                      }`}
                   >
                     <Building2 className="h-5 w-5" />
                     <span className="font-medium">Employer</span>
@@ -204,13 +201,12 @@ export default function Register() {
                     placeholder="First Name"
                     value={formData.firstName}
                     onChange={handleChange('firstName')}
-                    className={`w-full px-4 py-3 rounded-lg border transition-colors ${
-                      validationErrors.firstName
+                    className={`w-full px-4 py-3 rounded-lg border transition-colors ${validationErrors.firstName
                         ? 'border-red-500 focus:border-red-500'
                         : isDark
                           ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-[#BCE953]'
                           : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#BCE953]'
-                    } focus:outline-hidden focus:ring-2 focus:ring-[#BCE953]/20`}
+                      } focus:outline-hidden focus:ring-2 focus:ring-[#BCE953]/20`}
                   />
                   {validationErrors.firstName && (
                     <p className="text-red-500 text-sm flex items-center space-x-1">
@@ -226,13 +222,12 @@ export default function Register() {
                     placeholder="Last Name"
                     value={formData.lastName}
                     onChange={handleChange('lastName')}
-                    className={`w-full px-4 py-3 rounded-lg border transition-colors ${
-                      validationErrors.lastName
+                    className={`w-full px-4 py-3 rounded-lg border transition-colors ${validationErrors.lastName
                         ? 'border-red-500 focus:border-red-500'
                         : isDark
                           ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-[#BCE953]'
                           : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#BCE953]'
-                    } focus:outline-hidden focus:ring-2 focus:ring-[#BCE953]/20`}
+                      } focus:outline-hidden focus:ring-2 focus:ring-[#BCE953]/20`}
                   />
                   {validationErrors.lastName && (
                     <p className="text-red-500 text-sm flex items-center space-x-1">
@@ -251,17 +246,15 @@ export default function Register() {
                     placeholder="Email address"
                     value={formData.email}
                     onChange={handleChange('email')}
-                    className={`w-full px-4 py-3 rounded-lg border transition-colors ${
-                      validationErrors.email
+                    className={`w-full px-4 py-3 rounded-lg border transition-colors ${validationErrors.email
                         ? 'border-red-500 focus:border-red-500'
                         : isDark
                           ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-[#BCE953]'
                           : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#BCE953]'
-                    } focus:outline-hidden focus:ring-2 focus:ring-[#BCE953]/20`}
+                      } focus:outline-hidden focus:ring-2 focus:ring-[#BCE953]/20`}
                   />
-                  <Mail className={`absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 ${
-                    isDark ? 'text-gray-400' : 'text-gray-500'
-                  }`} />
+                  <Mail className={`absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 ${isDark ? 'text-gray-400' : 'text-gray-500'
+                    }`} />
                 </div>
                 {validationErrors.email && (
                   <p className="text-red-500 text-sm flex items-center space-x-1">
@@ -279,13 +272,12 @@ export default function Register() {
                     placeholder="Company Name"
                     value={formData.companyName}
                     onChange={handleChange('companyName')}
-                    className={`w-full px-4 py-3 rounded-lg border transition-colors ${
-                      validationErrors.companyName
+                    className={`w-full px-4 py-3 rounded-lg border transition-colors ${validationErrors.companyName
                         ? 'border-red-500 focus:border-red-500'
                         : isDark
                           ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-[#BCE953]'
                           : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#BCE953]'
-                    } focus:outline-hidden focus:ring-2 focus:ring-[#BCE953]/20`}
+                      } focus:outline-hidden focus:ring-2 focus:ring-[#BCE953]/20`}
                   />
                   {validationErrors.companyName && (
                     <p className="text-red-500 text-sm flex items-center space-x-1">
@@ -305,20 +297,18 @@ export default function Register() {
                       placeholder="Password"
                       value={formData.password}
                       onChange={handleChange('password')}
-                      className={`w-full px-4 py-3 rounded-lg border transition-colors pr-12 ${
-                        validationErrors.password
+                      className={`w-full px-4 py-3 rounded-lg border transition-colors pr-12 ${validationErrors.password
                           ? 'border-red-500 focus:border-red-500'
                           : isDark
                             ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-[#BCE953]'
                             : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#BCE953]'
-                      } focus:outline-hidden focus:ring-2 focus:ring-[#BCE953]/20`}
+                        } focus:outline-hidden focus:ring-2 focus:ring-[#BCE953]/20`}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
-                        isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'
-                      }`}
+                      className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'
+                        }`}
                     >
                       {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                     </button>
@@ -338,20 +328,18 @@ export default function Register() {
                       placeholder="Confirm Password"
                       value={formData.confirmPassword}
                       onChange={handleChange('confirmPassword')}
-                      className={`w-full px-4 py-3 rounded-lg border transition-colors pr-12 ${
-                        validationErrors.confirmPassword
+                      className={`w-full px-4 py-3 rounded-lg border transition-colors pr-12 ${validationErrors.confirmPassword
                           ? 'border-red-500 focus:border-red-500'
                           : isDark
                             ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-[#BCE953]'
                             : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#BCE953]'
-                      } focus:outline-hidden focus:ring-2 focus:ring-[#BCE953]/20`}
+                        } focus:outline-hidden focus:ring-2 focus:ring-[#BCE953]/20`}
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
-                        isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'
-                      }`}
+                      className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'
+                        }`}
                     >
                       {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                     </button>
@@ -372,11 +360,10 @@ export default function Register() {
                     type="checkbox"
                     checked={formData.agreeToTerms}
                     onChange={handleChange('agreeToTerms')}
-                    className={`mt-1 w-4 h-4 rounded ${
-                      isDark 
-                        ? 'bg-gray-800 border-gray-600 text-[#BCE953]' 
+                    className={`mt-1 w-4 h-4 rounded ${isDark
+                        ? 'bg-gray-800 border-gray-600 text-[#BCE953]'
                         : 'bg-white border-gray-300 text-[#BCE953]'
-                    }`}
+                      }`}
                   />
                   <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                     I agree to the{' '}
@@ -399,11 +386,10 @@ export default function Register() {
 
               {/* Error/Success Messages */}
               {error && (
-                <div className={`p-4 rounded-lg border ${
-                  isDark 
-                    ? 'bg-red-900/20 border-red-800 text-red-300' 
+                <div className={`p-4 rounded-lg border ${isDark
+                    ? 'bg-red-900/20 border-red-800 text-red-300'
                     : 'bg-red-50 border-red-200 text-red-700'
-                }`}>
+                  }`}>
                   <div className="flex items-center space-x-2">
                     <AlertCircle className="h-5 w-5" />
                     <span>{error}</span>
@@ -412,11 +398,10 @@ export default function Register() {
               )}
 
               {success && (
-                <div className={`p-4 rounded-lg border ${
-                  isDark 
-                    ? 'bg-green-900/20 border-green-800 text-green-300' 
+                <div className={`p-4 rounded-lg border ${isDark
+                    ? 'bg-green-900/20 border-green-800 text-green-300'
                     : 'bg-green-50 border-green-200 text-green-700'
-                }`}>
+                  }`}>
                   <div className="flex items-center space-x-2">
                     <Check className="h-5 w-5" />
                     <span>{success}</span>
@@ -428,11 +413,10 @@ export default function Register() {
               <Button
                 type="submit"
                 disabled={loading}
-                className={`w-full py-3 text-lg font-semibold rounded-lg transition-colors flex items-center justify-center space-x-2 ${
-                  loading
+                className={`w-full py-3 text-lg font-semibold rounded-lg transition-colors flex items-center justify-center space-x-2 ${loading
                     ? 'bg-gray-400 cursor-not-allowed'
                     : 'bg-[#BCE953] hover:bg-[#BCE953]/90 text-black'
-                }`}
+                  }`}
               >
                 {loading ? (
                   <span>Creating account...</span>
@@ -449,7 +433,7 @@ export default function Register() {
             <div className="mt-8 text-center">
               <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 Already have an account?{' '}
-                <Link 
+                <Link
                   to={`/login?role=${formData.role}`}
                   className="text-[#BCE953] hover:underline font-medium"
                 >
@@ -462,14 +446,13 @@ export default function Register() {
 
         {/* Right Side - Visual Content (Desktop only) */}
         <div className="hidden lg:flex relative flex-1 overflow-hidden">
-          <div className={`absolute inset-0 ${
-            isDark 
-              ? 'bg-linear-to-br from-gray-900 via-black to-gray-900' 
+          <div className={`absolute inset-0 ${isDark
+              ? 'bg-linear-to-br from-gray-900 via-black to-gray-900'
               : 'bg-linear-to-br from-info-600 via-purple-600 to-indigo-600'
-          }`}>
+            }`}>
             <div className="absolute inset-0 bg-linear-to-br from-[#BCE953]/20 to-transparent"></div>
           </div>
-          
+
           <div className="relative z-10 flex flex-col justify-center items-center h-full p-12 text-white">
             <div className="max-w-md text-center">
               <GraduationCap className="w-24 h-24 mx-auto mb-8 text-[#BCE953]" />
@@ -477,12 +460,12 @@ export default function Register() {
                 {formData.role === 'student' ? 'Launch Your Career' : 'Find Top Talent'}
               </h2>
               <p className="text-xl mb-8 text-gray-200">
-                {formData.role === 'student' 
+                {formData.role === 'student'
                   ? 'Connect with leading employers and discover opportunities that match your skills and interests.'
                   : 'Access a pool of talented students and graduates from AUT University.'
                 }
               </p>
-              
+
               <div className="grid grid-cols-2 gap-6 text-center">
                 <div>
                   <div className="text-3xl font-bold text-[#BCE953] mb-2">15k+</div>

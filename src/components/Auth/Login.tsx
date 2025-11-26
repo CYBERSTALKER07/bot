@@ -139,7 +139,7 @@ export default function Login() {
   if (step === 'landing') {
     return (
       <div className={cn(
-        'min-h-screen flex',
+        'min-h-screen flex ios-safe-top ios-bottom-safe',
         isDark ? 'bg-black' : 'bg-white'
       )}>
         {/* Left Side - Logo (Hidden on mobile) */}
@@ -181,7 +181,7 @@ export default function Login() {
             </div>
 
             <h1 className={cn(
-              'text-6xl font-bold',
+              'text-4xl md:text-6xl font-bold',
               isDark ? 'text-white' : 'text-black'
             )}>
               Happening now
@@ -247,7 +247,7 @@ export default function Login() {
   if (step === 'signin') {
     return (
       <div className={cn(
-        'min-h-screen flex items-center justify-center p-4',
+        'min-h-screen flex items-center justify-center p-4 ios-safe-top ios-bottom-safe',
         isDark ? 'bg-black' : 'bg-white'
       )}>
         <div className="max-w-[440px] w-full">
@@ -435,7 +435,7 @@ export default function Login() {
   // Sign Up Page (X-style)
   return (
     <div className={cn(
-      'min-h-screen flex items-center justify-center p-4',
+      'min-h-screen flex items-center justify-center p-4 ios-safe-top ios-bottom-safe',
       isDark ? 'bg-black' : 'bg-white'
     )}>
       <div className="max-w-[440px] w-full">

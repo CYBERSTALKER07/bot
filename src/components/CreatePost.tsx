@@ -383,7 +383,7 @@ export default function CreatePost() {
     >
       {/* Header */}
       <div className={cn(
-        'sticky top-0 z-10 backdrop-blur-xl border-b',
+        'sticky top-0 z-10 backdrop-blur-xl border-b ios-safe-top',
         isDark ? 'bg-black/80 border-[#2f3336]' : 'bg-white/80 border-gray-200'
       )}>
         <div className="flex items-center justify-between px-4 py-3">
@@ -446,7 +446,7 @@ export default function CreatePost() {
                 placeholder="Start a thread..."
                 className={cn(
                   'w-full text-base bg-transparent border-none resize-none p-0',
-                  'focus:outline-hidden min-h-[60px] placeholder-gray-500 focus:ring-0',
+                  'focus:outline-hidden min-h-[100px] placeholder-gray-500 focus:ring-0',
                   isDark ? 'text-[#e7e9ea]' : 'text-black'
                 )}
                 minHeight="auto"
@@ -483,23 +483,23 @@ export default function CreatePost() {
               )}
 
               {/* Action Icons */}
-              <div className="flex items-center gap-4 mt-4 text-gray-500">
+              <div className="flex items-center gap-2 mt-4 text-gray-500">
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="hover:text-[#D3FB52] transition-colors"
+                  className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-[#181818] hover:text-[#D3FB52] transition-colors"
                 >
                   <ImageIcon className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => videoInputRef.current?.click()}
-                  className="hover:text-[#D3FB52] transition-colors"
+                  className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-[#181818] hover:text-[#D3FB52] transition-colors"
                 >
                   <Video className="w-5 h-5" />
                 </button>
-                <button className="hover:text-[#D3FB52] transition-colors">
+                <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-[#181818] hover:text-[#D3FB52] transition-colors">
                   <div className="text-xs font-medium border border-current rounded px-1">GIF</div>
                 </button>
-                <button className="hover:text-[#D3FB52] transition-colors">
+                <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-[#181818] hover:text-[#D3FB52] transition-colors">
                   <MapPin className="w-5 h-5" />
                 </button>
               </div>
@@ -507,7 +507,7 @@ export default function CreatePost() {
           </div>
 
           {/* Bottom Bar */}
-          <div className="fixed bottom-0 left-0 right-0 p-4 flex justify-between items-center max-w-2xl mx-auto bg-inherit">
+          <div className="fixed bottom-0 left-0 right-0 p-4 flex justify-between items-center max-w-2xl mx-auto bg-inherit ios-bottom-safe border-t border-transparent">
             <div className={cn(
               "text-sm",
               isDark ? "text-[#71767b]" : "text-gray-400"

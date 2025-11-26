@@ -201,13 +201,25 @@ export function usePosts(limit = 20, currentUserId?: string) {
       }
     },
     getNextPageParam: (lastPage, allPages) => {
-      try {
-        if (!lastPage || !allPages || !Array.isArray(allPages) || allPages.length === 0) return undefined;
-        return lastPage.length === limit ? allPages.length : undefined;
-      } catch (e) {
-        console.error('Error in getNextPageParam:', e);
+      // Safety checks - ensure lastPage is defined and is an array
+      if (!lastPage || !Array.isArray(lastPage)) {
+        console.warn('getNextPageParam: lastPage is not an array', lastPage);
         return undefined;
       }
+
+      // Ensure allPages exists and is an array
+      if (!allPages || !Array.isArray(allPages) || allPages.length === 0) {
+        console.warn('getNextPageParam: allPages is invalid', allPages);
+        return undefined;
+      }
+
+      // If the last page has fewer items than the limit, we've reached the end
+      if (lastPage.length < limit) {
+        return undefined;
+      }
+
+      // Return the next page number
+      return allPages.length;
     },
     initialPageParam: 0,
     staleTime: 5 * 60 * 1000, // Reduced from 10 to 5 minutes for fresher data

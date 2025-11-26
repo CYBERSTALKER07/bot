@@ -1,21 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Search,
   Briefcase
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { useScrollDirection } from '../hooks/useScrollDirection';
 import Button from './ui/Button';
 import PageLayout from './ui/PageLayout';
 import { cn } from '../lib/cva';
 import { useJobs } from '../hooks/useJobs';
 import JobCard from './JobCard';
+import Animate from './ui/Animate';
 
 export default function JobsPage() {
   const { isDark } = useTheme();
+  const { isVisible: isScrollingUp } = useScrollDirection({ threshold: 3 });
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const { jobs: jobsData = [], loading, error } = useJobs();
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Filter jobs based on search and type
   const filteredJobs = (jobsData || []).filter(job => {
@@ -91,24 +102,24 @@ export default function JobsPage() {
       'min-h-screen',
       isDark ? 'bg-black text-white' : 'bg-white text-black'
     )}>
-      <PageLayout maxWidth="7xl">
-        <div className="py-8 sm:py-12">
+      <PageLayout maxWidth="7xl" padding={isMobile ? 'sm' : 'md'}>
+        <div className="py-4 sm:py-8 lg:py-12">
           {/* Search and Filter Section */}
-          <div className="mb-10 space-y-4">
+          <div className="mb-6 sm:mb-10 space-y-4">
 
             {/* Search Bar */}
-            <div className="relative ">
+            <div className="relative">
               <Search className={cn(
-                'absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5',
+                'absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5',
                 isDark ? 'text-gray-500' : 'text-gray-400'
               )} />
               <input
                 type="text"
-                placeholder="Search jobs by title, company, or keyword..."
+                placeholder={isMobile ? "Search jobs..." : "Search jobs by title, company, or keyword..."}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className={cn(
-                  'w-full pl-12 pr-4 py-3 rounded-xl border-2 transition-all duration-200 text-base',
+                  'w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 rounded-xl border-2 transition-all duration-200 text-sm sm:text-base',
                   isDark
                     ? 'bg-black border-gray-700 text-white placeholder-gray-500 focus:border-info-500 focus:outline-hidden'
                     : 'bg-gray-50 border-gray-200 text-black placeholder-gray-500 focus:border-info-500 focus:outline-hidden focus:ring-2 focus:ring-info-500/20'
@@ -129,13 +140,13 @@ export default function JobsPage() {
                   key={value}
                   onClick={() => setTypeFilter(value)}
                   className={cn(
-                    'px-4 py-2.5 rounded-full text-sm font-semibold transition-all duration-200',
+                    'px-3 sm:px-4 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 active:scale-95',
                     typeFilter === value
                       ? isDark
-                        ? 'bg-black text-white shadow-lg shadow-info-600'
-                        : 'bg-info-600 text-white shadow-lg shadow-info-600/30'
+                        ? 'bg-white text-black shadow-lg'
+                        : 'bg-black text-white shadow-lg'
                       : isDark
-                        ? 'bg-black text-gray-300 hover:bg-gray-700'
+                        ? 'bg-gray-900 text-gray-300 hover:bg-gray-800'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   )}
                 >
@@ -175,10 +186,13 @@ export default function JobsPage() {
           ) : (
             <>
               {/* Jobs Grid - Responsive Layout */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-                {filteredJobs.map((job) => (
-                  <div
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-10">
+                {filteredJobs.map((job, index) => (
+                  <Animate
                     key={job.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    enter={{ opacity: 1, y: 0, duration: 400, delay: index * 50 }}
+                    exit={{ opacity: 0, scale: 0.95, duration: 300 }}
                     className="h-full"
                   >
                     <JobCard
@@ -194,7 +208,7 @@ export default function JobsPage() {
                       is_remote={job.is_remote}
                       employer={job.employer}
                     />
-                  </div>
+                  </Animate>
                 ))}
               </div>
 

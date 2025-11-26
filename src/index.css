@@ -279,20 +279,17 @@
 
 @utility ios-safe-top {
   /* Enhanced iOS-specific safe area utilities */
-  padding-top: max(env(safe-area-inset-top), 100px);
-  /* Increased from 20px */
+  padding-top: max(env(safe-area-inset-top), 20px);
 }
 
 @utility ios-safe-bottom {
-  padding-bottom: max(env(safe-area-inset-bottom), 100px);
+  padding-bottom: max(env(safe-area-inset-bottom), 20px);
 }
 
 @utility ios-header-safe {
   /* Dynamic Island and Notch support - Enhanced */
   padding-top: max(env(safe-area-inset-top), 54px);
-  /* Increased from 44px */
   min-height: max(env(safe-area-inset-top), 54px);
-  /* Increased from 44px */
 }
 
 @utility ios-bottom-safe {
@@ -304,7 +301,6 @@
   /* Home indicator area protection - Enhanced */
   padding-bottom: max(env(safe-area-inset-bottom), 34px);
   min-height: 64px;
-  /* Ensure minimum touch target */
 }
 
 @utility ios-safe-area {
@@ -319,7 +315,6 @@
   @media screen and (max-width: 430px) and (max-height: 932px) {
     /* iPhone 14 Pro Max specific adjustments */
     padding-top: max(env(safe-area-inset-top), 69px);
-    /* Increased from 59px */
   }
 }
 
@@ -334,7 +329,6 @@
   @media screen and (max-width: 393px) and (max-height: 852px) {
     /* iPhone 14 Pro specific adjustments */
     padding-top: max(env(safe-area-inset-top), 69px);
-    /* Increased from 59px */
   }
 }
 
@@ -349,7 +343,6 @@
   @media screen and (max-width: 390px) and (max-height: 844px) {
     /* iPhone 12/13/14 standard specific adjustments */
     padding-top: max(env(safe-area-inset-top), 57px);
-    /* Increased from 47px */
   }
 }
 
@@ -363,7 +356,6 @@
   @media screen and (max-width: 375px) and (max-height: 812px) {
     /* iPhone X/XS/11 Pro specific adjustments */
     padding-top: max(env(safe-area-inset-top), 54px);
-    /* Increased from 44px */
   }
 }
 
@@ -377,7 +369,6 @@
   @media screen and (max-width: 375px) and (max-height: 667px) {
     /* iPhone SE 2nd/3rd gen adjustments */
     padding-top: max(env(safe-area-inset-top), 30px);
-    /* Increased from 20px */
   }
 }
 
@@ -705,6 +696,51 @@
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
+}
+
+@utility mobile-container {
+  /* Mobile-first container with safe areas */
+  @apply w-full px-4 safe-left safe-right;
+}
+
+@utility mobile-grid {
+  /* Mobile-first grid */
+  @apply grid grid-cols-1 gap-4;
+}
+
+@utility touch-action-none {
+  touch-action: none;
+}
+
+/* New Animations */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility animate-fade-in-up {
+  animation: fade-in-up 0.3s ease-out forwards;
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@utility animate-scale-in {
+  animation: scale-in 0.2s ease-out forwards;
 }
 
 @layer utilities {

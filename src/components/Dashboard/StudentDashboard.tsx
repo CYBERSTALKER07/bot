@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
+import {
   Search,
   TrendingUp,
   MapPin,
@@ -26,7 +26,7 @@ import {
 import { useJobs } from '../../hooks/useJobs';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
-import { 
+import {
   useRecommendedUsers,
   useMostLikedPosts,
   useBookmarks,
@@ -115,7 +115,7 @@ export default function StudentDashboard() {
             const diffTime = Math.abs(now.getTime() - appliedDate.getTime());
             const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
+
             let timeString = '';
             if (diffHours < 1) timeString = 'now';
             else if (diffHours < 24) timeString = `${diffHours}h`;
@@ -143,7 +143,7 @@ export default function StudentDashboard() {
   const filteredJobs = jobs
     .filter(job => {
       const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           job.company.toLowerCase().includes(searchTerm.toLowerCase());
+        job.company.toLowerCase().includes(searchTerm.toLowerCase());
       return matchesSearch;
     })
     .slice(0, 6);
@@ -153,7 +153,7 @@ export default function StudentDashboard() {
     const content = post.content || '';
     const hashtags = content.match(/#\w+/g) || [];
     const mainHashtag = hashtags[0] || `#Post${index + 1}`;
-    
+
     return {
       tag: mainHashtag,
       posts: `${post.likes_count || 0} likes`,
@@ -198,16 +198,15 @@ export default function StudentDashboard() {
     return (
       <PageLayout className={isDark ? 'bg-black text-white' : 'bg-white text-black'}>
         <div className="flex justify-center items-center h-screen">
-          <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${
-            isDark ? 'border-white' : 'border-black'
-          }`}></div>
+          <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${isDark ? 'border-white' : 'border-black'
+            }`}></div>
         </div>
       </PageLayout>
     );
   }
 
   return (
-    <PageLayout 
+    <PageLayout
       className={`min-h-screen ${isDark ? 'bg-black text-white' : 'bg-white text-black'}`}
       maxWidth="full"
       padding="none"
@@ -247,7 +246,7 @@ export default function StudentDashboard() {
       {showMobileSidebar && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="fixed inset-0 bg-black/50" onClick={() => setShowMobileSidebar(false)} />
-          <div 
+          <div
             id="mobile-sidebar"
             className={cn(
               'fixed left-0 top-0 h-full w-80 max-w-[85vw] overflow-y-auto ios-sidebar-fix ios-safe-area',
@@ -266,7 +265,7 @@ export default function StudentDashboard() {
                 <X className="h-5 w-5" />
               </Button>
             </div>
-            
+
             <div className="p-4 space-y-4">
               {/* Mobile Search */}
               <div className={cn(
@@ -309,32 +308,32 @@ export default function StudentDashboard() {
                 </button>
                 {expandedSections.actions && (
                   <div className="space-y-2">
-                    <Link 
-                      to="/applications" 
+                    <Link
+                      to="/applications"
                       className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors ios-nav-item"
                       onClick={() => setShowMobileSidebar(false)}
                     >
                       <Briefcase className={cn('h-5 w-5', isDark ? 'text-white' : 'text-black')} />
                       <span>View Applications</span>
                     </Link>
-                    <Link 
-                      to="/events" 
+                    <Link
+                      to="/events"
                       className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors ios-nav-item"
                       onClick={() => setShowMobileSidebar(false)}
                     >
                       <Calendar className={cn('h-5 w-5', isDark ? 'text-white' : 'text-black')} />
                       <span>Career Events</span>
                     </Link>
-                    <Link 
-                      to="/companies" 
+                    <Link
+                      to="/companies"
                       className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors ios-nav-item"
                       onClick={() => setShowMobileSidebar(false)}
                     >
                       <Building2 className={cn('h-5 w-5', isDark ? 'text-white' : 'text-black')} />
                       <span>Browse Companies</span>
                     </Link>
-                    <Link 
-                      to="/resources" 
+                    <Link
+                      to="/resources"
                       className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-500/10 transition-colors ios-nav-item"
                       onClick={() => setShowMobileSidebar(false)}
                     >
@@ -381,8 +380,8 @@ export default function StudentDashboard() {
                       <p className={cn('text-xs', isDark ? 'text-gray-500' : 'text-gray-500')}>No trending topics yet</p>
                     )}
                     <Link to="/explore">
-                      <Button 
-                        variant="ghost" 
+                      <Button
+                        variant="ghost"
                         className={cn('w-full justify-start p-2 text-sm', isDark ? 'text-white' : 'text-black')}
                         onClick={() => setShowMobileSidebar(false)}
                       >
@@ -418,15 +417,15 @@ export default function StudentDashboard() {
                         <div key={index} className="flex items-center justify-between p-2">
                           <div className="flex items-center space-x-3 flex-1">
                             {suggestedUser.avatar_url ? (
-                              <img 
-                                src={suggestedUser.avatar_url} 
+                              <img
+                                src={suggestedUser.avatar_url}
                                 alt={suggestedUser.name}
-                                className="w-8 h-8 rounded-full object-cover grayscale"
+                                className="w-8 h-8 rounded-full object-cover"
                               />
                             ) : (
                               <div className={cn(
                                 'w-8 h-8 rounded-full flex items-center justify-center font-bold',
-                                isDark ? 'bg-white text-black' : 'bg-black text-white'
+                                isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-700'
                               )}>
                                 {suggestedUser.name.charAt(0)}
                               </div>
@@ -435,12 +434,9 @@ export default function StudentDashboard() {
                               <div className="flex items-center space-x-1">
                                 <p className="font-bold text-sm truncate">{suggestedUser.name}</p>
                                 {suggestedUser.verified && (
-                                  <div className={cn(
-                                    'w-3 h-3 rounded-full flex items-center justify-center',
-                                    isDark ? 'bg-white' : 'bg-black'
-                                  )}>
-                                    <span className={cn('text-xs font-bold', isDark ? 'text-black' : 'text-white')}>✓</span>
-                                  </div>
+                                  <svg className="w-4 h-4 text-[#D3FB52] fill-current" viewBox="0 0 24 24">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  </svg>
                                 )}
                               </div>
                               <p className={cn(
@@ -451,17 +447,17 @@ export default function StudentDashboard() {
                               </p>
                             </div>
                           </div>
-                          <Button 
+                          <Button
                             size="sm"
                             onClick={() => {
-                              followUserMutation.mutate({ 
-                                followerId: user?.id || '', 
-                                followingId: suggestedUser.id 
+                              followUserMutation.mutate({
+                                followerId: user?.id || '',
+                                followingId: suggestedUser.id
                               });
                             }}
                             className={cn(
                               'rounded-full px-3 py-1 text-xs font-bold ml-2',
-                              isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-900'
+                              isDark ? 'bg-[#D3FB52] text-black hover:bg-[#D3FB52]/90' : 'bg-[#D3FB52] text-black hover:bg-[#D3FB52]/90'
                             )}
                           >
                             Follow
@@ -472,8 +468,8 @@ export default function StudentDashboard() {
                       <p className={cn('text-xs', isDark ? 'text-gray-500' : 'text-gray-500')}>No suggestions available</p>
                     )}
                     <Link to="/people">
-                      <Button 
-                        variant="ghost" 
+                      <Button
+                        variant="ghost"
                         className={cn('w-full justify-start p-2 text-sm', isDark ? 'text-white' : 'text-black')}
                         onClick={() => setShowMobileSidebar(false)}
                       >
@@ -490,7 +486,7 @@ export default function StudentDashboard() {
 
       {/* Main Layout Container */}
       <div className="flex flex-col lg:flex-row max-w-7xl rounded-3xl border mx-auto">
-        
+
         {/* Desktop Header - Hidden on Mobile */}
         <div className="hidden lg:flex flex-1 max-w-4xl mx-auto">
           <div className="w-full border rounded-3xl border-gray-800 dark:border-gray-800">
@@ -516,7 +512,7 @@ export default function StudentDashboard() {
             </div>
 
             {/* Main Content */}
-            <MainContent 
+            <MainContent
               isDark={isDark}
               jobs={jobs}
               filteredJobs={filteredJobs}
@@ -528,7 +524,7 @@ export default function StudentDashboard() {
 
         {/* Mobile Main Content */}
         <div className="lg:hidden w-full">
-          <MainContent 
+          <MainContent
             isDark={isDark}
             jobs={jobs}
             filteredJobs={filteredJobs}
@@ -539,7 +535,7 @@ export default function StudentDashboard() {
 
         {/* Desktop Right Sidebar */}
         <div className="hidden lg:block w-80 xl:w-96 p-4 space-y-4">
-          <DesktopSidebar 
+          <DesktopSidebar
             isDark={isDark}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
@@ -640,15 +636,15 @@ const MainContent = ({ isDark, jobs, filteredJobs, recentActivity, applicationsS
         <div className="space-y-3 sm:space-y-4">
           {recentActivity.length > 0 ? (
             recentActivity.map((activity, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50/5 transition-colors cursor-pointer"
               >
                 <div className="flex items-center space-x-3 flex-1 min-w-0">
                   <div className={cn(
                     'w-2 h-2 rounded-full shrink-0',
                     activity.type === 'application' ? isDark ? 'bg-white' : 'bg-black' :
-                    activity.type === 'saved' ? isDark ? 'bg-white' : 'bg-black' : 'bg-gray-500'
+                      activity.type === 'saved' ? isDark ? 'bg-white' : 'bg-black' : 'bg-gray-500'
                   )} />
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-sm sm:text-base truncate">
@@ -659,7 +655,7 @@ const MainContent = ({ isDark, jobs, filteredJobs, recentActivity, applicationsS
                       isDark ? 'text-gray-400' : 'text-gray-600'
                     )}>
                       {activity.type === 'application' ? 'Applied' :
-                       activity.type === 'saved' ? 'Saved job' : 'Viewed'}
+                        activity.type === 'saved' ? 'Saved job' : 'Viewed'}
                     </p>
                   </div>
                 </div>
@@ -685,18 +681,18 @@ const MainContent = ({ isDark, jobs, filteredJobs, recentActivity, applicationsS
       <div className="p-4 sm:p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-bold text-lg sm:text-xl">Recommended for You</h2>
-          <Link 
-            to="/jobs"  
+          <Link
+            to="/jobs"
             className={cn('hover:underline text-sm ios-touch-target', isDark ? 'text-white' : 'text-black')}
           >
             View all
           </Link>
         </div>
-        
+
         <div className="space-y-4 sm:space-y-6">
           {filteredJobs.map((job) => (
-            <Card 
-              key={job.id} 
+            <Card
+              key={job.id}
               className={cn(
                 'p-4 sm:p-6 transition-colors rounded-br-3xl rounded-bl-3xl cursor-pointer hover:bg-gray-50/5',
                 isDark ? 'border-gray-800' : 'border-gray-200'
@@ -735,12 +731,12 @@ const MainContent = ({ isDark, jobs, filteredJobs, recentActivity, applicationsS
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </div>
-              
+
               <div className="flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0">
                 <div className="flex items-center space-x-2 sm:space-x-4">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     className={cn(
                       'flex items-center space-x-2 p-2 rounded-full ios-touch-target',
                       isDark ? 'text-gray-400 hover:text-white hover:bg-gray-900' : 'text-gray-600 hover:text-black hover:bg-gray-100'
@@ -748,9 +744,9 @@ const MainContent = ({ isDark, jobs, filteredJobs, recentActivity, applicationsS
                   >
                     <Heart className="h-4 w-4" />
                   </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     className={cn(
                       'flex items-center space-x-2 p-2 rounded-full ios-touch-target',
                       isDark ? 'text-gray-400 hover:text-white hover:bg-gray-900' : 'text-gray-600 hover:text-black hover:bg-gray-100'
@@ -759,11 +755,11 @@ const MainContent = ({ isDark, jobs, filteredJobs, recentActivity, applicationsS
                     <Share className="h-4 w-4" />
                   </Button>
                 </div>
-                
+
                 <div className="flex space-x-2">
-                  <Button 
-                    variant="outlined" 
-                    size="sm" 
+                  <Button
+                    variant="outlined"
+                    size="sm"
                     className={cn(
                       'rounded-full flex-1 sm:flex-none ios-touch-target border',
                       isDark ? 'border-gray-700 hover:bg-gray-900' : 'border-gray-300 hover:bg-gray-100'
@@ -772,7 +768,7 @@ const MainContent = ({ isDark, jobs, filteredJobs, recentActivity, applicationsS
                     Save
                   </Button>
                   <Link to={`/job/${job.id}`} className="flex-1 sm:flex-none">
-                    <Button 
+                    <Button
                       className={cn(
                         'w-full rounded-full px-4 sm:px-6 ios-touch-target font-bold',
                         isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-900'
@@ -806,10 +802,10 @@ const DesktopSidebar = ({ isDark, searchTerm, setSearchTerm, trendingTopics, sug
   <>
     {/* Search */}
     <div className={cn(
-      'sticky top-0 p-3 backdrop-blur-3xl rounded-3xl border border-gray-800',
-      isDark ? 'bg-black' : 'bg-gray-100'
+      'sticky top-0 p-4 rounded-[24px] border shadow-lg',
+      isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200'
     )}>
-      <div className="relative border-gray-800 border rounded-3xl">
+      <div className="relative">
         <Search className={cn(
           'absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5',
           isDark ? 'text-gray-400' : 'text-gray-500'
@@ -820,7 +816,7 @@ const DesktopSidebar = ({ isDark, searchTerm, setSearchTerm, trendingTopics, sug
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className={cn(
-            'w-full pl-12 pr-4 py-3 rounded-2xl bg-transparent border-none outline-hidden text-lg',
+            'w-full pl-12 pr-4 py-3 rounded-2xl bg-transparent border-none outline-hidden',
             isDark ? 'text-white placeholder-gray-400' : 'text-black placeholder-gray-600'
           )}
         />
@@ -829,8 +825,8 @@ const DesktopSidebar = ({ isDark, searchTerm, setSearchTerm, trendingTopics, sug
 
     {/* Trending */}
     <div className={cn(
-      'rounded-3xl p-4 border border-gray-800',
-      isDark ? 'bg-black' : 'bg-gray-100'
+      'rounded-[24px] p-4 border shadow-lg',
+      isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200'
     )}>
       <h2 className="text-xl font-bold mb-4">What's trending</h2>
       <div className="space-y-3">
@@ -876,15 +872,15 @@ const DesktopSidebar = ({ isDark, searchTerm, setSearchTerm, trendingTopics, sug
             <div key={index} className="flex items-center justify-between">
               <div className="flex items-center space-x-3 flex-1 min-w-0">
                 {suggestedUser.avatar_url ? (
-                  <img 
-                    src={suggestedUser.avatar_url} 
+                  <img
+                    src={suggestedUser.avatar_url}
                     alt={suggestedUser.name}
-                    className="w-10 h-10 rounded-full object-cover grayscale"
+                    className="w-10 h-10 rounded-full object-cover"
                   />
                 ) : (
                   <div className={cn(
                     'w-10 h-10 rounded-full flex items-center justify-center font-bold',
-                    isDark ? 'bg-white text-black' : 'bg-black text-white'
+                    isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-700'
                   )}>
                     {suggestedUser.name.charAt(0)}
                   </div>
@@ -893,12 +889,9 @@ const DesktopSidebar = ({ isDark, searchTerm, setSearchTerm, trendingTopics, sug
                   <div className="flex items-center space-x-1">
                     <p className="font-bold text-sm truncate">{suggestedUser.name}</p>
                     {suggestedUser.verified && (
-                      <div className={cn(
-                        'w-4 h-4 rounded-full flex items-center justify-center',
-                        isDark ? 'bg-white' : 'bg-black'
-                      )}>
-                        <span className={cn('text-xs font-bold', isDark ? 'text-black' : 'text-white')}>✓</span>
-                      </div>
+                      <svg className="w-4 h-4 text-[#D3FB52] fill-current" viewBox="0 0 24 24">
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
                     )}
                   </div>
                   <p className={cn(
@@ -909,16 +902,16 @@ const DesktopSidebar = ({ isDark, searchTerm, setSearchTerm, trendingTopics, sug
                   </p>
                 </div>
               </div>
-              <Button 
+              <Button
                 onClick={() => {
-                  followUserMutation.mutate({ 
-                    followerId: user?.id || '', 
-                    followingId: suggestedUser.id 
+                  followUserMutation.mutate({
+                    followerId: user?.id || '',
+                    followingId: suggestedUser.id
                   });
                 }}
                 className={cn(
                   'rounded-full px-4 py-1 text-sm font-bold',
-                  isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-900'
+                  isDark ? 'bg-[#D3FB52] text-black hover:bg-[#D3FB52]/90' : 'bg-[#D3FB52] text-black hover:bg-[#D3FB52]/90'
                 )}
               >
                 Follow
