@@ -6,13 +6,19 @@ interface PageLayoutProps {
   className?: string;
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '4xl' | '6xl' | '7xl' | 'full';
   padding?: 'none' | 'sm' | 'md' | 'lg';
+  header?: React.ReactNode;
+  glassHeader?: boolean;
+  safeArea?: boolean;
 }
 
-export default function PageLayout({ 
-  children, 
-  className, 
+export default function PageLayout({
+  children,
+  className,
   maxWidth = '7xl',
-  padding = 'md'
+  padding = 'md',
+  header,
+  glassHeader = false,
+  safeArea = true
 }: PageLayoutProps) {
   const maxWidthClasses = {
     sm: 'max-w-sm',
@@ -36,10 +42,24 @@ export default function PageLayout({
   return (
     <div className={cn(
       'min-h-screen w-full',
+      safeArea && 'safe-top safe-bottom',
       className
     )}>
+      {/* Optional Glass Header */}
+      {header && (
+        <div className={cn(
+          'sticky top-0 z-40 border-b',
+          glassHeader && 'glass backdrop-blur-xl',
+          safeArea && 'ios-safe-top',
+          'dark:border-gray-800 border-gray-200'
+        )}>
+          {header}
+        </div>
+      )}
+
+      {/* Main Content */}
       <div className={cn(
-        'mx-auto',
+        'mx-auto mobile-container',
         maxWidthClasses[maxWidth],
         paddingClasses[padding]
       )}>

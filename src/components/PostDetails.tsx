@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { 
+import {
   ArrowLeft,
   Heart,
   MessageCircle,
@@ -63,7 +63,7 @@ export default function PostDetails() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isDark } = useTheme();
-  
+
   const [post, setPost] = useState<PostDetail | null>(null);
   const [showImageModal, setShowImageModal] = useState(false);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
@@ -143,7 +143,7 @@ export default function PostDetails() {
         ...prev,
         has_bookmarked: !prev.has_bookmarked
       } : null);
-      
+
       // TODO: Implement actual bookmark logic with database
     } catch (err) {
       console.error('Error toggling bookmark:', err);
@@ -170,7 +170,7 @@ export default function PostDetails() {
 
   if (error || !post) {
     return (
-      <PageLayout 
+      <PageLayout
         className={cn(
           'min-h-screen',
           isDark ? 'bg-black text-white' : 'bg-white text-black'
@@ -184,7 +184,7 @@ export default function PostDetails() {
           <p className={cn('mb-4', isDark ? 'text-gray-400' : 'text-gray-600')}>
             {error ? (error as Error).message : 'The post you are looking for does not exist or has been removed.'}
           </p>
-          <Button 
+          <Button
             onClick={() => navigate('/feed')}
             className="px-6 py-2"
           >
@@ -196,9 +196,9 @@ export default function PostDetails() {
   }
 
   return (
-    <PageLayout 
+    <PageLayout
       className={cn(
-        'min-h-screen',
+        'min-h-screen safe-top safe-bottom',
         isDark ? 'bg-black text-white' : 'bg-white text-black'
       )}
       maxWidth="full"
@@ -206,7 +206,7 @@ export default function PostDetails() {
     >
       {/* X/Twitter-Style Header */}
       <div className={cn(
-        'sticky top-0 z-10 backdrop-blur-xl border-b',
+        'sticky top-0 z-10 glass backdrop-blur-xl border-b ios-safe-top',
         isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200',
         isMobile ? 'top-16' : 'top-0'
       )}>
@@ -231,14 +231,14 @@ export default function PostDetails() {
       </div>
 
       {/* Main Content Container - Split Layout for Desktop */}
-      <div className="flex ml-36 mr-auto max-w-7xl">
+      <div className="flex ml-0 lg:ml-36 mr-auto max-w-7xl mobile-container">
         {/* Left Side - Post Content */}
         <div className="flex-1 max-w-2xl">
           <div className={cn(
-            'border-x min-h-screen',
+            'border-x min-h-screen ios-bottom-nav',
             isDark ? 'border-gray-800' : 'border-gray-200'
           )}>
-            
+
             {/* Main Post */}
             <div className={cn(
               'p-4 border-b',
@@ -255,13 +255,13 @@ export default function PostDetails() {
                     className="shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
                   />
                 </Link>
-                
+
                 {/* Post Content */}
                 <div className="flex-1 min-w-0">
-                  
+
                   {/* Author Info */}
                   <div className="flex items-center space-x-2 mb-2">
-                    <Link 
+                    <Link
                       to={`/profile/${post.author.id}`}
                       className="font-bold hover:underline text-lg"
                     >
@@ -274,7 +274,7 @@ export default function PostDetails() {
                       @{post.author.full_name.toLowerCase().replace(/\s+/g, '')}
                     </span>
                   </div>
-                  
+
                   {/* Post Text */}
                   <div className="mb-4">
                     <p className="text-xl leading-relaxed whitespace-pre-wrap">
@@ -286,12 +286,12 @@ export default function PostDetails() {
                   {post.tags && post.tags.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-4">
                       {post.tags.map((tag, index) => (
-                        <span 
+                        <span
                           key={index}
                           className={cn(
                             'text-sm px-2 py-1 rounded-full border cursor-pointer hover:bg-opacity-80',
-                            isDark 
-                              ? 'text-info-400 border-info-400/30 hover:bg-info-400/10' 
+                            isDark
+                              ? 'text-info-400 border-info-400/30 hover:bg-info-400/10'
                               : 'text-info-600 border-info-600/30 hover:bg-info-600/10'
                           )}
                         >
@@ -387,27 +387,27 @@ export default function PostDetails() {
                       onClick={() => document.getElementById('comment-input')?.focus()}
                       className={cn(
                         'flex items-center space-x-2 px-4 py-2 rounded-full transition-colors',
-                        isDark 
-                          ? 'text-gray-400 hover:text-info-400 hover:bg-info-500/10' 
+                        isDark
+                          ? 'text-gray-400 hover:text-info-400 hover:bg-info-500/10'
                           : 'text-gray-600 hover:text-info-600 hover:bg-info-500/10'
                       )}
                     >
                       <MessageCircle className="w-5 h-5" />
                       <span className="text-sm">{post.comments_count || ''}</span>
                     </Button>
-                    
+
                     <Button
                       className={cn(
                         'flex items-center space-x-2 px-4 py-2 rounded-full transition-colors',
-                        isDark 
-                          ? 'text-gray-400 hover:text-green-400 hover:bg-green-500/10' 
+                        isDark
+                          ? 'text-gray-400 hover:text-green-400 hover:bg-green-500/10'
                           : 'text-gray-600 hover:text-green-600 hover:bg-green-500/10'
                       )}
                     >
                       <Repeat2 className="w-5 h-5" />
                       <span className="text-sm">{post.shares_count || ''}</span>
                     </Button>
-                    
+
                     <Button
                       onClick={handleLikePost}
                       disabled={isLikeLoading}
@@ -415,7 +415,7 @@ export default function PostDetails() {
                         'flex items-center space-x-2 px-4 py-2 rounded-full transition-colors',
                         post.has_liked
                           ? 'text-red-500 hover:text-red-400'
-                          : isDark 
+                          : isDark
                             ? 'text-gray-400 hover:text-red-400 hover:bg-red-500/10'
                             : 'text-gray-600 hover:text-red-600 hover:bg-red-500/10'
                       )}
@@ -423,34 +423,34 @@ export default function PostDetails() {
                       <Heart className={cn('w-5 h-5', post.has_liked && 'fill-current')} />
                       <span className="text-sm">{post.likes_count || ''}</span>
                     </Button>
-                    
+
                     <Button
                       onClick={handleBookmarkPost}
                       className={cn(
                         'flex items-center space-x-2 px-4 py-2 rounded-full transition-colors',
                         post.has_bookmarked
                           ? 'text-info-500 hover:text-info-400'
-                          : isDark 
+                          : isDark
                             ? 'text-gray-400 hover:text-info-400 hover:bg-info-500/10'
                             : 'text-gray-600 hover:text-info-600 hover:bg-info-500/10'
                       )}
                     >
                       <Bookmark className={cn('w-5 h-5', post.has_bookmarked && 'fill-current')} />
                     </Button>
-                    
+
                     <div className="relative">
                       <Button
                         onClick={() => setShowMoreOptions(!showMoreOptions)}
                         className={cn(
                           'p-2 rounded-full transition-colors',
-                          isDark 
-                            ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-800' 
+                          isDark
+                            ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-800'
                             : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                         )}
                       >
                         <Share className="w-5 h-5" />
                       </Button>
-                      
+
                       {showMoreOptions && (
                         <div className={cn(
                           'absolute right-0 top-full mt-2 w-48 rounded-xl shadow-lg border z-50 py-2',
@@ -504,7 +504,7 @@ export default function PostDetails() {
             'hidden lg:block w-128 border-l ml-3 rounded-2xl sticky top-0 h-screen overflow-y-auto',
             isDark ? 'border-gray-800' : 'border-gray-200'
           )}>
-            <Comments postId={postId!} className="h-full" />  
+            <Comments postId={postId!} className="h-full" />
           </aside>
         )}
       </div>

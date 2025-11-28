@@ -404,10 +404,10 @@ export default function Feed() {
 
   return (
     <div className={cn(
-      'min-h-screen',
+      'min-h-screen safe-top safe-bottom',
       isDark ? 'bg-black text-white' : 'bg-white text-black'
     )}>
-      <div className="max-w-[1400px] mx-auto flex justify-center">
+      <div className="max-w-[1400px] mx-auto flex justify-center mobile-container">
         {/* Left Sidebar - Hidden on mobile */}
         {!isMobile && (
           <LeftSidebar
@@ -430,10 +430,10 @@ export default function Feed() {
         )}>
           {/* Header */}
           <div className={cn(
-            'sticky z-10 backdrop-blur-xl border-b transition-all duration-300',
-            isDark ? 'bg-black/80 border-[#1C1F20] ' : 'bg-white/80 border-gray-200',
+            'sticky z-10 glass backdrop-blur-xl border-b transition-all duration-300 ios-safe-top',
+            isDark ? 'bg-black/80 border-[#1C1F20]' : 'bg-white/80 border-gray-200',
             isMobile
-              ? (isHeaderVisible ? 'top-[calc(max(env(safe-area-inset-top),54px)+50px)]' : 'top-[max(env(safe-area-inset-top),54px)]')
+              ? (isHeaderVisible ? 'top-16' : 'top-0')
               : 'top-0'
           )}>
             <div className="p-2">
@@ -491,7 +491,7 @@ export default function Feed() {
           )}
 
           {/* Feed Content */}
-          <div ref={timelineRef} className="pb-20 min-h-screen">
+          <div ref={timelineRef} className="pb-20 min-h-screen ios-bottom-nav">
             {/* Pull to Refresh Indicator */}
             {isPulling && (
               <div className="flex justify-center py-6 animate-fade-in-up">

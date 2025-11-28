@@ -872,10 +872,10 @@ export default function Profile() {
 
   return (
     <div className={cn(
-      "min-h-screen",
+      "min-h-screen safe-top safe-bottom",
       isDark ? "bg-black text-white" : "bg-gray-50 text-gray-900"
     )}>
-      <div className="max-w-7xl mx-auto flex">
+      <div className="max-w-7xl mx-auto flex mobile-container">
         {/* Left Sidebar - Hidden on mobile */}
         <div className={cn(
           "hidden lg:block w-80 p-4 space-y-6 border-r sticky top-0 h-screen overflow-y-auto",
@@ -1037,9 +1037,9 @@ export default function Profile() {
         <div className={cn('flex-1 max-w-2xl border-x min-h-screen', isDark ? "bg-black border-gray-800" : "bg-gray-50 border-gray-200")}>
           {/* Header */}
           <div className={cn(
-            "sticky top-0 backdrop-blur-md z-20 border-b transition-all duration-300",
+            "sticky top-0 glass backdrop-blur-xl z-20 border-b transition-all duration-300 ios-safe-top",
             isDark ? "bg-black/80 border-gray-800" : "bg-white/80 border-gray-200",
-            isMobile ? "top-[max(env(safe-area-inset-top),54px)]" : "top-0"
+            isMobile ? "top-16" : "top-0"
           )}>
             <div className="flex items-center py-3 px-4">
               <button
@@ -1214,7 +1214,7 @@ export default function Profile() {
           </div>
 
           {/* Navigation Tabs */}
-          <div className={cn("border-b sticky top-[calc(max(env(safe-area-inset-top),54px)+53px)] z-10 backdrop-blur-md", isDark ? "bg-black/80 border-gray-800" : "bg-white/80 border-gray-200")}>
+          <div className={cn("border-b sticky glass backdrop-blur-xl z-10", isDark ? "bg-black/80 border-gray-800" : "bg-white/80 border-gray-200", isMobile ? "top-[calc(4rem+53px)]" : "top-[53px]")}>
             <div className="flex overflow-x-auto no-scrollbar">
               {[
                 { id: 'articles', label: 'Articles' },
@@ -1244,7 +1244,7 @@ export default function Profile() {
           </div>
 
           {/* Posts Content */}
-          <div className={cn("min-h-screen pb-20", isDark ? "bg-black" : "bg-gray-50")}>
+          <div className={cn("min-h-screen pb-20 ios-bottom-nav", isDark ? "bg-black" : "bg-gray-50")}>
             {postsLoading ? (
               <div className="flex justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#BCE953]"></div>

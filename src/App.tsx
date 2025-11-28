@@ -1,5 +1,6 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { Loader2 } from 'lucide-react';
@@ -228,6 +229,7 @@ function SmartHomeRoute() {
 
 function AppContent() {
   const { user, loading } = useAuth();
+  const location = useLocation();
   const [showSplash, setShowSplash] = useState(() => {
     return false;
   });
@@ -273,365 +275,367 @@ function AppContent() {
       {user && <Navigation />}
 
       <main className="min-h-screen">
-        <Routes>
-          {/* Public routes with lazy loading */}
-          <Route path="/login" element={
-            <AuthRedirectRoute>
-              <Suspense fallback={<LoadingFallback message="Loading login..." />}>
-                <Login />
-              </Suspense>
-            </AuthRedirectRoute>
-          } />
-          <Route path="/register" element={
-            <AuthRedirectRoute>
-              <Suspense fallback={<LoadingFallback message="Loading registration..." />}>
-                <Register />
-              </Suspense>
-            </AuthRedirectRoute>
-          } />
-          <Route path="/mobile-app" element={
-            <AuthRedirectRoute>
-              <Suspense fallback={<LoadingFallback message="Loading mobile app info..." />}>
-                <MobileAppPage />
-              </Suspense>
-            </AuthRedirectRoute>
-          } />
-          <Route path="/for-students" element={
-            <AuthRedirectRoute>
-              <Suspense fallback={<LoadingFallback message="Loading student resources..." />}>
-                <ForStudentsPage />
-              </Suspense>
-            </AuthRedirectRoute>
-          } />
-          <Route path="/for-employers" element={
-            <AuthRedirectRoute>
-              <Suspense fallback={<LoadingFallback message="Loading employer resources..." />}>
-                <ForEmployersPage />
-              </Suspense>
-            </AuthRedirectRoute>
-          } />
-          <Route path="/career-tips" element={
-            <AuthRedirectRoute>
-              <Suspense fallback={<LoadingFallback message="Loading career tips..." />}>
-                <CareerTipsPage />
-              </Suspense>
-            </AuthRedirectRoute>
-          } />
-          <Route path="/whos-hiring" element={
-            <AuthRedirectRoute>
-              <Suspense fallback={<LoadingFallback message="Loading hiring info..." />}>
-                <WhosHiringPage />
-              </Suspense>
-            </AuthRedirectRoute>
-          } />
-          <Route path="/companies" element={
-            <AuthRedirectRoute>
-              <Suspense fallback={<LoadingFallback message="Loading companies..." />}>
-                <CompaniesPage />
-              </Suspense>
-            </AuthRedirectRoute>
-          } />
-          <Route path="/company/:companyId" element={
-            <AuthRedirectRoute>
-              <Suspense fallback={<LoadingFallback message="Loading company profile..." />}>
-                <CompanyProfile />
-              </Suspense>
-            </AuthRedirectRoute>
-          } />
-          <Route path="/company-detail/:companyId" element={
-            <AuthRedirectRoute>
-              <Suspense fallback={<LoadingFallback message="Loading company detail..." />}>
-                <CompanyDetailPage />
-              </Suspense>
-            </AuthRedirectRoute>
-          } />
-          <Route path="/getting-started" element={
-            <AuthRedirectRoute>
-              <Suspense fallback={<LoadingFallback message="Loading getting started..." />}>
-                <GettingStartedPage />
-              </Suspense>
-            </AuthRedirectRoute>
-          } />
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            {/* Public routes with lazy loading */}
+            <Route path="/login" element={
+              <AuthRedirectRoute>
+                <Suspense fallback={<LoadingFallback message="Loading login..." />}>
+                  <Login />
+                </Suspense>
+              </AuthRedirectRoute>
+            } />
+            <Route path="/register" element={
+              <AuthRedirectRoute>
+                <Suspense fallback={<LoadingFallback message="Loading registration..." />}>
+                  <Register />
+                </Suspense>
+              </AuthRedirectRoute>
+            } />
+            <Route path="/mobile-app" element={
+              <AuthRedirectRoute>
+                <Suspense fallback={<LoadingFallback message="Loading mobile app info..." />}>
+                  <MobileAppPage />
+                </Suspense>
+              </AuthRedirectRoute>
+            } />
+            <Route path="/for-students" element={
+              <AuthRedirectRoute>
+                <Suspense fallback={<LoadingFallback message="Loading student resources..." />}>
+                  <ForStudentsPage />
+                </Suspense>
+              </AuthRedirectRoute>
+            } />
+            <Route path="/for-employers" element={
+              <AuthRedirectRoute>
+                <Suspense fallback={<LoadingFallback message="Loading employer resources..." />}>
+                  <ForEmployersPage />
+                </Suspense>
+              </AuthRedirectRoute>
+            } />
+            <Route path="/career-tips" element={
+              <AuthRedirectRoute>
+                <Suspense fallback={<LoadingFallback message="Loading career tips..." />}>
+                  <CareerTipsPage />
+                </Suspense>
+              </AuthRedirectRoute>
+            } />
+            <Route path="/whos-hiring" element={
+              <AuthRedirectRoute>
+                <Suspense fallback={<LoadingFallback message="Loading hiring info..." />}>
+                  <WhosHiringPage />
+                </Suspense>
+              </AuthRedirectRoute>
+            } />
+            <Route path="/companies" element={
+              <AuthRedirectRoute>
+                <Suspense fallback={<LoadingFallback message="Loading companies..." />}>
+                  <CompaniesPage />
+                </Suspense>
+              </AuthRedirectRoute>
+            } />
+            <Route path="/company/:companyId" element={
+              <AuthRedirectRoute>
+                <Suspense fallback={<LoadingFallback message="Loading company profile..." />}>
+                  <CompanyProfile />
+                </Suspense>
+              </AuthRedirectRoute>
+            } />
+            <Route path="/company-detail/:companyId" element={
+              <AuthRedirectRoute>
+                <Suspense fallback={<LoadingFallback message="Loading company detail..." />}>
+                  <CompanyDetailPage />
+                </Suspense>
+              </AuthRedirectRoute>
+            } />
+            <Route path="/getting-started" element={
+              <AuthRedirectRoute>
+                <Suspense fallback={<LoadingFallback message="Loading getting started..." />}>
+                  <GettingStartedPage />
+                </Suspense>
+              </AuthRedirectRoute>
+            } />
 
-          {/* Protected routes with lazy loading */}
-          <Route path="/feed" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading feed..." />}>
-                <Feed />
+            {/* Protected routes with lazy loading */}
+            <Route path="/feed" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading feed..." />}>
+                  <Feed />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <DashboardRouter />
+              </ProtectedRoute>
+            } />
+            <Route path="/university-dashboard" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading university dashboard..." />}>
+                  <UniversityDashboard />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/premium-upgrade" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading premium features..." />}>
+                  <PremiumUpgrade />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/profile-setup" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading profile setup..." />}>
+                  <ProfileSetup />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading profile..." />}>
+                  <Profile />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/profile/:userId" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading user profile..." />}>
+                  <Profile />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/profile/edit" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading profile editor..." />}>
+                  <EditProfile />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/job/:jobId" element={
+              <Suspense fallback={<LoadingFallback message="Loading job details..." />}>
+                <JobDetails />
               </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <DashboardRouter />
-            </ProtectedRoute>
-          } />
-          <Route path="/university-dashboard" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading university dashboard..." />}>
-                <UniversityDashboard />
+            } />
+            <Route path="/job/:jobId/apply" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading job application..." />}>
+                  <JobApplication />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/messages" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading messages..." />}>
+                  <Messages />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/applications" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading applications..." />}>
+                  <Applications />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/applicants" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading applicants..." />}>
+                  <Applicants />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/post-job" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading job posting..." />}>
+                  <PostJob />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/post-event" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading event form..." />}>
+                  <PostEventPage />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/employer/jobs" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading job management..." />}>
+                  <EmployerJobsManagement />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/events" element={
+              <Suspense fallback={<LoadingFallback message="Loading events..." />}>
+                <Events />
               </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/premium-upgrade" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading premium features..." />}>
-                <PremiumUpgrade />
+            } />
+            <Route path="/event/:eventId" element={
+              <Suspense fallback={<LoadingFallback message="Loading event details..." />}>
+                <EventDetails />
               </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/profile-setup" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading profile setup..." />}>
-                <ProfileSetup />
+            } />
+            <Route path="/resources" element={
+              <Suspense fallback={<LoadingFallback message="Loading resources..." />}>
+                <ResourceCenter />
               </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/profile" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading profile..." />}>
-                <Profile />
+            } />
+            <Route path="/resource/:resourceId" element={
+              <Suspense fallback={<LoadingFallback message="Loading resource details..." />}>
+                <ResourceDetails />
               </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/profile/:userId" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading user profile..." />}>
-                <Profile />
+            } />
+            <Route path="/digital-passport" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading digital passport..." />}>
+                  <DigitalLearningPassport />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/skills-audit" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading skills audit..." />}>
+                  <SkillsAuditSystem />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/skills/add" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading skills assessment..." />}>
+                  <SkillsAuditSystem />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/badges" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading badges..." />}>
+                  <DigitalLearningPassport />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading settings..." />}>
+                  <Settings />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/post/:postId" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading post details..." />}>
+                  <PostDetails />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/create-post" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading post creator..." />}>
+                  <CreatePostPage />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/hashtag/:hashtagName" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading hashtag..." />}>
+                  <HashtagDetailPage />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/notifications" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading notifications..." />}>
+                  <NotificationsPage />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/jobs" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading jobs..." />}>
+                  <JobsPage />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/bookmarks" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading bookmarks..." />}>
+                  <BookmarksPage />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/resume-builder" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading resume builder..." />}>
+                  <ResumeBuilder />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/ai-resume-builder" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading AI resume builder..." />}>
+                  <AIResumeBuilderPage />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/visual-resume-editor" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading Visual Resume Editor..." />}>
+                  <VisualResumeEditor />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/search-demo" element={
+              <Suspense fallback={<LoadingFallback message="Loading search demo..." />}>
+                <SearchDemoPage />
               </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/profile/edit" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading profile editor..." />}>
-                <EditProfile />
+            } />
+            <Route path="/search" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading search..." />}>
+                  <SearchPage />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/linkedin-job-import" element={
+              <Suspense fallback={<LoadingFallback message="Loading LinkedIn job import..." />}>
+                <LinkedInJobImport />
               </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/job/:jobId" element={
-            <Suspense fallback={<LoadingFallback message="Loading job details..." />}>
-              <JobDetails />
-            </Suspense>
-          } />
-          <Route path="/job/:jobId/apply" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading job application..." />}>
-                <JobApplication />
+            } />
+            <Route path="/linkedin-job-manager" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading LinkedIn job manager..." />}>
+                  <LinkedInJobManager />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/linkedin-callback" element={
+              <Suspense fallback={<LoadingFallback message="Processing LinkedIn connection..." />}>
+                <LinkedInCallback />
               </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/messages" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading messages..." />}>
-                <Messages />
-              </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/applications" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading applications..." />}>
-                <Applications />
-              </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/applicants" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading applicants..." />}>
-                <Applicants />
-              </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/post-job" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading job posting..." />}>
-                <PostJob />
-              </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/post-event" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading event form..." />}>
-                <PostEventPage />
-              </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/employer/jobs" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading job management..." />}>
-                <EmployerJobsManagement />
-              </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/events" element={
-            <Suspense fallback={<LoadingFallback message="Loading events..." />}>
-              <Events />
-            </Suspense>
-          } />
-          <Route path="/event/:eventId" element={
-            <Suspense fallback={<LoadingFallback message="Loading event details..." />}>
-              <EventDetails />
-            </Suspense>
-          } />
-          <Route path="/resources" element={
-            <Suspense fallback={<LoadingFallback message="Loading resources..." />}>
-              <ResourceCenter />
-            </Suspense>
-          } />
-          <Route path="/resource/:resourceId" element={
-            <Suspense fallback={<LoadingFallback message="Loading resource details..." />}>
-              <ResourceDetails />
-            </Suspense>
-          } />
-          <Route path="/digital-passport" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading digital passport..." />}>
-                <DigitalLearningPassport />
-              </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/skills-audit" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading skills audit..." />}>
-                <SkillsAuditSystem />
-              </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/skills/add" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading skills assessment..." />}>
-                <SkillsAuditSystem />
-              </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/badges" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading badges..." />}>
-                <DigitalLearningPassport />
-              </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/settings" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading settings..." />}>
-                <Settings />
-              </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/post/:postId" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading post details..." />}>
-                <PostDetails />
-              </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/create-post" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading post creator..." />}>
-                <CreatePostPage />
-              </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/hashtag/:hashtagName" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading hashtag..." />}>
-                <HashtagDetailPage />
-              </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/notifications" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading notifications..." />}>
-                <NotificationsPage />
-              </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/jobs" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading jobs..." />}>
-                <JobsPage />
-              </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/bookmarks" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading bookmarks..." />}>
-                <BookmarksPage />
-              </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/resume-builder" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading resume builder..." />}>
-                <ResumeBuilder />
-              </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/ai-resume-builder" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading AI resume builder..." />}>
-                <AIResumeBuilderPage />
-              </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/visual-resume-editor" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading Visual Resume Editor..." />}>
-                <VisualResumeEditor />
-              </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/search-demo" element={
-            <Suspense fallback={<LoadingFallback message="Loading search demo..." />}>
-              <SearchDemoPage />
-            </Suspense>
-          } />
-          <Route path="/search" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading search..." />}>
-                <SearchPage />
-              </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/linkedin-job-import" element={
-            <Suspense fallback={<LoadingFallback message="Loading LinkedIn job import..." />}>
-              <LinkedInJobImport />
-            </Suspense>
-          } />
-          <Route path="/linkedin-job-manager" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading LinkedIn job manager..." />}>
-                <LinkedInJobManager />
-              </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/linkedin-callback" element={
-            <Suspense fallback={<LoadingFallback message="Processing LinkedIn connection..." />}>
-              <LinkedInCallback />
-            </Suspense>
-          } />
-          <Route path="/ai-job-recommendations" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading AI job recommendations..." />}>
-                <AIJobRecommendations />
-              </Suspense>
-            </ProtectedRoute>
-          } />
-          <Route path="/explore" element={
-            <ProtectedRoute>
-              <Suspense fallback={<LoadingFallback message="Loading explore page..." />}>
-                <ExplorePage />
-              </Suspense>
-            </ProtectedRoute>
-          } />
+            } />
+            <Route path="/ai-job-recommendations" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading AI job recommendations..." />}>
+                  <AIJobRecommendations />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/explore" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading explore page..." />}>
+                  <ExplorePage />
+                </Suspense>
+              </ProtectedRoute>
+            } />
 
-          {/* Smart root route - shows landing page for web, redirects to login for PWA */}
-          <Route path="/" element={<SmartHomeRoute />} />
+            {/* Smart root route - shows landing page for web, redirects to login for PWA */}
+            <Route path="/" element={<SmartHomeRoute />} />
 
-          {/* Catch all route - redirect to appropriate home */}
-          <Route path="*" element={
-            user ? <Navigate to="/feed" replace /> : <Navigate to="/login" replace />
-          } />
-        </Routes>
+            {/* Catch all route - redirect to appropriate home */}
+            <Route path="*" element={
+              user ? <Navigate to="/feed" replace /> : <Navigate to="/login" replace />
+            } />
+          </Routes>
+        </AnimatePresence>
       </main>
     </div>
   );

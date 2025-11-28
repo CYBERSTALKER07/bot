@@ -100,13 +100,13 @@ export default function JobDetails() {
 
   return (
     <div className={cn(
-      'min-h-screen',
+      'min-h-screen safe-top safe-bottom',
       isDark ? 'bg-black text-white' : 'bg-gray-50 text-gray-900'
     )}>
       {/* Back Button */}
       <div className={cn(
-        'sticky top-0 z-39 border-b',
-        isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200'
+        'sticky top-0 z-39 border-b glass backdrop-blur-xl ios-safe-top',
+        isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
       )}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Link
@@ -124,7 +124,7 @@ export default function JobDetails() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto mobile-container sm:px-6 lg:px-8 py-8">
         {/* Job Header - Title & Info Section */}
         <div className={cn(
           'rounded-3xl overflow-hidden mb-8 p-8',
@@ -279,7 +279,7 @@ export default function JobDetails() {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 ios-bottom-nav">
           {/* Left Column - Job Details */}
           <div className="lg:col-span-2 space-y-8">
             {/* Job Description */}
@@ -414,7 +414,7 @@ export default function JobDetails() {
 
                 <div className="flex flex-col items-center text-center mb-6">
                   {job.employer.avatar_url ? (
-                    <img 
+                    <img
                       src={job.employer.avatar_url}
                       alt={job.employer.name}
                       className="w-16 h-16 rounded-full object-cover mb-4 border-4 border-info-400"
