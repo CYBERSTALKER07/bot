@@ -4,7 +4,7 @@ import {
   MapPin,
   Users,
   ChevronRight
-} from 'lucide-react';
+} from '@openai/apps-sdk-ui/components/Icon';
 import { useTheme } from '../context/ThemeContext';
 import { cn } from '../lib/cva';
 
@@ -65,7 +65,7 @@ export default function EventCard({
       webinar: { bg: 'from-purple-600 to-purple-400', text: 'text-purple-500', badge: 'bg-purple-500/10 text-purple-600' },
       networking: { bg: 'from-pink-600 to-pink-400', text: 'text-pink-500', badge: 'bg-pink-500/10 text-pink-600' },
       workshop: { bg: 'from-green-600 to-green-400', text: 'text-green-500', badge: 'bg-green-500/10 text-green-600' },
-      conference: { bg: 'from-orange-600 to-orange-400', text: 'text-orange-500', badge: 'bg-orange-500/10 text-orange-600' }
+      conference: { bg: 'from-[#D3FB52] to-[#B8E044]', text: 'text-[#D3FB52]', badge: 'bg-[#D3FB52]/10 text-[#D3FB52]' }
     };
     return colors[type] || colors.recruiting;
   };
@@ -100,10 +100,10 @@ export default function EventCard({
     >
       {/* Main Container - Flex Layout */}
       <div className="flex flex-col h-full border  rounded-3xl overflow-hidden">
-        
+
         {/* Top Section: Date and Image */}
         <div className="flex flex-1 min-h-0">
-          
+
           {/* Left: Date Column */}
           <div className={cn(
             'w-20 sm:w-24 flex flex-col rounded-tr-3xl rounded-br-3xl rounded-tl-3xl  rounded-bl-3xl border-r-0 border-l border-t border-b  border-r-none items-center justify-center py-4 sm:py-6 ',
@@ -168,7 +168,7 @@ export default function EventCard({
           'p-4 sm:p-5 border-t flex flex-col flex-1',
           isDark ? 'border-none bg-black' : 'border-gray-100 bg-white'
         )}>
-          
+
           {/* Event Type Tag */}
           <div className="mb-3">
             <span className={cn(
@@ -224,7 +224,7 @@ export default function EventCard({
             </div>
           )}
 
-       
+
 
           {/* Spacer */}
           <div className="flex-1" />
@@ -236,7 +236,7 @@ export default function EventCard({
               onRegister?.();
             }}
             disabled={isRegistered}
-            className={cn(  
+            className={cn(
               'w-full px-4 py-2.5  rounded-xl font-sem-font-sans text-sm transition-all duration-200 flex items-center justify-center gap-2',
               isRegistered
                 ? isDark

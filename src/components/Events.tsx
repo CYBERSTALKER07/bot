@@ -2,7 +2,7 @@ import { useState } from 'react';
 import {
   Search,
   Calendar
-} from 'lucide-react';
+} from '@openai/apps-sdk-ui/components/Icon';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import Button from './ui/Button';
@@ -16,7 +16,7 @@ export default function Events() {
   const { isDark } = useTheme();
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
-  
+
   const { data: employerEvents = [], isLoading: loading, error } = useEmployerEvents(50, 'upcoming');
   const registerForEventMutation = useRegisterForEvent();
 
@@ -25,7 +25,7 @@ export default function Events() {
       // Handle not logged in
       return;
     }
-    
+
     try {
       await registerForEventMutation.mutateAsync({
         eventId,
@@ -38,13 +38,13 @@ export default function Events() {
 
   // Filter events based on search and type
   const filteredEvents = employerEvents.filter(event => {
-    const matchesSearch = 
+    const matchesSearch =
       event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (event.employer?.company_name || '').toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesType = typeFilter === 'all' || event.event_type === typeFilter;
-    
+
     return matchesSearch && matchesType;
   });
 
@@ -68,8 +68,8 @@ export default function Events() {
             {/* Cards Grid Skeleton */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
-                <div 
-                  key={i} 
+                <div
+                  key={i}
                   className={cn(
                     'h-80 rounded-3xl animate-pulse',
                     isDark ? 'bg-gray-800' : 'bg-gray-200'
@@ -93,7 +93,7 @@ export default function Events() {
           <div className="text-center py-12">
             <Calendar className="h-16 w-16 mx-auto mb-4 opacity-30" />
             <p className="text-red-500 mb-4 text-lg font-semibold">Failed to load events</p>
-            <Button 
+            <Button
               className="rounded-full"
               onClick={() => window.location.reload()}
             >
@@ -112,9 +112,9 @@ export default function Events() {
     )}>
       <PageLayout maxWidth="7xl">
         <div className="py-8 sm:py-12">
-                {/* Search and Filter Section */}
+          {/* Search and Filter Section */}
           <div className="mb-10 space-y-4">
-            
+
             {/* Search Bar */}
             <div className="relative ">
               <Search className={cn(
@@ -151,9 +151,9 @@ export default function Events() {
                   className={cn(
                     'px-4 py-2.5 rounded-full text-sm font-semibold transition-all duration-200',
                     typeFilter === value
-                      ? isDark 
-                        ? 'bg-black text-white shadow-lg shadow-info-600' 
-                        : 'bg-info-600 text-white shadow-lg shadow-info-600/30'
+                      ? isDark
+                        ? 'bg-[#D3FB52] text-black shadow-lg shadow-[#D3FB52]/20'
+                        : 'bg-[#D3FB52] text-black shadow-lg shadow-[#D3FB52]/30'
                       : isDark
                         ? 'bg-black text-gray-300 hover:bg-gray-700'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -182,7 +182,7 @@ export default function Events() {
               )}>
                 Try adjusting your search or filters
               </p>
-              <Button 
+              <Button
                 className="rounded-full"
                 onClick={() => {
                   setSearchTerm('');
@@ -229,7 +229,7 @@ export default function Events() {
                 isDark ? 'text-gray-400' : 'text-gray-600'
               )}>
                 <p className="text-sm font-medium">
-                  Showing <span className="font-bold text-info-500">{filteredEvents.length}</span> of <span className="font-bold">{employerEvents.length}</span> events
+                  Showing <span className="font-bold text-[#D3FB52]">{filteredEvents.length}</span> of <span className="font-bold">{employerEvents.length}</span> events
                 </p>
               </div>
             </>
