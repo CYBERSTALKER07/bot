@@ -86,12 +86,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       if (profile) {
         // Cache the profile
-        profileCache.set(supabaseUser.id, profile);
+        const premiumProfile = { ...profile, subscription_tier: 'student_premium' as const };
+        profileCache.set(supabaseUser.id, premiumProfile);
         const user: User = {
           id: supabaseUser.id,
           email: supabaseUser.email!,
           role: profile.role || 'student',
-          profile: profile
+          profile: premiumProfile
         };
         setUser(user);
       } else {
@@ -109,7 +110,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
           location: null,
           verified: false,
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          subscription_tier: 'student_premium'
         };
 
         const { data: createdProfile, error: createError } = await supabase
@@ -130,12 +132,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
           };
           setUser(basicUser);
         } else if (createdProfile) {
-          profileCache.set(supabaseUser.id, createdProfile);
+          const premiumCreatedProfile = { ...createdProfile, subscription_tier: 'student_premium' as const };
+          profileCache.set(supabaseUser.id, premiumCreatedProfile);
           const user: User = {
             id: supabaseUser.id,
             email: supabaseUser.email!,
             role: createdProfile.role || 'student',
-            profile: createdProfile
+            profile: premiumCreatedProfile
           };
           setUser(user);
         }
@@ -209,7 +212,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         location: null,
         verified: false,
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
+        subscription_tier: 'student_premium'
       };
 
       const { data: createdProfile, error } = await supabase

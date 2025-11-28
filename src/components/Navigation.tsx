@@ -105,6 +105,7 @@ export default function Navigation() {
 
       adminItems.push(
         { icon: Members, label: 'Users', path: '/users' },
+        { icon: FileDocument, label: 'Applications', path: '/admin/applications' },
         { icon: Suitcase, label: 'Jobs', path: '/jobs' },
         { icon: Chat, label: 'Messages', path: '/messages' },
         { icon: Sparkles, label: 'Premium', path: '/premium-upgrade' },

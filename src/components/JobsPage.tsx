@@ -159,7 +159,7 @@ export default function JobsPage() {
           {/* Jobs Grid */}
           {filteredJobs.length === 0 ? (
             <div className={cn(
-              'text-center py-20 px-4 rounded-3xl border-2 border-dashed',
+              'text-center py-20 px-4 rounded-tr-full rounded-bl-full rounded-br-[1000px] rounded-tl-[800px] border-2 border ',
               isDark ? 'bg-black border-none' : 'bg-gray-50 border-gray-300'
             )}>
               <Briefcase className={cn(

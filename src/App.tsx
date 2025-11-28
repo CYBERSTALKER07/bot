@@ -79,6 +79,7 @@ const ExplorePage = lazy(() => import('./components/ExplorePage'));
 const PostEventPage = lazy(() => import('./pages/PostEventPage'));
 const UniversityDashboard = lazy(() => import('./pages/UniversityDashboard'));
 const PremiumUpgrade = lazy(() => import('./pages/PremiumUpgrade'));
+const AdminApplicationsPage = lazy(() => import('./pages/AdminApplicationsPage'));
 
 // LinkedIn Integration
 const LinkedInJobImport = lazy(() => import('./components/LinkedIn/LinkedInJobImport'));
@@ -434,6 +435,13 @@ function AppContent() {
               <ProtectedRoute>
                 <Suspense fallback={<LoadingFallback message="Loading applications..." />}>
                   <Applications />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/applications" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading applications..." />}>
+                  <AdminApplicationsPage />
                 </Suspense>
               </ProtectedRoute>
             } />

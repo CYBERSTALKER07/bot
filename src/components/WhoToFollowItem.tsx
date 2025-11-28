@@ -159,7 +159,7 @@ export default function WhoToFollowItem({ user, onNavigate }: WhoToFollowItemPro
         )}
       >
         <span className={cn(
-          "inline-block transition-all duration-300 ease-in-out",
+          "inline-block transition-all duration-0 ease-in-out",
           hoveredFollowId === user.id && isFollowing ? "scale-95 opacity-70" : "scale-100 opacity-100"
         )}>
           {statusLoading

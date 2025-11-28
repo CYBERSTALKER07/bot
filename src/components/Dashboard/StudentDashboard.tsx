@@ -169,7 +169,7 @@ export default function StudentDashboard() {
     verified: user.verified || false,
     avatar_url: user.avatar_url,
     bio: user.bio,
-    is_following: false // Will be checked via follow status
+    is_following: user.is_following || false
   }));
 
   const toggleSection = (section: keyof typeof expandedSections) => {
@@ -450,17 +450,30 @@ export default function StudentDashboard() {
                           <Button
                             size="sm"
                             onClick={() => {
-                              followUserMutation.mutate({
-                                followerId: user?.id || '',
-                                followingId: suggestedUser.id
-                              });
+                              if (suggestedUser.is_following) {
+                                unfollowUserMutation.mutate({
+                                  followerId: user?.id || '',
+                                  followingId: suggestedUser.id
+                                });
+                              } else {
+                                followUserMutation.mutate({
+                                  followerId: user?.id || '',
+                                  followingId: suggestedUser.id
+                                });
+                              }
                             }}
                             className={cn(
                               'rounded-full px-3 py-1 text-xs font-bold ml-2',
-                              isDark ? 'bg-[#D3FB52] text-black hover:bg-[#D3FB52]/90' : 'bg-[#D3FB52] text-black hover:bg-[#D3FB52]/90'
+                              suggestedUser.is_following
+                                ? isDark
+                                  ? 'bg-transparent border border-gray-700 text-white hover:bg-gray-900'
+                                  : 'bg-transparent border border-gray-300 text-black hover:bg-gray-100'
+                                : isDark
+                                  ? 'bg-[#D3FB52] text-black hover:bg-[#D3FB52]/90'
+                                  : 'bg-[#D3FB52] text-black hover:bg-[#D3FB52]/90'
                             )}
                           >
-                            Follow
+                            {suggestedUser.is_following ? 'Following' : 'Follow'}
                           </Button>
                         </div>
                       ))

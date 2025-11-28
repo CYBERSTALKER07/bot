@@ -11,6 +11,7 @@ import {
 } from 'framer-motion';
 import React, { Children, cloneElement, useEffect, useRef, useState } from 'react';
 import { cn } from '../lib/cva';
+import { useTheme } from '../context/ThemeContext';
 
 export type DockItemData = {
     icon: React.ReactNode;
@@ -54,6 +55,7 @@ function DockItem({
     isActive
 }: DockItemProps) {
     const ref = useRef<HTMLDivElement>(null);
+    const { isDark } = useTheme();
     const isHovered = useMotionValue(0);
 
     const mouseDistance = useTransform(mouseY, val => {
@@ -81,10 +83,12 @@ function DockItem({
             onClick={onClick}
             className={cn(
                 "relative inline-flex items-center justify-center rounded-full shadow-md transition-colors duration-200",
-                "border border-gray-200",
+                isDark ? "border-gray-700" : "border-gray-200",
                 isActive
-                    ? "bg-black text-white shadow-lg shadow-gray-500/50" // Active state is a darker gray with a subtle glow
-                    : "bg-white text-black hover:bg-white/50",
+                    ? isDark
+                        ? "bg-white text-black shadow-lg shadow-gray-800/50"
+                        : "bg-black text-white shadow-lg shadow-gray-500/50"
+                    : "bg-white text-black border-gray-200 border-[0.1px] shadow-2xl shadow-gray-500/50",
                 className
             )}
             tabIndex={0}

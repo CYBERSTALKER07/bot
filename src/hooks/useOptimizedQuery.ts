@@ -1056,7 +1056,7 @@ export function useRecommendedUsers(currentUserId?: string, limit = 6) {
           .limit(limit);
 
         if (error) throw error;
-        return users || [];
+        return (users || []).map(user => ({ ...user, is_following: false }));
       }
 
       // 1. Fetch current user's profile to get their preferences
@@ -1112,7 +1112,23 @@ export function useRecommendedUsers(currentUserId?: string, limit = 6) {
 
       if (error) throw error;
 
-      // 5. Score and filter users based on relevance
+      // 5. Fetch follow status for these users
+      const userIds = recommendedUsers?.map(u => u.id) || [];
+      let followingMap = new Set<string>();
+
+      if (userIds.length > 0) {
+        const { data: follows } = await supabase
+          .from('follows')
+          .select('following_id')
+          .eq('follower_id', currentUserId)
+          .in('following_id', userIds);
+
+        if (follows) {
+          follows.forEach(f => followingMap.add(f.following_id));
+        }
+      }
+
+      // 6. Score and filter users based on relevance
       const scoredUsers = (recommendedUsers || [])
         .map((user) => {
           let score = 0;
@@ -1149,7 +1165,11 @@ export function useRecommendedUsers(currentUserId?: string, limit = 6) {
           if (daysSinceCreated < 7) score += 40;
           if (daysSinceCreated < 30) score += 20;
 
-          return { ...user, _score: score };
+          return {
+            ...user,
+            _score: score,
+            is_following: followingMap.has(user.id)
+          };
         })
         .sort((a, b) => b._score - a._score) // Sort by relevance score
         .slice(0, limit) // Take only the top results
@@ -1158,10 +1178,9 @@ export function useRecommendedUsers(currentUserId?: string, limit = 6) {
       return scoredUsers;
     },
     enabled: !!currentUserId,
-    staleTime: Infinity, // Never mark as stale - keep cache forever
-    gcTime: Infinity, // Never garbage collect - keep cache forever
-    refetchInterval: 30 * 1000, // Refetch every 30 seconds in the background
-    refetchIntervalInBackground: true, // Continue refetching even when tab is not focused
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes
+    refetchInterval: 60 * 1000, // Refetch every minute
   });
 }
 

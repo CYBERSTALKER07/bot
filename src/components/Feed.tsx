@@ -430,7 +430,7 @@ export default function Feed() {
         )}>
           {/* Header */}
           <div className={cn(
-            'sticky z-10 glass backdrop-blur-xl border-b transition-all duration-300 ios-safe-top',
+            'sticky z-10 rounded-br-[24px] rounded-bl-[24px] glass backdrop-blur-xl border-b transition-all duration-300 ios-safe-top',
             isDark ? 'bg-black/80 border-[#1C1F20]' : 'bg-white/80 border-gray-200',
             isMobile
               ? (isHeaderVisible ? 'top-16' : 'top-0')
@@ -459,14 +459,14 @@ export default function Feed() {
                 <div className="flex-1">
                   <div
                     className={cn(
-                      'w-full py-3 text-xl bg-transparent border-none outline-hidden placeholder-gray-500 cursor-text',
-                      isDark ? 'text-white' : 'text-black'
+                      'w-full py-3 text-xl bg-transparent border-[#1C1F20]/50 border-b rounded-xl border-gray-200 outline-hidden placeholder-gray-500 cursor-text',
+                      isDark ? 'text-white' : 'text-gray-500'
                     )}
                     onClick={() => navigate('/create-post')}
                   >
                     What is happening?!
                   </div>
-                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#1C1F20]/50">
+                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-b-none border-r border-l rounded-l-xl rounded-r-xl  rounded-tr-xl rounded-tl-xl  border-gray-200">
                     <div className="flex gap-1 text-info-500">
                       <button className="p-2 rounded-full text-[#000000] hover:bg-black/10 transition-colors" onClick={() => navigate('/create-post')}>
                         <Camera className="w-5 h-5" />

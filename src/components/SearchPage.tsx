@@ -359,13 +359,14 @@ export default function SearchPage() {
 
       {/* Header */}
       <div className={cn(
-        'sticky top-0 z-10 backdrop-blur-xl border-b transition-all duration-300 ios-header ios-safe-top',
-        isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
+        'mr-[350px]',
+        'sticky top-0 z-10 backdrop-transparent border-b transition-all duration-300 ',
+        isDark ? ' border-none' : ' border-none'
       )}>
         <div className="max-w-2xl mx-auto px-4 py-3">
           {/* Search Bar Container */}
           <div className={cn(
-            'flex items-center gap-3 px-4 py-3 rounded-[24px] transition-all duration-200',
+            'flex items-center gap-3 px-4 py-3 rounded-[24px] transition-all backdrop-blur-xl duration-200',
             isSearchFocused
               ? isDark
                 ? 'bg-black border-2 border-gray-700'
@@ -491,7 +492,7 @@ export default function SearchPage() {
         <div className="flex-1 min-w-0">
           {!searchInput ? (
             // Full Post Cards Display
-            <div className="w-full max-w-2xl mx-auto border rounded-[24px] border-[0.1px] border-gray-200">
+            <div className={cn('w-full max-w-2xl mx-auto border rounded-[24px] border-[0.1px] border-gray-200', isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200')}>
               {/* Trending Posts as Full Cards */}
               {isLoadingPosts ? (
                 <div className="space-y-4">
@@ -779,7 +780,7 @@ export default function SearchPage() {
         </div>
 
         {/* Right Sidebar - Desktop Only */}
-        <div className='border-l-[0.1px] border-t-[0.1px] rounded-[24px] border-gray-200 '></div>
+        <div className={cn('border-l-[0.1px] border-t-[0.1px] rounded-[24px] border-gray-200', isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200')}></div>
         <aside className={cn(
           'hidden xl:block w-[320px] rounded-[24px] border-gray-200 h-screen sticky top-0 overflow-y-auto scrollbar-hide py-4 flex-shrink-0',
           isDark ? 'bg-black' : 'bg-white'
