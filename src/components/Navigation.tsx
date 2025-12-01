@@ -393,14 +393,14 @@ export default function Navigation() {
           <Dock
             items={[
               ...navigationItems.map(item => ({
-                icon: <item.icon className="size-6" />,
+                icon: <item.icon className="size-6" strokeWidth={1.5} />,
                 label: item.label,
                 onClick: () => handleNavItemPress(item.path, item),
                 isActive: isCurrentPath(item.path),
               })),
               // Add Logout item at the bottom
               {
-                icon: <Logout className="size-6" />,
+                icon: <Logout className="size-6" strokeWidth={1.5} />,
                 label: 'Logout',
                 onClick: handleLogout
               }

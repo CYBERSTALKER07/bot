@@ -118,8 +118,8 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
 
                 {/* AI Career Assistant */}
                 <div className={cn(
-                    "rounded-3xl border p-4 transition-colors cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900",
-                    isDark ? 'bg-black border-[#1C1F20] text-white' : 'bg-white border-[0.1px] border-gray-200 text-black shadow-lg'
+                    "rounded-3xl border p-4 transition-colors cursor-pointer  ",
+                    isDark ? 'bg-black border-[#1C1F20] hover:bg-gray-900 text-white ' : 'bg-white border-[0.1px] border-gray-200 text-black shadow-lg'
                 )}>
                     <div className="flex items-center gap-2 mb-3">
                         <Search className="w-5 h-5 text-info-500" />

@@ -697,14 +697,14 @@ export default function Feed() {
                           {/* Media Content - Only for non-quote retweets */}
                           {!post.is_quote_retweet && post.media && post.media.length > 0 && (
                             <div className={cn(
-                              "grid gap-1 rounded-2xl overflow-hidden mb-3 border",
+                              "grid gap-0.5 rounded-2xl overflow-hidden mb-3 border",
                               isDark ? 'border-[#1C1F20]' : 'border-[0.1px] border-gray-200',
                               post.media.length === 1 ? 'grid-cols-1' : 'grid-cols-2'
                             )}>
                               {post.media.map((media: { type: 'image' | 'video'; url: string; alt?: string }, index: number) => (
                                 <div
                                   key={index}
-                                  className="relative cursor-pointer"
+                                  className="relative cursor-pointer overflow-hidden"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     if (media.type === 'image') {
@@ -718,12 +718,18 @@ export default function Feed() {
                                     <img
                                       src={media.url}
                                       alt={media.alt || ''}
-                                      className="w-full h-full object-cover max-h-[500px]"
+                                      className={cn(
+                                        "w-full object-cover",
+                                        post.media.length === 1 ? "max-h-[600px]" : "h-[300px]"
+                                      )}
                                     />
                                   ) : (
                                     <EnhancedVideoPlayer
                                       src={media.url}
-                                      className="w-full h-full max-h-[500px]"
+                                      className={cn(
+                                        "w-full",
+                                        post.media.length === 1 ? "max-h-[600px]" : "h-[300px]"
+                                      )}
                                     />
                                   )}
                                 </div>

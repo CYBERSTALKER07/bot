@@ -81,6 +81,7 @@ const PostEventPage = lazy(() => import('./pages/PostEventPage'));
 const UniversityDashboard = lazy(() => import('./pages/UniversityDashboard'));
 const PremiumUpgrade = lazy(() => import('./pages/PremiumUpgrade'));
 const AdminApplicationsPage = lazy(() => import('./pages/AdminApplicationsPage'));
+const AnswersPage = lazy(() => import('./pages/AnswersPage'));
 
 // LinkedIn Integration
 const LinkedInJobImport = lazy(() => import('./components/LinkedIn/LinkedInJobImport'));
@@ -540,6 +541,13 @@ function AppContent() {
               <ProtectedRoute>
                 <Suspense fallback={<LoadingFallback message="Loading post details..." />}>
                   <PostDetails />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/post/:postId/answers" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading answers..." />}>
+                  <AnswersPage />
                 </Suspense>
               </ProtectedRoute>
             } />

@@ -324,7 +324,8 @@ export default function PostJob() {
                 'py-8 sm:py-10',
                 isDark ? 'bg-zinc-900/50' : 'bg-white'
               )}
-              footerClassName={cn(isDark ? '' : '')}
+              currentStep={currentStep}
+              footerClassName={cn(currentStep === 4 ? 'hidden' : '')}
             >
               {/* Step 1: Basic Information */}
               <Step>
@@ -729,6 +730,20 @@ export default function PostJob() {
                     >
                       <Eye className="h-5 w-5 mr-2" />
                       Preview
+                    </motion.button>
+                    <motion.button
+                      type="button"
+                      onClick={() => setCurrentStep(3)}
+                      variants={buttonVariants}
+                      initial="rest"
+                      whileHover="hover"
+                      whileTap="tap"
+                      className={cn("flex-1 border-2 py-3 rounded-2xl font-bold transition-all flex items-center justify-center", isDark ? 'border-white/10 text-white hover:bg-white/5' : 'border-gray-200 text-gray-600 hover:bg-gray-50')}
+                      disabled={isSubmitting || loading}
+                      title="Go back"
+                    >
+                      <ArrowLeft className="h-5 w-5 mr-2" />
+                      Previous
                     </motion.button>
                     <motion.button
                       type="submit"

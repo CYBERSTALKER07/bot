@@ -19,7 +19,7 @@ import { useSearch, useMostFollowedUsers, useMostLikedPosts, useMatchedJobs } fr
 import { useDebounce } from '../hooks/useDebounce';
 import { useAuth } from '../context/AuthContext';
 import WhoToFollowCard from './WhoToFollowCard';
-import { SearchResultsListSkeleton } from './ui/Skeleton';
+import { SearchResultsListSkeleton, PostCardSkeleton } from './ui/Skeleton';
 import { supabase } from '../lib/supabase';
 
 interface SearchResult {
@@ -131,7 +131,7 @@ export default function SearchPage() {
 
   // Fallback: Fetch regular users if mostFollowedUsers is empty
   const [suggestedUsers, setSuggestedUsers] = useState<any[]>([]);
-  const [employers, setEmployers] = useState<any[]>([]);
+  const [sidebarCompanies, setSidebarCompanies] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -158,26 +158,24 @@ export default function SearchPage() {
     fetchUsers();
   }, [mostFollowedUsers]);
 
-  // Fetch employers/companies for left sidebar
+  // Fetch companies for left sidebar
   useEffect(() => {
-    const fetchEmployers = async () => {
+    const fetchCompanies = async () => {
       try {
         const { data, error } = await supabase
-          .from('profiles')
-          .select('id, full_name, username, avatar_url, bio, company_name, verified')
-          .eq('role', 'employer')
-          .not('company_name', 'is', null)
+          .from('companies')
+          .select('id, name, logo_url, industry')
           .limit(5);
 
         if (!error && data) {
-          setEmployers(data);
+          setSidebarCompanies(data);
         }
       } catch (err) {
-        console.error('Error fetching employers:', err);
+        console.error('Error fetching companies:', err);
       }
     };
 
-    fetchEmployers();
+    fetchCompanies();
   }, []);
 
   // Fetch trending content for empty state
@@ -359,7 +357,6 @@ export default function SearchPage() {
 
       {/* Header */}
       <div className={cn(
-        'mr-[350px]',
         'sticky top-0 z-10 backdrop-transparent border-b transition-all duration-300 ',
         isDark ? ' border-none' : ' border-none'
       )}>
@@ -372,8 +369,8 @@ export default function SearchPage() {
                 ? 'bg-black border-2 border-gray-700'
                 : 'bg-white border-2 border-gray-400'
               : isDark
-                ? 'bg-gray-900/50 border border-gray-800 hover:border-gray-700'
-                : 'bg-gray-100/50 border border-[0.1px] border-gray-200 hover:border-gray-300'
+                ? 'bg-gray-900/50 border-[0.1px] border-gray-800 hover:border-gray-700'
+                : 'bg-gray-100/50 border-[0.1px] border-gray-200 hover:border-gray-300'
           )}>
             {/* Mobile Back Button */}
             <button
@@ -483,396 +480,399 @@ export default function SearchPage() {
             </div>
           </div>
         )}
-      </div>
 
-      {/* Main Content with Sidebar */}
-      {/* Main Content with Sidebar */}
-      <div className="max-w-7xl mx-auto px-4 py-4 flex flex-nowrap gap-4 pb-24 ios-bottom-safe">
-        {/* Center Column */}
-        <div className="flex-1 min-w-0">
-          {!searchInput ? (
-            // Full Post Cards Display
-            <div className={cn('w-full max-w-2xl mx-auto border rounded-[24px]', isDark ? 'bg-black border-gray-800' : 'bg-white border-[0.1px] border-gray-200')}>
-              {/* Trending Posts as Full Cards */}
-              {isLoadingPosts ? (
-                <div className="space-y-4">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className={cn('p-6 rounded-2xl animate-pulse', isDark ? 'bg-gray-900' : 'bg-gray-100')}>
-                      <div className="h-32 bg-gray-700 rounded"></div>
+
+        {/* Main Content with Sidebar */}
+        {/* Main Content with Sidebar */}
+        {/* Main Content with Sidebar */}
+        <div className="max-w-[1400px] mx-auto flex justify-center mobile-container px-4 xl:px-0 py-4 pb-24 ios-bottom-safe">
+          {/* Left Spacer for Balance - Desktop Only */}
+          <div className="hidden xl:block w-[300px] flex-shrink-0"></div>
+
+          {/* Center Column */}
+          <div className="flex-1 max-w-[650px] min-w-0">
+            {!searchInput ? (
+              // Full Post Cards Display
+              <div className={cn('w-full max-w-2xl mx-auto border rounded-none border-t-0', isDark ? 'bg-black border-gray-800' : 'bg-white border-[0.1px] border-gray-200')}>
+                {/* Trending Posts as Full Cards */}
+                {isLoadingPosts ? (
+                  <div className="divide-y border-b rounded-2xl overflow-hidden border-gray-200 dark:border-gray-800">
+                    {[1, 2, 3].map((i) => (
+                      <PostCardSkeleton key={i} />
+                    ))}
+                  </div>
+                ) : trendingPosts.length > 0 ? (
+                  <div className={cn('divide-y border-b rounded-2xl overflow-hidden', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
+                    {trendingPosts.map((post: any) => (
+                      <div
+                        key={post.id}
+                        onClick={() => navigate(`/post/${post.id}`)}
+                        className={cn(
+                          'p-4 transition-colors cursor-pointer',
+                          isDark ? 'hover:bg-gray-900/30' : 'hover:bg-gray-50'
+                        )}
+                      >
+                        {/* Post Header */}
+                        <div className="flex items-start gap-3 mb-3">
+                          <img
+                            src={post.author?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.author?.username}`}
+                            alt={post.author?.name}
+                            className="w-10 h-10 rounded-full object-cover shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <p className={cn("font-bold text-sm truncate", isDark ? "text-white" : "text-gray-900")}>
+                                {post.author?.name}
+                              </p>
+                              {post.author?.verified && (
+                                <Verified className="w-3.5 h-3.5 text-[#D3FB52] fill-current" />
+                              )}
+                              <span className={cn('text-sm', isDark ? 'text-gray-500' : 'text-gray-500')}>
+                                @{post.author?.username} · {new Date(post.created_at).toLocaleDateString()}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Post Content */}
+                        <div className="pl-[52px]">
+                          <p className={cn('text-base whitespace-pre-wrap mb-3', isDark ? 'text-white' : 'text-black')}>
+                            {post.content}
+                          </p>
+
+                          {/* Post Media */}
+                          {post.media && post.media.length > 0 && (
+                            <div className={cn('mb-3 rounded-2xl overflow-hidden border', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
+                              {post.media[0].type === 'image' ? (
+                                <img
+                                  src={post.media[0].url}
+                                  alt={post.media[0].alt || 'Post image'}
+                                  className="w-full max-h-[500px] object-cover"
+                                />
+                              ) : (
+                                <video
+                                  src={post.media[0].url}
+                                  controls
+                                  className="w-full max-h-[500px]"
+                                />
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+
+                {/* Who to Follow Section - Horizontal Scroll */}
+                {suggestedUsers.length > 0 && (
+                  <div className={cn('border-t border-b py-6 mt-4', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
+                    <h2 className={cn("text-xl font-bold mb-4 flex items-center gap-2", isDark ? "text-white" : "text-gray-900")}>
+                      <UsersIcon className="w-5 h-5" />
+                      Who to Follow
+                    </h2>
+                    <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                      {suggestedUsers.map((user: any) => (
+                        <WhoToFollowCard key={user.id} user={user} />
+                      ))}
                     </div>
-                  ))}
-                </div>
-              ) : trendingPosts.length > 0 ? (
-                <div className={cn('divide-y border-b rounded-2xl overflow-hidden', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
-                  {trendingPosts.map((post: any) => (
-                    <div
-                      key={post.id}
-                      onClick={() => navigate(`/post/${post.id}`)}
+                  </div>
+                )}
+
+                {/* Jobs Section */}
+                {recentJobs.length > 0 && (
+                  <div className={cn('border-t mt-4', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
+                    <div className="pt-6">
+                      <h2 className={cn("text-xl font-bold mb-4 flex items-center gap-2", isDark ? "text-white" : "text-gray-900")}>
+                        <Briefcase className="w-5 h-5" />
+                        Recent Jobs
+                      </h2>
+                      <div className="space-y-3">
+                        {recentJobs.slice(0, 3).map((job: any) => (
+                          <button
+                            key={job.id}
+                            onClick={() => navigate(`/jobs/${job.id}`)}
+                            className={cn(
+                              'w-full p-4 rounded-2xl text-left transition-all border group',
+                              isDark
+                                ? 'bg-gray-900/50 hover:bg-gray-900 border-gray-800 hover:border-gray-700'
+                                : 'bg-white hover:bg-gray-50 border-[0.1px] border-gray-200 hover:border-gray-300'
+                            )}
+                          >
+                            <h3 className={cn("font-bold text-base mb-1 group-hover:text-[#D3FB52] transition-colors", isDark ? "text-white" : "text-gray-900")}>
+                              {job.title}
+                            </h3>
+                            <p className={cn('text-sm mb-2', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                              {job.company}
+                            </p>
+                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                              <MapPin className="w-3.5 h-3.5" />
+                              <span>{job.location}</span>
+                              {job.type && (
+                                <>
+                                  <span>•</span>
+                                  <span>{job.type}</span>
+                                </>
+                              )}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Events Section */}
+                {upcomingEvents.length > 0 && (
+                  <div className={cn('border-t mt-4', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
+                    <div className="pt-6">
+                      <h2 className={cn("text-xl font-bold mb-4 flex items-center gap-2", isDark ? "text-white" : "text-gray-900")}>
+                        <Calendar className="w-5 h-5" />
+                        Upcoming Events
+                      </h2>
+                      <div className="space-y-3">
+                        {upcomingEvents.map((event: any) => (
+                          <button
+                            key={event.id}
+                            onClick={() => navigate(`/event/${event.id}`)}
+                            className={cn(
+                              'w-full p-4 rounded-2xl text-left transition-all border group',
+                              isDark
+                                ? 'bg-gray-900/50 hover:bg-gray-900 border-gray-800 hover:border-gray-700'
+                                : 'bg-white hover:bg-gray-50 border-[0.1px] border-gray-200 hover:border-gray-300'
+                            )}
+                          >
+                            <h3 className={cn("font-bold text-base mb-1 group-hover:text-[#D3FB52] transition-colors", isDark ? "text-white" : "text-gray-900")}>
+                              {event.title}
+                            </h3>
+                            <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
+                              <Clock className="w-4 h-4" />
+                              <span>{new Date(event.event_date).toLocaleDateString()}</span>
+                            </div>
+                            {event.location && (
+                              <div className="flex items-center gap-2 text-sm text-gray-500">
+                                <MapPin className="w-4 h-4" />
+                                <span className="truncate">{event.location}</span>
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : searchInput && loading ? (
+              // Loading State
+              <div className="max-w-2xl mx-auto">
+                <SearchResultsListSkeleton />
+              </div>
+            ) : (
+              // Results List
+              <div className="max-w-2xl mx-auto w-full">
+                {filteredResults.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-64 px-4 py-12 text-center">
+                    <div className={cn(
+                      "w-16 h-16 mb-4 rounded-full flex items-center justify-center",
+                      isDark ? "bg-gray-900" : "bg-gray-100"
+                    )}>
+                      <SearchIcon className={cn("w-8 h-8", isDark ? "text-gray-700" : "text-gray-400")} />
+                    </div>
+                    <h2 className={cn("text-xl font-bold mb-2", isDark ? "text-white" : "text-gray-900")}>
+                      No results found
+                    </h2>
+                    <p className={cn('text-sm mb-6', isDark ? 'text-gray-500' : 'text-gray-600')}>
+                      We couldn't find anything matching "{searchInput}"
+                    </p>
+                    <button
+                      onClick={() => setSearchInput('')}
                       className={cn(
-                        'p-4 transition-colors cursor-pointer',
-                        isDark ? 'hover:bg-gray-900/30' : 'hover:bg-gray-50'
+                        'text-sm px-6 py-2.5 rounded-full font-medium transition-all',
+                        'bg-[#D3FB52] text-black hover:bg-[#D3FB52]/90'
                       )}
                     >
-                      {/* Post Header */}
-                      <div className="flex items-start gap-3 mb-3">
-                        <img
-                          src={post.author?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.author?.username}`}
-                          alt={post.author?.name}
-                          className="w-10 h-10 rounded-full object-cover shrink-0"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <p className={cn("font-bold text-sm truncate", isDark ? "text-white" : "text-gray-900")}>
-                              {post.author?.name}
-                            </p>
-                            {post.author?.verified && (
-                              <Verified className="w-3.5 h-3.5 text-[#D3FB52] fill-current" />
+                      Clear search
+                    </button>
+                  </div>
+                ) : (
+                  <div className={cn('divide-y rounded-2xl overflow-hidden border', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
+                    {filteredResults.map((result) => (
+                      <div
+                        key={`${result.type}-${result.id}`}
+                        onClick={() => handleResultClick(result)}
+                        className={cn(
+                          "p-4 transition-all cursor-pointer group",
+                          isDark
+                            ? "hover:bg-gray-900"
+                            : "hover:bg-gray-50"
+                        )}
+                      >
+                        <div className="flex gap-3">
+                          {/* Avatar/Icon */}
+                          <div className="shrink-0">
+                            {result.avatar ? (
+                              <img
+                                src={result.avatar}
+                                alt={result.title}
+                                className={cn(
+                                  "object-cover",
+                                  result.type === 'company' ? "w-12 h-12 rounded-lg" : "w-10 h-10 rounded-full"
+                                )}
+                              />
+                            ) : (
+                              <div className={cn(
+                                "w-10 h-10 flex items-center justify-center",
+                                result.type === 'company' ? "rounded-lg" : "rounded-full",
+                                isDark ? "bg-gray-900 text-gray-400" : "bg-gray-100 text-gray-500"
+                              )}>
+                                {result.type === 'user' && <UsersIcon className="w-5 h-5" />}
+                                {result.type === 'job' && <Briefcase className="w-5 h-5" />}
+                                {result.type === 'company' && <Briefcase className="w-5 h-5" />}
+                                {result.type === 'hashtag' && <Hash className="w-5 h-5" />}
+                                {result.type === 'post' && <AtSign className="w-5 h-5" />}
+                              </div>
                             )}
-                            <span className={cn('text-sm', isDark ? 'text-gray-500' : 'text-gray-500')}>
-                              @{post.author?.username} · {new Date(post.created_at).toLocaleDateString()}
-                            </span>
+                          </div>
+
+                          {/* Content */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-0.5">
+                              <div className="flex items-center gap-1.5 min-w-0">
+                                <h3 className={cn(
+                                  "font-bold text-base truncate",
+                                  isDark ? "text-white" : "text-gray-900"
+                                )}>
+                                  {result.title}
+                                </h3>
+                                {result.verified && (
+                                  <Verified className="w-3.5 h-3.5 text-[#D3FB52] fill-current shrink-0" />
+                                )}
+                                <span className={cn(
+                                  "text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded-md font-medium ml-1",
+                                  isDark ? "bg-gray-900 text-gray-500" : "bg-gray-100 text-gray-500"
+                                )}>
+                                  {result.type}
+                                </span>
+                              </div>
+                            </div>
+
+                            <p className={cn("text-sm mb-1 truncate", isDark ? "text-gray-500" : "text-gray-600")}>
+                              {result.subtitle}
+                            </p>
+
+                            {result.description && (
+                              <p className={cn(
+                                "text-sm line-clamp-2",
+                                isDark ? "text-gray-400" : "text-gray-500"
+                              )}>
+                                {result.description}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
-                      {/* Post Content */}
-                      <div className="pl-[52px]">
-                        <p className={cn('text-base whitespace-pre-wrap mb-3', isDark ? 'text-white' : 'text-black')}>
-                          {post.content}
-                        </p>
-
-                        {/* Post Media */}
-                        {post.media && post.media.length > 0 && (
-                          <div className={cn('mb-3 rounded-2xl overflow-hidden border', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
-                            {post.media[0].type === 'image' ? (
-                              <img
-                                src={post.media[0].url}
-                                alt={post.media[0].alt || 'Post image'}
-                                className="w-full max-h-[500px] object-cover"
-                              />
-                            ) : (
-                              <video
-                                src={post.media[0].url}
-                                controls
-                                className="w-full max-h-[500px]"
-                              />
-                            )}
-                          </div>
+          {/* Right Sidebar - Desktop Only */}
+          <div className={cn('rounded-[24px] ', isDark ? 'bg-black border-gray-800' : 'bg-white border-l-[0.1px] border-t-[0.1px] border-gray-200')}></div>
+          <aside className={cn(
+            'hidden xl:block w-[400px] pl-6 rounded-[24px] h-screen sticky top-0 overflow-y-auto scrollbar-hide py-4 flex-shrink-0',
+            isDark ? 'bg-black' : 'bg-white border-[0.1px] border-gray-200'
+          )}>
+            <div className="space-y-4">
+              {/* Companies Section */}
+              {/* Companies Section */}
+              {sidebarCompanies.length > 0 && (
+                <div className={cn(
+                  'rounded-[24px] p-4 border shadow-lg',
+                  isDark ? 'bg-black border-gray-800' : 'bg-white border-[0.1px] border-gray-200'
+                )}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Briefcase className="w-4 h-4" />
+                    <h3 className={cn(
+                      'text-sm font-semibold',
+                      isDark ? 'text-white' : 'text-black'
+                    )}>
+                      Companies
+                    </h3>
+                  </div>
+                  <div className="space-y-2">
+                    {sidebarCompanies.map((company: any) => (
+                      <button
+                        key={company.id}
+                        onClick={() => navigate(`/company/${company.id}`)}
+                        className={cn(
+                          'w-full flex items-center gap-3 p-3 rounded-2xl transition-colors text-left',
+                          isDark ? 'hover:bg-gray-900' : 'hover:bg-gray-100'
                         )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-
-              {/* Who to Follow Section - Horizontal Scroll */}
-              {suggestedUsers.length > 0 && (
-                <div className={cn('border-t border-b py-6 mt-4', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
-                  <h2 className={cn("text-xl font-bold mb-4 flex items-center gap-2", isDark ? "text-white" : "text-gray-900")}>
-                    <UsersIcon className="w-5 h-5" />
-                    Who to Follow
-                  </h2>
-                  <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-                    {suggestedUsers.map((user: any) => (
-                      <WhoToFollowCard key={user.id} user={user} />
+                      >
+                        <img
+                          src={company.logo_url || `https://api.dicebear.com/7.x/initials/svg?seed=${company.name}`}
+                          alt={company.name}
+                          className="w-10 h-10 rounded-lg object-cover shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className={cn('font-semibold text-sm truncate', isDark ? 'text-white' : 'text-black')}>
+                            {company.name}
+                          </p>
+                          <p className={cn('text-xs truncate', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                            {company.industry || 'Company'}
+                          </p>
+                        </div>
+                      </button>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Jobs Section */}
-              {recentJobs.length > 0 && (
-                <div className={cn('border-t mt-4', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
-                  <div className="pt-6">
-                    <h2 className={cn("text-xl font-bold mb-4 flex items-center gap-2", isDark ? "text-white" : "text-gray-900")}>
-                      <Briefcase className="w-5 h-5" />
-                      Recent Jobs
-                    </h2>
-                    <div className="space-y-3">
-                      {recentJobs.slice(0, 3).map((job: any) => (
-                        <button
-                          key={job.id}
-                          onClick={() => navigate(`/jobs/${job.id}`)}
-                          className={cn(
-                            'w-full p-4 rounded-2xl text-left transition-all border group',
-                            isDark
-                              ? 'bg-gray-900/50 hover:bg-gray-900 border-gray-800 hover:border-gray-700'
-                              : 'bg-white hover:bg-gray-50 border-[0.1px] border-gray-200 hover:border-gray-300'
-                          )}
-                        >
-                          <h3 className={cn("font-bold text-base mb-1 group-hover:text-[#D3FB52] transition-colors", isDark ? "text-white" : "text-gray-900")}>
-                            {job.title}
-                          </h3>
-                          <p className={cn('text-sm mb-2', isDark ? 'text-gray-400' : 'text-gray-600')}>
-                            {job.company}
-                          </p>
-                          <div className="flex items-center gap-2 text-xs text-gray-500">
-                            <MapPin className="w-3.5 h-3.5" />
-                            <span>{job.location}</span>
-                            {job.type && (
-                              <>
-                                <span>•</span>
-                                <span>{job.type}</span>
-                              </>
-                            )}
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Events Section */}
-              {upcomingEvents.length > 0 && (
-                <div className={cn('border-t mt-4', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
-                  <div className="pt-6">
-                    <h2 className={cn("text-xl font-bold mb-4 flex items-center gap-2", isDark ? "text-white" : "text-gray-900")}>
-                      <Calendar className="w-5 h-5" />
-                      Upcoming Events
-                    </h2>
-                    <div className="space-y-3">
-                      {upcomingEvents.map((event: any) => (
-                        <button
-                          key={event.id}
-                          onClick={() => navigate(`/event/${event.id}`)}
-                          className={cn(
-                            'w-full p-4 rounded-2xl text-left transition-all border group',
-                            isDark
-                              ? 'bg-gray-900/50 hover:bg-gray-900 border-gray-800 hover:border-gray-700'
-                              : 'bg-white hover:bg-gray-50 border-[0.1px] border-gray-200 hover:border-gray-300'
-                          )}
-                        >
-                          <h3 className={cn("font-bold text-base mb-1 group-hover:text-[#D3FB52] transition-colors", isDark ? "text-white" : "text-gray-900")}>
-                            {event.title}
-                          </h3>
-                          <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-                            <Clock className="w-4 h-4" />
-                            <span>{new Date(event.event_date).toLocaleDateString()}</span>
-                          </div>
-                          {event.location && (
-                            <div className="flex items-center gap-2 text-sm text-gray-500">
-                              <MapPin className="w-4 h-4" />
-                              <span className="truncate">{event.location}</span>
-                            </div>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : searchInput && loading ? (
-            // Loading State
-            <div className="max-w-2xl mx-auto">
-              <SearchResultsListSkeleton />
-            </div>
-          ) : (
-            // Results List
-            <div className="max-w-2xl mx-auto w-full">
-              {filteredResults.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-64 px-4 py-12 text-center">
-                  <div className={cn(
-                    "w-16 h-16 mb-4 rounded-full flex items-center justify-center",
-                    isDark ? "bg-gray-900" : "bg-gray-100"
-                  )}>
-                    <SearchIcon className={cn("w-8 h-8", isDark ? "text-gray-700" : "text-gray-400")} />
-                  </div>
-                  <h2 className={cn("text-xl font-bold mb-2", isDark ? "text-white" : "text-gray-900")}>
-                    No results found
-                  </h2>
-                  <p className={cn('text-sm mb-6', isDark ? 'text-gray-500' : 'text-gray-600')}>
-                    We couldn't find anything matching "{searchInput}"
-                  </p>
-                  <button
-                    onClick={() => setSearchInput('')}
-                    className={cn(
-                      'text-sm px-6 py-2.5 rounded-full font-medium transition-all',
-                      'bg-[#D3FB52] text-black hover:bg-[#D3FB52]/90'
-                    )}
-                  >
-                    Clear search
-                  </button>
-                </div>
-              ) : (
-                <div className={cn('divide-y rounded-2xl overflow-hidden border', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
-                  {filteredResults.map((result) => (
-                    <div
-                      key={`${result.type}-${result.id}`}
-                      onClick={() => handleResultClick(result)}
-                      className={cn(
-                        "p-4 transition-all cursor-pointer group",
-                        isDark
-                          ? "hover:bg-gray-900"
-                          : "hover:bg-gray-50"
-                      )}
-                    >
-                      <div className="flex gap-3">
-                        {/* Avatar/Icon */}
-                        <div className="shrink-0">
-                          {result.avatar ? (
-                            <img
-                              src={result.avatar}
-                              alt={result.title}
-                              className={cn(
-                                "object-cover",
-                                result.type === 'company' ? "w-12 h-12 rounded-lg" : "w-10 h-10 rounded-full"
-                              )}
-                            />
-                          ) : (
-                            <div className={cn(
-                              "w-10 h-10 flex items-center justify-center",
-                              result.type === 'company' ? "rounded-lg" : "rounded-full",
-                              isDark ? "bg-gray-900 text-gray-400" : "bg-gray-100 text-gray-500"
-                            )}>
-                              {result.type === 'user' && <UsersIcon className="w-5 h-5" />}
-                              {result.type === 'job' && <Briefcase className="w-5 h-5" />}
-                              {result.type === 'company' && <Briefcase className="w-5 h-5" />}
-                              {result.type === 'hashtag' && <Hash className="w-5 h-5" />}
-                              {result.type === 'post' && <AtSign className="w-5 h-5" />}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Content */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-0.5">
-                            <div className="flex items-center gap-1.5 min-w-0">
-                              <h3 className={cn(
-                                "font-bold text-base truncate",
-                                isDark ? "text-white" : "text-gray-900"
-                              )}>
-                                {result.title}
-                              </h3>
-                              {result.verified && (
-                                <Verified className="w-3.5 h-3.5 text-[#D3FB52] fill-current shrink-0" />
-                              )}
-                              <span className={cn(
-                                "text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded-md font-medium ml-1",
-                                isDark ? "bg-gray-900 text-gray-500" : "bg-gray-100 text-gray-500"
-                              )}>
-                                {result.type}
-                              </span>
-                            </div>
-                          </div>
-
-                          <p className={cn("text-sm mb-1 truncate", isDark ? "text-gray-500" : "text-gray-600")}>
-                            {result.subtitle}
-                          </p>
-
-                          {result.description && (
-                            <p className={cn(
-                              "text-sm line-clamp-2",
-                              isDark ? "text-gray-400" : "text-gray-500"
-                            )}>
-                              {result.description}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Right Sidebar - Desktop Only */}
-        <div className={cn('rounded-[24px]', isDark ? 'bg-black border-gray-800' : 'bg-white border-l-[0.1px] border-t-[0.1px] border-gray-200')}></div>
-        <aside className={cn(
-          'hidden xl:block w-[320px] rounded-[24px] h-screen sticky top-0 overflow-y-auto scrollbar-hide py-4 flex-shrink-0',
-          isDark ? 'bg-black' : 'bg-white border-[0.1px] border-gray-200'
-        )}>
-          <div className="space-y-4">
-            {/* Companies Section */}
-            {employers.length > 0 && (
-              <div className={cn(
-                'rounded-[24px] p-4 border shadow-lg',
-                isDark ? 'bg-black border-gray-800' : 'bg-white border-[0.1px] border-gray-200'
-              )}>
-                <div className="flex items-center gap-2 mb-3">
-                  <Briefcase className="w-4 h-4" />
+              {/* Suggested Users Section */}
+              {suggestedUsers.length > 0 && (
+                <div className={cn(
+                  'rounded-[24px] p-4 border shadow-lg',
+                  isDark ? 'bg-black border-gray-800' : 'bg-white border-[0.1px] border-gray-200'
+                )}>
                   <h3 className={cn(
-                    'text-sm font-semibold',
+                    'text-sm font-semibold mb-3',
                     isDark ? 'text-white' : 'text-black'
                   )}>
-                    Companies
+                    Suggested for you
                   </h3>
+                  <div className="space-y-2">
+                    {suggestedUsers.slice(0, 5).map((user: any) => (
+                      <button
+                        key={user.id}
+                        onClick={() => navigate(`/profile/${user.id}`)}
+                        className={cn(
+                          'w-full flex items-center gap-3 p-3 rounded-2xl transition-colors text-left',
+                          isDark ? 'hover:bg-gray-900' : 'hover:bg-gray-100'
+                        )}
+                      >
+                        <img
+                          src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`}
+                          alt={user.full_name}
+                          className="w-10 h-10 rounded-full object-cover shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className={cn('font-semibold text-sm truncate', isDark ? 'text-white' : 'text-black')}>
+                            {user.full_name}
+                          </p>
+                          <p className={cn('text-xs truncate', isDark ? 'text-gray-400' : 'text-gray-600')}>
+                            @{user.username}
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  {employers.map((employer: any) => (
-                    <button
-                      key={employer.id}
-                      onClick={() => navigate(`/profile/${employer.id}`)}
-                      className={cn(
-                        'w-full flex items-center gap-3 p-3 rounded-2xl transition-colors text-left',
-                        isDark ? 'hover:bg-gray-900' : 'hover:bg-gray-100'
-                      )}
-                    >
-                      <img
-                        src={employer.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${employer.company_name}`}
-                        alt={employer.company_name}
-                        className="w-10 h-10 rounded-lg object-cover shrink-0"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className={cn('font-semibold text-sm truncate', isDark ? 'text-white' : 'text-black')}>
-                          {employer.company_name}
-                        </p>
-                        <p className={cn('text-xs truncate', isDark ? 'text-gray-400' : 'text-gray-600')}>
-                          {employer.full_name}
-                        </p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Suggested Users Section */}
-            {suggestedUsers.length > 0 && (
-              <div className={cn(
-                'rounded-[24px] p-4 border shadow-lg',
-                isDark ? 'bg-black border-gray-800' : 'bg-white border-[0.1px] border-gray-200'
-              )}>
-                <h3 className={cn(
-                  'text-sm font-semibold mb-3',
-                  isDark ? 'text-white' : 'text-black'
-                )}>
-                  Suggested for you
-                </h3>
-                <div className="space-y-2">
-                  {suggestedUsers.slice(0, 5).map((user: any) => (
-                    <button
-                      key={user.id}
-                      onClick={() => navigate(`/profile/${user.id}`)}
-                      className={cn(
-                        'w-full flex items-center gap-3 p-3 rounded-2xl transition-colors text-left',
-                        isDark ? 'hover:bg-gray-900' : 'hover:bg-gray-100'
-                      )}
-                    >
-                      <img
-                        src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`}
-                        alt={user.full_name}
-                        className="w-10 h-10 rounded-full object-cover shrink-0"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className={cn('font-semibold text-sm truncate', isDark ? 'text-white' : 'text-black')}>
-                          {user.full_name}
-                        </p>
-                        <p className={cn('text-xs truncate', isDark ? 'text-gray-400' : 'text-gray-600')}>
-                          @{user.username}
-                        </p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </aside>
+              )}
+            </div>
+          </aside>
+        </div>
       </div>
-    </div>
-  );
+      );
 }
