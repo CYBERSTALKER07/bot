@@ -461,28 +461,43 @@ export default function Feed() {
                 <div className="flex-1">
                   <div
                     className={cn(
-                      'w-full py-3 text-xl bg-transparent border-[#1C1F20]/50 border-b rounded-xl border-gray-200 outline-hidden placeholder-gray-500 cursor-text',
-                      isDark ? 'text-white' : 'text-gray-500'
+                      'w-full py-3 text-xl bg-transparent border-b rounded-xl border-gray-200 outline-hidden placeholder-gray-500 cursor-text',
+                      isDark ? 'text-white border-[#1C1F20]/50' : 'text-gray-500 border-[#1C1F20]/50'
                     )}
                     onClick={() => navigate('/create-post')}
                   >
                     What is happening?!
                   </div>
-                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-b-none border-r border-l rounded-l-xl rounded-r-xl  rounded-tr-xl rounded-tl-xl border-[0.1px] border-gray-200">
+                  <div className={cn(
+                    'flex items-center justify-between mt-3 pt-3 border-t border-b-none border-r border-l rounded-l-xl rounded-r-xl  rounded-tr-xl rounded-tl-xl border-[0.1px] border-gray-200',
+                    isDark ? 'border-[#1C1F20]/50' : 'border-[#1C1F20]/50'
+                  )}>
                     <div className="flex gap-1 text-info-500">
-                      <button className="p-2 rounded-full text-[#000000] hover:bg-black/10 transition-colors" onClick={() => navigate('/create-post')}>
+                      <button className={cn(
+                        'p-2 rounded-full text-[#000000] hover:bg-black/10 transition-colors',
+                        isDark ? 'text-white' : 'text-gray-500'
+                      )} onClick={() => navigate('/create-post')}>
                         <Camera className="w-5 h-5" />
                       </button>
-                      <button className="p-2 rounded-full text-[#000000] hover:bg-black/10 transition-colors" onClick={() => navigate('/create-post')}>
+                      <button className={cn(
+                        'p-2 rounded-full text-[#000000] hover:bg-black/10 transition-colors',
+                        isDark ? 'text-white' : 'text-gray-500'
+                      )} onClick={() => navigate('/create-post')}>
                         <Video className="w-5 h-5" />
                       </button>
-                      <button className="p-2 rounded-full text-[#000000] hover:bg-black/10 transition-colors" onClick={() => navigate('/create-post')}>
+                      <button className={cn(
+                        'p-2 rounded-full text-[#000000] hover:bg-black/10 transition-colors',
+                        isDark ? 'text-white' : 'text-gray-500'
+                      )} onClick={() => navigate('/create-post')}>
                         <MapPin className="w-5 h-5" />
                       </button>
                     </div>
                     <Button
                       onClick={() => navigate('/create-post')}
-                      className="bg-[#D3FB52] hover:bg-[#D3FB52]/80 text-black font-bold rounded-full px-5 py-1.5"
+                      className={cn(
+                        'bg-[#D3FB52] hover:bg-[#D3FB52]/80 text-black font-bold rounded-full px-5 py-1.5',
+                        isDark ? 'text-white  border-[#1C1F20]/50' : 'text-gray-500 border-[#1C1F20]/50'
+                      )}
                     >
                       Post
                     </Button>

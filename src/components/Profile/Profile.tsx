@@ -28,6 +28,7 @@ import FollowButton from '../FollowButton';
 import { cn } from '../../lib/cva';
 import { useRecommendedUsers, useMatchedJobs } from '../../hooks/useOptimizedQuery';
 import WhoToFollowItem from '../WhoToFollowItem';
+import ProfileViewers from './ProfileViewers';
 import { ProfileHeaderSkeleton, ProfileTabsSkeleton, ProfilePostsSkeleton, ProfileSidebarSkeleton, LeftSidebarSkeleton } from '../ui/Skeleton';
 
 interface ProfileData {
@@ -787,6 +788,25 @@ export default function Profile() {
     fetchIndustryInsights();
   }, [fetchTrendingTopics, fetchIndustryInsights]);
 
+  // Track profile view when visiting another user's profile
+  useEffect(() => {
+    const trackProfileView = async () => {
+      // Only track if viewing someone else's profile and user is authenticated
+      if (!isOwnProfile && userId && user?.id && profileData.id) {
+        try {
+          await supabase.rpc('log_profile_view', {
+            target_profile_id: userId
+          });
+          console.log('✅ Profile view tracked for:', userId);
+        } catch (error) {
+          console.error('Error tracking profile view:', error);
+        }
+      }
+    };
+
+    trackProfileView();
+  }, [isOwnProfile, userId, user?.id, profileData.id]);
+
   // Sample post data
   // const samplePost = {
   //   id: '1',
@@ -1000,7 +1020,7 @@ export default function Profile() {
           <div className="space-y-2">
             <button
               onClick={() => navigate('/settings')}
-              className={cn("w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors", isDark ? "text-gray-400 hover:bg-gray-900" : "text-gray-700 hover:bg-gray-100")}
+              className={cn("w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors", isDark ? "text-gray-400 hover:bg-[#1C1C1E]" : "text-gray-700 hover:bg-gray-100")}
             >
               <Settings className="w-5 h-5" />
               <span>Settings</span>
@@ -1026,7 +1046,7 @@ export default function Profile() {
             <div className="flex items-center py-3 px-4">
               <button
                 onClick={() => navigate(-1)}
-                className={cn("p-2 rounded-full transition-colors mr-4", isDark ? "hover:bg-gray-900" : "hover:bg-gray-100")}
+                className={cn("p-2 rounded-full transition-colors mr-4", isDark ? "hover:bg-[#1C1C1E]" : "hover:bg-gray-100")}
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
@@ -1038,7 +1058,7 @@ export default function Profile() {
                   {profileStats.posts} posts
                 </p>
               </div>
-              <button className={cn("p-2 rounded-full transition-colors", isDark ? "hover:bg-gray-900" : "hover:bg-gray-100")}>
+              <button className={cn("p-2 rounded-full transition-colors", isDark ? "hover:bg-[#1C1C1E]" : "hover:bg-gray-100")}>
                 <MoreHorizontal className="w-5 h-5" />
               </button>
             </div>
@@ -1069,7 +1089,7 @@ export default function Profile() {
                     className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-black object-cover shadow-lg"
                   />
                 ) : (
-                  <div className={cn("w-24 h-24 md:w-32 md:h-32 rounded-full border-4 flex items-center justify-center font-bold text-3xl md:text-4xl shadow-lg", isDark ? "bg-gray-900 border-black text-gray-400" : "bg-gray-300 border-white text-gray-700")}>
+                  <div className={cn("w-24 h-24 md:w-32 md:h-32 rounded-full border-4 flex items-center justify-center font-bold text-3xl md:text-4xl shadow-lg", isDark ? "bg-[#1C1C1E] border-black text-gray-400" : "bg-gray-300 border-white text-gray-700")}>
                     {(profileData.full_name || user?.profile?.full_name || 'U').charAt(0)}
                   </div>
                 )}
@@ -1233,7 +1253,7 @@ export default function Profile() {
               </div>
             ) : posts.length === 0 ? (
               <div className="text-center py-12">
-                <div className={cn("w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center", isDark ? "bg-gray-900" : "bg-gray-100")}>
+                <div className={cn("w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center", isDark ? "bg-[#1C1C1E]" : "bg-gray-100")}>
                   <MessageCircle className={cn("w-8 h-8", isDark ? "text-gray-700" : "text-gray-400")} />
                 </div>
                 <h3 className={cn("text-lg font-semibold mb-2", isDark ? "text-white" : "text-gray-900")}>No posts yet</h3>
@@ -1253,7 +1273,7 @@ export default function Profile() {
               posts.map((post) => (
                 <div key={post.id} className={cn("border-b p-4 transition-colors cursor-pointer", isDark ? "border-gray-800 hover:bg-black" : "border-[0.1px] border-gray-200 hover:bg-gray-50")} onClick={() => navigate(`/post/${post.id}`)}>
                   <div className="flex gap-3">
-                    <div className={cn("w-10 h-10 rounded-full flex items-center justify-center font-bold shrink-0", isDark ? "bg-gray-900" : "bg-white")}>
+                    <div className={cn("w-10 h-10 rounded-full flex items-center justify-center font-bold shrink-0", isDark ? "bg-[#1C1C1E]" : "bg-white")}>
                       {post.author?.avatar_url ? (
                         <img
                           src={post.author.avatar_url}
@@ -1369,6 +1389,11 @@ export default function Profile() {
               className={cn("w-full py-2 pl-10 pr-4 rounded-full focus:outline-hidden border border-white", isDark ? "bg-black text-white placeholder-white focus:bg-black" : "bg-white text-gray-900 placeholder-gray-400 focus:bg-gray-100")}
             />
           </div>
+
+          {/* Who Viewed Your Profile - Only show on own profile */}
+          {isOwnProfile && (
+            <ProfileViewers limit={5} showViewAll={true} />
+          )}
 
           {/* You might like */}
           <div className={cn("rounded-2xl overflow-hidden border shadow-xs", isDark ? "bg-black border-gray-800" : "bg-white border-[0.1px] border-gray-200")}>
@@ -1558,7 +1583,7 @@ export default function Profile() {
           </div>
 
           {/* Footer Links */}
-          <div className={cn("text-xs space-y-2 p-3 rounded-2xl", isDark ? "bg-gray-900/50 text-gray-500" : "bg-gray-100 text-gray-600")}>
+          <div className={cn("text-xs space-y-2 p-3 rounded-2xl", isDark ? "bg-[#1C1C1E]/50 text-gray-500" : "bg-gray-100 text-gray-600")}>
             <div className="flex flex-wrap gap-2">
               <button className="hover:underline">Privacy Policy</button>
               <button className="hover:underline">Cookie Policy</button>

@@ -79,7 +79,7 @@ export const EnhancedPostCard: React.FC<EnhancedPostCardProps> = ({
       onClick={onClick}
       className={cn(
         'relative cursor-pointer transition-all duration-200',
-        'overflow-hidden border-b border-[0.1px] border-gray-200',
+        'overflow-hidden ',
         isDark ? 'hover:bg-gray-950/50' : 'hover:bg-gray-50/50',
         isPressed && !isMobile ? 'scale-[0.98]' : 'scale-100'
       )}

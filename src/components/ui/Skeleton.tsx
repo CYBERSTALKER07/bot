@@ -871,27 +871,27 @@ export function RightSidebarCompaniesSkeleton() {
 export function RightSidebarWhoToFollowSkeleton() {
   return (
     <div className="rounded-xl p-4 border bg-black border-gray-700">
-      <Skeleton width="40%" height={24} className="mb-4 bg-gray-800" />
+      <Skeleton width="40%" height={24} className="mb-4 bg-[#2C2C2E]" />
       <div className="divide-y divide-gray-700 space-y-0">
         {[...Array(3)].map((_, i) => (
           <div key={i} className="p-4 flex items-center justify-between hover:bg-gray-900/50 transition-colors">
             <div className="flex items-center gap-3 flex-1 min-w-0">
               {/* Avatar */}
-              <Skeleton variant="circular" width={40} height={40} className="bg-gray-800" />
+              <Skeleton variant="circular" width={40} height={40} className="bg-[#2C2C2E]" />
 
               {/* Info */}
               <div className="flex-1 space-y-2 min-w-0">
-                <Skeleton width="60%" height={14} className="bg-gray-800" />
-                <Skeleton width="70%" height={12} className="bg-gray-800" />
+                <Skeleton width="60%" height={14} className="bg-[#2C2C2E]" />
+                <Skeleton width="70%" height={12} className="bg-[#2C2C2E]" />
               </div>
             </div>
 
             {/* Follow Button */}
-            <Skeleton width={80} height={32} className="rounded-full shrink-0 ml-2 bg-gray-800" />
+            <Skeleton width={80} height={32} className="rounded-full shrink-0 ml-2 bg-[#2C2C2E]" />
           </div>
         ))}
       </div>
-      <Skeleton width="100%" height={36} className="rounded-lg mt-4 bg-gray-800" />
+      <Skeleton width="100%" height={36} className="rounded-lg mt-4 bg-[#2C2C2E]" />
     </div>
   );
 }
