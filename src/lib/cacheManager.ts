@@ -148,7 +148,7 @@ class CacheManager {
   getStats(): { memoryCacheSize: number; storageSize: number } {
     let storageSize = 0;
     const storage = this.config.storage === 'localStorage' ? localStorage : sessionStorage;
-    
+
     try {
       for (let i = 0; i < storage.length; i++) {
         const key = storage.key(i);
@@ -173,44 +173,44 @@ class CacheManager {
 // Create singleton instances for different cache types
 export const profileCache = new CacheManager({
   storage: 'localStorage',
-  ttl: 60 * 60 * 1000, // 1 hour
+  ttl: 5 * 60 * 1000, // 5 minutes - semi-static data
   prefix: 'profile_'
 });
 
 export const postsCache = new CacheManager({
-  storage: 'memory', // Use memory storage instead of localStorage for posts
-  ttl: 60 * 60 * 1000, // Increase TTL to 1 hour instead of 10 minutes
+  storage: 'memory',
+  ttl: 30 * 1000, // 30 seconds - very dynamic data
   prefix: 'posts_'
 });
 
 export const followCache = new CacheManager({
   storage: 'localStorage',
-  ttl: 30 * 60 * 1000, // 30 minutes
+  ttl: 30 * 1000, // 30 seconds - dynamic data
   prefix: 'follow_'
 });
 
 export const searchCache = new CacheManager({
-  storage: 'memory', // Use memory storage instead of sessionStorage
-  ttl: 60 * 60 * 1000, // Increase TTL to 1 hour for consistency
+  storage: 'memory',
+  ttl: 10 * 1000, // 10 seconds - very short for fresh results
   prefix: 'search_'
 });
 
 // Update cache configurations for explore section data
 export const jobsCache = new CacheManager({
-  storage: 'memory', // Use memory storage instead of localStorage
-  ttl: 60 * 60 * 1000, // Increase TTL to 1 hour
+  storage: 'memory',
+  ttl: 2 * 60 * 1000, // 2 minutes - semi-dynamic data
   prefix: 'jobs_'
 });
 
 export const companiesCache = new CacheManager({
-  storage: 'memory', // Use memory storage for better reliability
-  ttl: 60 * 60 * 1000, // Keep 1 hour TTL
+  storage: 'memory',
+  ttl: 10 * 60 * 1000, // 10 minutes - static data
   prefix: 'companies_'
 });
 
 export const notificationsCache = new CacheManager({
   storage: 'sessionStorage',
-  ttl: 5 * 60 * 1000, // 5 minutes - notifications should be fresh
+  ttl: 60 * 1000, // 1 minute - notifications should be very fresh
   prefix: 'notifications_'
 });
 

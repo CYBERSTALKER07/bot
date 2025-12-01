@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   X,
@@ -32,6 +32,8 @@ import LeftSidebar from './LeftSidebar';
 import RightSidebar from './RightSidebar';
 import { useInfiniteScroll, usePullToRefresh } from '../hooks/useScrollOptimizations';
 import { useScrollDirection } from '../hooks/useScrollDirection';
+import { useRealtimePosts } from '../hooks/useRealtimePosts';
+import { rateLimiter } from '../lib/rateLimiter';
 import Animate from './ui/Animate';
 
 
@@ -173,6 +175,46 @@ export default function Feed() {
   const { mutate: likePostMutation } = useLikePost();
   const { mutate: retweetPostMutation } = useCreateRetweet();
   const { mutate: bookmarkPostMutation } = useBookmarkPost();
+
+  // Real-time posts subscription for instant updates
+  const [realtimePosts, setRealtimePosts] = useState<Post[]>([]);
+
+  useRealtimePosts({
+    onNewPost: useCallback((newPost: any) => {
+      // Check rate limit before adding new post
+      const rateCheck = rateLimiter.check(user?.id || 'anonymous', user?.subscription_tier || 'free');
+
+      if (!rateCheck.allowed) {
+        console.warn('⚠️ Rate limit reached for real-time updates');
+        return;
+      }
+
+      // Add new post to realtime posts (will appear at top of feed)
+      setRealtimePosts(prev => [newPost as Post, ...prev]);
+
+      // Optional: Show toast notification
+      console.log('🆕 New post received in real-time!', newPost);
+    }, [user?.id, user?.subscription_tier]),
+
+    onUpdatePost: useCallback((updatedPost: any) => {
+      // Update post in realtime posts
+      setRealtimePosts(prev =>
+        prev.map(p => p.id === updatedPost.id ? updatedPost as Post : p)
+      );
+    }, []),
+
+    onDeletePost: useCallback((postId: string) => {
+      // Remove post from realtime posts
+      setRealtimePosts(prev => prev.filter(p => p.id !== postId));
+    }, []),
+
+    enabled: activeTab === 'for-you' // Only subscribe when on "For You" tab
+  });
+
+  // Combine realtime posts with fetched posts
+  const combinedPosts = useMemo(() => {
+    return [...realtimePosts, ...allPosts];
+  }, [realtimePosts, allPosts]);
 
   // Sidebar Data Hooks
   const { data: profileData } = useProfile(user?.id);
@@ -406,7 +448,7 @@ export default function Feed() {
 
   return (
     <div className={cn(
-      'min-h-screen safe-top safe-bottom',
+      'min-h-screen pl-25 safe-top safe-bottom',
       isDark ? 'bg-black text-white' : 'bg-white text-black'
     )}>
       <div className="max-w-[1400px] mx-auto flex justify-center mobile-container">
@@ -531,7 +573,7 @@ export default function Feed() {
               />
             ) : (
               <div>
-                {allPosts.map((post: Post, index: number) => (
+                {combinedPosts.map((post: Post, index: number) => (
                   <Animate
                     key={post.id}
                     initial={{ opacity: 0, y: 20 }}
@@ -610,7 +652,7 @@ export default function Feed() {
                                     <span key={index}>
                                       <Link
                                         to={`/hashtag/${hashtagName}`}
-                                        className="text-info-500 hover:underline font-medium"
+                                        className={cn("hover:underline font-medium", isDark ? "text-blue-500" : "text-blue-500")}
                                         onClick={(e) => e.stopPropagation()}
                                       >
                                         #{hashtagName}
@@ -628,7 +670,7 @@ export default function Feed() {
                                     <span key={index}>
                                       <Link
                                         to={`/search?q=@${username}`}
-                                        className="text-info-500 hover:underline font-medium"
+                                        className={cn("hover:underline font-medium", isDark ? "text-blue-500" : "text-blue-500")}
                                         onClick={(e) => e.stopPropagation()}
                                       >
                                         @{username}

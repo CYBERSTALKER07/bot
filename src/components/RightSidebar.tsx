@@ -68,19 +68,19 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                     <div className={cn(
                         'flex items-center px-4 py-3 rounded-3xl transition-all duration-200 border',
                         isDark
-                            ? 'bg-gray-900/50 border-gray-900 focus-within:bg-black focus-within:ring-1 focus-within:ring-info-500'
-                            : 'bg-gray-100 border-gray-300 focus-within:bg-white focus-within:ring-1 focus-within:ring-info-500'
+                            ? 'bg-black border-gray-900 focus-within:bg-black focus-within:ring-1 focus-within:ring-gray-900'
+                            : 'bg-gray-100 border-gray-300 focus-within:bg-white focus-within:ring-1 focus-within:ring-gray-300'
                     )}>
                         <Search className={cn(
                             'w-5 h-5 mr-3 transition-colors',
-                            isDark ? 'text-gray-500 group-focus-within:text-info-500' : 'text-gray-400 group-focus-within:text-info-500'
+                            isDark ? 'text-gray-400 group-focus-within:text-white' : 'text-gray-400 group-focus-within:text-gray-400'
                         )} />
                         <input
                             ref={searchInputRef}
                             type="text"
                             placeholder="Search users, jobs, companies..."
                             className={cn(
-                                'bg-transparent border-none outline-hidden w-full text-sm placeholder-gray-500',
+                                'bg-transparent border-none outline-hidden w-full text-sm',
                                 isDark ? 'text-white' : 'text-black'
                             )}
                             value={sidebarSearchInput}
@@ -98,7 +98,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                                 }}
                                 className={cn(
                                     'p-1 rounded-full hover:bg-gray-700 transition-colors',
-                                    isDark ? 'text-gray-400' : 'text-gray-500'
+                                    isDark ? 'text-gray-400' : 'text-gray-400'
                                 )}
                             >
                                 <X className="w-4 h-4" />
@@ -235,12 +235,12 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                             </div>
                         )}
                     </div>
-                    <div className="mt-4">
+                    <div className={cn("mt-4  rounded-2xl", isDark ? 'bg-[#5829d8]' : 'bg-white')}>
                         <Button
                             variant="ghost"
                             className={cn(
                                 'w-full',
-                                isDark ? 'text-white hover:bg-white/10' : 'text-gray-900 hover:bg-gray-100'
+                                isDark ? ' text-white hover:bg-white/10' : 'text-gray-900 hover:bg-gray-100'
                             )}
                             onClick={() => navigate('/explore')}
                         >

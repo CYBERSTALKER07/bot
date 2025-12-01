@@ -88,7 +88,7 @@ function DockItem({
                     ? isDark
                         ? "bg-white text-black shadow-lg shadow-gray-800/50"
                         : "bg-black text-white shadow-lg shadow-gray-500/50"
-                    : "bg-white text-black border-gray-200 border-[0.1px] shadow-2xl shadow-gray-500/50",
+                    : "bg-black text-white border-gray-900 border-[0.1px] shadow-2xl shadow-gray-500/50",
                 className
             )}
             tabIndex={0}
@@ -189,7 +189,7 @@ export default function Dock({
                     mouseY.set(Infinity);
                 }}
                 className={cn(
-                    "flex flex-col items-center gap-4 rounded-full pb-2 px-2 border-none bg-transparent border-[rgba(255,255,255,0.5)] shadow-[0_0_70px_0_rgba(0,0,0,0.5)] shadow-white/50",
+                    "flex flex-col items-center gap-4 rounded-full   pb-2 px-2 border-none bg-transparent border-[rgba(255,255,255,0.5)] shadow-[0_0_70px_0_rgba(0,0,0,0.5)] shadow-white/50",
                     className
                 )}
                 style={{ width: panelWidth }}
