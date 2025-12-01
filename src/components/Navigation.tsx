@@ -35,6 +35,8 @@ interface NavigationItem {
   font?: 'serif' | 'sans-serif';
 }
 
+import { useBreakpoint } from '@openai/apps-sdk-ui/hooks/useBreakpoints';
+
 // X-Style Navigation
 export default function Navigation() {
   const { user, logout } = useAuth();
@@ -44,19 +46,16 @@ export default function Navigation() {
   const { isVisible: isBottomNavVisible } = useScrollDirection({ threshold: 3 });
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+  // isMobile corresponds to < lg (1024px)
+  const isLg = useBreakpoint('lg');
+  const isMobile = !isLg;
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 1024);
-      if (window.innerWidth >= 1024) {
-        setIsMobileMenuOpen(false);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    if (isLg) {
+      setIsMobileMenuOpen(false);
+    }
+  }, [isLg]);
 
   // X-style navigation items
   const getNavigationItems = (): NavigationItem[] => {

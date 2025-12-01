@@ -57,6 +57,7 @@ const SkillsAuditSystem = lazy(() => import('./components/SkillsAuditSystem'));
 const Feed = lazy(() => import('./components/Feed'));
 const PostDetails = lazy(() => import('./components/PostDetails'));
 const CompaniesPage = lazy(() => import('./components/CompaniesPage'));
+const CreateCompanyPage = lazy(() => import('./components/CreateCompanyPage'));
 const CompanyProfile = lazy(() => import('./components/CompanyProfile'));
 const CompanyDetailPage = lazy(() => import('./components/CompanyDetailPage'));
 const ResumeBuilder = lazy(() => import('./components/ResumeBuilder/index'));
@@ -329,25 +330,32 @@ function AppContent() {
               </AuthRedirectRoute>
             } />
             <Route path="/companies" element={
-              <AuthRedirectRoute>
+              <ProtectedRoute>
                 <Suspense fallback={<LoadingFallback message="Loading companies..." />}>
                   <CompaniesPage />
                 </Suspense>
-              </AuthRedirectRoute>
+              </ProtectedRoute>
             } />
             <Route path="/company/:companyId" element={
-              <AuthRedirectRoute>
+              <ProtectedRoute>
                 <Suspense fallback={<LoadingFallback message="Loading company profile..." />}>
                   <CompanyProfile />
                 </Suspense>
-              </AuthRedirectRoute>
+              </ProtectedRoute>
             } />
             <Route path="/company-detail/:companyId" element={
-              <AuthRedirectRoute>
+              <ProtectedRoute>
                 <Suspense fallback={<LoadingFallback message="Loading company detail..." />}>
                   <CompanyDetailPage />
                 </Suspense>
-              </AuthRedirectRoute>
+              </ProtectedRoute>
+            } />
+            <Route path="/company/create" element={
+              <ProtectedRoute>
+                <Suspense fallback={<LoadingFallback message="Loading..." />}>
+                  <CreateCompanyPage />
+                </Suspense>
+              </ProtectedRoute>
             } />
             <Route path="/getting-started" element={
               <AuthRedirectRoute>

@@ -30,6 +30,8 @@ const GrokIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+import { useBreakpoint } from '@openai/apps-sdk-ui/hooks/useBreakpoints';
+
 export function FloatingActionMenu({
   className = ''
 }: FloatingActionMenuProps) {
@@ -39,8 +41,12 @@ export function FloatingActionMenu({
   const [pressedItem, setPressedItem] = useState<string | null>(null);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [isFabPressed, setIsFabPressed] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const [isTablet, setIsTablet] = useState(false);
+
+  const isMd = useBreakpoint('md');
+  const isLg = useBreakpoint('lg');
+
+  const [isMobile, setIsMobile] = useState(!isMd);
+  const [isTablet, setIsTablet] = useState(isMd && !isLg);
 
   // Enhanced state for slide gesture functionality
   const [isDragging, setIsDragging] = useState(false);
@@ -53,30 +59,18 @@ export function FloatingActionMenu({
   const [showCenterMenu, setShowCenterMenu] = useState(false);
 
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const swipeGestureRef = useRef<HTMLDivElement>(null);
 
   // Detect device type
   useEffect(() => {
-    const checkDeviceType = () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      const isLandscape = width > height;
+    setIsMobile(!isMd);
+    setIsTablet(isMd && !isLg);
 
-      setIsMobile(width < 768);
-      setIsTablet(width >= 768 && width < 1024);
-
-      // iPad specific detection
-      const isIPad = /iPad|Macintosh/.test(navigator.userAgent) && 'ontouchend' in document;
-      if (isIPad) {
-        setIsTablet(true);
-      }
-    };
-
-    checkDeviceType();
-    window.addEventListener('resize', checkDeviceType);
-
-    return () => window.removeEventListener('resize', checkDeviceType);
-  }, []);
+    // iPad specific detection
+    const isIPad = /iPad|Macintosh/.test(navigator.userAgent) && 'ontouchend' in document;
+    if (isIPad) {
+      setIsTablet(true);
+    }
+  }, [isMd, isLg]);
 
   // iPad two-finger swipe gesture detection
   useEffect(() => {

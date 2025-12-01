@@ -384,7 +384,7 @@ export default function CreatePost() {
       {/* Header */}
       <div className={cn(
         'sticky top-0 z-10 backdrop-blur-xl border-b ios-safe-top',
-        isDark ? 'bg-black/80 border-[#2f3336]' : 'bg-white/80 border-gray-200'
+        isDark ? 'bg-black/80 border-[#2f3336]' : 'bg-white/80 border-[0.1px] border-gray-200'
       )}>
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center space-x-4">
@@ -457,7 +457,7 @@ export default function CreatePost() {
                 <div className="mt-3 mb-3 relative">
                   <div className={cn(
                     "relative rounded-xl overflow-hidden border",
-                    isDark ? "border-[#2f3336]" : "border-gray-200"
+                    isDark ? "border-[#2f3336]" : "border-[0.1px] border-gray-200"
                   )}>
                     {newPost.media_type === 'image' ? (
                       <img
@@ -555,12 +555,12 @@ export default function CreatePost() {
           <div className={cn(
             'rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden',
             'animate-in zoom-in-95 fade-in duration-200',
-            isDark ? 'bg-black border border-[#2f3336]' : 'bg-white border border-gray-200'
+            isDark ? 'bg-black border border-[#2f3336]' : 'bg-white border border-[0.1px] border-gray-200'
           )}>
             {/* Modal Header */}
             <div className={cn(
               'px-6 py-4 border-b flex items-center justify-between',
-              isDark ? 'border-[#2f3336]' : 'border-gray-200'
+              isDark ? 'border-[#2f3336]' : 'border-[0.1px] border-gray-200'
             )}>
               <div>
                 <h2 className="text-xl font-bold">Optimize for X/Twitter</h2>
@@ -588,7 +588,7 @@ export default function CreatePost() {
             <div className="p-6 space-y-4">
               <div className={cn(
                 'p-4 rounded-lg border',
-                isDark ? 'bg-[#16181c] border-[#2f3336]' : 'bg-gray-50 border-gray-200'
+                isDark ? 'bg-[#16181c] border-[#2f3336]' : 'bg-gray-50 border-[0.1px] border-gray-200'
               )}>
                 <h3 className="font-medium mb-2">Current Image</h3>
                 <div className={cn(
@@ -612,7 +612,7 @@ export default function CreatePost() {
                     'w-full p-4 rounded-lg border-2 text-left transition-all',
                     isDark
                       ? 'border-[#2f3336] hover:border-[#D3FB52] hover:bg-[#16181c]'
-                      : 'border-gray-200 hover:border-[#D3FB52] hover:bg-gray-50'
+                      : 'border-[0.1px] border-gray-200 hover:border-[#D3FB52] hover:bg-gray-50'
                   )}
                 >
                   <div className="flex items-center justify-between">
@@ -639,7 +639,7 @@ export default function CreatePost() {
                     'w-full p-4 rounded-lg border-2 text-left transition-all',
                     isDark
                       ? 'border-[#2f3336] hover:border-[#D3FB52] hover:bg-[#16181c]'
-                      : 'border-gray-200 hover:border-[#D3FB52] hover:bg-gray-50'
+                      : 'border-[0.1px] border-gray-200 hover:border-[#D3FB52] hover:bg-gray-50'
                   )}
                 >
                   <div className="flex items-center justify-between">
@@ -663,7 +663,7 @@ export default function CreatePost() {
               {/* Optimization Benefits */}
               <div className={cn(
                 'p-4 rounded-lg border',
-                isDark ? 'bg-[#16181c] border-[#2f3336]' : 'bg-gray-50 border-gray-200'
+                isDark ? 'bg-[#16181c] border-[#2f3336]' : 'bg-gray-50 border-[0.1px] border-gray-200'
               )}>
                 <h4 className="font-medium mb-2">
                   ✨ What optimization does:

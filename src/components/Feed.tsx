@@ -23,6 +23,7 @@ import { useCreateRetweet } from '../hooks/useRetweet';
 import RetweetHeader from './RetweetHeader';
 import QuoteTweetCard from './QuoteTweetCard';
 import EnhancedPostCardInteractions from './ui/EnhancedPostCardInteractions';
+import EnhancedPostCard from './ui/EnhancedPostCard';
 import EnhancedVideoPlayer from './ui/EnhancedVideoPlayer';
 import ImageLightbox from './ui/ImageLightbox';
 import { FloatingActionMenu } from './FloatingActionMenu';
@@ -108,11 +109,16 @@ interface SearchResultData {
   users?: Array<{ id: string; full_name: string; username: string; bio?: string; avatar_url?: string; verified?: boolean }>;
 }
 
+import { useBreakpoint } from "@openai/apps-sdk-ui/hooks/useBreakpoints";
+
 export default function Feed() {
   const { user } = useAuth();
   const { isDark } = useTheme();
   const navigate = useNavigate();
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  // isMobile is true if we are BELOW the 'lg' breakpoint (1024px)
+  // useBreakpoint('lg') returns true if we are AT OR ABOVE 'lg'
+  const isDesktop = useBreakpoint("lg");
+  const isMobile = !isDesktop;
   const { isVisible: isHeaderVisible } = useScrollDirection({ threshold: 3 });
 
   // Refs
@@ -254,11 +260,7 @@ export default function Feed() {
     { rootMargin: '200px' }
   );
 
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 1024);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -426,12 +428,12 @@ export default function Feed() {
         {/* Main Feed Content */}
         <div className={cn(
           'flex-1 max-w-[650px]   min-h-screen',
-          isDark ? '' : 'border-gray-200'
+          isDark ? '' : 'border-[0.1px] border-gray-200'
         )}>
           {/* Header */}
           <div className={cn(
-            'sticky z-10 rounded-br-[24px] rounded-bl-[24px] glass backdrop-blur-xl border-b transition-all duration-300 ios-safe-top',
-            isDark ? 'bg-black/80 border-[#1C1F20]' : 'bg-white/80 border-gray-200',
+            'sticky z-10 rounded-br-4xl rounded-bl-4xl glass backdrop-blur-xl border-b transition-all duration-300 ios-safe-top',
+            isDark ? 'bg-black/80 border-[#1C1F20]' : 'bg-white/80 border-[0.1px] border-gray-200',
             isMobile
               ? (isHeaderVisible ? 'top-16' : 'top-0')
               : 'top-0'
@@ -452,7 +454,7 @@ export default function Feed() {
           {!isMobile && (
             <div className={cn(
               'p-4 border-b',
-              isDark ? 'border-[#1C1F20]' : 'border-gray-200'
+              isDark ? 'border-[#1C1F20]' : 'border-[0.1px] border-gray-200'
             )}>
               <div className="flex gap-3">
                 <Avatar src={user?.profile?.avatar_url || undefined} alt={user?.profile?.full_name || undefined} size="md" />
@@ -466,7 +468,7 @@ export default function Feed() {
                   >
                     What is happening?!
                   </div>
-                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-b-none border-r border-l rounded-l-xl rounded-r-xl  rounded-tr-xl rounded-tl-xl  border-gray-200">
+                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-b-none border-r border-l rounded-l-xl rounded-r-xl  rounded-tr-xl rounded-tl-xl border-[0.1px] border-gray-200">
                     <div className="flex gap-1 text-info-500">
                       <button className="p-2 rounded-full text-[#000000] hover:bg-black/10 transition-colors" onClick={() => navigate('/create-post')}>
                         <Camera className="w-5 h-5" />
@@ -521,11 +523,9 @@ export default function Feed() {
                     enter={{ opacity: 1, y: 0, duration: 400, delay: index * 50 }}
                     exit={{ opacity: 0, y: -20, duration: 300 }}
                   >
-                    <div
-                      className={cn(
-                        'border-b hover:bg-[#1C1F20]/30 transition-colors cursor-pointer',
-                        isDark ? 'border-[#1C1F20]' : 'border-gray-200 shadow-xs hover:shadow-md'
-                      )}
+                    <EnhancedPostCard
+                      isDark={isDark}
+                      isMobile={isMobile}
                       onClick={() => navigate(`/post/${post.id}`)}
                     >
                       {/* Retweet Header */}
@@ -537,7 +537,7 @@ export default function Feed() {
                         />
                       )}
 
-                      <div className="p-4 flex gap-3">
+                      <div className="p-3 sm:p-4 flex gap-3">
                         {/* Author Avatar */}
                         <div className="shrink-0" onClick={(e) => {
                           e.stopPropagation();
@@ -641,7 +641,7 @@ export default function Feed() {
                           {!post.is_quote_retweet && post.media && post.media.length > 0 && (
                             <div className={cn(
                               "grid gap-1 rounded-2xl overflow-hidden mb-3 border",
-                              isDark ? 'border-[#1C1F20]' : 'border-gray-200',
+                              isDark ? 'border-[#1C1F20]' : 'border-[0.1px] border-gray-200',
                               post.media.length === 1 ? 'grid-cols-1' : 'grid-cols-2'
                             )}>
                               {post.media.map((media: { type: 'image' | 'video'; url: string; alt?: string }, index: number) => (
@@ -691,7 +691,7 @@ export default function Feed() {
                           />
                         </div>
                       </div>
-                    </div>
+                    </EnhancedPostCard>
                   </Animate>
                 ))}
               </div>

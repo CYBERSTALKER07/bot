@@ -1,32 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Search,
   Briefcase
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
-import { useScrollDirection } from '../hooks/useScrollDirection';
 import Button from './ui/Button';
 import PageLayout from './ui/PageLayout';
 import { cn } from '../lib/cva';
 import { useJobs } from '../hooks/useJobs';
 import JobCard from './JobCard';
 import Animate from './ui/Animate';
+import { useBreakpoint } from '@openai/apps-sdk-ui/hooks/useBreakpoints';
 
 export default function JobsPage() {
   const { isDark } = useTheme();
-  const { isVisible: isScrollingUp } = useScrollDirection({ threshold: 3 });
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  const isMd = useBreakpoint('md');
+  const isMobile = !isMd;
 
   const { jobs: jobsData = [], loading, error } = useJobs();
-
-  // Handle window resize
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   // Filter jobs based on search and type
   const filteredJobs = (jobsData || []).filter(job => {

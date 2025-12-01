@@ -98,10 +98,79 @@ export interface Database {
           updated_at?: string;
         };
       };
+      companies: {
+        Row: {
+          id: number;
+          name: string;
+          logo_url: string | null;
+          cover_image_url: string | null;
+          description: string | null;
+          website: string | null;
+          industry: string | null;
+          size: string | null;
+          location: string | null;
+          rating: number;
+          reviews_count: number;
+          is_verified: boolean;
+          is_hiring: boolean;
+          employee_count: number | null;
+          founded_year: number | null;
+          featured_benefits: string[] | null;
+          growth_rate: number | null;
+          owner_id: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: number;
+          name: string;
+          logo_url?: string | null;
+          cover_image_url?: string | null;
+          description?: string | null;
+          website?: string | null;
+          industry?: string | null;
+          size?: string | null;
+          location?: string | null;
+          rating?: number;
+          reviews_count?: number;
+          is_verified?: boolean;
+          is_hiring?: boolean;
+          employee_count?: number | null;
+          founded_year?: number | null;
+          featured_benefits?: string[] | null;
+          growth_rate?: number | null;
+          owner_id?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: number;
+          name?: string;
+          logo_url?: string | null;
+          cover_image_url?: string | null;
+          description?: string | null;
+          website?: string | null;
+          industry?: string | null;
+          size?: string | null;
+          location?: string | null;
+          rating?: number;
+          reviews_count?: number;
+          is_verified?: boolean;
+          is_hiring?: boolean;
+          employee_count?: number | null;
+          founded_year?: number | null;
+          featured_benefits?: string[] | null;
+          growth_rate?: number | null;
+          owner_id?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
       jobs: {
         Row: {
           id: string;
           employer_id: string;
+          company_id: number | null;
           title: string;
           description: string;
           location: string | null;
@@ -119,6 +188,7 @@ export interface Database {
         Insert: {
           id?: string;
           employer_id: string;
+          company_id?: number | null;
           title: string;
           description: string;
           location?: string | null;
@@ -136,6 +206,7 @@ export interface Database {
         Update: {
           id?: string;
           employer_id?: string;
+          company_id?: number | null;
           title?: string;
           description?: string;
           location?: string | null;

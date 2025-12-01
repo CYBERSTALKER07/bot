@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -90,6 +90,8 @@ interface Post {
   };
 }
 
+import { useBreakpoint } from '@openai/apps-sdk-ui/hooks/useBreakpoints';
+
 export default function Profile() {
   const { user } = useAuth();
   const { isDark } = useTheme();
@@ -101,16 +103,9 @@ export default function Profile() {
   const isOwnProfile = !userId || userId === user?.id;
 
   // Enhanced responsive breakpoints
-  const [screenSize, setScreenSize] = useState(() => {
-    const width = window.innerWidth;
-    if (width < 480) return 'xs';
-    if (width < 640) return 'sm';
-    if (width < 768) return 'md';
-    if (width < 1024) return 'lg';
-    return 'xl';
-  });
-
-  const isMobile = screenSize === 'xs' || screenSize === 'sm';
+  // isMobile corresponds to < sm (640px)
+  const isSm = useBreakpoint('sm');
+  const isMobile = !isSm;
 
   // Profile stats
   const [profileStats, setProfileStats] = useState<ProfileStats>({
@@ -178,53 +173,9 @@ export default function Profile() {
   //   { label: 'Achievements', value: '12', icon: Award }
   // ];
 
-  // Handle responsive resize
-  useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      if (width < 480) setScreenSize('xs');
-      else if (width < 640) setScreenSize('sm');
-      else if (width < 768) setScreenSize('md');
-      else if (width < 1024) setScreenSize('lg');
-      else setScreenSize('xl');
-    };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
-  // Load profile data
-  useEffect(() => {
-    if (isOwnProfile && user) {
-      loadProfileData();
-    } else if (userId) {
-      loadOtherUserProfile(userId);
-    }
-  }, [user?.id, userId, isOwnProfile]);
-
-  // Fetch posts when user ID or active tab changes
-  useEffect(() => {
-    if (userId) {
-      fetchUserPosts(userId, activeTab);
-    } else if (user?.id) {
-      fetchUserPosts(user.id, activeTab);
-    }
-  }, [userId, user?.id, activeTab]);
-
-  // Fetch follower/following counts
-  useEffect(() => {
-    if (profileData.id) {
-      fetchFollowerCounts(profileData.id);
-    }
-  }, [profileData.id]);
-
-  // Fetch dynamic trending topics based on hashtags and engagement
-  useEffect(() => {
-    fetchTrendingTopics();
-    fetchIndustryInsights();
-  }, []);
-
-  const loadProfileData = async () => {
+  const loadProfileData = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -256,9 +207,9 @@ export default function Profile() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
-  const loadOtherUserProfile = async (targetUserId: string) => {
+  const loadOtherUserProfile = useCallback(async (targetUserId: string) => {
     try {
       setLoading(true);
       console.log('👥 Fetching other user profile:', targetUserId);
@@ -316,9 +267,9 @@ export default function Profile() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchUserPosts = async (targetUserId?: string, tab: string = activeTab) => {
+  const fetchUserPosts = useCallback(async (targetUserId?: string, tab: string = activeTab) => {
     const userIdToFetch = targetUserId || user?.id;
     if (!userIdToFetch) return;
 
@@ -510,9 +461,9 @@ export default function Profile() {
     } finally {
       setPostsLoading(false);
     }
-  };
+  }, [user, activeTab]);
 
-  const fetchTrendingTopics = async () => {
+  const fetchTrendingTopics = useCallback(async () => {
     try {
       // setTrendingLoading(true);
 
@@ -613,9 +564,9 @@ export default function Profile() {
     } finally {
       // setTrendingLoading(false);
     }
-  };
+  }, []);
 
-  const fetchIndustryInsights = async () => {
+  const fetchIndustryInsights = useCallback(async () => {
     try {
       // setInsightsLoading(true);
 
@@ -768,7 +719,7 @@ export default function Profile() {
     } finally {
       // setInsightsLoading(false);
     }
-  };
+  }, []);
 
   const handleEditProfile = () => {
     navigate('/profile/edit');
@@ -781,7 +732,7 @@ export default function Profile() {
   };
 
   // Fetch real follower and following counts from database
-  const fetchFollowerCounts = async (userId: string) => {
+  const fetchFollowerCounts = useCallback(async (userId: string) => {
     try {
       // Fetch follower count
       const { count: followersCount } = await supabase
@@ -803,7 +754,38 @@ export default function Profile() {
     } catch (error) {
       console.error('Error fetching follower counts:', error);
     }
-  };
+  }, []);
+
+  // Load profile data
+  useEffect(() => {
+    if (isOwnProfile && user) {
+      loadProfileData();
+    } else if (userId) {
+      loadOtherUserProfile(userId);
+    }
+  }, [user, userId, isOwnProfile, loadProfileData, loadOtherUserProfile]);
+
+  // Fetch posts when user ID or active tab changes
+  useEffect(() => {
+    if (userId) {
+      fetchUserPosts(userId, activeTab);
+    } else if (user?.id) {
+      fetchUserPosts(user.id, activeTab);
+    }
+  }, [userId, user?.id, activeTab, fetchUserPosts]);
+
+  // Fetch follower/following counts
+  useEffect(() => {
+    if (profileData.id) {
+      fetchFollowerCounts(profileData.id);
+    }
+  }, [profileData.id, fetchFollowerCounts]);
+
+  // Fetch dynamic trending topics based on hashtags and engagement
+  useEffect(() => {
+    fetchTrendingTopics();
+    fetchIndustryInsights();
+  }, [fetchTrendingTopics, fetchIndustryInsights]);
 
   // Sample post data
   // const samplePost = {
@@ -826,13 +808,13 @@ export default function Profile() {
           {/* Left Sidebar Skeleton */}
           <div className={cn(
             "hidden lg:block w-80 p-4 space-y-6 border-r sticky top-0 h-screen overflow-y-auto",
-            isDark ? "bg-black border-gray-800" : "bg-white border-gray-200"
+            isDark ? "bg-black border-gray-800" : "bg-white border-[0.1px] border-gray-200"
           )}>
             <LeftSidebarSkeleton />
           </div>
 
           {/* Main Content Skeleton */}
-          <div className={cn('flex-1 max-w-2xl border-x', isDark ? "bg-black border-gray-800" : "bg-gray-50 border-gray-200")}>
+          <div className={cn('flex-1 max-w-2xl border-x', isDark ? "bg-black border-gray-800" : "bg-gray-50 border-[0.1px] border-gray-200")}>
             <ProfileHeaderSkeleton />
             <ProfileTabsSkeleton />
             <ProfilePostsSkeleton />
@@ -879,7 +861,7 @@ export default function Profile() {
         {/* Left Sidebar - Hidden on mobile */}
         <div className={cn(
           "hidden lg:block w-80 p-4 space-y-6 border-r sticky top-0 h-screen overflow-y-auto",
-          isDark ? "bg-black border-gray-800" : "bg-white border-gray-200"
+          isDark ? "bg-black border-gray-800" : "bg-white border-[0.1px] border-gray-200"
         )}>
           {/* User Profile Quick View */}
           <div className="relative rounded-2xl p-4 text-white overflow-hidden">
@@ -951,8 +933,8 @@ export default function Profile() {
 
 
           {/* Industry Insights */}
-          <div className={cn("rounded-2xl border overflow-hidden", isDark ? "bg-black border-gray-800" : "bg-white border-gray-200")}>
-            <div className={cn("p-4 border-b", isDark ? "border-gray-800" : "border-gray-200")}>
+          <div className={cn("rounded-2xl border overflow-hidden", isDark ? "bg-black border-gray-800" : "bg-white border-[0.1px] border-gray-200")}>
+            <div className={cn("p-4 border-b", isDark ? "border-gray-800" : "border-[0.1px] border-gray-200")}>
               <h3 className={cn("font-bold", isDark ? "text-gray-300" : "text-gray-900")}>Industry Pulse</h3>
               <p className={cn("text-xs", isDark ? "text-gray-400" : "text-gray-600")}>Real-time market insights</p>
             </div>
@@ -985,8 +967,8 @@ export default function Profile() {
           </Button>
 
           {/* Recent Connections */}
-          <div className={cn("rounded-2xl border overflow-hidden", isDark ? "bg-black border-gray-800" : "bg-white border-gray-200")}>
-            <div className={cn("p-4 border-b", isDark ? "border-gray-800" : "border-gray-200")}>
+          <div className={cn("rounded-2xl border overflow-hidden", isDark ? "bg-black border-gray-800" : "bg-white border-[0.1px] border-gray-200")}>
+            <div className={cn("p-4 border-b", isDark ? "border-gray-800" : "border-[0.1px] border-gray-200")}>
               <h3 className={cn("font-bold", isDark ? "text-gray-300" : "text-gray-900")}>Recent Connections</h3>
             </div>
             <div className={cn("divide-y", isDark ? "divide-gray-800" : "divide-gray-200")}>
@@ -1034,11 +1016,11 @@ export default function Profile() {
         </div>
 
         {/* Main Content */}
-        <div className={cn('flex-1 max-w-2xl border-x min-h-screen', isDark ? "bg-black border-gray-800" : "bg-gray-50 border-gray-200")}>
+        <div className={cn('flex-1 max-w-2xl border-x min-h-screen', isDark ? "bg-black border-gray-800" : "bg-gray-50 border-[0.1px] border-gray-200")}>
           {/* Header */}
           <div className={cn(
             "sticky top-0 glass backdrop-blur-xl z-20 border-b transition-all duration-300 ios-safe-top",
-            isDark ? "bg-black/80 border-gray-800" : "bg-white/80 border-gray-200",
+            isDark ? "bg-black/80 border-gray-800" : "bg-white/80 border-[0.1px] border-gray-200",
             isMobile ? "top-16" : "top-0"
           )}>
             <div className="flex items-center py-3 px-4">
@@ -1214,7 +1196,7 @@ export default function Profile() {
           </div>
 
           {/* Navigation Tabs */}
-          <div className={cn("border-b sticky glass backdrop-blur-xl z-10", isDark ? "bg-black/80 border-gray-800" : "bg-white/80 border-gray-200", isMobile ? "top-[calc(4rem+53px)]" : "top-[53px]")}>
+          <div className={cn("border-b sticky glass backdrop-blur-xl z-10", isDark ? "bg-black/80 border-gray-800" : "bg-white/80 border-[0.1px] border-gray-200", isMobile ? "top-[calc(4rem+53px)]" : "top-[53px]")}>
             <div className="flex overflow-x-auto no-scrollbar">
               {[
                 { id: 'articles', label: 'Articles' },
@@ -1269,7 +1251,7 @@ export default function Profile() {
               </div>
             ) : (
               posts.map((post) => (
-                <div key={post.id} className={cn("border-b p-4 transition-colors cursor-pointer", isDark ? "border-gray-800 hover:bg-black" : "border-gray-200 hover:bg-gray-50")} onClick={() => navigate(`/post/${post.id}`)}>
+                <div key={post.id} className={cn("border-b p-4 transition-colors cursor-pointer", isDark ? "border-gray-800 hover:bg-black" : "border-[0.1px] border-gray-200 hover:bg-gray-50")} onClick={() => navigate(`/post/${post.id}`)}>
                   <div className="flex gap-3">
                     <div className={cn("w-10 h-10 rounded-full flex items-center justify-center font-bold shrink-0", isDark ? "bg-gray-900" : "bg-white")}>
                       {post.author?.avatar_url ? (
@@ -1389,8 +1371,8 @@ export default function Profile() {
           </div>
 
           {/* You might like */}
-          <div className={cn("rounded-2xl overflow-hidden border shadow-xs", isDark ? "bg-black border-gray-800" : "bg-white border-gray-200")}>
-            <div className={cn("p-4 border-b", isDark ? "border-gray-800" : "border-gray-200")}>
+          <div className={cn("rounded-2xl overflow-hidden border shadow-xs", isDark ? "bg-black border-gray-800" : "bg-white border-[0.1px] border-gray-200")}>
+            <div className={cn("p-4 border-b", isDark ? "border-gray-800" : "border-[0.1px] border-gray-200")}>
               <h2 className="text-xl font-serif">You might like</h2>
             </div>
             <div className="divide-y divide-gray-200">
@@ -1426,8 +1408,8 @@ export default function Profile() {
           </div>
 
           {/* What's happening */}
-          <div className={cn("rounded-2xl overflow-hidden border shadow-xs", isDark ? "bg-black border-gray-800" : "bg-white border-gray-200")}>
-            <div className={cn("p-4 border-b", isDark ? "border-gray-800" : "border-gray-200")}>
+          <div className={cn("rounded-2xl overflow-hidden border shadow-xs", isDark ? "bg-black border-gray-800" : "bg-white border-[0.1px] border-gray-200")}>
+            <div className={cn("p-4 border-b", isDark ? "border-gray-800" : "border-[0.1px] border-gray-200")}>
               <h2 className="text-xl font-extralight ">What's happening</h2>
             </div>
             <div className="divide-y divide-gray-200">
@@ -1460,8 +1442,8 @@ export default function Profile() {
           </div>
 
           {/* Industry Insights */}
-          <div className={cn("rounded-2xl border overflow-hidden", isDark ? "bg-black border-gray-800" : "bg-white border-gray-200")}>
-            <div className={cn("p-4 border-b", isDark ? "border-gray-800" : "border-gray-200")}>
+          <div className={cn("rounded-2xl border overflow-hidden", isDark ? "bg-black border-gray-800" : "bg-white border-[0.1px] border-gray-200")}>
+            <div className={cn("p-4 border-b", isDark ? "border-gray-800" : "border-[0.1px] border-gray-200")}>
               <h3 className="font-bold">Industry Pulse</h3>
               <p className={cn("text-xs", isDark ? "text-gray-400" : "text-gray-600")}>Real-time market insights</p>
             </div>
@@ -1504,8 +1486,8 @@ export default function Profile() {
           </div>
 
           {/* Career Opportunities Scanner */}
-          <div className={cn("rounded-2xl border overflow-hidden", isDark ? "bg-black border-gray-800" : "bg-white border-gray-200")}>
-            <div className={cn("p-4 border-b", isDark ? "border-gray-800" : "border-gray-200")}>
+          <div className={cn("rounded-2xl border overflow-hidden", isDark ? "bg-black border-gray-800" : "bg-white border-[0.1px] border-gray-200")}>
+            <div className={cn("p-4 border-b", isDark ? "border-gray-800" : "border-[0.1px] border-gray-200")}>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 <h3 className="font-bold">Live Opportunities</h3>
@@ -1519,7 +1501,7 @@ export default function Profile() {
                 matchedJobs.map((job: any, index: number) => (
                   <div
                     key={job.id || index}
-                    className={cn("border rounded-lg p-3 cursor-pointer transition-all hover:shadow-md", isDark ? "border-gray-700 hover:border-gray-600" : "border-gray-200 hover:border-gray-400")}
+                    className={cn("border rounded-lg p-3 cursor-pointer transition-all hover:shadow-md", isDark ? "border-gray-700 hover:border-gray-600" : "border-[0.1px] border-gray-200 hover:border-gray-400")}
                     onClick={() => navigate(`/job/${job.id}`)}
                   >
                     <div className="flex items-center justify-between mb-2">

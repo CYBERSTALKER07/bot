@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from '../contexts/ThemeContext';
+import { useTheme } from '../context/ThemeContext';
 import {
-  FolderOpenIcon,
-  AcademicCapIcon,
-  DocumentTextIcon,
-  TrophyIcon,
-  PlusIcon
-} from '../lib/icons';
+  FolderOpen as FolderOpenIcon,
+  GraduationCap as AcademicCapIcon,
+  FileText as DocumentTextIcon,
+  Trophy as TrophyIcon,
+  Plus as PlusIcon
+} from 'lucide-react';
 
 interface QuickAction {
   id: string;
@@ -23,6 +23,8 @@ interface FloatingActionButtonProps {
   onAddEntry?: (entryType: string) => void;
 }
 
+import { useBreakpoint } from '@openai/apps-sdk-ui/hooks/useBreakpoints';
+
 export function FloatingActionButton({ onAddEntry }: FloatingActionButtonProps) {
   const navigate = useNavigate();
   const { isDark } = useTheme();
@@ -30,27 +32,18 @@ export function FloatingActionButton({ onAddEntry }: FloatingActionButtonProps) 
   const [hoveredFabItem, setHoveredFabItem] = useState<string | null>(null);
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [isFabPressed, setIsFabPressed] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  
+
+  // isMobile corresponds to < lg (1024px)
+  const isLg = useBreakpoint('lg');
+  const isMobile = !isLg;
+
   const [isGliding, setIsGliding] = useState(false);
   const [glideTarget, setGlideTarget] = useState<string | null>(null);
   const [startTouchPosition, setStartTouchPosition] = useState<{ x: number; y: number } | null>(null);
-  
+
   const fabMenuRef = useRef<HTMLDivElement>(null);
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
   const fabButtonRef = useRef<HTMLButtonElement>(null);
-
-  // Detect mobile device
-  useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-    
-    checkIsMobile();
-    window.addEventListener('resize', checkIsMobile);
-    
-    return () => window.removeEventListener('resize', checkIsMobile);
-  }, []);
 
   // FAB Quick Actions
   const quickActions: QuickAction[] = [
@@ -154,10 +147,10 @@ export function FloatingActionButton({ onAddEntry }: FloatingActionButtonProps) 
     if (isFabPressed && startTouchPosition && isFabOpen) {
       const touch = e.touches[0];
       setIsGliding(true);
-      
+
       const elementFromPoint = document.elementFromPoint(touch.clientX, touch.clientY);
       const actionButton = elementFromPoint?.closest('button[data-action-id]');
-      
+
       if (actionButton) {
         const actionId = actionButton.getAttribute('data-action-id');
         setGlideTarget(actionId);
@@ -208,7 +201,7 @@ export function FloatingActionButton({ onAddEntry }: FloatingActionButtonProps) 
             const Icon = action.icon;
             const isPressed = pressedFabItem === action.id;
             const isHovered = hoveredFabItem === action.id;
-            
+
             // Touch event handlers - always present for mobile compatibility
             const touchProps = {
               onTouchStart: () => setPressedFabItem(action.id),
@@ -226,7 +219,7 @@ export function FloatingActionButton({ onAddEntry }: FloatingActionButtonProps) 
                 const touch = e.touches[0];
                 const elementFromPoint = document.elementFromPoint(touch.clientX, touch.clientY);
                 const currentButton = e.currentTarget;
-                
+
                 if (elementFromPoint === currentButton || currentButton.contains(elementFromPoint)) {
                   setHoveredFabItem(action.id);
                 } else {
@@ -248,7 +241,7 @@ export function FloatingActionButton({ onAddEntry }: FloatingActionButtonProps) 
                 setHoveredFabItem(null);
               }
             } : {};
-            
+
             return (
               <button
                 key={action.id}
@@ -260,9 +253,9 @@ export function FloatingActionButton({ onAddEntry }: FloatingActionButtonProps) 
                   transition-all duration-300 ease-out text-white border ${isDark ? 'border-white/20' : 'border-white/20'}
                   ${isFabOpen ? 'opacity-100 scale-100 pointer-events-auto visible' : 'opacity-0 scale-0 pointer-events-none invisible'}
                   ${action.color} touch-manipulation select-none z-61
-                  ${isPressed ? 'scale-150 h-16 w-16 brightness-125 shadow-2xl ring-4 ring-white/30' : 
-                    isHovered ? 'scale-125  w-[70px] h-[70px] brightness-110 shadow-xl' : 
-                    'scale-100 brightness-100'}
+                  ${isPressed ? 'scale-150 h-16 w-16 brightness-125 shadow-2xl ring-4 ring-white/30' :
+                    isHovered ? 'scale-125  w-[70px] h-[70px] brightness-110 shadow-xl' :
+                      'scale-100 brightness-100'}
                 `}
                 style={{
                   ...getFabMenuPosition(index, quickActions.length),
@@ -271,7 +264,7 @@ export function FloatingActionButton({ onAddEntry }: FloatingActionButtonProps) 
                 aria-label={action.description}
               >
                 <Icon className={`transition-all duration-200 ${isPressed || isHovered ? 'h-8 w-8' : 'h-6 w-6'}`} />
-                
+
                 {isPressed && (
                   <div className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
                     <div className="absolute inset-0 bg-white rounded-full opacity-40 animate-ping" />
@@ -305,9 +298,9 @@ export function FloatingActionButton({ onAddEntry }: FloatingActionButtonProps) 
           className={`
             relative w-14 h-14 rounded-full flex items-center justify-center
             shadow-2xl transition-all duration-300 ease-out focus:outline-hidden focus:ring-4 focus:ring-white/20
-            ${isFabOpen 
+            ${isFabOpen
               ? 'bg-white text-black rotate-45 scale-110 shadow-white/20'
-              : isFabPressed 
+              : isFabPressed
                 ? 'bg-white text-black scale-125 shadow-white/40 ring-4 ring-white/30'
                 : 'bg-white text-black hover:scale-105 hover:shadow-white/30'
             }
@@ -316,23 +309,23 @@ export function FloatingActionButton({ onAddEntry }: FloatingActionButtonProps) 
           aria-label={isFabOpen ? 'Close menu' : 'Open quick actions'}
         >
           <PlusIcon className="h-6 w-6" />
-          
+
           {/* FAB glow effect */}
           <div className={`
             absolute inset-0 rounded-full bg-white transition-all duration-300 pointer-events-none
-            ${isFabOpen 
-              ? 'opacity-20 scale-150' 
-              : isFabPressed 
-                ? 'opacity-30 scale-175 animate-pulse' 
+            ${isFabOpen
+              ? 'opacity-20 scale-150'
+              : isFabPressed
+                ? 'opacity-30 scale-175 animate-pulse'
                 : 'opacity-0 scale-100'
             }
           `} />
-          
+
           {/* Progress ring for long press */}
           {isFabPressed && !isFabOpen && (
             <div className="absolute inset-0 rounded-full pointer-events-none">
-              <svg 
-                className="w-full h-full -rotate-90" 
+              <svg
+                className="w-full h-full -rotate-90"
                 viewBox="0 0 100 100"
               >
                 <circle

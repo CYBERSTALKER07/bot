@@ -19,7 +19,7 @@ export function Skeleton({
     <div
       className={cn(
         'relative overflow-hidden',
-        'bg-gray-200 dark:bg-gray-800',
+        'bg-gray-200 dark:bg-[#2C2C2E]',
         animation === 'pulse' && 'animate-pulse',
         animation === 'wave' && 'skeleton-wave',
         variant === 'circular' && 'rounded-full',

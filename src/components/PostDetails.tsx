@@ -58,6 +58,8 @@ interface PostDetail {
   media_description?: string;
 }
 
+import { useBreakpoint } from '@openai/apps-sdk-ui/hooks/useBreakpoints';
+
 export default function PostDetails() {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
@@ -67,7 +69,11 @@ export default function PostDetails() {
   const [post, setPost] = useState<PostDetail | null>(null);
   const [showImageModal, setShowImageModal] = useState(false);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+  // isMobile corresponds to < lg (1024px)
+  const isLg = useBreakpoint('lg');
+  const isMobile = !isLg;
+
   const [isLikeLoading, setIsLikeLoading] = useState(false);
 
   // Use the new usePostDetail hook
@@ -81,14 +87,6 @@ export default function PostDetails() {
       setPost(postData as PostDetail);
     }
   }, [postData]);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   // Handle like/unlike post
   const handleLikePost = async () => {

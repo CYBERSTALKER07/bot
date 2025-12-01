@@ -6,11 +6,11 @@ import {
     Users,
     MapPin,
     X,
+    Star,
 } from 'lucide-react';
 import { cn } from '../lib/cva';
 import Button from './ui/Button';
 import WhoToFollowItem from './WhoToFollowItem';
-import { RightSidebarSkeleton } from './ui/Skeleton';
 
 interface SearchResult {
     id: string;
@@ -36,11 +36,7 @@ interface RightSidebarProps {
     recommendedCompanies: any[];
     recommendedUsersLoading: boolean;
     recommendedUsers: any[];
-    jobsLoading: boolean;
-    jobs: any[];
     navigate: (path: string) => void;
-    formatTime: (date: string) => string;
-    handleAtSymbolClick: () => void;
 }
 
 const RightSidebar: React.FC<RightSidebarProps> = ({
@@ -57,18 +53,14 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
     recommendedCompanies,
     recommendedUsersLoading,
     recommendedUsers,
-    jobsLoading,
-    jobs,
     navigate,
-    formatTime,
-    handleAtSymbolClick,
 }) => {
     const isUsernameSearch = sidebarSearchInput.startsWith('@');
 
     return (
         <aside className={cn(
             'hidden xl:block w-[400px] pl-6 py-4 h-screen sticky top-0 overflow-y-auto scrollbar-hide',
-            isDark ? 'bg-black border-l border-[#1C1F20]' : 'bg-white border-l border-gray-200'
+            isDark ? 'bg-black border-l border-[#1C1F20]' : 'bg-white border-none border-[0.1px] border-gray-200'
         )}>
             <div className="space-y-6 pb-20">
                 {/* Search Bar */}
@@ -118,7 +110,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                     {showSearchDropdown && (sidebarSearchInput || userSearchResults.length > 0) && (
                         <div className={cn(
                             'absolute top-full left-0 right-0 mt-2 rounded-3xl shadow-xl border overflow-hidden z-50 max-h-[80vh] overflow-y-auto',
-                            isDark ? 'bg-black border-[#1C1F20]' : 'bg-white border-gray-200'
+                            isDark ? 'bg-black border-[#1C1F20]' : 'bg-white border-[0.1px] border-gray-200'
                         )}>
                             {searchLoading ? (
                                 <div className="p-4 text-center text-gray-500">Searching...</div>
@@ -187,7 +179,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                 {/* Job Recommendations */}
                 <div className={cn(
                     'rounded-3xl p-4 border',
-                    isDark ? 'bg-black border-[#1C1F20]' : 'bg-white border-gray-200 shadow-lg'
+                    isDark ? 'bg-black border-[#1C1F20]' : 'bg-white border-[0.1px] border-gray-200 shadow-lg'
                 )}>
                     <h3 className="font-bold text-3xl font-serif mb-4 flex items-center">
                         <Bookmark className="h-5 w-5 mr-2" />
@@ -260,7 +252,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                 {/* Who to Follow */}
                 <div className={cn(
                     'rounded-3xl p-4 border',
-                    isDark ? 'bg-black border-[#1C1F20]' : 'bg-white border-gray-200 shadow-lg'
+                    isDark ? 'bg-black border-[#1C1F20]' : 'bg-white border-[0.1px] border-gray-200 shadow-lg'
                 )}>
                     <h3 className="font-serif text-lg mb-4 flex items-center">
                         <Users className="h-5 w-5 mr-2" />
@@ -296,6 +288,23 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                         onClick={() => navigate('/explore')}
                     >
                         Show more
+                    </Button>
+                </div>
+                {/* Premium Subscription Card */}
+                <div className="rounded-[24px] h-[200px] p-4 mb-6" style={{ backgroundColor: '#E4612E' }}>
+                    <h3 className="font-bold text-3xl font-serif mb-4 flex items-center text-black">
+                        <Star className="h-5 w-5 mr-2 fill-black" />
+                        Go Premium
+                    </h3>
+                    <p className="text-sm mb-4 text-black">
+                        Unlock exclusive features, ad-free experience, and priority support.
+                    </p>
+                    <Button
+                        variant="ghost"
+                        className="w-full bg-black text-white hover:bg-gray-800"
+                        onClick={() => navigate('/premium')}
+                    >
+                        Upgrade Now
                     </Button>
                 </div>
 

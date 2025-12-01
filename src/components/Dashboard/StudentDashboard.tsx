@@ -395,7 +395,7 @@ export default function StudentDashboard() {
               {/* Mobile Who to Follow */}
               <div className={cn(
                 'rounded-2xl p-4',
-                isDark ? 'bg-black' : 'bg-gray-100'
+                isDark ? 'bg-black' : 'bg-white'
               )}>
                 <button
                   className="flex items-center justify-between w-full mb-3 ios-nav-item"
@@ -873,10 +873,10 @@ const DesktopSidebar = ({ isDark, searchTerm, setSearchTerm, trendingTopics, sug
 
     {/* Who to follow */}
     <div className={cn(
-      'rounded-3xl border border-gray-800 p-4',
-      isDark ? 'bg-black' : 'bg-gray-100'
+      'rounded-3xl border-[0.1px] border-gray-200 p-4',
+      isDark ? 'bg-black' : 'bg-white'
     )}>
-      <h2 className="text-xl font-bold mb-4">Who to follow</h2>
+      <h2 className="text-xl font-bold mb-4"></h2>
       <div className="space-y-3">
         {usersLoading ? (
           <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-600')}>Loading...</p>
@@ -944,8 +944,8 @@ const DesktopSidebar = ({ isDark, searchTerm, setSearchTerm, trendingTopics, sug
 
     {/* Quick Actions */}
     <div className={cn(
-      'rounded-3xl border border-gray-800 p-4',
-      isDark ? 'bg-black' : 'bg-gray-100'
+      'rounded-3xl border-[0.1px] border-gray-200 p-4',
+      isDark ? 'bg-black' : 'bg-white'
     )}>
       <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
       <div className="space-y-2">

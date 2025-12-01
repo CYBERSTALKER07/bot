@@ -373,7 +373,7 @@ export default function SearchPage() {
                 : 'bg-white border-2 border-gray-400'
               : isDark
                 ? 'bg-gray-900/50 border border-gray-800 hover:border-gray-700'
-                : 'bg-gray-100/50 border border-gray-200 hover:border-gray-300'
+                : 'bg-gray-100/50 border border-[0.1px] border-gray-200 hover:border-gray-300'
           )}>
             {/* Mobile Back Button */}
             <button
@@ -474,7 +474,7 @@ export default function SearchPage() {
                       ? "bg-[#D3FB52] text-black border-[#D3FB52]"
                       : isDark
                         ? "bg-transparent text-gray-400 border-gray-800 hover:border-gray-700 hover:text-white"
-                        : "bg-transparent text-gray-600 border-gray-200 hover:border-gray-300 hover:text-gray-900"
+                        : "bg-transparent text-gray-600 border-[0.1px] border-gray-200 hover:border-gray-300 hover:text-gray-900"
                   )}
                 >
                   {tab.label}
@@ -492,7 +492,7 @@ export default function SearchPage() {
         <div className="flex-1 min-w-0">
           {!searchInput ? (
             // Full Post Cards Display
-            <div className={cn('w-full max-w-2xl mx-auto border rounded-[24px] border-[0.1px] border-gray-200', isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200')}>
+            <div className={cn('w-full max-w-2xl mx-auto border rounded-[24px]', isDark ? 'bg-black border-gray-800' : 'bg-white border-[0.1px] border-gray-200')}>
               {/* Trending Posts as Full Cards */}
               {isLoadingPosts ? (
                 <div className="space-y-4">
@@ -503,7 +503,7 @@ export default function SearchPage() {
                   ))}
                 </div>
               ) : trendingPosts.length > 0 ? (
-                <div className={cn('divide-y border-b rounded-2xl overflow-hidden', isDark ? 'border-gray-800' : 'border-gray-200')}>
+                <div className={cn('divide-y border-b rounded-2xl overflow-hidden', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
                   {trendingPosts.map((post: any) => (
                     <div
                       key={post.id}
@@ -543,7 +543,7 @@ export default function SearchPage() {
 
                         {/* Post Media */}
                         {post.media && post.media.length > 0 && (
-                          <div className={cn('mb-3 rounded-2xl overflow-hidden border', isDark ? 'border-gray-800' : 'border-gray-200')}>
+                          <div className={cn('mb-3 rounded-2xl overflow-hidden border', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
                             {post.media[0].type === 'image' ? (
                               <img
                                 src={post.media[0].url}
@@ -567,7 +567,7 @@ export default function SearchPage() {
 
               {/* Who to Follow Section - Horizontal Scroll */}
               {suggestedUsers.length > 0 && (
-                <div className={cn('border-t border-b py-6 mt-4', isDark ? 'border-gray-800' : 'border-gray-200')}>
+                <div className={cn('border-t border-b py-6 mt-4', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
                   <h2 className={cn("text-xl font-bold mb-4 flex items-center gap-2", isDark ? "text-white" : "text-gray-900")}>
                     <UsersIcon className="w-5 h-5" />
                     Who to Follow
@@ -582,7 +582,7 @@ export default function SearchPage() {
 
               {/* Jobs Section */}
               {recentJobs.length > 0 && (
-                <div className={cn('border-t mt-4', isDark ? 'border-gray-800' : 'border-gray-200')}>
+                <div className={cn('border-t mt-4', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
                   <div className="pt-6">
                     <h2 className={cn("text-xl font-bold mb-4 flex items-center gap-2", isDark ? "text-white" : "text-gray-900")}>
                       <Briefcase className="w-5 h-5" />
@@ -597,7 +597,7 @@ export default function SearchPage() {
                             'w-full p-4 rounded-2xl text-left transition-all border group',
                             isDark
                               ? 'bg-gray-900/50 hover:bg-gray-900 border-gray-800 hover:border-gray-700'
-                              : 'bg-white hover:bg-gray-50 border-gray-200 hover:border-gray-300'
+                              : 'bg-white hover:bg-gray-50 border-[0.1px] border-gray-200 hover:border-gray-300'
                           )}
                         >
                           <h3 className={cn("font-bold text-base mb-1 group-hover:text-[#D3FB52] transition-colors", isDark ? "text-white" : "text-gray-900")}>
@@ -625,7 +625,7 @@ export default function SearchPage() {
 
               {/* Events Section */}
               {upcomingEvents.length > 0 && (
-                <div className={cn('border-t mt-4', isDark ? 'border-gray-800' : 'border-gray-200')}>
+                <div className={cn('border-t mt-4', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
                   <div className="pt-6">
                     <h2 className={cn("text-xl font-bold mb-4 flex items-center gap-2", isDark ? "text-white" : "text-gray-900")}>
                       <Calendar className="w-5 h-5" />
@@ -640,7 +640,7 @@ export default function SearchPage() {
                             'w-full p-4 rounded-2xl text-left transition-all border group',
                             isDark
                               ? 'bg-gray-900/50 hover:bg-gray-900 border-gray-800 hover:border-gray-700'
-                              : 'bg-white hover:bg-gray-50 border-gray-200 hover:border-gray-300'
+                              : 'bg-white hover:bg-gray-50 border-[0.1px] border-gray-200 hover:border-gray-300'
                           )}
                         >
                           <h3 className={cn("font-bold text-base mb-1 group-hover:text-[#D3FB52] transition-colors", isDark ? "text-white" : "text-gray-900")}>
@@ -696,7 +696,7 @@ export default function SearchPage() {
                   </button>
                 </div>
               ) : (
-                <div className={cn('divide-y rounded-2xl overflow-hidden border', isDark ? 'border-gray-800' : 'border-gray-200')}>
+                <div className={cn('divide-y rounded-2xl overflow-hidden border', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
                   {filteredResults.map((result) => (
                     <div
                       key={`${result.type}-${result.id}`}
@@ -780,17 +780,17 @@ export default function SearchPage() {
         </div>
 
         {/* Right Sidebar - Desktop Only */}
-        <div className={cn('border-l-[0.1px] border-t-[0.1px] rounded-[24px] border-gray-200', isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200')}></div>
+        <div className={cn('rounded-[24px]', isDark ? 'bg-black border-gray-800' : 'bg-white border-l-[0.1px] border-t-[0.1px] border-gray-200')}></div>
         <aside className={cn(
-          'hidden xl:block w-[320px] rounded-[24px] border-gray-200 h-screen sticky top-0 overflow-y-auto scrollbar-hide py-4 flex-shrink-0',
-          isDark ? 'bg-black' : 'bg-white'
+          'hidden xl:block w-[320px] rounded-[24px] h-screen sticky top-0 overflow-y-auto scrollbar-hide py-4 flex-shrink-0',
+          isDark ? 'bg-black' : 'bg-white border-[0.1px] border-gray-200'
         )}>
           <div className="space-y-4">
             {/* Companies Section */}
             {employers.length > 0 && (
               <div className={cn(
-                'rounded-[24px] p-4 border border-[0.1px] border-gray-200 shadow-lg',
-                isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200'
+                'rounded-[24px] p-4 border shadow-lg',
+                isDark ? 'bg-black border-gray-800' : 'bg-white border-[0.1px] border-gray-200'
               )}>
                 <div className="flex items-center gap-2 mb-3">
                   <Briefcase className="w-4 h-4" />
@@ -834,7 +834,7 @@ export default function SearchPage() {
             {suggestedUsers.length > 0 && (
               <div className={cn(
                 'rounded-[24px] p-4 border shadow-lg',
-                isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200'
+                isDark ? 'bg-black border-gray-800' : 'bg-white border-[0.1px] border-gray-200'
               )}>
                 <h3 className={cn(
                   'text-sm font-semibold mb-3',

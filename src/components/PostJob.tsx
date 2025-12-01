@@ -35,6 +35,8 @@ import { cn } from '../lib/cva';
 import { buttonVariants } from '../lib/animations';
 import { triggerSuccessConfetti } from '../lib/confetti';
 
+import { useBreakpoint } from '@openai/apps-sdk-ui/hooks/useBreakpoints';
+
 export default function PostJob() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -70,15 +72,10 @@ export default function PostJob() {
   const [newSkill, setNewSkill] = useState('');
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [currentStep, setCurrentStep] = useState(1);
-  const [isMobile, setIsMobile] = useState(false);
 
-  // Detect mobile
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  // isMobile corresponds to < lg (1024px)
+  const isLg = useBreakpoint('lg');
+  const isMobile = !isLg;
 
   // Check if user is employer
   useEffect(() => {
@@ -159,7 +156,7 @@ export default function PostJob() {
     setMediaPreview(null);
 
     if (fileInputRef.current) fileInputRef.current.value = '';
-    if (videoInputRef.current) fileInputRef.current.value = '';
+    if (videoInputRef.current) videoInputRef.current.value = '';
   };
 
   const validateForm = (): boolean => {

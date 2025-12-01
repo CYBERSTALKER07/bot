@@ -31,15 +31,15 @@ export const EnhancedPostCard: React.FC<EnhancedPostCardProps> = ({
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!isMobile) {
       setIsPressed(true);
-      
+
       // Create ripple effect
       const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
       const id = rippleIdRef.current++;
-      
+
       setRipples(prev => [...prev, { id, x, y }]);
-      
+
       // Remove ripple after animation
       setTimeout(() => {
         setRipples(prev => prev.filter(r => r.id !== id));
@@ -79,7 +79,7 @@ export const EnhancedPostCard: React.FC<EnhancedPostCardProps> = ({
       onClick={onClick}
       className={cn(
         'relative cursor-pointer transition-all duration-200',
-        'overflow-hidden',
+        'overflow-hidden border-b border-[0.1px] border-gray-200',
         isDark ? 'hover:bg-gray-950/50' : 'hover:bg-gray-50/50',
         isPressed && !isMobile ? 'scale-[0.98]' : 'scale-100'
       )}

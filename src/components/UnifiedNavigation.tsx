@@ -13,7 +13,11 @@ import {
   X,
   BarChart3,
   Rss,
-  Smartphone
+  Smartphone,
+  FileText,
+  Settings,
+  Briefcase,
+  Users
 } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext';
@@ -25,7 +29,7 @@ import { cn } from '../lib/cva';
 import { useExclusiveAccordion } from '../hooks/useExclusiveState';
 
 interface NavigationItem {
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<{ className?: string }>;
   label: string;
   path: string;
   badge?: number;
@@ -60,6 +64,8 @@ const SEMI_PUBLIC_ROUTES = [
   '/job'
 ];
 
+import { useBreakpoint } from '@openai/apps-sdk-ui/hooks/useBreakpoints';
+
 export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNavigationProps) {
   const { user, logout } = useAuth();
   const { isDark } = useTheme();
@@ -69,39 +75,33 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
 
   // Always call all hooks first, before any conditional logic
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isHidden, setIsHidden] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(3);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  const [unreadCount] = useState(3);
+
+  // isMobile corresponds to < md (768px)
+  const isMd = useBreakpoint('md');
+  const isMobile = !isMd;
 
   // Use exclusive accordion for navigation groups
-  const { toggle: toggleGroup, isOpen: isGroupOpen } = useExclusiveAccordion();
+  useExclusiveAccordion();
 
-  const sidebarRef = useRef<HTMLDivElement>(null);
-  const hoverZoneRef = useRef<HTMLDivElement>(null);
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Clear timeout when component unmounts
   useEffect(() => {
+    const timeoutId = hideTimeoutRef.current;
     return () => {
-      if (hideTimeoutRef.current) {
-        clearTimeout(hideTimeoutRef.current);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
       }
     };
   }, []);
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-      if (window.innerWidth >= 768) {
-        setIsMobileMenuOpen(false);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    if (isMd) {
+      setIsMobileMenuOpen(false);
+    }
+  }, [isMd]);
 
   // Determine navigation mode
   const isLandingRoute = LANDING_ROUTES.includes(location.pathname) ||
@@ -109,6 +109,103 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
 
   const shouldShowLandingNav = mode === 'landing' || (isLandingRoute && !user);
   const shouldShowAuthenticatedNav = mode === 'authenticated' || (user && !isLandingRoute);
+
+  const isCurrentPath = (path: string) => location.pathname === path;
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
+  // Enhanced navigation items with grouping
+  const getNavigationItems = (): NavigationItem[] => {
+    if (user?.role === 'student') {
+      return [
+        { icon: Rss, label: 'Feed', path: '/feed', group: 'main' },
+        { icon: BarChart3, label: 'Dashboard', path: '/dashboard', group: 'main' },
+        { icon: Search, label: 'Find Jobs', path: '/jobs', group: 'jobs' },
+        { icon: Building2, label: 'Companies', path: '/companies', group: 'jobs' },
+        { icon: FileText, label: 'Applications', path: '/applications', group: 'jobs' },
+        { icon: FileText, label: 'Learning Passport', path: '/digital-passport', group: 'learning' },
+        { icon: BarChart3, label: 'Skills Audit', path: '/skills-audit', group: 'learning' },
+        { icon: MessageSquare, label: 'Messages', path: '/messages', badge: unreadCount, group: 'communication' },
+        { icon: Calendar, label: 'Events', path: '/events', group: 'communication' },
+        { icon: BookOpen, label: 'Resources', path: '/resources', group: 'learning' },
+        { icon: Settings, label: 'Profile Setup', path: '/profile-setup', group: 'profile' },
+        // Add new mobile-accessible pages
+        { icon: BookOpen, label: 'Career Tips', path: '/career-tips', group: 'learning' },
+        { icon: Users, label: 'Who\'s Hiring', path: '/whos-hiring', group: 'jobs' },
+        { icon: GraduationCap, label: 'For Students', path: '/for-students', group: 'tools' },
+        { icon: Smartphone, label: 'Mobile App', path: '/mobile-app', group: 'tools' },
+      ];
+    }
+
+    if (user?.role === 'employer') {
+      return [
+        { icon: Rss, label: 'Feed', path: '/feed', group: 'main' },
+        { icon: BarChart3, label: 'Dashboard', path: '/dashboard', group: 'main' },
+        { icon: Briefcase, label: 'Post Jobs', path: '/post-job', group: 'jobs' },
+        { icon: Users, label: 'Applicants', path: '/applicants', group: 'jobs' },
+        { icon: Building2, label: 'Companies', path: '/companies', group: 'jobs' },
+        { icon: MessageSquare, label: 'Messages', path: '/messages', badge: unreadCount, group: 'communication' },
+        { icon: FileText, label: 'Resources', path: '/resources', group: 'learning' },
+        { icon: Settings, label: 'Profile Setup', path: '/profile-setup', group: 'profile' },
+        // Add new mobile-accessible pages
+        { icon: Building2, label: 'For Employers', path: '/for-employers', group: 'tools' },
+        { icon: BookOpen, label: 'Career Tips', path: '/career-tips', group: 'learning' },
+        { icon: Smartphone, label: 'Mobile App', path: '/mobile-app', group: 'tools' },
+      ];
+    }
+
+    if (user?.role === 'admin') {
+      return [
+        { icon: Rss, label: 'Feed', path: '/feed', group: 'main' },
+        { icon: BarChart3, label: 'Admin Panel', path: '/dashboard', group: 'main' },
+        { icon: Users, label: 'Users', path: '/users', group: 'management' },
+        { icon: Briefcase, label: 'Jobs', path: '/jobs', group: 'management' },
+        { icon: Building2, label: 'Companies', path: '/companies', group: 'management' },
+        { icon: FileText, label: 'Reports', path: '/reports', group: 'analytics' },
+        { icon: Settings, label: 'Settings', path: '/settings', group: 'system' },
+        { icon: User, label: 'Profile Setup', path: '/profile-setup', group: 'profile' },
+        // Add new mobile-accessible pages
+        { icon: BookOpen, label: 'Career Tips', path: '/career-tips', group: 'tools' },
+        { icon: Users, label: 'Who\'s Hiring', path: '/whos-hiring', group: 'tools' },
+        { icon: Smartphone, label: 'Mobile App', path: '/mobile-app', group: 'tools' },
+        { icon: GraduationCap, label: 'For Students', path: '/for-students', group: 'tools' },
+        { icon: Building2, label: 'For Employers', path: '/for-employers', group: 'tools' },
+      ];
+    }
+
+    return [
+      { icon: Rss, label: 'Feed', path: '/feed', group: 'main' },
+      { icon: BarChart3, label: 'Dashboard', path: '/dashboard', group: 'main' },
+      { icon: Search, label: 'Find Jobs', path: '/jobs', group: 'jobs' },
+      { icon: Building2, label: 'Companies', path: '/companies', group: 'jobs' },
+      { icon: MessageSquare, label: 'Messages', path: '/messages', group: 'communication' },
+      { icon: Calendar, label: 'Events', path: '/events', group: 'communication' },
+      { icon: BookOpen, label: 'Resources', path: '/resources', group: 'learning' },
+      { icon: Settings, label: 'Profile Setup', path: '/profile-setup', group: 'profile' },
+      // Add new mobile-accessible pages
+      { icon: BookOpen, label: 'Career Tips', path: '/career-tips', group: 'learning' },
+      { icon: Users, label: 'Who\'s Hiring', path: '/whos-hiring', group: 'jobs' },
+      { icon: Smartphone, label: 'Mobile App', path: '/mobile-app', group: 'tools' },
+    ];
+  };
+
+  const navigationItems = getNavigationItems();
+  // Group navigation items
+  const groupedItems = navigationItems.reduce((acc, item) => {
+    const group = item.group || 'main';
+    if (!acc[group]) acc[group] = [];
+    acc[group].push(item);
+    return acc;
+  }, {} as Record<string, NavigationItem[]>);
+
+  const mobileNavItems = navigationItems.filter(item => item.group === 'main' || ['jobs', 'messages'].includes(item.path.split('/')[1]));
 
   // Don't render navigation if conditions aren't met
   if (!shouldShowLandingNav && !shouldShowAuthenticatedNav) {
@@ -210,7 +307,7 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
 
               {/* Right side - Authentication & Mobile Menu */}
               <div className="flex items-center space-x-4">
-                <ThemeToggle size="small" />
+                <ThemeToggle size="sm" />
 
                 {/* Desktop Auth Links */}
                 <div className="hidden md:flex items-center space-x-4">
@@ -226,7 +323,7 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                         Dashboard
                       </Link>
                       <div className="w-8 h-8 rounded-ful l bg-brand-primary/10 text-brand-primary flex items-center justify-center text-sm font-medium">
-                        {user?.name?.charAt(0) || <User className="h-4 w-4" />}
+                        {(user?.profile?.full_name || user?.profile?.username)?.charAt(0) || <User className="h-4 w-4" />}
                       </div>
                     </>
                   ) : (
@@ -257,7 +354,7 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                 <div className="md:hidden">
                   <Button
                     variant="ghost"
-                    size="icon"
+                    size="medium"
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                     aria-expanded={isMobileMenuOpen}
                     aria-label="Toggle menu"
@@ -267,7 +364,7 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                       <X className="h-5 w-5" />
                     ) : (
                       <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-sm font-medium">
-                        {user?.name?.charAt(0) || <User className="h-4 w-4" />}
+                        {(user?.profile?.full_name || user?.profile?.username)?.charAt(0) || <User className="h-4 w-4" />}
                       </div>
                     )}
                   </Button>
@@ -283,10 +380,10 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                   <div className="px-4 py-3 border-b border-neutral-200">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center text-sm font-medium">
-                        {user?.name?.charAt(0) || <User className="h-5 w-5" />}
+                        {(user?.profile?.full_name || user?.profile?.username)?.charAt(0) || <User className="h-5 w-5" />}
                       </div>
                       <div>
-                        <p className="font-medium text-sm">{user?.name || 'User'}</p>
+                        <p className="font-medium text-sm">{user?.profile?.full_name || user?.profile?.username || 'User'}</p>
                         <p className="text-xs text-neutral-500">{user?.email || 'user@example.com'}</p>
                       </div>
                     </div>
@@ -371,127 +468,6 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
     );
   }
 
-  // AUTHENTICATED USER NAVIGATION
-  // Handle mouse enter to show sidebar
-  const handleMouseEnter = () => {
-    if (hideTimeoutRef.current) {
-      clearTimeout(hideTimeoutRef.current);
-      hideTimeoutRef.current = null;
-    }
-    setIsHovered(true);
-    if (isHidden) {
-      setIsHidden(false);
-    }
-  };
-
-  // Handle mouse leave to hide sidebar after delay
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    // Keep sidebar in collapsed mode instead of completely hiding
-    if (!isCollapsed) {
-      hideTimeoutRef.current = setTimeout(() => {
-        setIsCollapsed(true);
-      }, 300); // Reduced delay for better UX
-    }
-  };
-
-  // Enhanced navigation items with grouping
-  const getNavigationItems = (): NavigationItem[] => {
-    if (user?.role === 'student') {
-      return [
-        { icon: Rss, label: 'Feed', path: '/feed', group: 'main' },
-        { icon: BarChart3, label: 'Dashboard', path: '/dashboard', group: 'main' },
-        { icon: Search, label: 'Find Jobs', path: '/jobs', group: 'jobs' },
-        { icon: Building2, label: 'Companies', path: '/companies', group: 'jobs' },
-        { icon: FileText, label: 'Applications', path: '/applications', group: 'jobs' },
-        { icon: FileText, label: 'Learning Passport', path: '/digital-passport', group: 'learning' },
-        { icon: BarChart3, label: 'Skills Audit', path: '/skills-audit', group: 'learning' },
-        { icon: MessageSquare, label: 'Messages', path: '/messages', badge: unreadCount, group: 'communication' },
-        { icon: Calendar, label: 'Events', path: '/events', group: 'communication' },
-        { icon: BookOpen, label: 'Resources', path: '/resources', group: 'learning' },
-        { icon: Settings, label: 'Profile Setup', path: '/profile-setup', group: 'profile' },
-        // Add new mobile-accessible pages
-        { icon: BookOpen, label: 'Career Tips', path: '/career-tips', group: 'learning' },
-        { icon: Users, label: 'Who\'s Hiring', path: '/whos-hiring', group: 'jobs' },
-        { icon: GraduationCap, label: 'For Students', path: '/for-students', group: 'tools' },
-        { icon: Smartphone, label: 'Mobile App', path: '/mobile-app', group: 'tools' },
-      ];
-    }
-
-    if (user?.role === 'employer') {
-      return [
-        { icon: Rss, label: 'Feed', path: '/feed', group: 'main' },
-        { icon: BarChart3, label: 'Dashboard', path: '/dashboard', group: 'main' },
-        { icon: Briefcase, label: 'Post Jobs', path: '/post-job', group: 'jobs' },
-        { icon: Users, label: 'Applicants', path: '/applicants', group: 'jobs' },
-        { icon: Building2, label: 'Companies', path: '/companies', group: 'jobs' },
-        { icon: MessageSquare, label: 'Messages', path: '/messages', badge: unreadCount, group: 'communication' },
-        { icon: FileText, label: 'Resources', path: '/resources', group: 'learning' },
-        { icon: Settings, label: 'Profile Setup', path: '/profile-setup', group: 'profile' },
-        // Add new mobile-accessible pages
-        { icon: Building2, label: 'For Employers', path: '/for-employers', group: 'tools' },
-        { icon: BookOpen, label: 'Career Tips', path: '/career-tips', group: 'learning' },
-        { icon: Smartphone, label: 'Mobile App', path: '/mobile-app', group: 'tools' },
-      ];
-    }
-
-    if (user?.role === 'admin') {
-      return [
-        { icon: Rss, label: 'Feed', path: '/feed', group: 'main' },
-        { icon: BarChart3, label: 'Admin Panel', path: '/dashboard', group: 'main' },
-        { icon: Users, label: 'Users', path: '/users', group: 'management' },
-        { icon: Briefcase, label: 'Jobs', path: '/jobs', group: 'management' },
-        { icon: Building2, label: 'Companies', path: '/companies', group: 'management' },
-        { icon: FileText, label: 'Reports', path: '/reports', group: 'analytics' },
-        { icon: Settings, label: 'Settings', path: '/settings', group: 'system' },
-        { icon: User, label: 'Profile Setup', path: '/profile-setup', group: 'profile' },
-        // Add new mobile-accessible pages
-        { icon: BookOpen, label: 'Career Tips', path: '/career-tips', group: 'tools' },
-        { icon: Users, label: 'Who\'s Hiring', path: '/whos-hiring', group: 'tools' },
-        { icon: Smartphone, label: 'Mobile App', path: '/mobile-app', group: 'tools' },
-        { icon: GraduationCap, label: 'For Students', path: '/for-students', group: 'tools' },
-        { icon: Building2, label: 'For Employers', path: '/for-employers', group: 'tools' },
-      ];
-    }
-
-    return [
-      { icon: Rss, label: 'Feed', path: '/feed', group: 'main' },
-      { icon: BarChart3, label: 'Dashboard', path: '/dashboard', group: 'main' },
-      { icon: Search, label: 'Find Jobs', path: '/jobs', group: 'jobs' },
-      { icon: Building2, label: 'Companies', path: '/companies', group: 'jobs' },
-      { icon: MessageSquare, label: 'Messages', path: '/messages', group: 'communication' },
-      { icon: Calendar, label: 'Events', path: '/events', group: 'communication' },
-      { icon: BookOpen, label: 'Resources', path: '/resources', group: 'learning' },
-      { icon: Settings, label: 'Profile Setup', path: '/profile-setup', group: 'profile' },
-      // Add new mobile-accessible pages
-      { icon: BookOpen, label: 'Career Tips', path: '/career-tips', group: 'learning' },
-      { icon: Users, label: 'Who\'s Hiring', path: '/whos-hiring', group: 'jobs' },
-      { icon: Smartphone, label: 'Mobile App', path: '/mobile-app', group: 'tools' },
-    ];
-  };
-
-  const navigationItems = getNavigationItems();
-  const mobileNavItems = navigationItems.filter(item => item.group === 'main' || ['jobs', 'messages'].includes(item.path.split('/')[1]));
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  };
-
-  const isCurrentPath = (path: string) => location.pathname === path;
-
-  // Group navigation items
-  const groupedItems = navigationItems.reduce((acc, item) => {
-    const group = item.group || 'main';
-    if (!acc[group]) acc[group] = [];
-    acc[group].push(item);
-    return acc;
-  }, {} as Record<string, NavigationItem[]>);
-
   // Mobile Navigation for authenticated users
   if (isMobile) {
     return (
@@ -518,7 +494,7 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
             <div className="flex items-center space-x-3">
               <Button
                 variant="ghost"
-                size="icon"
+                size="medium"
                 className="relative ios-touch-target"
                 aria-label={`Notifications ${unreadCount ? `(${unreadCount} unread)` : ''}`}
               >
@@ -532,7 +508,7 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
 
               <Button
                 variant="ghost"
-                size="icon"
+                size="medium"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 aria-expanded={isMobileMenuOpen}
                 aria-label="Toggle menu"
@@ -542,7 +518,7 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
                   <X className="h-5 w-5" />
                 ) : (
                   <div className="w-8 h-8 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center text-sm font-medium">
-                    {user?.name?.charAt(0) || <User className="h-4 w-4" />}
+                    {user?.profile?.full_name?.charAt(0) || <User className="h-4 w-4" />}
                   </div>
                 )}
               </Button>
@@ -589,7 +565,7 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
             </div>
             <Button
               variant="ghost"
-              size="icon"
+              size="medium"
               onClick={() => setIsMobileMenuOpen(false)}
               className={cn(
                 "ios-touch-target",
@@ -609,11 +585,11 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
               <div className="px-4 py-4 border-b border-neutral-200 bg-linear-to-r from-brand-primary/5 to-transparent ios-nav-spacing">
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 ios-rounded bg-brand-primary/10 text-brand-primary flex items-center justify-center text-lg font-medium">
-                    {user?.name?.charAt(0) || <User className="h-6 w-6" />}
+                    {user?.profile?.full_name?.charAt(0) || <User className="h-6 w-6" />}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">
-                      {user?.name || 'User'}
+                      {user?.profile?.full_name || 'User'}
                     </p>
                     <p className="text-xs text-neutral-500 truncate">
                       {user?.email || 'user@example.com'}
@@ -771,11 +747,11 @@ export default function UnifiedNavigation({ onScrollToSection, mode }: UnifiedNa
         <div className="px-6 py-4 border-b border-neutral-200">
           <div className="flex items-center space-x-4">
             <div className="w-14 h-14 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xl font-medium">
-              {user?.name?.charAt(0) || <User className="h-6 w-6" />}
+              {user?.profile?.full_name?.charAt(0) || <User className="h-6 w-6" />}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-foreground truncate">
-                {user?.name || 'User'}
+                {user?.profile?.full_name || 'User'}
               </p>
               <p className="text-xs text-neutral-500 truncate">
                 {user?.email || 'user@example.com'}

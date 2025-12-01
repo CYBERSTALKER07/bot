@@ -41,9 +41,9 @@ interface LeftSidebarProps {
 
 export const LeftSidebarSkeleton = () => (
     <div className="space-y-6">
-        <div className="rounded-3xl p-4 border border-gray-200 dark:border-[#1C1F20] h-64 animate-pulse bg-gray-100 dark:bg-gray-900" />
-        <div className="rounded-3xl p-4 border border-gray-200 dark:border-[#1C1F20] h-32 animate-pulse bg-gray-100 dark:bg-gray-900" />
-        <div className="rounded-3xl p-4 border border-gray-200 dark:border-[#1C1F20] h-64 animate-pulse bg-gray-100 dark:bg-gray-900" />
+        <div className="rounded-3xl p-4 border border-[0.1px] border-gray-200 dark:border-[#1C1F20] h-64 animate-pulse bg-gray-100 dark:bg-gray-900" />
+        <div className="rounded-3xl p-4 border border-[0.1px] border-gray-200 dark:border-[#1C1F20] h-32 animate-pulse bg-gray-100 dark:bg-gray-900" />
+        <div className="rounded-3xl p-4 border border-[0.1px] border-gray-200 dark:border-[#1C1F20] h-64 animate-pulse bg-gray-100 dark:bg-gray-900" />
     </div>
 );
 
@@ -61,7 +61,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
     return (
         <aside className={cn(
             "hidden lg:block w-[300px] pr-6 py-4 h-screen sticky top-0 overflow-y-auto scrollbar-hide",
-            isDark ? 'bg-black border-r border-[#1C1F20]' : 'bg-white border-r border-gray-200'
+            isDark ? 'bg-black border-r border-[#1C1F20]' : 'bg-white border-r border-[0.1px] border-gray-200'
         )}>
             <div className="space-y-6">
                 {/* User Profile Quick View */}
@@ -119,7 +119,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
                 {/* AI Career Assistant */}
                 <div className={cn(
                     "rounded-3xl border p-4 transition-colors cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900",
-                    isDark ? 'bg-black border-[#1C1F20] text-white' : 'bg-white border-gray-200 text-black shadow-lg'
+                    isDark ? 'bg-black border-[#1C1F20] text-white' : 'bg-white border-[0.1px] border-gray-200 text-black shadow-lg'
                 )}>
                     <div className="flex items-center gap-2 mb-3">
                         <Search className="w-5 h-5 text-info-500" />
@@ -133,9 +133,9 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
                 {/* Trending Topics */}
                 <div className={cn(
                     "rounded-3xl border overflow-hidden",
-                    isDark ? 'bg-black border-[#1C1F20] text-white' : 'bg-white border-gray-200 text-black shadow-lg'
+                    isDark ? 'bg-black border-[#1C1F20] text-white' : 'bg-white border-[0.1px] border-gray-200 text-black shadow-lg'
                 )}>
-                    <div className={cn("p-4 border-b", isDark ? "border-[#1C1F20]" : "border-gray-200")}>
+                    <div className={cn("p-4 border-b border-[0.1px]", isDark ? "border-[#1C1F20]" : "border-gray-200")}>
                         <h3 className="font-bold text-xl">Trending</h3>
                     </div>
                     <div className={cn("divide-y", isDark ? "divide-gray-800" : "divide-gray-200")}>
@@ -169,9 +169,9 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
                 {/* Matched Jobs */}
                 <div className={cn(
                     "rounded-3xl border overflow-hidden",
-                    isDark ? 'bg-black border-[#1C1F20] text-white' : 'bg-white border-gray-200 text-black shadow-xs'
+                    isDark ? 'bg-black border-[#1C1F20] text-white' : 'bg-white border-[0.1px] border-gray-200 text-black shadow-xs'
                 )}>
-                    <div className={cn("p-4 border-b", isDark ? "border-[#1C1F20]" : "border-gray-200")}>
+                    <div className={cn("p-4 border-b border-[0.1px]", isDark ? "border-[#1C1F20]" : "border-gray-200")}>
                         <h3 className="font-bold text-xl">Jobs for you</h3>
                     </div>
                     <div className="p-0">
@@ -183,7 +183,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
                                     key={job.id || index}
                                     className={cn(
                                         'p-4 hover:bg-gray-50 dark:hover:bg-gray-900 transition-all cursor-pointer border-b last:border-0',
-                                        isDark ? 'border-[#1C1F20]' : 'border-gray-200'
+                                        isDark ? 'border-[#1C1F20]' : 'border-[0.1px] border-gray-200'
                                     )}
                                     onClick={() => navigate(`/job/${job.id}`)}
                                 >
@@ -211,7 +211,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
                             </div>
                         )}
                     </div>
-                    <div className={cn("p-3 text-center hover:bg-gray-50 dark:hover:bg-gray-900 cursor-pointer transition-colors", isDark ? "border-t border-[#1C1F20]" : "border-t border-gray-200")}>
+                    <div className={cn("p-3 text-center hover:bg-gray-50 dark:hover:bg-gray-900 cursor-pointer transition-colors", isDark ? "border-t border-[#1C1F20]" : "border-t border-[0.1px] border-gray-200")}>
                         <button
                             onClick={() => navigate('/jobs')}
                             className="text-info-500 text-sm font-medium"
