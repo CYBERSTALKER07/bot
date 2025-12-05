@@ -259,9 +259,8 @@ export default function Comments({ postId, currentUserId }: CommentsProps) {
           <button
             onClick={() => handleLikeComment(comment.id, comment.user_liked || false)}
             aria-label={comment.user_liked ? 'Unlike comment' : 'Like comment'}
-            className={`flex items-center space-x-2 transition-colors group ${
-              comment.user_liked ? 'text-red-600' : 'text-gray-500 hover:text-red-600'
-            }`}
+            className={`flex items-center space-x-2 transition-colors group ${comment.user_liked ? 'text-red-600' : 'text-gray-500 hover:text-red-600'
+              }`}
           >
             <div className="p-2 rounded-full group-hover:bg-red-50 transition-colors">
               <Heart className={`w-4 h-4 ${comment.user_liked ? 'fill-current' : ''}`} />
@@ -369,6 +368,7 @@ export default function Comments({ postId, currentUserId }: CommentsProps) {
                 placeholder="Post your reply"
                 className="w-full p-3 text-lg border-none resize-none focus:ring-0 focus:outline-hidden placeholder-gray-500"
                 rows={3}
+                id="comment-input"
                 maxLength={280}
               />
               <div className="flex justify-between items-center mt-3">

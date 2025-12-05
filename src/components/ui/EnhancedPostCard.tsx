@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../lib/cva';
+import InlineComments from './InlineComments';
+
+interface Post {
+  id: string;
+  replies_count: number;
+  [key: string]: unknown;
+}
 
 interface EnhancedPostCardProps {
   children: React.ReactNode;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent) => void;
   isDark?: boolean;
   isMobile?: boolean;
+  post?: Post;
 }
 
 /**
@@ -23,6 +31,7 @@ export const EnhancedPostCard: React.FC<EnhancedPostCardProps> = ({
   onClick,
   isDark = false,
   isMobile = false,
+  post,
 }) => {
   const [isPressed, setIsPressed] = useState(false);
   const [ripples, setRipples] = useState<Array<{ id: number; x: number; y: number }>>([]);
@@ -112,6 +121,13 @@ export const EnhancedPostCard: React.FC<EnhancedPostCardProps> = ({
 
       {/* Content */}
       {children}
+
+      {/* Inline Comments */}
+      {post && post.replies_count > 0 && (
+        <div onClick={(e) => e.stopPropagation()}>
+          <InlineComments postId={post.id} totalReplies={post.replies_count} />
+        </div>
+      )}
     </motion.div>
   );
 };

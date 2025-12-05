@@ -37,7 +37,7 @@ const SegmentedControlRoot = ({
         <SegmentedControlContext.Provider value={{ value, onChange }}>
             <div
                 className={cn(
-                    'flex p-1 rounded-[24px] relative isolate',
+                    'flex p-1 rounded-lg h-[48px] relative isolate',
                     isDark ? 'bg-gray-900' : 'bg-gray-100',
                     className
                 )}
@@ -85,7 +85,7 @@ const SegmentedControlOption = ({
                 <motion.div
                     layoutId="segmented-control-active"
                     className={cn(
-                        'absolute inset-0 rounded-[24px] -z-10 shadow-sm',
+                        'absolute inset-0 rounded-lg -z-10 shadow-sm',
                         isDark ? 'bg-white' : 'bg-white'
                     )}
                     transition={{

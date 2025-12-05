@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Heart, MessageCircle, Reply, MoreHorizontal, Trash2, Edit } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { supabase } from '../../lib/supabase';
 import Avatar from './Avatar';
 import Button from './Button';
+import ReplyInput from './ReplyInput';
 import { cn } from '../../lib/cva';
 
 interface Comment {
@@ -37,7 +38,12 @@ interface CommentsProps {
 export default function Comments({ postId, className }: CommentsProps) {
   const { user } = useAuth();
   const { isDark } = useTheme();
-  
+
+  // Extract the real post ID (remove retweet_ prefix if present)
+  const effectivePostId = postId?.startsWith('retweet_')
+    ? postId.substring(8)
+    : postId;
+
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [newComment, setNewComment] = useState('');
@@ -47,24 +53,49 @@ export default function Comments({ postId, className }: CommentsProps) {
   const [editContent, setEditContent] = useState('');
   const [isCommenting, setIsCommenting] = useState(false);
 
+  // Refs for maintaining focus
+  const replyInputRef = useRef<HTMLTextAreaElement>(null);
+  const editInputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Focus reply input when replying to a comment
+  useEffect(() => {
+    if (replyingTo && replyInputRef.current) {
+      replyInputRef.current.focus();
+      // Put cursor at end
+      const len = replyInputRef.current.value.length;
+      replyInputRef.current.setSelectionRange(len, len);
+    }
+  }, [replyingTo]);
+
+  // Focus edit input when editing a comment
+  useEffect(() => {
+    if (editingComment && editInputRef.current) {
+      editInputRef.current.focus();
+      // Put cursor at end
+      const len = editInputRef.current.value.length;
+      editInputRef.current.setSelectionRange(len, len);
+    }
+  }, [editingComment]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchComments();
-  }, [postId]);
+  }, [effectivePostId]);
 
   const fetchComments = async () => {
     try {
       setLoading(true);
-      
+
       // First try a simple query to check if table exists
       const { data: commentsData, error } = await supabase
         .from('comments')
         .select('*')
-        .eq('post_id', postId)
+        .eq('post_id', effectivePostId)
         .order('created_at', { ascending: true });
 
       if (error) {
         console.error('Error fetching comments:', error);
-        
+
         // If table doesn't exist, show empty state
         if (error.code === '42P01') {
           console.log('Comments table does not exist yet');
@@ -165,10 +196,10 @@ export default function Comments({ postId, className }: CommentsProps) {
     return rootComments;
   };
 
-  const handleAddComment = async (parentId?: string) => {
-    if (!user || (!newComment.trim() && !replyContent.trim())) return;
+  const handleAddComment = async (parentId?: string, directContent?: string) => {
+    const content = directContent || (parentId ? replyContent : newComment);
+    if (!user || !content.trim()) return;
 
-    const content = parentId ? replyContent : newComment;
     setIsCommenting(true);
 
     try {
@@ -179,7 +210,7 @@ export default function Comments({ postId, className }: CommentsProps) {
 
       // Debug logging
       console.log('Adding comment:', {
-        postId,
+        postId: effectivePostId,
         userId: user.id,
         content: content.trim(),
         parentId
@@ -189,7 +220,7 @@ export default function Comments({ postId, className }: CommentsProps) {
       const { data, error } = await supabase
         .from('comments')
         .insert([{
-          post_id: postId,
+          post_id: effectivePostId,
           user_id: user.id,
           parent_id: parentId || null,
           content: content.trim()
@@ -228,7 +259,7 @@ export default function Comments({ postId, className }: CommentsProps) {
 
       if (parentId) {
         // Add as reply to existing comment
-        setComments(prevComments => 
+        setComments(prevComments =>
           updateCommentsWithReply(prevComments, parentId, newCommentObj)
         );
         setReplyContent('');
@@ -245,7 +276,7 @@ export default function Comments({ postId, className }: CommentsProps) {
       }
     } catch (error) {
       console.error('Detailed error adding comment:', error);
-      
+
       // More specific error messages
       let errorMessage = 'Failed to add comment. ';
       if (error.code === '23503') {
@@ -257,7 +288,7 @@ export default function Comments({ postId, className }: CommentsProps) {
       } else {
         errorMessage += 'Please try again.';
       }
-      
+
       alert(errorMessage);
     } finally {
       setIsCommenting(false);
@@ -312,7 +343,7 @@ export default function Comments({ postId, className }: CommentsProps) {
       }
 
       // Update local state
-      setComments(prevComments => 
+      setComments(prevComments =>
         updateCommentLikes(prevComments, commentId, !existingLike)
       );
 
@@ -360,7 +391,7 @@ export default function Comments({ postId, className }: CommentsProps) {
       if (error) throw error;
 
       // Update local state
-      setComments(prevComments => 
+      setComments(prevComments =>
         updateCommentContent(prevComments, commentId, editContent.trim(), true)
       );
 
@@ -403,7 +434,7 @@ export default function Comments({ postId, className }: CommentsProps) {
       if (error) throw error;
 
       // Remove from local state
-      setComments(prevComments => 
+      setComments(prevComments =>
         removeComment(prevComments, commentId)
       );
     } catch (error) {
@@ -449,7 +480,7 @@ export default function Comments({ postId, className }: CommentsProps) {
             size="sm"
             className="shrink-0"
           />
-          
+
           <div className="flex-1 min-w-0">
             {/* Author Info */}
             <div className="flex items-center space-x-2 mb-1">
@@ -479,12 +510,14 @@ export default function Comments({ postId, className }: CommentsProps) {
             {editingComment === comment.id ? (
               <div className="mb-3">
                 <textarea
+                  ref={editInputRef}
+                  dir="ltr"
                   value={editContent}
                   onChange={(e) => setEditContent(e.target.value)}
                   className={cn(
-                    'w-full p-2 border rounded-lg resize-none',
-                    isDark 
-                      ? 'bg-black border-gray-700 text-white' 
+                    'w-full p-2 border rounded-lg resize-none text-left',
+                    isDark
+                      ? 'bg-black border-gray-700 text-white'
                       : 'bg-white border-gray-300 text-gray-900'
                   )}
                   rows={2}
@@ -526,8 +559,8 @@ export default function Comments({ postId, className }: CommentsProps) {
                   'flex items-center space-x-1 px-0 py-1 text-sm transition-colors',
                   comment.has_liked
                     ? 'text-red-500 hover:text-red-400'
-                    : isDark 
-                      ? 'text-gray-400 hover:text-red-400' 
+                    : isDark
+                      ? 'text-gray-400 hover:text-red-400'
                       : 'text-gray-600 hover:text-red-600'
                 )}
               >
@@ -544,8 +577,8 @@ export default function Comments({ postId, className }: CommentsProps) {
                 }}
                 className={cn(
                   'flex items-center space-x-1 px-0 py-1 text-sm transition-colors',
-                  isDark 
-                    ? 'text-gray-400 hover:text-info-400' 
+                  isDark
+                    ? 'text-gray-400 hover:text-info-400'
                     : 'text-gray-600 hover:text-info-600'
                 )}
               >
@@ -563,8 +596,8 @@ export default function Comments({ postId, className }: CommentsProps) {
                     }}
                     className={cn(
                       'flex items-center space-x-1 px-0 py-1 text-sm transition-colors',
-                      isDark 
-                        ? 'text-gray-400 hover:text-yellow-400' 
+                      isDark
+                        ? 'text-gray-400 hover:text-yellow-400'
                         : 'text-gray-600 hover:text-yellow-600'
                     )}
                   >
@@ -578,8 +611,8 @@ export default function Comments({ postId, className }: CommentsProps) {
                     onClick={() => handleDeleteComment(comment.id)}
                     className={cn(
                       'flex items-center space-x-1 px-0 py-1 text-sm transition-colors',
-                      isDark 
-                        ? 'text-gray-400 hover:text-red-400' 
+                      isDark
+                        ? 'text-gray-400 hover:text-red-400'
                         : 'text-gray-600 hover:text-red-600'
                     )}
                   >
@@ -594,8 +627,8 @@ export default function Comments({ postId, className }: CommentsProps) {
                 size="sm"
                 className={cn(
                   'flex items-center space-x-1 px-0 py-1 text-sm transition-colors',
-                  isDark 
-                    ? 'text-gray-400 hover:text-gray-300' 
+                  isDark
+                    ? 'text-gray-400 hover:text-gray-300'
                     : 'text-gray-600 hover:text-gray-500'
                 )}
               >
@@ -605,50 +638,20 @@ export default function Comments({ postId, className }: CommentsProps) {
 
             {/* Reply Input */}
             {replyingTo === comment.id && (
-              <div className="mt-3 p-3 bg-gray-50 dark:bg-black rounded-lg">
-                <div className="flex space-x-3">
-                  <Avatar
-                    src={user?.profile?.avatar_url}
-                    alt={user?.profile?.full_name || 'You'}
-                    size="sm"
-                    className="shrink-0"
-                  />
-                  <div className="flex-1">
-                    <textarea
-                      value={replyContent}
-                      onChange={(e) => setReplyContent(e.target.value)}
-                      className={cn(
-                        'w-full p-2 border rounded-lg resize-none',
-                        isDark 
-                          ? 'bg-black border-gray-600 text-white' 
-                          : 'bg-white border-gray-300 text-gray-900'
-                      )}
-                      rows={2}
-                      placeholder={`Reply to ${comment.author.name}...`}
-                    />
-                    <div className="flex rouned-md space-x-2 mt-2">
-                      <Button
-                      className='rounded-md'
-                        size="sm"
-                        onClick={() => handleAddComment(comment.id)}
-                        disabled={!replyContent.trim() || isCommenting}
-                      >
-                        {isCommenting ? 'Replying...' : 'Reply'}
-                      </Button>
-                      <Button className='rouned-md'
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                          setReplyingTo(null);
-                          setReplyContent('');
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <ReplyInput
+                authorName={comment.author.name}
+                userAvatarUrl={user?.profile?.avatar_url || undefined}
+                userName={user?.profile?.full_name || 'You'}
+                isDark={isDark}
+                isSubmitting={isCommenting}
+                onSubmit={(content) => {
+                  handleAddComment(comment.id, content);
+                }}
+                onCancel={() => {
+                  setReplyingTo(null);
+                  setReplyContent('');
+                }}
+              />
             )}
           </div>
         </div>
@@ -703,8 +706,8 @@ export default function Comments({ postId, className }: CommentsProps) {
               onChange={(e) => setNewComment(e.target.value)}
               className={cn(
                 'w-full p-3 border rounded-2xl resize-none',
-                isDark 
-                  ? 'bg-black border-gray-700 text-white placeholder-gray-400' 
+                isDark
+                  ? 'bg-black border-gray-700 text-white placeholder-gray-400'
                   : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
               )}
               rows={3}
@@ -718,7 +721,7 @@ export default function Comments({ postId, className }: CommentsProps) {
                 {500 - newComment.length} characters remaining
               </span>
               <Button
-              className='rounded-md w-20 h-8'
+                className='rounded-md w-20 h-8'
                 onClick={() => handleAddComment()}
                 disabled={!newComment.trim() || isCommenting || newComment.length > 500}
                 size="sm"

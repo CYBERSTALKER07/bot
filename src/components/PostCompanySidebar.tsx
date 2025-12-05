@@ -108,7 +108,7 @@ export default function PostCompanySidebar({
                 {!searchQuery && trendingCompanies.length > 0 && (
                     <div className={cn('rounded-2xl p-4 border', isDark ? 'bg-gray-900/30 border-gray-800' : 'bg-gray-50 border-gray-200')}>
                         <div className="flex items-center gap-2 mb-3">
-                            <TrendingUp className="w-4 h-4 text-orange-500" />
+                            {/* <TrendingUp className="w-4 h-4 text-orange-500" /> */}
                             <h3 className={cn('text-sm font-semibold', isDark ? 'text-white' : 'text-black')}>Trending Companies</h3>
                         </div>
                         <div className="space-y-2">

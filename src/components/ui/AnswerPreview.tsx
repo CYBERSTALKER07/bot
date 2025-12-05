@@ -108,20 +108,14 @@ export default function AnswerPreview({ answer, totalAnswers, postId }: AnswerPr
                         initialReplies={answer.reply_count || 0}
                         isLiked={false}
                         isRetweeted={false}
-                        isBookmarked={false}
                         onLike={() => {
                             // Handle like action
                         }}
                         onRetweet={() => {
                             // Handle retweet action
                         }}
-                        onReply={() => navigate(`/post/${postId}`)}
-                        onShare={() => {
-                            // Handle share action
-                        }}
-                        onBookmark={() => {
-                            // Handle bookmark action
-                        }}
+                        onComment={() => navigate(`/post/${postId}`)}
+                        onReply={() => navigate(`/post/${postId}/answers`)}
                     />
                 </div>
             </div>

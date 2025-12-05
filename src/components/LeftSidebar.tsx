@@ -2,6 +2,9 @@ import React from 'react';
 import {
     Search,
     MapPin,
+    TrendingUp,
+    Briefcase,
+    Sparkles
 } from 'lucide-react';
 import { cn } from '../lib/cva';
 
@@ -40,10 +43,10 @@ interface LeftSidebarProps {
 }
 
 export const LeftSidebarSkeleton = () => (
-    <div className="space-y-6">
-        <div className="rounded-3xl p-4 border border-[0.1px] border-gray-200 dark:border-[#1C1F20] h-64 animate-pulse bg-gray-100 dark:bg-gray-900" />
-        <div className="rounded-3xl p-4 border border-[0.1px] border-gray-200 dark:border-[#1C1F20] h-32 animate-pulse bg-gray-100 dark:bg-gray-900" />
-        <div className="rounded-3xl p-4 border border-[0.1px] border-gray-200 dark:border-[#1C1F20] h-64 animate-pulse bg-gray-100 dark:bg-gray-900" />
+    <div className="space-y-6 hidden lg:block w-[300px]">
+        <div className="rounded-3xl p-4 border border-gray-200 dark:border-[#1C1F20] h-48 animate-pulse bg-gray-100 dark:bg-gray-900" />
+        <div className="rounded-3xl p-4 border border-gray-200 dark:border-[#1C1F20] h-24 animate-pulse bg-gray-100 dark:bg-gray-900" />
+        <div className="rounded-3xl p-4 border border-gray-200 dark:border-[#1C1F20] h-64 animate-pulse bg-gray-100 dark:bg-gray-900" />
     </div>
 );
 
@@ -60,11 +63,12 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
 }) => {
     return (
         <aside className={cn(
-            "hidden lg:block w-[300px] pr-6 py-4 h-screen sticky top-0 overflow-y-auto scrollbar-hide",
-            isDark ? 'bg-black border-r border-[#1C1F20]' : 'bg-white border-r border-[0.1px] border-gray-200'
+            "hidden lg:block w-[300px] pr-6 py-4 h-screen sticky top-0 overflow-y-auto no-scrollbar",
+            isDark ? 'bg-black border-r border-[#1C1F20]' : 'bg-white border-r border-gray-200'
         )}>
-            <div className="space-y-6">
-                {/* User Profile Quick View */}
+            <div className="space-y-5">
+
+                {/* 1. User Profile Quick View (Restored) */}
                 <div className="relative rounded-3xl p-4 text-white overflow-hidden group cursor-pointer transition-all hover:opacity-95">
                     {/* Cover Photo Background */}
                     {profileData.cover_image_url ? (
@@ -74,7 +78,8 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
                             className="absolute inset-0 w-full h-full object-cover rounded-3xl"
                         />
                     ) : (
-                        <div className="absolute inset-0 bg-linear-to-r from-gray-900 to-info-600 rounded-3xl" />
+                        // Fixed typo: bg-linear-to-r -> bg-gradient-to-r
+                        <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-blue-600 rounded-3xl" />
                     )}
 
                     {/* Dark overlay for better text readability */}
@@ -116,109 +121,141 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
                     </div>
                 </div>
 
-                {/* AI Career Assistant */}
-                <div className={cn(
-                    "rounded-3xl border p-4 transition-colors cursor-pointer  ",
-                    isDark ? 'bg-black border-[#1C1F20] hover:bg-gray-900 text-white ' : 'bg-white border-[0.1px] border-gray-200 text-black shadow-lg'
-                )}>
-                    <div className="flex items-center gap-2 mb-3">
-                        <Search className="w-5 h-5 text-info-500" />
-                        <h3 className="font-bold text-lg">WorkX AI Assistant</h3>
+                {/* 2. AI Career Assistant */}
+                <div
+                    className={cn(
+                        "rounded-3xl p-5 transition-all cursor-pointer group border relative overflow-hidden",
+                        isDark
+                            ? 'bg-gradient-to-br from-[#1C1F20] to-black border-[#1C1F20] hover:border-gray-700'
+                            : 'bg-white border-gray-200 shadow-sm hover:shadow-md hover:border-blue-200'
+                    )}
+                >
+                    <div className="absolute -top-10 -right-10 w-24 h-24 bg-blue-500/20 rounded-full blur-2xl group-hover:bg-blue-500/30 transition-all" />
+
+                    <div className="flex items-center gap-3 mb-2 relative z-10">
+                        <div className="p-2 rounded-full bg-blue-500/10 text-blue-500">
+                            <Sparkles className="w-5 h-5" />
+                        </div>
+                        <h3 className={cn("font-bold text-base", isDark ? "text-white" : "text-gray-900")}>WorkX AI</h3>
                     </div>
-                    <p className={cn("text-sm mb-3", isDark ? "text-gray-400" : "text-gray-600")}>
-                        Get personalized career guidance with the help of AI powered by Grok
+                    <p className={cn("text-xs leading-relaxed relative z-10", isDark ? "text-gray-400" : "text-gray-500")}>
+                        Analyze your profile and get personalized career advice powered by Grok 3.
                     </p>
                 </div>
 
-                {/* Trending Topics */}
+                {/* 3. Trending Topics */}
                 <div className={cn(
                     "rounded-3xl border overflow-hidden",
-                    isDark ? 'bg-black border-[#1C1F20] text-white' : 'bg-white border-[0.1px] border-gray-200 text-black shadow-lg'
+                    isDark ? 'bg-black border-[#1C1F20]' : 'bg-white border-gray-200 shadow-sm'
                 )}>
-                    <div className={cn("p-4 border-b border-[0.1px]", isDark ? "border-[#1C1F20]" : "border-gray-200")}>
-                        <h3 className="font-bold text-xl">Trending</h3>
+                    <div className={cn("p-4 border-b flex items-center gap-2", isDark ? "border-[#1C1F20]" : "border-gray-100")}>
+                        <TrendingUp className={cn("w-4 h-4", isDark ? "text-gray-400" : "text-gray-500")} />
+                        <h3 className={cn("font-bold text-sm uppercase tracking-wider", isDark ? "text-white" : "text-gray-900")}>Trending</h3>
                     </div>
-                    <div className={cn("divide-y", isDark ? "divide-gray-800" : "divide-gray-200")}>
+
+                    <div className="divide-y divide-gray-100 dark:divide-gray-800/50">
                         {mostLikedPostsLoading ? (
-                            <div className="text-center py-4 text-gray-500">Loading...</div>
+                            <div className="p-4 space-y-3">
+                                <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-3/4 animate-pulse" />
+                                <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-1/2 animate-pulse" />
+                            </div>
                         ) : mostLikedPosts && mostLikedPosts.length > 0 ? (
-                            mostLikedPosts.map((post, index) => (
+                            mostLikedPosts.slice(0, 4).map((post, index) => (
                                 <div
                                     key={index}
                                     className={cn(
-                                        "p-3 transition-colors cursor-pointer",
-                                        isDark ? 'hover:bg-gray-900' : 'hover:bg-gray-50'
+                                        "p-4 transition-colors cursor-pointer group",
+                                        isDark ? 'hover:bg-[#1C1F20]' : 'hover:bg-gray-50'
                                     )}
                                     onClick={() => navigate(`/post/${post.id}`)}
                                 >
                                     <div className="flex items-center justify-between mb-1">
-                                        <span className="text-sm font-bold text-gray-500">Trending in Tech</span>
+                                        <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">
+                                            Trending in {post.topic || 'General'}
+                                        </span>
                                     </div>
-                                    <p className="text-sm font-bold mb-1">{post.author.name}</p>
-                                    <p className={cn("text-xs", isDark ? "text-gray-400" : "text-gray-600")}>
-                                        {post.content.slice(0, 60)}...
+                                    <p className={cn("text-sm font-bold mb-1 line-clamp-2 leading-tight group-hover:underline", isDark ? "text-gray-200" : "text-gray-800")}>
+                                        {post.content}
+                                    </p>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        {post.likes_count || 0} likes
                                     </p>
                                 </div>
                             ))
                         ) : (
-                            <div className="text-center py-4 text-gray-500">No trending posts</div>
+                            <div className="p-6 text-center">
+                                <p className="text-sm text-gray-500">No trending topics yet</p>
+                            </div>
                         )}
                     </div>
                 </div>
 
-                {/* Matched Jobs */}
+                {/* 4. Matched Jobs */}
                 <div className={cn(
                     "rounded-3xl border overflow-hidden",
-                    isDark ? 'bg-black border-[#1C1F20] text-white' : 'bg-white border-[0.1px] border-gray-200 text-black shadow-xs'
+                    isDark ? 'bg-black border-[#1C1F20]' : 'bg-white border-gray-200 shadow-sm'
                 )}>
-                    <div className={cn("p-4 border-b border-[0.1px]", isDark ? "border-[#1C1F20]" : "border-gray-200")}>
-                        <h3 className="font-bold text-xl">Jobs for you</h3>
+                    <div className={cn("p-4 border-b flex items-center gap-2", isDark ? "border-[#1C1F20]" : "border-gray-100")}>
+                        <Briefcase className={cn("w-4 h-4", isDark ? "text-gray-400" : "text-gray-500")} />
+                        <h3 className={cn("font-bold text-sm uppercase tracking-wider", isDark ? "text-white" : "text-gray-900")}>Jobs for you</h3>
                     </div>
-                    <div className="p-0">
+
+                    <div>
                         {matchedJobsLoading ? (
-                            <div className="text-center py-4 text-gray-500">Loading...</div>
+                            <div className="p-4 space-y-3">
+                                <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-full animate-pulse" />
+                                <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-2/3 animate-pulse" />
+                            </div>
                         ) : matchedJobs && matchedJobs.length > 0 ? (
                             matchedJobs.slice(0, 3).map((job: any, index: number) => (
                                 <div
                                     key={job.id || index}
                                     className={cn(
-                                        'p-4 hover:bg-gray-50 dark:hover:bg-gray-900 transition-all cursor-pointer border-b last:border-0',
-                                        isDark ? 'border-[#1C1F20]' : 'border-[0.1px] border-gray-200'
+                                        'p-4 hover:bg-gray-50 dark:hover:bg-[#1C1F20] transition-all cursor-pointer border-b last:border-0 border-gray-100 dark:border-gray-800',
                                     )}
                                     onClick={() => navigate(`/job/${job.id}`)}
                                 >
-                                    <div className="flex items-center justify-between mb-1">
-                                        <h4 className="font-bold text-sm truncate">{job.title}</h4>
+                                    <div className="flex items-start justify-between mb-1">
+                                        <h4 className={cn("font-bold text-sm truncate pr-2", isDark ? "text-gray-200" : "text-gray-800")}>
+                                            {job.title}
+                                        </h4>
                                         {job.matchPercentage > 0 && (
-                                            <span className="text-xs font-medium text-info-500">
-                                                {job.matchPercentage}% match
+                                            <span className={cn(
+                                                "text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0",
+                                                job.matchPercentage >= 80
+                                                    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                                                    : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                                            )}>
+                                                {job.matchPercentage}%
                                             </span>
                                         )}
                                     </div>
-                                    <p className="text-xs text-gray-500 mb-2">{job.company}</p>
+                                    <p className="text-xs text-gray-500 mb-2 font-medium">{job.company}</p>
 
                                     <div className="flex items-center gap-2 text-xs text-gray-400">
-                                        <span className="flex items-center gap-1">
-                                            <MapPin className="h-3 w-3" />
-                                            {job.location}
-                                        </span>
+                                        <MapPin className="h-3 w-3" />
+                                        <span className="truncate max-w-[150px]">{job.location}</span>
                                     </div>
                                 </div>
                             ))
                         ) : (
-                            <div className="text-center py-4 text-gray-500">
-                                <p className="text-sm">No matched jobs yet</p>
+                            <div className="p-6 text-center text-gray-500">
+                                <p className="text-sm">No matched jobs found</p>
                             </div>
                         )}
                     </div>
-                    <div className={cn("p-3 text-center hover:bg-gray-50 dark:hover:bg-gray-900 cursor-pointer transition-colors", isDark ? "border-t border-[#1C1F20]" : "border-t border-[0.1px] border-gray-200")}>
-                        <button
-                            onClick={() => navigate('/jobs')}
-                            className="text-info-500 text-sm font-medium"
-                        >
-                            Show more
-                        </button>
-                    </div>
+
+                    <button
+                        onClick={() => navigate('/jobs')}
+                        className={cn(
+                            "w-full py-3 text-center text-xs font-bold uppercase tracking-wider transition-colors",
+                            isDark
+                                ? "text-gray-400 hover:text-white hover:bg-[#1C1F20]"
+                                : "text-gray-500 hover:text-blue-600 hover:bg-gray-50"
+                        )}
+                    >
+                        View all jobs
+                    </button>
                 </div>
             </div>
         </aside>

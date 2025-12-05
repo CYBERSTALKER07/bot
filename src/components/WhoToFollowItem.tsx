@@ -109,8 +109,8 @@ export default function WhoToFollowItem({ user, onNavigate }: WhoToFollowItemPro
           />
         ) : (
           <div className={cn(
-            "w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-white font-bold text-sm",
-            isDark ? 'bg-gray-700' : 'bg-gray-400'
+            "w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-white font-bold text-2xl",
+            isDark ? 'bg-gray-700' : 'bg-white text-gray-300 font-serif  border-gray-200 border-[0.1px]'
           )}>
             {user.full_name?.charAt(0).toUpperCase() || 'U'}
           </div>
@@ -118,7 +118,7 @@ export default function WhoToFollowItem({ user, onNavigate }: WhoToFollowItemPro
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-1">
             <h4 className={cn(
-              "font-semibold text-sm truncate",
+              "font-bold text-sm  truncate",
               isDark ? 'text-white' : 'text-black'
             )}>
               {user.full_name}
@@ -148,13 +148,13 @@ export default function WhoToFollowItem({ user, onNavigate }: WhoToFollowItemPro
 
       {/* Follow Button */}
       <Button
-        size="sm"
+        size="xl"
         color={isFollowing ? "secondary" : "primary"}
         variant={isFollowing ? "soft" : "solid"}
         onClick={handleFollowClick}
         disabled={processingFollowId === user.id || statusLoading}
         className={cn(
-          "w-[80px] shrink-0 ml-2 text-xs",
+          "w-[80px] rounded-3xl  shrink-0 ml-2 text-md font-bold",
           isFollowing && hoveredFollowId === user.id && 'hover:!bg-red-500 hover:!text-white'
         )}
       >

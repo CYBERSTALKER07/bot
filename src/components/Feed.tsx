@@ -17,7 +17,17 @@ import Avatar from './ui/Avatar';
 import PageLayout from './ui/PageLayout';
 import { cn } from '../lib/cva';
 import SegmentedControl from './ui/SegmentedControl';
-import { usePosts, useCreatePost, useProfile, useRecommendedUsers, useRecommendedCompanies, useLikePost, useMatchedJobs, useMostLikedPosts, useBookmarkPost, useSearch } from '../hooks/useOptimizedQuery';
+import {
+  usePosts,
+  useCreatePost,
+  useProfile,
+  useRecommendedUsers,
+  useRecommendedCompanies,
+  useLikePost,
+  useMatchedJobs,
+  useMostLikedPosts,
+  useSearch
+} from '../hooks/useOptimizedQuery';
 import { useJobs } from '../hooks/useJobs';
 import { useCreateRetweet } from '../hooks/useRetweet';
 import RetweetHeader from './RetweetHeader';
@@ -33,11 +43,11 @@ import RightSidebar from './RightSidebar';
 import { useInfiniteScroll, usePullToRefresh } from '../hooks/useScrollOptimizations';
 import { useScrollDirection } from '../hooks/useScrollDirection';
 import { useRealtimePosts } from '../hooks/useRealtimePosts';
-import { rateLimiter } from '../lib/rateLimiter';
 import Animate from './ui/Animate';
 
-
+// --- Types ---
 interface Post {
+  [key: string]: any; // Index signature for compatibility with dynamic data
   id: string;
   content: string;
   author: {
@@ -56,7 +66,6 @@ interface Post {
   has_bookmarked: boolean;
   media?: { type: 'image' | 'video'; url: string; alt?: string }[];
   reply_to?: { id: string; author: { name: string; username: string } };
-  // Retweet fields
   is_retweet?: boolean;
   is_quote_retweet?: boolean;
   quote_content?: string;
@@ -111,16 +120,44 @@ interface SearchResultData {
   users?: Array<{ id: string; full_name: string; username: string; bio?: string; avatar_url?: string; verified?: boolean }>;
 }
 
-import { useBreakpoint } from "@openai/apps-sdk-ui/hooks/useBreakpoints";
+// --- Custom Hook to Replace Broken Import ---
+const useBreakpoint = (breakpoint: 'sm' | 'md' | 'lg' | 'xl' | '2xl') => {
+  const [isMatch, setIsMatch] = useState(false);
+
+  useEffect(() => {
+    const breakpoints = {
+      sm: '640px',
+      md: '768px',
+      lg: '1024px',
+      xl: '1280px',
+      '2xl': '1536px',
+    };
+
+    const query = `(min-width: ${breakpoints[breakpoint]})`;
+    const media = window.matchMedia(query);
+
+    const listener = () => setIsMatch(media.matches);
+
+    // Set initial value
+    setIsMatch(media.matches);
+
+    // Listen for changes
+    media.addEventListener('change', listener);
+    return () => media.removeEventListener('change', listener);
+  }, [breakpoint]);
+
+  return isMatch;
+};
 
 export default function Feed() {
   const { user } = useAuth();
   const { isDark } = useTheme();
   const navigate = useNavigate();
-  // isMobile is true if we are BELOW the 'lg' breakpoint (1024px)
-  // useBreakpoint('lg') returns true if we are AT OR ABOVE 'lg'
+
+  // Responsive check
   const isDesktop = useBreakpoint("lg");
   const isMobile = !isDesktop;
+
   const { isVisible: isHeaderVisible } = useScrollDirection({ threshold: 3 });
 
   // Refs
@@ -152,9 +189,6 @@ export default function Feed() {
   const [sidebarSearchInput, setSidebarSearchInput] = useState('');
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
 
-  // FAB State
-  // Removed unused FAB state variables
-
   // Data Fetching Hooks
   const {
     data: posts,
@@ -174,46 +208,86 @@ export default function Feed() {
   const { mutate: createPostMutation } = useCreatePost();
   const { mutate: likePostMutation } = useLikePost();
   const { mutate: retweetPostMutation } = useCreateRetweet();
-  const { mutate: bookmarkPostMutation } = useBookmarkPost();
+
 
   // Real-time posts subscription for instant updates
   const [realtimePosts, setRealtimePosts] = useState<Post[]>([]);
 
   useRealtimePosts({
-    onNewPost: useCallback((newPost: any) => {
-      // Check rate limit before adding new post
-      const rateCheck = rateLimiter.check(user?.id || 'anonymous', user?.subscription_tier || 'free');
+    onNewPost: useCallback(async (newPost: any) => {
+      // Immediately add post with placeholder author for instant display
+      const instantPost: Post = {
+        id: newPost.id,
+        content: newPost.content || '',
+        author: {
+          id: newPost.user_id,
+          name: 'Loading...',
+          username: 'user',
+          avatar_url: undefined,
+          verified: false
+        },
+        created_at: newPost.created_at,
+        likes_count: newPost.likes_count || 0,
+        retweets_count: newPost.shares_count || 0,
+        replies_count: newPost.comments_count || 0,
+        has_liked: false,
+        has_retweeted: false,
+        has_bookmarked: false,
+        media: newPost.image_url ? [{ type: 'image' as const, url: newPost.image_url }] :
+          newPost.video_url ? [{ type: 'video' as const, url: newPost.video_url }] : undefined
+      };
 
-      if (!rateCheck.allowed) {
-        console.warn('⚠️ Rate limit reached for real-time updates');
-        return;
+      // Add to state immediately for sub-second display
+      setRealtimePosts(prev => [instantPost, ...prev]);
+
+      // Then fetch author data asynchronously and update
+      try {
+        const { data: authorData } = await supabase
+          .from('profiles')
+          .select('id, full_name, username, avatar_url, verified')
+          .eq('id', newPost.user_id)
+          .single();
+
+        if (authorData) {
+          setRealtimePosts(prev => prev.map(p =>
+            p.id === newPost.id
+              ? {
+                ...p,
+                author: {
+                  id: authorData.id,
+                  name: authorData.full_name || 'User',
+                  username: authorData.username || 'user',
+                  avatar_url: authorData.avatar_url,
+                  verified: authorData.verified || false
+                }
+              }
+              : p
+          ));
+        }
+      } catch (err) {
+        console.error('Error fetching author for realtime post:', err);
       }
-
-      // Add new post to realtime posts (will appear at top of feed)
-      setRealtimePosts(prev => [newPost as Post, ...prev]);
-
-      // Optional: Show toast notification
-      console.log('🆕 New post received in real-time!', newPost);
-    }, [user?.id, user?.subscription_tier]),
+    }, []),
 
     onUpdatePost: useCallback((updatedPost: any) => {
-      // Update post in realtime posts
       setRealtimePosts(prev =>
-        prev.map(p => p.id === updatedPost.id ? updatedPost as Post : p)
+        prev.map(p => p.id === updatedPost.id ? { ...p, ...updatedPost } as Post : p)
       );
     }, []),
 
     onDeletePost: useCallback((postId: string) => {
-      // Remove post from realtime posts
       setRealtimePosts(prev => prev.filter(p => p.id !== postId));
     }, []),
 
-    enabled: activeTab === 'for-you' // Only subscribe when on "For You" tab
+    enabled: activeTab === 'for-you'
   });
 
-  // Combine realtime posts with fetched posts
+  // Optimize combined posts to avoid duplicates between realtime and fetched data
   const combinedPosts = useMemo(() => {
-    return [...realtimePosts, ...allPosts];
+    const realtimeIds = new Set(realtimePosts.map(p => p.id));
+    // Filter out posts from historical fetch that are already in realtime state
+    const filteredHistoricalPosts = allPosts.filter(p => !realtimeIds.has(p.id));
+    return [...realtimePosts, ...filteredHistoricalPosts];
   }, [realtimePosts, allPosts]);
 
   // Sidebar Data Hooks
@@ -302,8 +376,6 @@ export default function Feed() {
     { rootMargin: '200px' }
   );
 
-
-
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (searchDropdownRef.current && !searchDropdownRef.current.contains(e.target as Node) &&
@@ -386,23 +458,7 @@ export default function Feed() {
 
   const handleLike = (postId: string) => likePostMutation({ postId, userId: user?.id || '' });
   const handleRetweet = (postId: string, content?: string) => retweetPostMutation({ postId, userId: user?.id || '', quoteContent: content });
-  const handleBookmark = (postId: string) => bookmarkPostMutation({ postId, userId: user?.id || '' });
 
-  const handleShare = async (post: Post) => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `Post by ${post.author.name}`,
-          text: post.content,
-          url: window.location.href
-        });
-      } catch (error) {
-        console.log('Error sharing:', error);
-      }
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-    }
-  };
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -420,8 +476,6 @@ export default function Feed() {
     searchInputRef.current?.focus();
     setShowSearchDropdown(true);
   };
-
-
 
   if (loading) {
     return (
@@ -469,27 +523,25 @@ export default function Feed() {
 
         {/* Main Feed Content */}
         <div className={cn(
-          'flex-1 max-w-[650px]   min-h-screen',
+          'flex-1 max-w-[650px] min-h-screen',
           isDark ? '' : 'border-[0.1px] border-gray-200'
         )}>
           {/* Header */}
           <div className={cn(
-            'sticky z-10 rounded-br-4xl rounded-bl-4xl glass backdrop-blur-xl border-b transition-all duration-300 ios-safe-top',
+            'sticky z-10 rounded-br-lg rounded-bl-lg h-[48px] rounded-tl-lg rounded-tr-lg glass backdrop-blur-xl border-b-[0.1px] rounded-b-lg transition-all duration-300',
             isDark ? 'bg-black/80 border-[#1C1F20]' : 'bg-white/80 border-[0.1px] border-gray-200',
             isMobile
               ? (isHeaderVisible ? 'top-16' : 'top-0')
               : 'top-0'
           )}>
-            <div className="p-2">
-              <SegmentedControl
-                value={activeTab}
-                onChange={(val) => setActiveTab(val as 'for-you' | 'explore')}
-                className="w-full"
-              >
-                <SegmentedControl.Option value="for-you">For you</SegmentedControl.Option>
-                <SegmentedControl.Option value="explore">Explore</SegmentedControl.Option>
-              </SegmentedControl>
-            </div>
+            <SegmentedControl
+              value={activeTab}
+              onChange={(val) => setActiveTab(val as 'for-you' | 'explore')}
+              className="w-full"
+            >
+              <SegmentedControl.Option className='font-bold' value="for-you">For you</SegmentedControl.Option>
+              <SegmentedControl.Option className='font-bold' value="explore">Explore</SegmentedControl.Option>
+            </SegmentedControl>
           </div>
 
           {/* Create Post Input (Desktop) */}
@@ -511,7 +563,7 @@ export default function Feed() {
                     What is happening?!
                   </div>
                   <div className={cn(
-                    'flex items-center justify-between mt-3 pt-3 border-t border-b-none border-r border-l rounded-l-xl rounded-r-xl  rounded-tr-xl rounded-tl-xl border-[0.1px] border-gray-200',
+                    'flex items-center justify-between mt-3 pt-3 border-t border-b-none border-r border-l rounded-l-xl rounded-r-xl rounded-tr-xl rounded-tl-xl border-[0.1px] border-gray-200',
                     isDark ? 'border-[#1C1F20]/50' : 'border-[#1C1F20]/50'
                   )}>
                     <div className="flex gap-1 text-info-500">
@@ -538,7 +590,7 @@ export default function Feed() {
                       onClick={() => navigate('/create-post')}
                       className={cn(
                         'bg-[#D3FB52] hover:bg-[#D3FB52]/80 text-black font-bold rounded-full px-5 py-1.5',
-                        isDark ? 'text-white  border-[#1C1F20]/50' : 'text-gray-500 border-[#1C1F20]/50'
+                        isDark ? 'text-white border-[#1C1F20]/50' : 'text-gray-500 border-[#1C1F20]/50'
                       )}
                     >
                       Post
@@ -551,7 +603,6 @@ export default function Feed() {
 
           {/* Feed Content */}
           <div ref={timelineRef} className="pb-20 min-h-screen ios-bottom-nav">
-            {/* Pull to Refresh Indicator */}
             {isPulling && (
               <div className="flex justify-center py-6 animate-fade-in-up">
                 <div className="relative">
@@ -573,190 +624,204 @@ export default function Feed() {
               />
             ) : (
               <div>
-                {combinedPosts.map((post: Post, index: number) => (
-                  <Animate
-                    key={post.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    enter={{ opacity: 1, y: 0, duration: 400, delay: index * 50 }}
-                    exit={{ opacity: 0, y: -20, duration: 300 }}
-                  >
-                    <EnhancedPostCard
-                      isDark={isDark}
-                      isMobile={isMobile}
-                      onClick={() => navigate(`/post/${post.id}`)}
+                {combinedPosts.map((post: Post, index: number) => {
+                  let effectivePostId = post.id;
+                  if (post.is_retweet && post.original_post?.id) {
+                    effectivePostId = post.original_post.id;
+                  } else if (post.id.startsWith('retweet_')) {
+                    effectivePostId = post.id.substring(8);
+                  }
+
+                  return (
+                    <Animate
+                      key={post.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      enter={{ opacity: 1, y: 0, duration: 400, delay: index * 50 }}
+                      exit={{ opacity: 0, y: -20, duration: 300 }}
                     >
-                      {/* Retweet Header */}
-                      {post.is_retweet && post.retweeted_by && (
-                        <RetweetHeader
-                          retweetedByName={post.retweeted_by.name}
-                          retweetedById={post.retweeted_by.id}
-                          isMobile={isMobile}
-                        />
-                      )}
-
-                      <div className="p-3 sm:p-4 flex gap-3">
-                        {/* Author Avatar */}
-                        <div className="shrink-0" onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/profile/${post.author.id}`);
-                        }}>
-                          <Avatar
-                            src={post.author.avatar_url}
-                            alt={post.author.name}
-                            size="md"
-                            className="hover:opacity-90 transition-opacity"
+                      <EnhancedPostCard
+                        post={post}
+                        isDark={isDark}
+                        isMobile={isMobile}
+                        onClick={(e) => {
+                          if ((e.target as HTMLElement).closest('button, a')) return;
+                          navigate(`/post/${effectivePostId}`);
+                        }}
+                      >
+                        {post.is_retweet && post.retweeted_by && (
+                          <RetweetHeader
+                            retweetedByName={post.retweeted_by.name}
+                            retweetedById={post.retweeted_by.id}
+                            isMobile={isMobile}
                           />
-                        </div>
+                        )}
 
-                        {/* Post Content */}
-                        <div className="flex-1 min-w-0">
-                          {/* Header: Name, Username, Time, More */}
-                          <div className="flex items-center justify-between mb-1">
-                            <div className="flex items-center gap-1 overflow-hidden">
-                              <Link
-                                to={`/profile/${post.author.id}`}
-                                className="font-bold hover:underline truncate text-base"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                {post.author.name}
-                              </Link>
-                              {post.author.verified && (
-                                <span className="text-info-500 shrink-0">
-                                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><g><path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .495.083.965.238 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z" /></g></svg>
-                                </span>
-                              )}
-                              <span className="text-gray-500 text-sm truncate">@{post.author.username}</span>
-                              <span className="text-gray-500 text-sm">·</span>
-                              <span className="text-gray-500 text-sm hover:underline">{formatTime(post.created_at)}</span>
-                            </div>
-                            <button className="text-gray-500 hover:text-info-500 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
-                              <span className="sr-only">More</span>
-                              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><g><path d="M3 12c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm9 2c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm7 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"></path></g></svg>
-                            </button>
+                        <div className="p-3 sm:p-4 flex gap-3">
+                          {/* Avatar with threading line */}
+                          <div className="shrink-0 relative" onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/profile/${post.author.id}`);
+                          }}>
+                            <Avatar
+                              src={post.author.avatar_url}
+                              alt={post.author.name}
+                              size="md"
+                              className="hover:opacity-90 transition-opacity cursor-pointer relative z-10"
+                            />
+                            {/* Threading line - extends from avatar down when there are replies */}
+                            {post.replies_count > 0 && (
+                              <div
+                                className={cn(
+                                  "absolute left-1/2 -translate-x-1/2 top-10 w-[2px] bottom-[-100%]",
+                                  isDark ? "bg-gray-700" : "bg-gray-300"
+                                )}
+                                style={{ height: 'calc(100% + 16px)' }}
+                              />
+                            )}
                           </div>
 
-                          {/* Text Content */}
-                          {post.content && (
-                            <div
-                              className={cn(
-                                'text-[15px] leading-normal mb-3 whitespace-pre-wrap wrap-break-word',
-                                isDark ? 'text-white' : 'text-gray-900'
-                              )}
-                            >
-                              {post.content.split(/(\s+)/).map((word, index) => {
-                                // Check if word is a hashtag
-                                const hashtagMatch = word.match(/^#(\w+)/);
-                                if (hashtagMatch) {
-                                  const hashtagName = hashtagMatch[1];
-                                  return (
-                                    <span key={index}>
-                                      <Link
-                                        to={`/hashtag/${hashtagName}`}
-                                        className={cn("hover:underline font-medium", isDark ? "text-blue-500" : "text-blue-500")}
-                                        onClick={(e) => e.stopPropagation()}
-                                      >
-                                        #{hashtagName}
-                                      </Link>
-                                      {word.substring(hashtagMatch[0].length)}
-                                    </span>
-                                  );
-                                }
-
-                                // Check if word is a mention
-                                const mentionMatch = word.match(/^@(\w+)/);
-                                if (mentionMatch) {
-                                  const username = mentionMatch[1];
-                                  return (
-                                    <span key={index}>
-                                      <Link
-                                        to={`/search?q=@${username}`}
-                                        className={cn("hover:underline font-medium", isDark ? "text-blue-500" : "text-blue-500")}
-                                        onClick={(e) => e.stopPropagation()}
-                                      >
-                                        @{username}
-                                      </Link>
-                                      {word.substring(mentionMatch[0].length)}
-                                    </span>
-                                  );
-                                }
-
-                                return <span key={index}>{word}</span>;
-                              })}
-                            </div>
-                          )}
-
-                          {/* Quote Retweet: Show original post in container */}
-                          {post.is_quote_retweet && post.original_post && (
-                            <QuoteTweetCard
-                              post={post.original_post}
-                              isDark={isDark}
-                              onClick={() => navigate(`/post/${post.original_post?.id}`)}
-                            />
-                          )}
-
-                          {/* Media Content - Only for non-quote retweets */}
-                          {!post.is_quote_retweet && post.media && post.media.length > 0 && (
-                            <div className={cn(
-                              "grid gap-0.5 rounded-2xl overflow-hidden mb-3 border",
-                              isDark ? 'border-[#1C1F20]' : 'border-[0.1px] border-gray-200',
-                              post.media.length === 1 ? 'grid-cols-1' : 'grid-cols-2'
-                            )}>
-                              {post.media.map((media: { type: 'image' | 'video'; url: string; alt?: string }, index: number) => (
-                                <div
-                                  key={index}
-                                  className="relative cursor-pointer overflow-hidden"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    if (media.type === 'image') {
-                                      setLightboxImages(post.media || []);
-                                      setSelectedImageIndex(index);
-                                      setLightboxOpen(true);
-                                    }
-                                  }}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-1">
+                              <div className="flex items-center gap-1 overflow-hidden">
+                                <Link
+                                  to={`/profile/${post.author.id}`}
+                                  className="font-bold hover:underline truncate text-base"
+                                  onClick={(e) => e.stopPropagation()}
                                 >
-                                  {media.type === 'image' ? (
-                                    <img
-                                      src={media.url}
-                                      alt={media.alt || ''}
-                                      className={cn(
-                                        "w-full object-cover",
-                                        post.media.length === 1 ? "max-h-[600px]" : "h-[300px]"
-                                      )}
-                                    />
-                                  ) : (
-                                    <EnhancedVideoPlayer
-                                      src={media.url}
-                                      className={cn(
-                                        "w-full",
-                                        post.media.length === 1 ? "max-h-[600px]" : "h-[300px]"
-                                      )}
-                                    />
-                                  )}
-                                </div>
-                              ))}
+                                  {post.author.name}
+                                </Link>
+                                {post.author.verified && (
+                                  <span className="text-info-500 shrink-0">
+                                    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><g><path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .495.083.965.238 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z" /></g></svg>
+                                  </span>
+                                )}
+                                <span className="text-gray-500 text-sm truncate">@{post.author.username}</span>
+                                <span className="text-gray-500 text-sm">·</span>
+                                <span className="text-gray-500 text-sm hover:underline">{formatTime(post.created_at)}</span>
+                              </div>
+                              <button className="text-gray-500 hover:text-info-500 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
+                                <span className="sr-only">More</span>
+                                <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><g><path d="M3 12c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm9 2c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm7 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"></path></g></svg>
+                              </button>
                             </div>
-                          )}
 
-                          {/* Post Actions */}
-                          <EnhancedPostCardInteractions
-                            postId={post.id}
-                            initialLikes={post.likes_count}
-                            initialRetweets={post.retweets_count}
-                            initialReplies={post.replies_count}
-                            isLiked={post.has_liked}
-                            isRetweeted={post.has_retweeted}
-                            isBookmarked={post.has_bookmarked}
-                            onLike={() => handleLike(post.id)}
-                            onRetweet={() => handleRetweet(post.id)}
-                            onReply={() => navigate(`/post/${post.id}`)}
-                            onShare={() => handleShare(post)}
-                            onBookmark={() => handleBookmark(post.id)}
-                          />
+                            {post.content && (
+                              <div
+                                className={cn(
+                                  'text-[15px] leading-normal mb-3 whitespace-pre-wrap wrap-break-word',
+                                  isDark ? 'text-white' : 'text-gray-900'
+                                )}
+                              >
+                                {post.content.split(/(\s+)/).map((word, index) => {
+                                  const hashtagMatch = word.match(/^#(\w+)/);
+                                  if (hashtagMatch) {
+                                    const hashtagName = hashtagMatch[1];
+                                    return (
+                                      <span key={index}>
+                                        <Link
+                                          to={`/hashtag/${hashtagName}`}
+                                          className={cn("hover:underline font-medium", isDark ? "text-blue-500" : "text-blue-500")}
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          #{hashtagName}
+                                        </Link>
+                                        {word.substring(hashtagMatch[0].length)}
+                                      </span>
+                                    );
+                                  }
+
+                                  const mentionMatch = word.match(/^@(\w+)/);
+                                  if (mentionMatch) {
+                                    const username = mentionMatch[1];
+                                    return (
+                                      <span key={index}>
+                                        <Link
+                                          to={`/search?q=@${username}`}
+                                          className={cn("hover:underline font-medium", isDark ? "text-blue-500" : "text-blue-500")}
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          @{username}
+                                        </Link>
+                                        {word.substring(mentionMatch[0].length)}
+                                      </span>
+                                    );
+                                  }
+
+                                  return <span key={index}>{word}</span>;
+                                })}
+                              </div>
+                            )}
+
+                            {post.is_quote_retweet && post.original_post && (
+                              <QuoteTweetCard
+                                post={post.original_post}
+                                isDark={isDark}
+                                onClick={() => navigate(`/post/${post.original_post?.id}`)}
+                              />
+                            )}
+
+                            {!post.is_quote_retweet && post.media && post.media.length > 0 && (
+                              <div className={cn(
+                                "grid gap-0.5 rounded-2xl overflow-hidden mb-3 border",
+                                isDark ? 'border-[#1C1F20]' : 'border-[0.1px] border-gray-200',
+                                post.media.length === 1 ? 'grid-cols-1' : 'grid-cols-2'
+                              )}>
+                                {post.media.map((media: { type: 'image' | 'video'; url: string; alt?: string }, index: number) => (
+                                  <div
+                                    key={index}
+                                    className="relative cursor-pointer overflow-hidden"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      if (media.type === 'image') {
+                                        setLightboxImages(post.media || []);
+                                        setSelectedImageIndex(index);
+                                        setLightboxOpen(true);
+                                      }
+                                    }}
+                                  >
+                                    {media.type === 'image' ? (
+                                      <img
+                                        src={media.url}
+                                        alt={media.alt || ''}
+                                        className={cn(
+                                          "w-full object-cover",
+                                          (post.media?.length ?? 0) === 1 ? "max-h-[600px]" : "h-[300px]"
+                                        )}
+                                      />
+                                    ) : (
+                                      <EnhancedVideoPlayer
+                                        src={media.url}
+                                        className={cn(
+                                          "w-full",
+                                          (post.media?.length ?? 0) === 1 ? "max-h-[600px]" : "h-[300px]"
+                                        )}
+                                      />
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            <div onClick={(e) => e.stopPropagation()}>
+                              <EnhancedPostCardInteractions
+                                postId={effectivePostId}
+                                initialLikes={post.likes_count}
+                                initialRetweets={post.retweets_count}
+                                initialReplies={post.replies_count}
+                                isLiked={post.has_liked}
+                                isRetweeted={post.has_retweeted}
+                                onLike={() => handleLike(effectivePostId)}
+                                onRetweet={() => handleRetweet(effectivePostId)}
+                                onComment={() => navigate(`/post/${effectivePostId}`)}
+                                onReply={() => navigate(`/post/${effectivePostId}/answers`)}
+                              />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </EnhancedPostCard>
-                  </Animate>
-                ))}
+                      </EnhancedPostCard>
+                    </Animate>
+                  );
+                })}
               </div>
             )}
             <div ref={sentinelRef} className="h-10" />
@@ -779,22 +844,15 @@ export default function Feed() {
             recommendedCompanies={recommendedCompanies}
             recommendedUsersLoading={recommendedUsersLoading}
             recommendedUsers={recommendedUsers}
-            jobsLoading={jobsLoading}
-            jobs={jobs}
             navigate={navigate}
-            formatTime={formatTime}
-            handleAtSymbolClick={handleAtSymbolClick}
           />
         )}
-
       </div>
 
-      {/* Grok Floating Action Menu */}
-      <div className="fixed bottom-4 right-4 z-40">      <FloatingActionMenu />
+      <div className="fixed bottom-4 right-4 z-40">
+        <FloatingActionMenu />
       </div>
 
-
-      {/* Image Lightbox Modal */}
       <ImageLightbox
         images={lightboxImages}
         isOpen={lightboxOpen}
@@ -802,8 +860,6 @@ export default function Feed() {
         initialIndex={selectedImageIndex}
       />
 
-
-      {/* Post Creation Modal */}
       {showPostModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white dark:bg-black rounded-3xl shadow-lg w-full max-w-lg mx-4 p-6 relative">

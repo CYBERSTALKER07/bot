@@ -144,6 +144,7 @@ export default function Stepper({
                 <div className={`mt-8 sm:mt-10 flex ${currentStep !== 1 ? 'justify-between' : 'justify-end'}`}>
                   {currentStep !== 1 && (
                     <button
+                      type="button"
                       onClick={handleBack}
                       className={`duration-350 rounded px-3 sm:px-4 py-2 sm:py-2.5 transition text-sm sm:text-base font-medium ${currentStep === 1
                         ? 'pointer-events-none opacity-50 text-neutral-400'
@@ -155,6 +156,7 @@ export default function Stepper({
                     </button>
                   )}
                   <button
+                    type="button"
                     onClick={isLastStep ? handleComplete : handleNext}
                     className="duration-350 flex items-center justify-center rounded-full bg-info-600 dark:bg-info-600 py-2 sm:py-2.5 px-4 sm:px-5 font-medium text-sm sm:text-base tracking-tight text-white transition hover:bg-info-700 dark:hover:bg-info-700 active:bg-info-800 dark:active:bg-info-800"
                     {...nextButtonProps}

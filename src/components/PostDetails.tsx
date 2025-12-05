@@ -15,7 +15,8 @@ import {
   Eye,
   CheckCircle,
   Flag,
-  UserX
+  UserX,
+  MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -59,9 +60,11 @@ interface PostDetail {
 }
 
 import { useBreakpoint } from '@openai/apps-sdk-ui/hooks/useBreakpoints';
+import { useLocation } from 'react-router-dom';
 
 export default function PostDetails() {
   const { postId } = useParams<{ postId: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isDark } = useTheme();
@@ -76,8 +79,13 @@ export default function PostDetails() {
 
   const [isLikeLoading, setIsLikeLoading] = useState(false);
 
+  // Extract the real post ID (remove retweet_ prefix if present)
+  const effectivePostId = postId?.startsWith('retweet_')
+    ? postId.substring(8)
+    : postId;
+
   // Use the new usePostDetail hook
-  const { data: postData, isLoading: loading, error } = usePostDetail(postId, user?.id);
+  const { data: postData, isLoading: loading, error } = usePostDetail(effectivePostId, user?.id);
   const likePostMutation = useLikePost();
   const unlikePostMutation = useUnlikePost();
 
@@ -87,6 +95,20 @@ export default function PostDetails() {
       setPost(postData as PostDetail);
     }
   }, [postData]);
+
+  // Handle auto-focus on reply
+  useEffect(() => {
+    if (location.state?.focusReply) {
+      // Small timeout to ensure DOM is ready
+      setTimeout(() => {
+        const commentInput = document.getElementById('comment-input');
+        if (commentInput) {
+          commentInput.focus();
+          commentInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 500);
+    }
+  }, [location.state]);
 
   // Handle like/unlike post
   const handleLikePost = async () => {
@@ -382,7 +404,12 @@ export default function PostDetails() {
                     isDark ? 'border-gray-800' : 'border-gray-200'
                   )}>
                     <Button
-                      onClick={() => document.getElementById('comment-input')?.focus()}
+                      onClick={() => {
+                        const commentsSection = document.getElementById('comments-section');
+                        if (commentsSection) {
+                          commentsSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }}
                       className={cn(
                         'flex items-center space-x-2 px-4 py-2 rounded-full transition-colors',
                         isDark
@@ -392,6 +419,19 @@ export default function PostDetails() {
                     >
                       <MessageCircle className="w-5 h-5" />
                       <span className="text-sm">{post.comments_count || ''}</span>
+                    </Button>
+
+                    <Button
+                      onClick={() => navigate(`/post/${effectivePostId}/answers`)}
+                      className={cn(
+                        'flex items-center space-x-2 px-4 py-2 rounded-full transition-colors',
+                        isDark
+                          ? 'text-gray-400 hover:text-info-400 hover:bg-info-500/10'
+                          : 'text-gray-600 hover:text-info-600 hover:bg-info-500/10'
+                      )}
+                    >
+                      <MessageSquare className="w-5 h-5" />
+                      <span className="text-sm">Reply</span>
                     </Button>
 
                     <Button
@@ -491,7 +531,9 @@ export default function PostDetails() {
 
             {/* Comments Section - Mobile/Tablet */}
             {isMobile && (
-              <Comments postId={postId!} className={cn('border-t', isDark ? 'border-gray-800' : 'border-gray-200')} />
+              <div id="comments-section">
+                <Comments postId={effectivePostId!} className={cn('border-t', isDark ? 'border-gray-800' : 'border-gray-200')} />
+              </div>
             )}
           </div>
         </div>
@@ -502,7 +544,9 @@ export default function PostDetails() {
             'hidden lg:block w-128 border-l ml-3 rounded-2xl sticky top-0 h-screen overflow-y-auto',
             isDark ? 'border-gray-800' : 'border-gray-200'
           )}>
-            <Comments postId={postId!} className="h-full" />
+            <div id="comments-section" className="h-full">
+              <Comments postId={effectivePostId!} className="h-full" />
+            </div>
           </aside>
         )}
       </div>

@@ -88,7 +88,13 @@ function DockItem({
                     ? isDark
                         ? "bg-white text-black shadow-lg shadow-gray-800/50"
                         : "bg-black text-white shadow-lg shadow-gray-500/50"
-                    : "bg-black text-white border-gray-900 border-[0.1px] shadow-2xl shadow-gray-500/50",
+                    : "bg-black text-white  border-[0.1px] shadow-2xl shadow-gray-500/50",
+                "cursor-pointer",
+                !isActive
+                    ? isDark
+                        ? "bg-black text-white shadow-lg shadow-gray-800/50"
+                        : "bg-white text-black shadow-lg shadow-gray-500/50"
+                    : "bg-black text-white  border-[0.1px] shadow-2xl shadow-gray-500/50",
                 className
             )}
             tabIndex={0}

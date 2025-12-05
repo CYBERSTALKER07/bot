@@ -2,26 +2,25 @@ import { useState, useRef, useMemo, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
   Search as SearchIcon,
-  X as XIcon,
   ArrowLeft,
-  AtSign,
   Users as UsersIcon,
   Briefcase,
-  Calendar,
-  MapPin,
+  TrendingUp,
+  ChevronRight,
+  Filter,
+  Building2,
   Clock,
-  Hash,
-  Verified
+  Verified,
+  MoreHorizontal
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { cn } from '../lib/cva';
-import { useSearch, useMostFollowedUsers, useMostLikedPosts, useMatchedJobs } from '../hooks/useOptimizedQuery';
+import { useSearch, useMostLikedPosts } from '../hooks/useOptimizedQuery'; // Assuming matched hooks exist
 import { useDebounce } from '../hooks/useDebounce';
 import { useAuth } from '../context/AuthContext';
-import WhoToFollowCard from './WhoToFollowCard';
-import { SearchResultsListSkeleton, PostCardSkeleton } from './ui/Skeleton';
 import { supabase } from '../lib/supabase';
 
+// --- Types ---
 interface SearchResult {
   id: string;
   type: 'user' | 'job' | 'post' | 'company' | 'hashtag';
@@ -30,849 +29,518 @@ interface SearchResult {
   description: string;
   avatar?: string;
   verified?: boolean;
-  engagement?: {
-    likes?: number;
-    replies?: number;
-  };
 }
 
-interface SearchResultData {
-  users?: Array<{ id: string; full_name: string; username: string; bio?: string; avatar_url?: string; verified?: boolean }>;
-  posts?: Array<{ id: string; content: string; profiles?: Array<{ full_name: string; username: string; avatar_url?: string }> }>;
-  jobs?: Array<{ id: string; title: string; company: string; location: string; type?: string }>;
-  companies?: Array<{ id: string; name: string; industry?: string; description?: string; logo_url?: string }>;
-  hashtags?: Array<{ id: string; name: string; usage_count: number; trending_score: number }>;
-}
+// --- Constants & Styles ---
+const COLORS = {
+  pink: 'bg-[#F472B6] text-black',
+  orange: 'bg-[#FB923C] text-black',
+  teal: 'bg-[#2DD4BF] text-black',
+  verified: 'text-[#2DD4BF]',
+};
 
+// CSS Injection for Scrollbars & Glassmorphism
 const styles = `
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(107, 114, 128, 0.5) transparent;
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
-
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+  .dark .glass-panel {
+    background: rgba(15, 15, 17, 0.85);
   }
-
-  ::-webkit-scrollbar-track {
-    background: transparent;
+  @keyframes shimmer {
+    0% { opacity: 0.5; transform: translateX(-5%); }
+    50% { opacity: 1; transform: translateX(0); }
+    100% { opacity: 0.5; transform: translateX(-5%); }
   }
-
-  ::-webkit-scrollbar-thumb {
-    background: rgba(107, 114, 128, 0.5);
-    border-radius: 4px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(107, 114, 128, 0.7);
-  }
-
-  .search-result {
-    transition: background-color 0.15s ease;
-  }
-
-  .search-result:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-  }
-
-  .search-input::placeholder {
-    color: rgba(107, 114, 128, 0.7);
-  }
-
-  .at-symbol {
-    color: #3b82f6;
-    font-weight: 600;
-  }
-
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-
-  @media (max-width: 640px) {
-    .search-sidebar {
-      display: none;
-    }
-  }
+  .glass-pulse { animation: shimmer 2s infinite ease-in-out; }
 `;
 
+// --- GLASSMORPHIC SKELETONS ---
+
+const GlassBlock = ({ className, rounded = "rounded-full" }: { className?: string, rounded?: string }) => (
+  <div className={cn(
+    "glass-pulse bg-gray-200/50 dark:bg-white/5 backdrop-blur-md border border-white/20 dark:border-white/5",
+    rounded, className
+  )} />
+);
+
+const HeroSkeleton = () => (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {[1, 2].map(i => (
+      <div key={i} className="h-48 rounded-[32px] border border-gray-100 dark:border-gray-800 bg-white/40 dark:bg-white/5 backdrop-blur-sm p-8 flex flex-col justify-between">
+        <div className="space-y-4">
+          <GlassBlock className="h-12 w-24 rounded-2xl" />
+          <GlassBlock className="h-4 w-32 rounded-lg" />
+        </div>
+        <GlassBlock className="h-24 w-24 rounded-full self-end opacity-10" />
+      </div>
+    ))}
+  </div>
+);
+
+const PostSkeleton = () => (
+  <div className="p-6 rounded-[32px] border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#18181B] space-y-5">
+    <div className="flex gap-4">
+      <GlassBlock className="w-14 h-14 rounded-full shrink-0" />
+      <div className="space-y-2 flex-1 pt-2">
+        <GlassBlock className="h-4 w-32 rounded-lg" />
+        <GlassBlock className="h-3 w-20 rounded-lg" />
+      </div>
+    </div>
+    <div className="space-y-3 pl-18">
+      <GlassBlock className="h-3 w-full rounded-lg" />
+      <GlassBlock className="h-3 w-5/6 rounded-lg" />
+      <GlassBlock className="h-3 w-4/6 rounded-lg" />
+    </div>
+  </div>
+);
+
+const SearchResultSkeleton = () => (
+  <div className="p-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-white/5 mb-3 flex items-center gap-4">
+    <GlassBlock className="w-14 h-14 rounded-full shrink-0" />
+    <div className="flex-1 space-y-2">
+      <GlassBlock className="h-4 w-40 rounded-lg" />
+      <GlassBlock className="h-3 w-24 rounded-lg" />
+    </div>
+    <GlassBlock className="w-8 h-8 rounded-full" />
+  </div>
+);
+
+const SidebarItemSkeleton = ({ type = 'circle' }: { type?: 'circle' | 'square' }) => (
+  <div className="flex items-center gap-3 py-1">
+    <GlassBlock className={cn("w-10 h-10 shrink-0", type === 'square' ? "rounded-xl" : "rounded-full")} />
+    <div className="flex-1 space-y-2">
+      <GlassBlock className="h-3 w-24 rounded-lg" />
+      <GlassBlock className="h-2 w-16 rounded-lg" />
+    </div>
+  </div>
+);
+
+const PromoSkeleton = () => (
+  <div className="h-48 rounded-[32px] border border-gray-100 dark:border-gray-800 bg-white/40 dark:bg-white/5 backdrop-blur-sm p-6 flex flex-col justify-center space-y-4 relative overflow-hidden">
+    <GlassBlock className="h-6 w-3/4 rounded-xl relative z-10" />
+    <GlassBlock className="h-6 w-1/2 rounded-xl relative z-10" />
+    <GlassBlock className="h-10 w-32 rounded-full mt-4 relative z-10" />
+    <div className="absolute -right-4 top-0 h-full w-24 bg-white/5 -skew-x-12" />
+  </div>
+);
+
+// --- Helper: Highlight Text ---
+const HighlightedText = ({ text, highlight }: { text: string; highlight: string }) => {
+  if (!highlight.trim()) return <span className="truncate">{text}</span>;
+  const regex = new RegExp(`(${highlight})`, 'gi');
+  const parts = text.split(regex);
+  return (
+    <span className="truncate">
+      {parts.map((part, i) =>
+        regex.test(part) ? (
+          <span key={i} className="text-[#F472B6] font-bold bg-[#F472B6]/10 rounded-sm px-0.5">
+            {part}
+          </span>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </span>
+  );
+};
+
 export default function SearchPage() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { isDark } = useTheme();
   const { user } = useAuth();
+
   const inputRef = useRef<HTMLInputElement>(null);
   const [searchInput, setSearchInput] = useState(searchParams.get('q') || '');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [activeTab, setActiveTab] = useState('Top');
+  const [recentSearches, setRecentSearches] = useState(['Product Design', '#RemoteWork', 'Fashion Tech', 'Google']);
 
   const tabs = [
     { id: 'Top', label: 'Top' },
     { id: 'People', label: 'People' },
     { id: 'Jobs', label: 'Jobs' },
-    { id: 'Posts', label: 'Posts' },
     { id: 'Companies', label: 'Companies' }
   ];
 
-  // Parse search input to detect @ symbol
-  const isUsernameSearch = searchInput.startsWith('@');
-  const cleanSearchQuery = searchInput.startsWith('@') ? searchInput.slice(1) : searchInput;
-
-  const debouncedQuery = useDebounce(cleanSearchQuery, 300);
+  const debouncedQuery = useDebounce(searchInput, 300);
   const { data: searchResults, isLoading: loading } = useSearch(debouncedQuery);
+  const { data: trendingPosts = [], isLoading: isLoadingPosts } = useMostLikedPosts(3, user?.id);
 
-  // Fetch most followed users for sidebar
-  const { data: mostFollowedUsers = [] } = useMostFollowedUsers(5);
-
-  // Fallback: Fetch regular users if mostFollowedUsers is empty
-  const [suggestedUsers, setSuggestedUsers] = useState<any[]>([]);
+  // Sidebar Data State
+  const [suggestedPeople, setSuggestedPeople] = useState<any[]>([]);
   const [sidebarCompanies, setSidebarCompanies] = useState<any[]>([]);
+  const [isLoadingSidebar, setIsLoadingSidebar] = useState(true);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      if (mostFollowedUsers.length > 0) {
-        setSuggestedUsers(mostFollowedUsers);
-        return;
-      }
-
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('id, full_name, username, avatar_url, bio, verified')
-          .not('username', 'is', null)
-          .limit(10);
-
-        if (!error && data) {
-          setSuggestedUsers(data);
-        }
-      } catch (err) {
-        console.error('Error fetching users:', err);
-      }
-    };
-
-    fetchUsers();
-  }, [mostFollowedUsers]);
-
-  // Fetch companies for left sidebar
-  useEffect(() => {
-    const fetchCompanies = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('companies')
-          .select('id, name, logo_url, industry')
-          .limit(5);
-
-        if (!error && data) {
-          setSidebarCompanies(data);
-        }
-      } catch (err) {
-        console.error('Error fetching companies:', err);
-      }
-    };
-
-    fetchCompanies();
-  }, []);
-
-  // Fetch trending content for empty state
-  const { data: trendingPosts = [], isLoading: isLoadingPosts } = useMostLikedPosts(4, user?.id);
-  const { data: recentJobs = [] } = useMatchedJobs(undefined, 4);
-  const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
-
-  // Fetch upcoming events
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('employer_events')
-          .select('id, title, event_date, location, employer_id, status')
-          .gte('event_date', new Date().toISOString())
-          .eq('status', 'upcoming')
-          .order('event_date', { ascending: true })
-          .limit(3);
-
-        if (!error && data) {
-          setUpcomingEvents(data);
-        }
-      } catch (err) {
-        console.error('Error fetching events:', err);
-      }
-    };
-
-    fetchEvents();
-  }, []);
-
-
-  // Filter and sort results based on search type
-  const allResults: SearchResult[] = useMemo(() => {
-    const typedResults = searchResults as SearchResultData | undefined;
-    if (!typedResults) return [];
-
-    const results: SearchResult[] = [];
-
-    // Add users
-    (typedResults.users || []).forEach((user) => {
-      results.push({
-        id: user.id,
-        type: 'user',
-        title: user.full_name,
-        subtitle: `@${user.username}`,
-        description: user.bio || '',
-        avatar: user.avatar_url,
-        verified: user.verified || false,
-      });
-    });
-
-    // Add posts
-    (typedResults.posts || []).forEach((post: any) => {
-      const profile = post.profiles;
-      results.push({
-        id: post.id,
-        type: 'post',
-        title: post.content.substring(0, 100) + (post.content.length > 100 ? '...' : ''),
-        subtitle: `by @${profile?.username || 'user'}`,
-        description: post.content,
-        avatar: profile?.avatar_url,
-      });
-    });
-
-    // Add jobs
-    (typedResults.jobs || []).forEach((job: any) => {
-      results.push({
-        id: job.id,
-        type: 'job',
-        title: job.title,
-        subtitle: job.company,
-        description: `${job.location} • ${job.type || 'Full-time'}`,
-      });
-    });
-
-    // Add companies
-    (typedResults.companies || []).forEach((company: any) => {
-      results.push({
-        id: company.id,
-        type: 'company',
-        title: company.name,
-        subtitle: company.description || '',
-        description: company.website || '',
-        avatar: company.logo_url,
-      });
-    });
-
-    // Add hashtags
-    (typedResults.hashtags || []).forEach((hashtag: any) => {
-      results.push({
-        id: hashtag.id,
-        type: 'hashtag',
-        title: `#${hashtag.name}`,
-        subtitle: `${hashtag.usage_count || 0} posts`,
-        description: 'Trending hashtag',
-      });
-    });
-
-    // If searching by username (@), prioritize exact username matches for users
-    if (isUsernameSearch && cleanSearchQuery) {
-      const userResults = results.filter(r => r.type === 'user');
-      const otherResults = results.filter(r => r.type !== 'user');
-
-      userResults.sort((a, b) => {
-        const aUsername = a.subtitle?.slice(1) || '';
-        const bUsername = b.subtitle?.slice(1) || '';
-
-        // Exact match first
-        if (aUsername.toLowerCase() === cleanSearchQuery.toLowerCase()) return -1;
-        if (bUsername.toLowerCase() === cleanSearchQuery.toLowerCase()) return 1;
-
-        // Starts with query
-        if (aUsername.toLowerCase().startsWith(cleanSearchQuery.toLowerCase())) return -1;
-        if (bUsername.toLowerCase().startsWith(cleanSearchQuery.toLowerCase())) return 1;
-
-        // Default order
-        return 0;
-      });
-
-      return [...userResults, ...otherResults];
+    const fetchData = async () => {
+      setIsLoadingSidebar(true);
+      await new Promise(r => setTimeout(r, 1200)); // Simulate skeleton
+      const { data: people } = await supabase.from('profiles').select('*').limit(3);
+      if (people) setSuggestedPeople(people);
+      const { data: companies } = await supabase.from('companies').select('*').limit(3);
+      if (companies) setSidebarCompanies(companies);
+      setIsLoadingSidebar(false);
     }
+    fetchData();
+  }, []);
 
-    return results;
-  }, [searchResults, isUsernameSearch, cleanSearchQuery]);
+  // Update URL on search
+  useEffect(() => {
+    if (debouncedQuery) setSearchParams({ q: debouncedQuery });
+    else setSearchParams({});
+  }, [debouncedQuery, setSearchParams]);
 
   const filteredResults = useMemo(() => {
-    if (activeTab === 'Top') return allResults;
-    if (activeTab === 'People') return allResults.filter(r => r.type === 'user');
-    if (activeTab === 'Jobs') return allResults.filter(r => r.type === 'job');
-    if (activeTab === 'Posts') return allResults.filter(r => r.type === 'post' || r.type === 'hashtag');
-    if (activeTab === 'Companies') return allResults.filter(r => r.type === 'company');
-    return allResults;
-  }, [allResults, activeTab]);
+    const raw = searchResults as any;
+    if (!raw) return [];
 
-  const handleClearSearch = () => {
-    setSearchInput('');
-    inputRef.current?.focus();
-  };
+    let list: SearchResult[] = [];
+    if (raw.users) raw.users.forEach((u: any) => list.push({ id: u.id, type: 'user', title: u.full_name, subtitle: `@${u.username}`, description: u.bio, avatar: u.avatar_url, verified: u.verified }));
+    if (raw.jobs) raw.jobs.forEach((j: any) => list.push({ id: j.id, type: 'job', title: j.title, subtitle: j.company, description: j.location }));
+    if (raw.companies) raw.companies.forEach((c: any) => list.push({ id: c.id, type: 'company', title: c.name, subtitle: c.industry, description: c.description, avatar: c.logo_url }));
 
-  const handleResultClick = (result: SearchResult) => {
-    switch (result.type) {
-      case 'user':
-        navigate(`/profile/${result.id}`);
-        break;
-      case 'job':
-        navigate(`/jobs/${result.id}`);
-        break;
-      case 'post':
-        navigate(`/post/${result.id}`);
-        break;
-      case 'company':
-        navigate(`/company/${result.id}`);
-        break;
-      case 'hashtag':
-        navigate(`/hashtag/${result.title.replace('#', '')}`);
-        break;
-      default:
-        console.warn('Unknown result type:', result.type);
+    if (activeTab !== 'Top') {
+      if (activeTab === 'People') list = list.filter(x => x.type === 'user');
+      if (activeTab === 'Jobs') list = list.filter(x => x.type === 'job');
+      if (activeTab === 'Companies') list = list.filter(x => x.type === 'company');
     }
-  };
-
-  const handleAtSymbolClick = () => {
-    setSearchInput('@');
-    inputRef.current?.focus();
-  };
-
-  useEffect(() => {
-    if (searchInput) {
-      inputRef.current?.focus();
-    }
-  }, [searchInput]);
+    return list;
+  }, [searchResults, activeTab]);
 
   return (
-    <div className={cn(
-      'min-h-screen',
-      isDark ? 'bg-black text-white' : 'bg-white text-black'
-    )}>
+    <div className={cn('min-h-screen pb-20 font-sans transition-colors duration-300', isDark ? 'bg-[#0f0f11] text-gray-100' : 'bg-[#FAFAFA] text-gray-900')}>
       <style>{styles}</style>
 
-      {/* Header */}
+      {/* --- Sticky Header --- */}
       <div className={cn(
-        'sticky top-0 z-10 backdrop-transparent border-b transition-all duration-300 ',
-        isDark ? ' border-none' : ' border-none'
+        'sticky top-0 z-50 border-b transition-all duration-300 glass-panel',
+        isDark ? 'border-gray-800/50' : 'border-gray-200/50'
       )}>
-        <div className="max-w-2xl mx-auto px-4 py-3">
-          {/* Search Bar Container */}
-          <div className={cn(
-            'flex items-center gap-3 px-4 py-3 rounded-[24px] transition-all backdrop-blur-xl duration-200',
-            isSearchFocused
-              ? isDark
-                ? 'bg-black border-2 border-gray-700'
-                : 'bg-white border-2 border-gray-400'
-              : isDark
-                ? 'bg-gray-900/50 border-[0.1px] border-gray-800 hover:border-gray-700'
-                : 'bg-gray-100/50 border-[0.1px] border-gray-200 hover:border-gray-300'
-          )}>
-            {/* Mobile Back Button */}
-            <button
-              onClick={() => navigate(-1)}
-              className={cn(
-                'sm:hidden p-1 rounded-full transition-colors',
-                isDark ? 'hover:bg-gray-700/50' : 'hover:bg-gray-200'
-              )}
-              title="Go back"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
+        <div className="max-w-5xl mx-auto px-4 py-4 space-y-4">
 
-            <SearchIcon className={cn(
-              'w-5 h-5 shrink-0 transition-colors',
-              isSearchFocused
-                ? isDark ? 'text-gray-300' : 'text-gray-600'
-                : isDark ? 'text-gray-500' : 'text-gray-400'
-            )} />
-
-            <input
-              ref={inputRef}
-              type="text"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onFocus={() => setIsSearchFocused(true)}
-              onBlur={() => setIsSearchFocused(false)}
-              placeholder="Search by name or type @ for username"
-              className={cn(
-                'flex-1 bg-transparent outline-hidden text-base search-input placeholder:text-gray-500',
-                isDark ? 'text-white' : 'text-black'
-              )}
-            />
-
-            {/* @ Symbol Quick Button */}
-            {!searchInput && (
-              <button
-                onClick={handleAtSymbolClick}
-                title="Search by username"
-                className={cn(
-                  'p-2 rounded-full transition-all',
-                  isDark
-                    ? 'text-gray-500 hover:text-gray-300 hover:bg-gray-800'
-                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-200'
+          {/* Search Input Area */}
+          <div className="flex justify-center w-full">
+            <div className="w-full relative group">
+              <div className={cn(
+                'flex items-center gap-3 px-5 py-3.5 rounded-2xl transition-all duration-300 shadow-sm',
+                isSearchFocused
+                  ? isDark ? 'bg-[#18181B] border border-[#F472B6] ring-2 ring-[#F472B6]/20' : 'bg-white border border-[#F472B6] ring-2 ring-[#F472B6]/20'
+                  : isDark ? 'bg-[#18181B] border border-gray-800 hover:border-gray-700' : 'bg-white border border-gray-200 hover:border-gray-300'
+              )}>
+                {searchInput ? (
+                  <button onClick={() => setSearchInput('')} className="p-1 -ml-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                    <ArrowLeft className="w-5 h-5 text-[#F472B6]" />
+                  </button>
+                ) : (
+                  <SearchIcon className={cn('w-5 h-5 transition-colors', isSearchFocused ? 'text-[#F472B6]' : 'text-gray-400')} />
                 )}
-              >
-                <AtSign className="w-5 h-5" />
-              </button>
-            )}
 
-            {searchInput && (
-              <button
-                onClick={handleClearSearch}
-                title="Clear search"
-                className={cn(
-                  'p-1 rounded-full transition-colors shrink-0',
-                  isDark
-                    ? 'text-gray-500 hover:text-white hover:bg-gray-800'
-                    : 'text-gray-400 hover:text-black hover:bg-gray-200'
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onFocus={() => setIsSearchFocused(true)}
+                  onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
+                  placeholder="Search creators, jobs, or tags..."
+                  className="flex-1 bg-transparent outline-none text-[16px] placeholder:text-gray-500 font-medium"
+                />
+
+                {searchInput && (
+                  <button
+                    onClick={() => setSearchInput('')}
+                    className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <span className="sr-only">Clear</span>
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                  </button>
                 )}
-              >
-                <XIcon className="w-5 h-5" />
-              </button>
-            )}
+              </div>
+
+              {/* Recent Searches Dropdown */}
+              {isSearchFocused && !searchInput && (
+                <div className={cn(
+                  "absolute top-full left-0 right-0 mt-3 p-2 rounded-3xl border shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top",
+                  isDark ? "bg-[#18181B] border-gray-800" : "bg-white border-gray-100"
+                )}>
+                  <div className="flex items-center justify-between px-4 py-2">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">Recent</h3>
+                    <button className="text-xs text-[#F472B6] font-semibold hover:underline">Clear all</button>
+                  </div>
+                  {recentSearches.map((term, i) => (
+                    <button key={i} onClick={() => setSearchInput(term)} className={cn(
+                      "flex items-center justify-between w-full p-3 rounded-2xl transition-colors group",
+                      isDark ? "hover:bg-white/5" : "hover:bg-gray-50"
+                    )}>
+                      <div className="flex items-center gap-3">
+                        <div className={cn("p-2 rounded-full", isDark ? "bg-white/5 group-hover:bg-[#F472B6]/20" : "bg-gray-100 group-hover:bg-[#F472B6]/10")}>
+                          <Clock className="w-4 h-4 text-gray-400 group-hover:text-[#F472B6]" />
+                        </div>
+                        <span className="font-medium">{term}</span>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Search Mode Indicator */}
+          {/* Styled Tabs */}
           {searchInput && (
-            <div className={cn(
-              'mt-2 px-4 text-xs font-medium flex items-center gap-2',
-              isUsernameSearch
-                ? 'text-blue-400'
-                : isDark ? 'text-gray-500' : 'text-gray-500'
-            )}>
-              {isUsernameSearch ? (
-                <>
-                  <AtSign className="w-3 h-3" />
-                  <span>Searching by username</span>
-                </>
+            <div className="flex justify-center w-full animate-in slide-in-from-top-2 duration-300">
+              <div className="flex items-center gap-1 p-1.5 bg-gray-100 dark:bg-[#18181B] rounded-full border border-gray-200 dark:border-gray-800">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={cn(
+                      "px-6 py-2 rounded-full text-sm font-bold transition-all duration-300",
+                      activeTab === tab.id
+                        ? `${COLORS.pink} shadow-lg shadow-pink-500/20 scale-105`
+                        : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-300 hover:bg-gray-200/50 dark:hover:bg-white/5"
+                    )}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* --- Main Content Area --- */}
+      <div className="max-w-5xl mx-auto px-4 py-8 flex items-start gap-10">
+
+        {/* LEFT COLUMN (MAIN FEED) */}
+        <div className="flex-1 min-w-0">
+
+          {!searchInput ? (
+            /* --- DISCOVERY MODE --- */
+            <div className="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
+
+              {/* Bento Grid Stats */}
+              {isLoadingPosts ? (
+                <HeroSkeleton />
               ) : (
-                <span>Searching by name</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className={cn("group p-8 rounded-[32px] relative overflow-hidden flex flex-col justify-between h-48 transition-transform hover:scale-[1.02] cursor-pointer", COLORS.pink)}>
+                    <div className="relative z-10">
+                      <h3 className="text-4xl font-black tracking-tighter mb-1">27</h3>
+                      <p className="font-bold opacity-80 uppercase tracking-wide text-xs">Active Designers</p>
+                    </div>
+                    <UsersIcon className="absolute -bottom-6 -right-6 w-32 h-32 opacity-20 rotate-12 transition-transform group-hover:rotate-0" />
+                  </div>
+                  <div className={cn("group p-8 rounded-[32px] relative overflow-hidden flex flex-col justify-between h-48 transition-transform hover:scale-[1.02] cursor-pointer", COLORS.orange)}>
+                    <div className="relative z-10">
+                      <h3 className="text-4xl font-black tracking-tighter mb-1">19</h3>
+                      <p className="font-bold opacity-80 uppercase tracking-wide text-xs">Active Vacancies</p>
+                    </div>
+                    <TrendingUp className="absolute -bottom-6 -right-6 w-32 h-32 opacity-20 transition-transform group-hover:scale-110" />
+                  </div>
+                </div>
+              )}
+
+              {/* Trending Feed */}
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-black tracking-tight flex items-center gap-2">
+                    Latest Updates <span className="text-[#F472B6]">.</span>
+                  </h2>
+                </div>
+
+                <div className="grid grid-cols-1 gap-6">
+                  {isLoadingPosts
+                    ? [1, 2, 3].map(i => <PostSkeleton key={i} />)
+                    : trendingPosts.map((post: any) => (
+                      <div key={post.id} className={cn(
+                        "group p-6 rounded-[32px] border transition-all cursor-pointer",
+                        isDark ? "bg-[#18181B] border-gray-800 hover:border-gray-700 hover:shadow-2xl hover:shadow-black/50" : "bg-white border-gray-200 hover:border-[#F472B6]/30 hover:shadow-xl hover:shadow-[#F472B6]/5"
+                      )}>
+                        <div className="flex gap-4">
+                          <img src={post.author?.avatar_url} className="w-14 h-14 rounded-full object-cover border-2 border-transparent group-hover:border-[#F472B6] transition-colors" alt="" />
+                          <div className="flex-1">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h4 className="font-bold text-lg group-hover:text-[#F472B6] transition-colors">{post.author?.name}</h4>
+                                <p className={cn("text-sm font-medium", isDark ? "text-gray-500" : "text-gray-400")}>@{post.author?.username}</p>
+                              </div>
+                              <button className="text-gray-400 hover:text-[#F472B6]"><MoreHorizontal className="w-5 h-5" /></button>
+                            </div>
+                            <p className="mt-3 text-[15px] leading-relaxed line-clamp-3 opacity-90">{post.content}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* --- SEARCH RESULTS LIST --- */
+            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+              {!loading && (
+                <div className="flex items-center justify-between pb-2 px-1">
+                  <p className="text-sm font-medium text-gray-500">Found <span className="text-[#F472B6] font-bold">{filteredResults.length}</span> results</p>
+                  <button className="text-sm font-bold flex items-center gap-1.5 hover:text-[#F472B6] transition-colors bg-gray-100 dark:bg-[#18181B] px-3 py-1.5 rounded-lg">
+                    <Filter className="w-3.5 h-3.5" /> Filter
+                  </button>
+                </div>
+              )}
+
+              {loading ? (
+                [1, 2, 3, 4].map((i) => <SearchResultSkeleton key={i} />)
+              ) : filteredResults.length === 0 ? (
+                <div className="text-center py-24 rounded-[32px] border border-dashed border-gray-300 dark:border-gray-800 bg-gray-50/50 dark:bg-[#18181B]/50">
+                  <SearchIcon className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+                  <h3 className="text-lg font-bold">No results found</h3>
+                  <p className="text-sm text-gray-500">Try adjusting your search terms</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-3">
+                  {filteredResults.map((result) => (
+                    <div key={result.id} onClick={() => navigate(`/${result.type}/${result.id}`)} className={cn(
+                      "p-4 rounded-3xl border transition-all cursor-pointer relative group",
+                      isDark
+                        ? "bg-[#18181B] border-gray-800 hover:bg-[#202024] hover:border-gray-700"
+                        : "bg-white border-gray-100 hover:border-[#F472B6]/30 hover:shadow-lg hover:shadow-[#F472B6]/5"
+                    )}>
+                      <div className="flex items-center gap-4">
+                        <div className="relative shrink-0">
+                          <img
+                            src={result.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${result.title}`}
+                            alt={result.title}
+                            className={cn(
+                              "object-cover shadow-sm",
+                              result.type === 'company' ? "w-16 h-16 rounded-2xl" : "w-16 h-16 rounded-full"
+                            )}
+                          />
+                          <div className={cn(
+                            "absolute -bottom-1 -right-1 p-1.5 rounded-full border-[3px] shadow-sm",
+                            isDark ? "bg-[#18181B] border-[#18181B]" : "bg-white border-white"
+                          )}>
+                            {result.type === 'user' && <UsersIcon className="w-3 h-3 text-[#F472B6]" />}
+                            {result.type === 'job' && <Briefcase className="w-3 h-3 text-[#FB923C]" />}
+                            {result.type === 'company' && <Building2 className="w-3 h-3 text-[#2DD4BF]" />}
+                          </div>
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-0.5">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <h3 className="font-bold text-[17px] tracking-tight truncate">
+                                <HighlightedText text={result.title} highlight={searchInput} />
+                              </h3>
+                              {result.verified && <Verified className={cn("w-4 h-4 fill-current flex-shrink-0", COLORS.verified)} />}
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-[#F472B6] group-hover:translate-x-1 transition-all" />
+                          </div>
+                          <p className="text-sm text-gray-500 font-medium truncate">{result.subtitle}</p>
+                          <p className="text-xs text-gray-400 mt-1 truncate max-w-[90%]">{result.description}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           )}
         </div>
 
-        {/* Filter Tabs */}
-        {searchInput && (
-          <div className="max-w-2xl mx-auto w-full px-4 pb-3">
-            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={cn(
-                    "px-4 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap border",
-                    activeTab === tab.id
-                      ? "bg-[#D3FB52] text-black border-[#D3FB52]"
-                      : isDark
-                        ? "bg-transparent text-gray-400 border-gray-800 hover:border-gray-700 hover:text-white"
-                        : "bg-transparent text-gray-600 border-[0.1px] border-gray-200 hover:border-gray-300 hover:text-gray-900"
-                  )}
-                >
-                  {tab.label}
-                </button>
-              ))}
+        {/* RIGHT SIDEBAR (DESKTOP ONLY) */}
+        <div className="hidden lg:block w-[340px] shrink-0 sticky top-28 h-fit space-y-8 animate-in fade-in slide-in-from-right-8 duration-1000">
+
+          {/* 1. Trending People Widget */}
+          <div className={cn("p-6 rounded-[32px] border", isDark ? "bg-[#18181B] border-gray-800" : "bg-white border-gray-200")}>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-bold text-lg">Trending People</h3>
+              <button className="text-xs font-bold text-[#F472B6] hover:underline">View All</button>
             </div>
-          </div>
-        )}
 
-
-        {/* Main Content with Sidebar */}
-        {/* Main Content with Sidebar */}
-        {/* Main Content with Sidebar */}
-        <div className="max-w-[1400px] mx-auto flex justify-center mobile-container px-4 xl:px-0 py-4 pb-24 ios-bottom-safe">
-          {/* Left Spacer for Balance - Desktop Only */}
-          <div className="hidden xl:block w-[300px] flex-shrink-0"></div>
-
-          {/* Center Column */}
-          <div className="flex-1 max-w-[650px] min-w-0">
-            {!searchInput ? (
-              // Full Post Cards Display
-              <div className={cn('w-full max-w-2xl mx-auto border rounded-none border-t-0', isDark ? 'bg-black border-gray-800' : 'bg-white border-[0.1px] border-gray-200')}>
-                {/* Trending Posts as Full Cards */}
-                {isLoadingPosts ? (
-                  <div className="divide-y border-b rounded-2xl overflow-hidden border-gray-200 dark:border-gray-800">
-                    {[1, 2, 3].map((i) => (
-                      <PostCardSkeleton key={i} />
-                    ))}
-                  </div>
-                ) : trendingPosts.length > 0 ? (
-                  <div className={cn('divide-y border-b rounded-2xl overflow-hidden', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
-                    {trendingPosts.map((post: any) => (
-                      <div
-                        key={post.id}
-                        onClick={() => navigate(`/post/${post.id}`)}
-                        className={cn(
-                          'p-4 transition-colors cursor-pointer',
-                          isDark ? 'hover:bg-gray-900/30' : 'hover:bg-gray-50'
-                        )}
-                      >
-                        {/* Post Header */}
-                        <div className="flex items-start gap-3 mb-3">
-                          <img
-                            src={post.author?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.author?.username}`}
-                            alt={post.author?.name}
-                            className="w-10 h-10 rounded-full object-cover shrink-0"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-1.5">
-                              <p className={cn("font-bold text-sm truncate", isDark ? "text-white" : "text-gray-900")}>
-                                {post.author?.name}
-                              </p>
-                              {post.author?.verified && (
-                                <Verified className="w-3.5 h-3.5 text-[#D3FB52] fill-current" />
-                              )}
-                              <span className={cn('text-sm', isDark ? 'text-gray-500' : 'text-gray-500')}>
-                                @{post.author?.username} · {new Date(post.created_at).toLocaleDateString()}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Post Content */}
-                        <div className="pl-[52px]">
-                          <p className={cn('text-base whitespace-pre-wrap mb-3', isDark ? 'text-white' : 'text-black')}>
-                            {post.content}
-                          </p>
-
-                          {/* Post Media */}
-                          {post.media && post.media.length > 0 && (
-                            <div className={cn('mb-3 rounded-2xl overflow-hidden border', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
-                              {post.media[0].type === 'image' ? (
-                                <img
-                                  src={post.media[0].url}
-                                  alt={post.media[0].alt || 'Post image'}
-                                  className="w-full max-h-[500px] object-cover"
-                                />
-                              ) : (
-                                <video
-                                  src={post.media[0].url}
-                                  controls
-                                  className="w-full max-h-[500px]"
-                                />
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : null}
-
-                {/* Who to Follow Section - Horizontal Scroll */}
-                {suggestedUsers.length > 0 && (
-                  <div className={cn('border-t border-b py-6 mt-4', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
-                    <h2 className={cn("text-xl font-bold mb-4 flex items-center gap-2", isDark ? "text-white" : "text-gray-900")}>
-                      <UsersIcon className="w-5 h-5" />
-                      Who to Follow
-                    </h2>
-                    <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-                      {suggestedUsers.map((user: any) => (
-                        <WhoToFollowCard key={user.id} user={user} />
-                      ))}
+            <div className="space-y-5">
+              {isLoadingSidebar
+                ? [1, 2, 3].map(i => <SidebarItemSkeleton key={i} type="circle" />)
+                : suggestedPeople.map((p, i) => (
+                  <div key={i} onClick={() => navigate(`/profile/${p.id}`)} className="flex items-center gap-4 group cursor-pointer">
+                    <div className="relative">
+                      <img src={p.avatar_url} className="w-12 h-12 rounded-full bg-gray-200 object-cover border-2 border-transparent group-hover:border-[#F472B6] transition-colors" alt="" />
+                      <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#2DD4BF] border-[3px] border-white dark:border-[#18181B] rounded-full"></div>
                     </div>
-                  </div>
-                )}
-
-                {/* Jobs Section */}
-                {recentJobs.length > 0 && (
-                  <div className={cn('border-t mt-4', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
-                    <div className="pt-6">
-                      <h2 className={cn("text-xl font-bold mb-4 flex items-center gap-2", isDark ? "text-white" : "text-gray-900")}>
-                        <Briefcase className="w-5 h-5" />
-                        Recent Jobs
-                      </h2>
-                      <div className="space-y-3">
-                        {recentJobs.slice(0, 3).map((job: any) => (
-                          <button
-                            key={job.id}
-                            onClick={() => navigate(`/jobs/${job.id}`)}
-                            className={cn(
-                              'w-full p-4 rounded-2xl text-left transition-all border group',
-                              isDark
-                                ? 'bg-gray-900/50 hover:bg-gray-900 border-gray-800 hover:border-gray-700'
-                                : 'bg-white hover:bg-gray-50 border-[0.1px] border-gray-200 hover:border-gray-300'
-                            )}
-                          >
-                            <h3 className={cn("font-bold text-base mb-1 group-hover:text-[#D3FB52] transition-colors", isDark ? "text-white" : "text-gray-900")}>
-                              {job.title}
-                            </h3>
-                            <p className={cn('text-sm mb-2', isDark ? 'text-gray-400' : 'text-gray-600')}>
-                              {job.company}
-                            </p>
-                            <div className="flex items-center gap-2 text-xs text-gray-500">
-                              <MapPin className="w-3.5 h-3.5" />
-                              <span>{job.location}</span>
-                              {job.type && (
-                                <>
-                                  <span>•</span>
-                                  <span>{job.type}</span>
-                                </>
-                              )}
-                            </div>
-                          </button>
-                        ))}
-                      </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-sm truncate group-hover:text-[#F472B6] transition-colors">{p.full_name}</p>
+                      <p className="text-xs text-gray-500 truncate">@{p.username}</p>
                     </div>
-                  </div>
-                )}
-
-                {/* Events Section */}
-                {upcomingEvents.length > 0 && (
-                  <div className={cn('border-t mt-4', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
-                    <div className="pt-6">
-                      <h2 className={cn("text-xl font-bold mb-4 flex items-center gap-2", isDark ? "text-white" : "text-gray-900")}>
-                        <Calendar className="w-5 h-5" />
-                        Upcoming Events
-                      </h2>
-                      <div className="space-y-3">
-                        {upcomingEvents.map((event: any) => (
-                          <button
-                            key={event.id}
-                            onClick={() => navigate(`/event/${event.id}`)}
-                            className={cn(
-                              'w-full p-4 rounded-2xl text-left transition-all border group',
-                              isDark
-                                ? 'bg-gray-900/50 hover:bg-gray-900 border-gray-800 hover:border-gray-700'
-                                : 'bg-white hover:bg-gray-50 border-[0.1px] border-gray-200 hover:border-gray-300'
-                            )}
-                          >
-                            <h3 className={cn("font-bold text-base mb-1 group-hover:text-[#D3FB52] transition-colors", isDark ? "text-white" : "text-gray-900")}>
-                              {event.title}
-                            </h3>
-                            <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-                              <Clock className="w-4 h-4" />
-                              <span>{new Date(event.event_date).toLocaleDateString()}</span>
-                            </div>
-                            {event.location && (
-                              <div className="flex items-center gap-2 text-sm text-gray-500">
-                                <MapPin className="w-4 h-4" />
-                                <span className="truncate">{event.location}</span>
-                              </div>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : searchInput && loading ? (
-              // Loading State
-              <div className="max-w-2xl mx-auto">
-                <SearchResultsListSkeleton />
-              </div>
-            ) : (
-              // Results List
-              <div className="max-w-2xl mx-auto w-full">
-                {filteredResults.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-64 px-4 py-12 text-center">
-                    <div className={cn(
-                      "w-16 h-16 mb-4 rounded-full flex items-center justify-center",
-                      isDark ? "bg-gray-900" : "bg-gray-100"
+                    <button className={cn(
+                      "p-2 rounded-full transition-colors",
+                      isDark ? "hover:bg-white/10 text-gray-400 hover:text-white" : "hover:bg-gray-100 text-gray-400 hover:text-black"
                     )}>
-                      <SearchIcon className={cn("w-8 h-8", isDark ? "text-gray-700" : "text-gray-400")} />
-                    </div>
-                    <h2 className={cn("text-xl font-bold mb-2", isDark ? "text-white" : "text-gray-900")}>
-                      No results found
-                    </h2>
-                    <p className={cn('text-sm mb-6', isDark ? 'text-gray-500' : 'text-gray-600')}>
-                      We couldn't find anything matching "{searchInput}"
-                    </p>
-                    <button
-                      onClick={() => setSearchInput('')}
-                      className={cn(
-                        'text-sm px-6 py-2.5 rounded-full font-medium transition-all',
-                        'bg-[#D3FB52] text-black hover:bg-[#D3FB52]/90'
-                      )}
-                    >
-                      Clear search
+                      <UsersIcon className="w-4 h-4" />
                     </button>
                   </div>
-                ) : (
-                  <div className={cn('divide-y rounded-2xl overflow-hidden border', isDark ? 'border-gray-800' : 'border-[0.1px] border-gray-200')}>
-                    {filteredResults.map((result) => (
-                      <div
-                        key={`${result.type}-${result.id}`}
-                        onClick={() => handleResultClick(result)}
-                        className={cn(
-                          "p-4 transition-all cursor-pointer group",
-                          isDark
-                            ? "hover:bg-gray-900"
-                            : "hover:bg-gray-50"
-                        )}
-                      >
-                        <div className="flex gap-3">
-                          {/* Avatar/Icon */}
-                          <div className="shrink-0">
-                            {result.avatar ? (
-                              <img
-                                src={result.avatar}
-                                alt={result.title}
-                                className={cn(
-                                  "object-cover",
-                                  result.type === 'company' ? "w-12 h-12 rounded-lg" : "w-10 h-10 rounded-full"
-                                )}
-                              />
-                            ) : (
-                              <div className={cn(
-                                "w-10 h-10 flex items-center justify-center",
-                                result.type === 'company' ? "rounded-lg" : "rounded-full",
-                                isDark ? "bg-gray-900 text-gray-400" : "bg-gray-100 text-gray-500"
-                              )}>
-                                {result.type === 'user' && <UsersIcon className="w-5 h-5" />}
-                                {result.type === 'job' && <Briefcase className="w-5 h-5" />}
-                                {result.type === 'company' && <Briefcase className="w-5 h-5" />}
-                                {result.type === 'hashtag' && <Hash className="w-5 h-5" />}
-                                {result.type === 'post' && <AtSign className="w-5 h-5" />}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Content */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between mb-0.5">
-                              <div className="flex items-center gap-1.5 min-w-0">
-                                <h3 className={cn(
-                                  "font-bold text-base truncate",
-                                  isDark ? "text-white" : "text-gray-900"
-                                )}>
-                                  {result.title}
-                                </h3>
-                                {result.verified && (
-                                  <Verified className="w-3.5 h-3.5 text-[#D3FB52] fill-current shrink-0" />
-                                )}
-                                <span className={cn(
-                                  "text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded-md font-medium ml-1",
-                                  isDark ? "bg-gray-900 text-gray-500" : "bg-gray-100 text-gray-500"
-                                )}>
-                                  {result.type}
-                                </span>
-                              </div>
-                            </div>
-
-                            <p className={cn("text-sm mb-1 truncate", isDark ? "text-gray-500" : "text-gray-600")}>
-                              {result.subtitle}
-                            </p>
-
-                            {result.description && (
-                              <p className={cn(
-                                "text-sm line-clamp-2",
-                                isDark ? "text-gray-400" : "text-gray-500"
-                              )}>
-                                {result.description}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+                ))}
+            </div>
           </div>
 
-          {/* Right Sidebar - Desktop Only */}
-          <div className={cn('rounded-[24px] ', isDark ? 'bg-black border-gray-800' : 'bg-white border-l-[0.1px] border-t-[0.1px] border-gray-200')}></div>
-          <aside className={cn(
-            'hidden xl:block w-[400px] pl-6 rounded-[24px] h-screen sticky top-0 overflow-y-auto scrollbar-hide py-4 flex-shrink-0',
-            isDark ? 'bg-black' : 'bg-white border-[0.1px] border-gray-200'
-          )}>
-            <div className="space-y-4">
-              {/* Companies Section */}
-              {/* Companies Section */}
-              {sidebarCompanies.length > 0 && (
-                <div className={cn(
-                  'rounded-[24px] p-4 border shadow-lg',
-                  isDark ? 'bg-black border-gray-800' : 'bg-white border-[0.1px] border-gray-200'
-                )}>
-                  <div className="flex items-center gap-2 mb-3">
-                    <Briefcase className="w-4 h-4" />
-                    <h3 className={cn(
-                      'text-sm font-semibold',
-                      isDark ? 'text-white' : 'text-black'
-                    )}>
-                      Companies
-                    </h3>
-                  </div>
-                  <div className="space-y-2">
-                    {sidebarCompanies.map((company: any) => (
-                      <button
-                        key={company.id}
-                        onClick={() => navigate(`/company/${company.id}`)}
-                        className={cn(
-                          'w-full flex items-center gap-3 p-3 rounded-2xl transition-colors text-left',
-                          isDark ? 'hover:bg-gray-900' : 'hover:bg-gray-100'
-                        )}
-                      >
-                        <img
-                          src={company.logo_url || `https://api.dicebear.com/7.x/initials/svg?seed=${company.name}`}
-                          alt={company.name}
-                          className="w-10 h-10 rounded-lg object-cover shrink-0"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className={cn('font-semibold text-sm truncate', isDark ? 'text-white' : 'text-black')}>
-                            {company.name}
-                          </p>
-                          <p className={cn('text-xs truncate', isDark ? 'text-gray-400' : 'text-gray-600')}>
-                            {company.industry || 'Company'}
-                          </p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Suggested Users Section */}
-              {suggestedUsers.length > 0 && (
-                <div className={cn(
-                  'rounded-[24px] p-4 border shadow-lg',
-                  isDark ? 'bg-black border-gray-800' : 'bg-white border-[0.1px] border-gray-200'
-                )}>
-                  <h3 className={cn(
-                    'text-sm font-semibold mb-3',
-                    isDark ? 'text-white' : 'text-black'
-                  )}>
-                    Suggested for you
-                  </h3>
-                  <div className="space-y-2">
-                    {suggestedUsers.slice(0, 5).map((user: any) => (
-                      <button
-                        key={user.id}
-                        onClick={() => navigate(`/profile/${user.id}`)}
-                        className={cn(
-                          'w-full flex items-center gap-3 p-3 rounded-2xl transition-colors text-left',
-                          isDark ? 'hover:bg-gray-900' : 'hover:bg-gray-100'
-                        )}
-                      >
-                        <img
-                          src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`}
-                          alt={user.full_name}
-                          className="w-10 h-10 rounded-full object-cover shrink-0"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className={cn('font-semibold text-sm truncate', isDark ? 'text-white' : 'text-black')}>
-                            {user.full_name}
-                          </p>
-                          <p className={cn('text-xs truncate', isDark ? 'text-gray-400' : 'text-gray-600')}>
-                            @{user.username}
-                          </p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
+          {/* 2. Recommended Companies Widget */}
+          <div className={cn("p-6 rounded-[32px] border", isDark ? "bg-[#18181B] border-gray-800" : "bg-white border-gray-200")}>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-bold text-lg">Companies</h3>
             </div>
-          </aside>
+
+            <div className="space-y-5">
+              {isLoadingSidebar
+                ? [1, 2].map(i => <SidebarItemSkeleton key={i} type="square" />)
+                : sidebarCompanies.map((c, i) => (
+                  <div key={i} onClick={() => navigate(`/company/${c.id}`)} className="flex items-center gap-4 group cursor-pointer">
+                    <div className="relative shrink-0">
+                      <img src={c.logo_url} className="w-12 h-12 rounded-2xl bg-gray-200 object-cover shadow-sm group-hover:shadow-md transition-shadow" alt="" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-sm truncate group-hover:text-[#FB923C] transition-colors">{c.name}</p>
+                      <p className="text-xs text-gray-500 truncate">{c.industry || 'Business'}</p>
+                    </div>
+                    <button className={cn("px-3 py-1.5 rounded-full text-[10px] font-bold border transition-colors opacity-0 group-hover:opacity-100", isDark ? "border-gray-700 bg-white text-black" : "border-gray-200 bg-black text-white")}>
+                      View
+                    </button>
+                  </div>
+                ))}
+            </div>
+          </div>
+
+          {/* 3. Promo Widget */}
+          {isLoadingSidebar ? (
+            <PromoSkeleton />
+          ) : (
+            <div className={cn("p-8 rounded-[32px] relative overflow-hidden group cursor-pointer transition-transform hover:scale-[1.02]", COLORS.teal)}>
+              <div className="relative z-10">
+                <span className="inline-block px-2 py-1 bg-black/10 rounded-lg text-[10px] font-black uppercase tracking-widest mb-3 backdrop-blur-sm">New Issue</span>
+                <h3 className="font-black text-2xl leading-tight mb-6">The Future <br />of Design Systems</h3>
+                <button className="px-5 py-2.5 bg-black text-white rounded-xl text-xs font-bold hover:bg-gray-900 transition-colors shadow-lg flex items-center gap-2 group-hover:gap-3 transition-all">
+                  Read Magazine <ChevronRight className="w-3 h-3" />
+                </button>
+              </div>
+              <div className="absolute top-0 right-0 w-32 h-full bg-black/5 -skew-x-12 transform translate-x-10 group-hover:translate-x-6 transition-transform duration-700"></div>
+              <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-white/20 rounded-full blur-3xl group-hover:bg-white/30 transition-colors duration-500"></div>
+            </div>
+          )}
+
+          {/* Mini Footer */}
+          <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs font-medium text-gray-500 px-4">
+            <a href="#" className="hover:text-gray-900 dark:hover:text-gray-300 transition-colors">Privacy</a>
+            <a href="#" className="hover:text-gray-900 dark:hover:text-gray-300 transition-colors">Terms</a>
+            <a href="#" className="hover:text-gray-900 dark:hover:text-gray-300 transition-colors">Advertising</a>
+            <a href="#" className="hover:text-gray-900 dark:hover:text-gray-300 transition-colors">Cookies</a>
+            <span className="text-gray-400">© 2024 Design.co</span>
+          </div>
         </div>
+
       </div>
-      );
+    </div>
+  );
 }

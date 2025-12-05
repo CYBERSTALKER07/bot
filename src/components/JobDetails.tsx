@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft,
   MapPin,
@@ -9,12 +10,13 @@ import {
   Briefcase,
   Share2,
   Bookmark,
-  BookmarkCheck,
   CheckCircle,
   Building2,
   Clock,
   X,
-  Heart
+  Heart,
+  Globe,
+  Zap
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -22,595 +24,302 @@ import { useJobDetail } from '../hooks/useOptimizedQuery';
 import Button from './ui/Button';
 import { cn } from '../lib/cva';
 
+// --- Sub-Components ---
+
+const StatCard = ({ icon: Icon, label, value, colorClass, isDark }: any) => (
+  <div className={cn(
+    "p-4 rounded-2xl border flex flex-col justify-center transition-all hover:scale-[1.02]",
+    isDark ? "bg-[#1C1C1E] border-white/5" : "bg-white border-gray-100 shadow-sm"
+  )}>
+    <div className={cn("p-2 w-fit rounded-xl mb-3", colorClass)}>
+      <Icon className="w-5 h-5" />
+    </div>
+    <p className={cn("text-xs font-medium uppercase tracking-wider mb-1", isDark ? "text-gray-500" : "text-gray-400")}>
+      {label}
+    </p>
+    <p className={cn("font-bold text-lg truncate", isDark ? "text-white" : "text-gray-900")}>
+      {value}
+    </p>
+  </div>
+);
+
+const SectionHeading = ({ children, isDark }: { children: React.ReactNode, isDark: boolean }) => (
+  <h2 className={cn("text-xl font-bold mb-6 flex items-center gap-2", isDark ? "text-white" : "text-gray-900")}>
+    {children}
+  </h2>
+);
+
 export default function JobDetails() {
   const { jobId } = useParams<{ jobId: string }>();
   const { user } = useAuth();
   const { isDark } = useTheme();
   const navigate = useNavigate();
+
+  // Data Fetching
   const { data: job, isLoading: loading, error: jobError } = useJobDetail(jobId);
 
+  // State
   const [showApplyModal, setShowApplyModal] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [coverLetter, setCoverLetter] = useState('');
 
-  if (loading) {
-    return (
-      <div className={cn(
-        'min-h-screen flex items-center justify-center p-4',
-        isDark ? 'bg-black' : 'bg-gray-50'
-      )}>
-        <div className={cn(
-          'rounded-3xl p-8 text-center max-w-md w-full',
-          isDark ? 'bg-black border border-gray-800' : 'bg-white border border-gray-200'
-        )}>
-          <p className={cn('font-semibold mb-2', isDark ? 'text-gray-300' : 'text-gray-600')}>Loading job details...</p>
-        </div>
-      </div>
-    );
-  }
+  // --- Loading / Error States ---
+  if (loading) return <div className={cn("min-h-screen flex items-center justify-center", isDark ? "bg-black" : "bg-gray-50")}><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-current text-gray-500" /></div>;
+  if (!job || jobError) return <div className="min-h-screen flex items-center justify-center">Job not found</div>;
 
-  if (!job || jobError) {
-    return (
-      <div className={cn(
-        'min-h-screen flex items-center justify-center p-4',
-        isDark ? 'bg-black' : 'bg-gray-50'
-      )}>
-        <div className={cn(
-          'rounded-3xl p-8 text-center max-w-md w-full',
-          isDark ? 'bg-black border border-gray-800' : 'bg-white border border-gray-200'
-        )}>
-          <p className="text-red-600 font-semibold mb-2">Job Not Found</p>
-          <p className={cn('text-sm mb-6', isDark ? 'text-gray-400' : 'text-gray-600')}>
-            {jobError instanceof Error ? jobError.message : 'The job you are looking for could not be found.'}
-          </p>
-          <Button onClick={() => navigate('/jobs')}>Back to Jobs</Button>
-        </div>
-      </div>
-    );
-  }
-
-  const handleApply = async () => {
-    if (!user?.id) {
-      navigate('/login');
-      return;
-    }
+  // --- Handlers ---
+  const handleApply = () => {
+    if (!user?.id) return navigate('/login');
     setShowApplyModal(true);
   };
 
-  const handleSubmitApplication = async () => {
-    try {
-      // Handle application submission
-      console.log('Application submitted for job:', job.id);
-      console.log('Cover letter:', coverLetter);
-      setShowApplyModal(false);
-      setCoverLetter('');
-    } catch (err) {
-      console.error('Error submitting application:', err);
-    }
+  const handleSubmitApplication = () => {
+    // Logic here
+    setShowApplyModal(false);
   };
 
-  const formatDate = (date: string | undefined) => {
-    if (!date) return 'TBA';
-    return new Date(date).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
+  const formatDate = (date: string) => new Date(date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
   return (
-    <div className={cn(
-      'min-h-screen safe-top safe-bottom',
-      isDark ? 'bg-black text-white' : 'bg-gray-50 text-gray-900'
-    )}>
-      {/* Back Button */}
-      <div className={cn(
-        'sticky top-0 z-39 border-b glass backdrop-blur-xl ios-safe-top',
-        isDark ? 'bg-black/80 border-gray-800' : 'bg-white/80 border-gray-200'
-      )}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <Link
-            to="/jobs"
-            className={cn(
-              'inline-flex items-center space-x-2 transition-colors',
-              isDark
-                ? 'text-info-400 hover:text-info-300'
-                : 'text-info-600 hover:text-info-700'
-            )}
-          >
-            <ArrowLeft className="h-5 w-5" />
-            <span className="font-medium">Back to Jobs</span>
+    <div className={cn("min-h-screen pb-20 font-sans", isDark ? "bg-black text-white" : "bg-[#FAFAFA] text-gray-900")}>
+
+      {/* --- 1. Immersive Header --- */}
+      <div className="relative">
+        {/* Abstract Gradient Background */}
+        <div className={cn(
+          "absolute inset-0 h-[400px] overflow-hidden",
+          isDark
+            ? "bg-gradient-to-b from-indigo-900/40 via-black/80 to-black"
+            : "bg-gradient-to-b from-indigo-50 via-white/80 to-[#FAFAFA]"
+        )}>
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-500/30 to-transparent" />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
+          {/* Nav */}
+          <Link to="/jobs" className={cn("inline-flex items-center gap-2 text-sm font-medium mb-8 transition-colors w-fit px-3 py-1.5 rounded-full backdrop-blur-md border", isDark ? "text-gray-300 hover:text-white border-white/10 bg-white/5" : "text-gray-600 hover:text-black border-black/5 bg-white/40")}>
+            <ArrowLeft className="w-4 h-4" /> Back to Jobs
           </Link>
+
+          {/* Job Header Content */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-4">
+                <div className={cn("w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold shadow-lg", isDark ? "bg-zinc-800 text-white" : "bg-white text-indigo-600")}>
+                  {job.company.charAt(0)}
+                </div>
+                <div>
+                  <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-1">{job.title}</h1>
+                  <div className={cn("flex items-center gap-2 text-sm font-medium", isDark ? "text-gray-400" : "text-gray-500")}>
+                    <Building2 className="w-4 h-4" /> {job.company}
+                    <span className="w-1 h-1 rounded-full bg-current opacity-50" />
+                    <span className="text-indigo-500">Active recruiting</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Desktop Actions */}
+            <div className="hidden md:flex gap-3">
+              <button onClick={() => setIsBookmarked(!isBookmarked)} className={cn("p-3 rounded-xl border transition-all", isDark ? "border-white/10 hover:bg-white/5" : "border-gray-200 hover:bg-white bg-white/50")}>
+                <Bookmark className={cn("w-5 h-5", isBookmarked && "fill-current text-indigo-500")} />
+              </button>
+              <button className={cn("p-3 rounded-xl border transition-all", isDark ? "border-white/10 hover:bg-white/5" : "border-gray-200 hover:bg-white bg-white/50")}>
+                <Share2 className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto mobile-container sm:px-6 lg:px-8 py-8">
-        {/* Job Header - Title & Info Section */}
-        <div className={cn(
-          'rounded-3xl overflow-hidden mb-8 p-8',
-          isDark
-            ? 'bg-black border border-gray-800 shadow-2xl shadow-black/50'
-            : 'bg-white border border-gray-200 shadow-lg'
-        )}>
-          {/* Job Type Badge */}
-          <div className="flex items-center space-x-2 mb-4 w-fit">
-            <span className={cn(
-              'px-4 py-2 rounded-full text-sm font-semibold inline-flex items-center space-x-2',
-              isDark
-                ? 'bg-info-900/30 text-info-300 border border-info-700'
-                : 'bg-info-50 text-info-700 border border-info-200'
-            )}>
-              <Briefcase className="h-4 w-4" />
-              <span>{job.type || 'Full-time'}</span>
-            </span>
-          </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-          {/* Title and Company */}
-          <h1 className={cn(
-            'text-4xl font-bold mb-2',
-            isDark ? 'text-white' : 'text-gray-900'
-          )}>{job.title}</h1>
-          <p className={cn(
-            'text-lg mb-6',
-            isDark ? 'text-gray-400' : 'text-gray-600'
-          )}>
-            {job.company}
-          </p>
+          {/* --- LEFT COLUMN: CONTENT (8 cols) --- */}
+          <div className="lg:col-span-8 space-y-8">
 
-          {/* Quick Info Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            {/* Location */}
-            <div className={cn(
-              'flex items-start space-x-4 p-4 rounded-xl',
-              isDark
-                ? 'bg-gray-900 border border-gray-700'
-                : 'bg-gray-50 border border-gray-200'
-            )}>
-              <MapPin className={cn(
-                'h-6 w-6 shrink-0 mt-1',
-                isDark ? 'text-red-400' : 'text-red-500'
-              )} />
-              <div>
-                <p className={cn('text-sm mb-1', isDark ? 'text-gray-400' : 'text-gray-600')}>Location</p>
-                <p className={cn('text-lg font-semibold', isDark ? 'text-white' : 'text-gray-900')}>{job.location}</p>
-              </div>
+            {/* 2. Bento Stats Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <StatCard
+                icon={DollarSign} label="Salary" value={job.salary_range || 'Competitive'}
+                colorClass={isDark ? "bg-green-500/10 text-green-400" : "bg-green-50 text-green-600"} isDark={isDark}
+              />
+              <StatCard
+                icon={MapPin} label="Location" value={job.location}
+                colorClass={isDark ? "bg-blue-500/10 text-blue-400" : "bg-blue-50 text-blue-600"} isDark={isDark}
+              />
+              <StatCard
+                icon={Briefcase} label="Type" value={job.type}
+                colorClass={isDark ? "bg-purple-500/10 text-purple-400" : "bg-purple-50 text-purple-600"} isDark={isDark}
+              />
+              <StatCard
+                icon={Clock} label="Posted" value={formatDate(job.posted_at)}
+                colorClass={isDark ? "bg-orange-500/10 text-orange-400" : "bg-orange-50 text-orange-600"} isDark={isDark}
+              />
             </div>
 
-            {/* Salary */}
-            <div className={cn(
-              'flex items-start space-x-4 p-4 rounded-xl',
-              isDark
-                ? 'bg-gray-900 border border-gray-700'
-                : 'bg-gray-50 border border-gray-200'
-            )}>
-              <DollarSign className={cn(
-                'h-6 w-6 shrink-0 mt-1',
-                isDark ? 'text-green-400' : 'text-green-500'
-              )} />
-              <div>
-                <p className={cn('text-sm mb-1', isDark ? 'text-gray-400' : 'text-gray-600')}>Salary</p>
-                <p className={cn('text-lg font-semibold', isDark ? 'text-white' : 'text-gray-900')}>{job.salary_range || 'Competitive'}</p>
-              </div>
-            </div>
-
-            {/* Posted Date */}
-            <div className={cn(
-              'flex items-start space-x-4 p-4 rounded-xl',
-              isDark
-                ? 'bg-gray-900 border border-gray-700'
-                : 'bg-gray-50 border border-gray-200'
-            )}>
-              <Calendar className={cn(
-                'h-6 w-6 shrink-0 mt-1',
-                isDark ? 'text-yellow-400' : 'text-yellow-500'
-              )} />
-              <div>
-                <p className={cn('text-sm mb-1', isDark ? 'text-gray-400' : 'text-gray-600')}>Posted</p>
-                <p className={cn('text-lg font-semibold', isDark ? 'text-white' : 'text-gray-900')}>{formatDate(job.posted_at)}</p>
-              </div>
-            </div>
-
-            {/* Job Type */}
-            <div className={cn(
-              'flex items-start space-x-4 p-4 rounded-xl',
-              isDark
-                ? 'bg-gray-900 border border-gray-700'
-                : 'bg-gray-50 border border-gray-200'
-            )}>
-              <Clock className={cn(
-                'h-6 w-6 shrink-0 mt-1',
-                isDark ? 'text-info-400' : 'text-info-500'
-              )} />
-              <div>
-                <p className={cn('text-sm mb-1', isDark ? 'text-gray-400' : 'text-gray-600')}>Type</p>
-                <p className={cn('text-lg font-semibold', isDark ? 'text-white' : 'text-gray-900')}>{job.type || 'Full-time'}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center space-x-3 mb-6">
-            <button
-              onClick={() => setIsBookmarked(!isBookmarked)}
-              aria-label={isBookmarked ? "Remove bookmark" : "Bookmark job"}
-              className={cn(
-                'p-3 rounded-full transition-all',
-                isBookmarked
-                  ? 'bg-yellow-400 text-black'
-                  : isDark
-                    ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-              )}
-            >
-              {isBookmarked ? (
-                <BookmarkCheck className="h-5 w-5" />
-              ) : (
-                <Bookmark className="h-5 w-5" />
-              )}
-            </button>
-
-            <button
-              aria-label="Share job"
-              className={cn(
-                'p-3 rounded-full transition-all',
-                isDark
-                  ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                  : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-              )}
-            >
-              <Share2 className="h-5 w-5" />
-            </button>
-          </div>
-
-          {/* Apply Button */}
-          <div>
-            <button
-              onClick={handleApply}
-              className={cn(
-                'w-full px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 transform hover:scale-105',
-                isDark
-                  ? 'bg-info-600 text-white hover:bg-info-700'
-                  : 'bg-info-600 text-white hover:bg-info-700'
-              )}
-            >
-              Apply Now 🚀
-            </button>
-          </div>
-        </div>
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 ios-bottom-nav">
-          {/* Left Column - Job Details */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Job Description */}
-            <div className={cn(
-              'rounded-3xl p-8',
-              isDark ? 'bg-black border border-gray-800 shadow-2xl shadow-black/50' : 'bg-white border border-gray-200 shadow-lg'
-            )}>
-              <h2 className={cn(
-                'text-2xl font-bold mb-6',
-                isDark ? 'text-white' : 'text-gray-900'
-              )}>About This Job</h2>
-              <p className={cn(
-                'text-lg leading-relaxed whitespace-pre-line',
-                isDark ? 'text-gray-400' : 'text-gray-700'
-              )}>
+            {/* 3. Description */}
+            <div className={cn("p-8 rounded-[32px] border", isDark ? "bg-[#121212] border-white/5" : "bg-white border-black/5")}>
+              <SectionHeading isDark={isDark}>About the Role</SectionHeading>
+              <div className={cn("prose prose-lg max-w-none leading-relaxed whitespace-pre-line", isDark ? "prose-invert text-gray-300" : "text-gray-600")}>
                 {job.description}
-              </p>
+              </div>
             </div>
 
-            {/* Requirements */}
-            {job.requirements && job.requirements.length > 0 && (
-              <div className={cn(
-                'rounded-3xl p-8',
-                isDark ? 'bg-black border border-gray-800 shadow-2xl shadow-black/50' : 'bg-white border border-gray-200 shadow-lg'
-              )}>
-                <h3 className={cn(
-                  'text-2xl font-bold mb-6',
-                  isDark ? 'text-white' : 'text-gray-900'
-                )}>Requirements</h3>
-                <ul className="space-y-3">
-                  {job.requirements.map((req, idx) => (
-                    <li key={idx} className="flex items-start gap-3">
-                      <CheckCircle className={cn(
-                        'h-5 w-5 mt-1 shrink-0',
-                        isDark ? 'text-green-400' : 'text-green-600'
-                      )} />
-                      <span className={cn(
-                        'text-lg',
-                        isDark ? 'text-gray-400' : 'text-gray-700'
-                      )}>
-                        {req}
-                      </span>
+            {/* 4. Requirements & Skills */}
+            <div className={cn("p-8 rounded-[32px] border", isDark ? "bg-[#121212] border-white/5" : "bg-white border-black/5")}>
+              <SectionHeading isDark={isDark}>Requirements</SectionHeading>
+              {job.requirements && (
+                <ul className="space-y-4 mb-8">
+                  {job.requirements.map((req: string, i: number) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <div className={cn("mt-1 p-1 rounded-full", isDark ? "bg-indigo-500/20 text-indigo-400" : "bg-indigo-50 text-indigo-600")}>
+                        <CheckCircle className="w-4 h-4" />
+                      </div>
+                      <span className={cn("text-base", isDark ? "text-gray-300" : "text-gray-700")}>{req}</span>
                     </li>
                   ))}
                 </ul>
-              </div>
-            )}
+              )}
 
-            {/* Skills */}
-            {job.skills && job.skills.length > 0 && (
-              <div className={cn(
-                'rounded-3xl p-8',
-                isDark ? 'bg-black border border-gray-800 shadow-2xl shadow-black/50' : 'bg-white border border-gray-200 shadow-lg'
-              )}>
-                <h3 className={cn(
-                  'text-2xl font-bold mb-6',
-                  isDark ? 'text-white' : 'text-gray-900'
-                )}>Required Skills</h3>
-                <div className="flex flex-wrap gap-3">
-                  {job.skills.map((skill, idx) => (
-                    <span
-                      key={idx}
-                      className={cn(
-                        'px-4 py-2 rounded-full text-sm font-medium',
-                        isDark
-                          ? 'bg-gray-800 text-gray-300 border border-gray-700'
-                          : 'bg-gray-100 text-gray-700 border border-gray-200'
-                      )}
-                    >
+              <div className="pt-6 border-t border-dashed border-gray-700/20">
+                <h3 className={cn("text-sm font-bold uppercase tracking-wider mb-4", isDark ? "text-gray-500" : "text-gray-400")}>Tech Stack & Skills</h3>
+                <div className="flex flex-wrap gap-2">
+                  {job.skills?.map((skill: string, i: number) => (
+                    <span key={i} className={cn("px-4 py-2 rounded-full text-sm font-medium border", isDark ? "bg-zinc-900 border-zinc-800 text-gray-300" : "bg-gray-50 border-gray-200 text-gray-700")}>
                       {skill}
                     </span>
                   ))}
                 </div>
               </div>
-            )}
+            </div>
 
-            {/* Benefits */}
+            {/* 5. Benefits */}
             {job.benefits && (
-              <div className={cn(
-                'rounded-3xl p-8',
-                isDark ? 'bg-black border border-gray-800 shadow-2xl shadow-black/50' : 'bg-white border border-gray-200 shadow-lg'
-              )}>
-                <h3 className={cn(
-                  'text-2xl font-bold mb-6',
-                  isDark ? 'text-white' : 'text-gray-900'
-                )}>Benefits & Perks</h3>
-                <ul className="space-y-3">
-                  {Array.isArray(job.benefits) ? job.benefits.map((benefit, idx) => (
-                    <li key={idx} className="flex items-start gap-3">
-                      <Heart className={cn(
-                        'h-5 w-5 mt-1 shrink-0',
-                        isDark ? 'text-pink-400' : 'text-pink-600'
-                      )} />
-                      <span className={cn(
-                        'text-lg',
-                        isDark ? 'text-gray-400' : 'text-gray-700'
-                      )}>
-                        {benefit}
-                      </span>
-                    </li>
-                  )) : (
-                    <li className="flex items-start gap-3">
-                      <Heart className={cn(
-                        'h-5 w-5 mt-1 shrink-0',
-                        isDark ? 'text-pink-400' : 'text-pink-600'
-                      )} />
-                      <span className={cn(
-                        'text-lg',
-                        isDark ? 'text-gray-400' : 'text-gray-700'
-                      )}>
-                        {job.benefits}
-                      </span>
-                    </li>
-                  )}
-                </ul>
+              <div className={cn("p-8 rounded-[32px] border", isDark ? "bg-[#121212] border-white/5" : "bg-white border-black/5")}>
+                <SectionHeading isDark={isDark}>Perks & Benefits</SectionHeading>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {(Array.isArray(job.benefits) ? job.benefits : [job.benefits]).map((benefit: string, i: number) => (
+                    <div key={i} className={cn("flex items-center gap-3 p-4 rounded-2xl border", isDark ? "bg-zinc-900/50 border-white/5" : "bg-gray-50 border-gray-100")}>
+                      <Heart className={cn("w-5 h-5", isDark ? "text-pink-400" : "text-pink-500")} />
+                      <span className={cn("font-medium", isDark ? "text-gray-200" : "text-gray-700")}>{benefit}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
 
-          {/* Right Column - Employer Info & Sidebar */}
-          <div className="space-y-8">
-            {/* Employer Card */}
-            {job.employer && (
+          {/* --- RIGHT COLUMN: STICKY SIDEBAR (4 cols) --- */}
+          <div className="lg:col-span-4 relative">
+            <div className="sticky top-24 space-y-6">
+
+              {/* 6. Apply Card */}
               <div className={cn(
-                'rounded-3xl p-8 sticky top-24',
-                isDark ? 'bg-black border border-gray-800 shadow-2xl shadow-black/50' : 'bg-white border border-gray-200 shadow-lg'
+                "p-6 rounded-[32px] border shadow-xl relative overflow-hidden",
+                isDark ? "bg-zinc-900 border-white/10" : "bg-white border-gray-100 shadow-gray-200/50"
               )}>
-                <h3 className={cn(
-                  'text-xl font-bold mb-6',
-                  isDark ? 'text-white' : 'text-gray-900'
-                )}>About the Company</h3>
+                {/* Gradient glow effect */}
+                <div className="absolute -top-12 -right-12 w-40 h-40 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
 
-                <div className="flex flex-col items-center text-center mb-6">
-                  {job.employer.avatar_url ? (
-                    <img
-                      src={job.employer.avatar_url}
-                      alt={job.employer.name}
-                      className="w-16 h-16 rounded-full object-cover mb-4 border-4 border-info-400"
-                    />
-                  ) : (
-                    <div className={cn(
-                      'w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mb-4 border-4',
-                      isDark
-                        ? 'bg-linear-to-br from-info-600 to-purple-600 text-white border-info-500'
-                        : 'bg-linear-to-br from-blue-400 to-purple-500 text-white border-info-400'
-                    )}>
-                      {job.employer.name?.charAt(0).toUpperCase()}
-                    </div>
-                  )}
+                <h3 className={cn("text-xl font-bold mb-2", isDark ? "text-white" : "text-gray-900")}>Interested?</h3>
+                <p className={cn("text-sm mb-6", isDark ? "text-gray-400" : "text-gray-500")}>Don't wait. Applications close soon.</p>
 
-                  <p className={cn(
-                    'text-lg font-bold',
-                    isDark ? 'text-white' : 'text-gray-900'
-                  )}>
-                    {job.employer.name}
-                  </p>
-                  <p className={cn(
-                    'text-sm',
-                    isDark ? 'text-gray-400' : 'text-gray-600'
-                  )}>
-                    {job.employer.company_name}
-                  </p>
-                  {job.employer.verified && (
-                    <div className="mt-2 flex items-center space-x-1 text-info-500">
-                      <CheckCircle className="h-4 w-4" />
-                      <span className="text-xs font-semibold">Verified</span>
-                    </div>
+                <button
+                  onClick={handleApply}
+                  className={cn(
+                    "w-full py-4 rounded-2xl font-bold text-lg shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2",
+                    isDark ? "bg-black text-white hover:bg-indigo-600" : "bg-black text-white hover:bg-indigo-700"
                   )}
+                >
+                  Apply Now <Zap className="w-5 h-5 fill-current" />
+                </button>
+
+                <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-500">
+                  <Clock className="w-3 h-3" /> Usually responds in 2 days
                 </div>
+              </div>
 
-                <div className="space-y-3 mb-6">
-                  <div className="flex items-center gap-2">
-                    <Users className={cn(
-                      'h-5 w-5',
-                      isDark ? 'text-info-400' : 'text-info-600'
-                    )} />
-                    <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>
-                      View employer profile
-                    </span>
+              {/* 7. Company Card */}
+              <div className={cn("p-6 rounded-[32px] border", isDark ? "bg-[#121212] border-white/5" : "bg-white border-black/5")}>
+                <h3 className={cn("text-sm font-bold uppercase tracking-wider mb-4 opacity-50", isDark ? "text-white" : "text-black")}>About the company</h3>
+
+                <div className="flex items-center gap-4 mb-4">
+                  <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-bold shadow-sm", isDark ? "bg-zinc-800 text-white" : "bg-gray-100 text-indigo-600")}>
+                    {job.company.charAt(0)}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Building2 className={cn(
-                      'h-5 w-5',
-                      isDark ? 'text-info-400' : 'text-info-600'
-                    )} />
-                    <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>
-                      {job.location}
-                    </span>
+                  <div>
+                    <h4 className={cn("font-bold text-lg", isDark ? "text-white" : "text-gray-900")}>{job.company}</h4>
+                    <a href="#" className="text-xs text-indigo-500 hover:underline flex items-center gap-1">
+                      Visit Website <Globe className="w-3 h-3" />
+                    </a>
                   </div>
                 </div>
 
-                <button className={cn(
-                  'w-full px-4 py-2 rounded-lg font-semibold transition-all',
-                  isDark
-                    ? 'bg-info-900/20 text-info-400 hover:bg-info-900/30'
-                    : 'bg-info-50 text-info-600 hover:bg-info-100'
-                )}>
-                  View Employer Profile
+                <p className={cn("text-sm mb-6 line-clamp-3", isDark ? "text-gray-400" : "text-gray-600")}>
+                  Leading the industry in innovation and design. We are looking for passionate individuals to join our growing team.
+                </p>
+
+                <button className={cn("w-full py-3 rounded-xl text-sm font-bold border transition-colors", isDark ? "border-zinc-700 text-white hover:bg-zinc-800" : "border-gray-200 text-gray-900 hover:bg-gray-50")}>
+                  View Company Profile
                 </button>
               </div>
-            )}
 
-            {/* Quick Apply Card */}
-            <div className={cn(
-              'rounded-3xl p-8',
-              isDark ? 'bg-black border border-gray-800 shadow-2xl shadow-black/50' : 'bg-white border border-gray-200 shadow-lg'
-            )}>
-              <h3 className={cn(
-                'text-xl font-bold mb-4',
-                isDark ? 'text-white' : 'text-gray-900'
-              )}>Ready to Apply?</h3>
-              <p className={cn(
-                'text-sm mb-4',
-                isDark ? 'text-gray-400' : 'text-gray-600'
-              )}>
-                Submit your application and let the employer know why you're a great fit!
-              </p>
-              <button
-                onClick={handleApply}
-                className={cn(
-                  'w-full px-6 py-3 rounded-lg font-semibold transition-all',
-                  isDark
-                    ? 'bg-info-600 text-white hover:bg-info-700'
-                    : 'bg-info-600 text-white hover:bg-info-700'
-                )}
-              >
-                Start Application
-              </button>
-              <p className={cn(
-                'text-center text-sm mt-3',
-                isDark ? 'text-gray-500' : 'text-gray-500'
-              )}>
-                Join other applicants
-              </p>
             </div>
           </div>
+
         </div>
       </div>
 
-      {/* Application Modal */}
-      {showApplyModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className={cn(
-            'rounded-3xl p-8 max-w-md w-full',
-            isDark ? 'bg-black border border-gray-800' : 'bg-white'
-          )}>
-            <div className="flex items-center justify-between mb-6">
-              <h3 className={cn(
-                'text-2xl font-bold',
-                isDark ? 'text-white' : 'text-gray-900'
-              )}>Apply for Position</h3>
-              <button
-                onClick={() => setShowApplyModal(false)}
-                aria-label="Close application modal"
-                className={cn(
-                  'p-2 rounded-full transition-colors',
-                  isDark
-                    ? 'hover:bg-gray-800 text-gray-400'
-                    : 'hover:bg-gray-100 text-gray-500'
-                )}
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
+      {/* Mobile Sticky Action Bar */}
+      <div className={cn(
+        "lg:hidden fixed bottom-0 left-0 right-0 p-4 border-t backdrop-blur-xl z-50",
+        isDark ? "bg-black/80 border-white/10" : "bg-white/80 border-gray-200"
+      )}>
+        <button
+          onClick={handleApply}
+          className={cn(
+            "w-full py-4 rounded-2xl font-bold text-lg shadow-lg",
+            isDark ? "bg-indigo-500 text-white" : "bg-indigo-600 text-white"
+          )}
+        >
+          Apply Now
+        </button>
+      </div>
 
-            <div className="mb-4">
-              <p className={cn(
-                'font-semibold text-lg mb-1',
-                isDark ? 'text-white' : 'text-gray-900'
-              )}>
-                {job.title}
-              </p>
-              <p className={cn(
-                'text-sm',
-                isDark ? 'text-gray-400' : 'text-gray-600'
-              )}>
-                {job.company} • {job.location}
-              </p>
-            </div>
-
-            <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleSubmitApplication(); }}>
-              <div>
-                <label className={cn(
-                  'block text-sm font-medium mb-2',
-                  isDark ? 'text-gray-300' : 'text-gray-700'
-                )}>
-                  Cover Letter (Optional)
-                </label>
-                <textarea
-                  value={coverLetter}
-                  onChange={(e) => setCoverLetter(e.target.value)}
-                  className={cn(
-                    'w-full p-3 border rounded-lg focus:ring-2 focus:ring-info-500 focus:border-transparent outline-hidden',
-                    isDark
-                      ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
-                  )}
-                  rows={4}
-                  placeholder="Tell us why you're interested in this position..."
-                />
+      {/* --- Application Modal --- */}
+      <AnimatePresence>
+        {showApplyModal && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowApplyModal(false)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className={cn("relative w-full max-w-lg rounded-[32px] overflow-hidden shadow-2xl", isDark ? "bg-[#1C1C1E] border border-white/10" : "bg-white")}>
+              <div className="p-8">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className={cn("text-2xl font-bold", isDark ? "text-white" : "text-black")}>Apply for {job.title}</h2>
+                  <button onClick={() => setShowApplyModal(false)} className="p-2 rounded-full hover:bg-gray-500/10"><X className="w-5 h-5" /></button>
+                </div>
+                <form onSubmit={(e) => { e.preventDefault(); handleSubmitApplication(); }} className="space-y-6">
+                  <div>
+                    <label className="text-sm font-bold mb-2 block">Cover Letter</label>
+                    <textarea
+                      className={cn("w-full p-4 rounded-2xl border outline-none focus:ring-2 focus:ring-indigo-500/50 resize-none", isDark ? "bg-black border-zinc-800" : "bg-gray-50 border-gray-200")}
+                      rows={6}
+                      placeholder="Why are you a good fit?"
+                      value={coverLetter}
+                      onChange={e => setCoverLetter(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex gap-3">
+                    <button type="button" onClick={() => setShowApplyModal(false)} className={cn("flex-1 py-4 rounded-2xl font-bold border transition-colors", isDark ? "border-zinc-700 hover:bg-zinc-800" : "border-gray-200 hover:bg-gray-50")}>Cancel</button>
+                    <button type="submit" className="flex-1 py-4 rounded-2xl font-bold bg-indigo-500 text-white hover:bg-indigo-600 shadow-lg shadow-indigo-500/20">Submit Application</button>
+                  </div>
+                </form>
               </div>
-
-              <div className="flex space-x-4">
-                <button
-                  type="button"
-                  onClick={() => setShowApplyModal(false)}
-                  className={cn(
-                    'flex-1 px-6 py-3 border rounded-lg font-medium transition-colors',
-                    isDark
-                      ? 'border-gray-700 text-gray-300 hover:bg-gray-800'
-                      : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-                  )}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className={cn(
-                    'flex-1 px-6 py-3 rounded-lg font-medium text-white transition-all',
-                    isDark
-                      ? 'bg-info-600 hover:bg-info-700'
-                      : 'bg-info-600 hover:bg-info-700'
-                  )}
-                >
-                  Submit Application
-                </button>
-              </div>
-            </form>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }

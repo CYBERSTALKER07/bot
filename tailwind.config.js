@@ -157,7 +157,7 @@ export default {
           muted: '#71717A',
         },
 
-        // Legacy support (keeping for compatibility)
+        // Legacy support
         'asu-maroon': '#8C1D40',
         'asu-gold': '#FFC627',
         'dark-bg': '#0A0A0A',
@@ -168,14 +168,15 @@ export default {
       },
 
       // Enhanced Typography
+      // FIXED: Merged the duplicate font definitions here
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        serif: ['Merriweather', 'serif'],
         mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'monospace'],
         display: ['Cal Sans', 'Inter', 'system-ui', 'sans-serif'],
       },
 
       fontSize: {
-        // Professional typography scale
         xs: ['0.75rem', { lineHeight: '1rem', letterSpacing: '0.025em' }],
         sm: ['0.875rem', { lineHeight: '1.25rem', letterSpacing: '0.025em' }],
         base: ['1rem', { lineHeight: '1.5rem', letterSpacing: '0rem' }],
@@ -220,8 +221,6 @@ export default {
         '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
         'inner': 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
         'none': 'none',
-
-        // Material Design elevation
         'elevation-1': '0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 1px 2px 0 rgba(0, 0, 0, 0.24)',
         'elevation-2': '0 3px 6px 0 rgba(0, 0, 0, 0.16), 0 3px 6px 0 rgba(0, 0, 0, 0.23)',
         'elevation-3': '0 10px 20px 0 rgba(0, 0, 0, 0.19), 0 6px 6px 0 rgba(0, 0, 0, 0.23)',
@@ -335,7 +334,5 @@ export default {
       },
     },
   },
-  plugins: [
-    // Add any Tailwind plugins here
-  ],
+  plugins: [],
 };

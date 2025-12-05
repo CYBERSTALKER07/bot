@@ -7,7 +7,6 @@ import { cn } from '../lib/cva';
 import {
     useHashtag,
     useHashtagPosts,
-    useHashtagAnalytics,
     useIsFollowingHashtag,
     useToggleHashtagFollow,
     useRelatedHashtags
@@ -30,7 +29,6 @@ export default function HashtagDetailPage() {
 
     // Fetch hashtag data
     const { data: hashtag, isLoading: hashtagLoading } = useHashtag(hashtagName);
-    const { data: analytics } = useHashtagAnalytics(hashtag?.id);
     const { data: isFollowing, isLoading: followLoading } = useIsFollowingHashtag(user?.id, hashtag?.id);
     const { data: relatedHashtags = [] } = useRelatedHashtags(hashtag?.id, 5);
 
@@ -373,12 +371,10 @@ export default function HashtagDetailPage() {
                                                     initialReplies={post.replies_count}
                                                     isLiked={post.has_liked}
                                                     isRetweeted={post.has_retweeted}
-                                                    isBookmarked={post.has_bookmarked}
                                                     onLike={() => { }}
                                                     onRetweet={() => { }}
+                                                    onComment={() => navigate(`/post/${post.id}`)}
                                                     onReply={() => navigate(`/post/${post.id}`)}
-                                                    onShare={() => { }}
-                                                    onBookmark={() => { }}
                                                 />
                                             </div>
                                         </div>

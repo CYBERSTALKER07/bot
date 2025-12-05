@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { motion, useSpring } from 'framer-motion';
-import { Heart, MessageCircle, Repeat2, Share, Bookmark } from 'lucide-react';
+import { motion, useSpring, AnimatePresence } from 'framer-motion';
+import { Heart, MessageCircle, MessageSquare, Repeat2 } from 'lucide-react';
 import gsap from 'gsap';
 import { useTheme } from '../../context/ThemeContext';
 import { cn } from '../../lib/cva';
@@ -11,64 +11,63 @@ interface EnhancedPostCardInteractionsProps {
   initialRetweets: number;
   initialReplies: number;
   isLiked: boolean;
-  isBookmarked: boolean;
   isRetweeted: boolean;
   onLike: (postId: string) => Promise<void> | void;
+  onComment: (postId: string) => void;
   onReply: (postId: string) => void;
   onRetweet: (postId: string) => Promise<void> | void;
-  onShare: (postId: string) => void;
-  onBookmark: (postId: string) => Promise<void> | void;
 }
 
-// Ripple effect component
+// 1. Enhanced Ripple with sharper fade-out
 const RippleEffect: React.FC<{ x: number; y: number }> = ({ x, y }) => {
   return (
     <motion.div
-      className="absolute pointer-events-none rounded-full bg-white/30"
-      initial={{ x, y, scale: 0, opacity: 1 }}
-      animate={{ x, y, scale: 4, opacity: 0 }}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
+      className="absolute pointer-events-none rounded-full bg-current opacity-20" // Use current text color for ripple
+      initial={{ x, y, scale: 0, opacity: 0.3 }}
+      animate={{ x, y, scale: 3, opacity: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
       style={{
-        width: 10,
-        height: 10,
+        width: 20, // Slightly larger start
+        height: 20,
         transform: 'translate(-50%, -50%)',
       }}
     />
   );
 };
 
-// Particle effect for likes
-const FloatingParticle: React.FC<{ delay: number }> = ({ delay }) => {
-  const x = Math.random() * 60 - 30;
-  const y = Math.random() * 60 - 30;
-  const rotation = Math.random() * 360;
+// 2. Physics-based Particles
+const FloatingParticle: React.FC<{ delay: number; color: string }> = ({ delay, color }) => {
+  // Random dispersion
+  const x = (Math.random() - 0.5) * 60;
+  const y = -Math.random() * 50 - 20; // Move mostly up
+  const scale = Math.random() * 0.5 + 0.5;
 
   return (
     <motion.div
-      className="absolute pointer-events-none"
-      initial={{ x: 0, y: 0, opacity: 1, scale: 1, rotate: 0 }}
-      animate={{ x, y, opacity: 0, scale: 0, rotate: rotation }}
-      transition={{ duration: 0.8, delay, ease: 'easeOut' }}
+      className="absolute pointer-events-none rounded-full"
+      initial={{ x: 0, y: 0, opacity: 1, scale: 0 }}
+      animate={{ x, y, opacity: 0, scale: scale }}
+      transition={{ duration: 0.8, delay, ease: [0.2, 0.8, 0.2, 1] }} // Custom bezier
       style={{
-        width: 8,
-        height: 8,
-        background: '#ef4444',
-        borderRadius: '50%',
+        width: 6,
+        height: 6,
+        backgroundColor: color,
+        top: '50%',
+        left: '50%',
       }}
     />
   );
 };
 
-// Enhanced Action Button with Animations
+// Enhanced Action Button
 const EnhancedActionButton: React.FC<{
   icon: React.ReactNode;
   count?: number;
   isActive?: boolean;
   isDark: boolean;
   isMobile: boolean;
-  color: 'red' | 'blue' | 'green' | 'yellow';
+  type: 'like' | 'retweet' | 'reply' | 'share' | 'bookmark';
   onClick: () => void;
-  onHover?: (hovering: boolean) => void;
   showParticles?: boolean;
 }> = ({
   icon,
@@ -76,57 +75,54 @@ const EnhancedActionButton: React.FC<{
   isActive,
   isDark,
   isMobile,
-  color,
+  type,
   onClick,
-  onHover,
   showParticles,
 }) => {
-    const [isPressed, setIsPressed] = useState(false);
     const [ripples, setRipples] = useState<Array<{ x: number; y: number; id: number }>>([]);
     const buttonRef = useRef<HTMLButtonElement>(null);
     const rippleIdRef = useRef(0);
-    const countRef = useRef(count || 0);
     const [displayCount, setDisplayCount] = useState(count);
 
-    // Spring animations for scale and color
-    const scale = useSpring(isPressed ? 0.85 : 1, {
-      damping: 15,
-      stiffness: 300,
-      mass: 1,
-    });
+    // Spring animation for "press" feel
+    const scale = useSpring(1, { stiffness: 400, damping: 17 });
 
     useEffect(() => {
-      if (count !== countRef.current) {
-        // Animate count change
-        const diff = (count || 0) - countRef.current;
-        if (diff > 0) {
-          setDisplayCount(count);
-          countRef.current = count || 0;
-        }
+      if (count !== displayCount) {
+        setDisplayCount(count);
       }
-    }, [count]);
+    }, [count, displayCount]);
 
-    const colorMap = {
-      red: isDark
-        ? 'text-gray-500 hover:text-red-500 hover:bg-red-500/10'
-        : 'text-gray-500 hover:text-red-600 hover:bg-red-100/60',
-      blue: isDark
-        ? 'text-gray-500 hover:text-info-500 hover:bg-info-500/10'
-        : 'text-gray-500 hover:text-info-600 hover:bg-info-100/60',
-      green: isDark
-        ? 'text-gray-500 hover:text-green-500 hover:bg-green-500/10'
-        : 'text-gray-500 hover:text-green-600 hover:bg-green-100/60',
-      yellow: isDark
-        ? 'text-gray-500 hover:text-orange-500 hover:bg-orange-500/10'
-        : 'text-gray-500 hover:text-orange-600 hover:bg-orange-100/60',
+    // Color Logic aligned with Tailwind Config
+    const colorStyles = {
+      like: {
+        active: isDark ? 'text-red-500' : 'text-red-600',
+        hover: isDark ? 'hover:text-red-400 hover:bg-red-500/10' : 'hover:text-red-600 hover:bg-red-50',
+        particle: '#ef4444'
+      },
+      retweet: {
+        active: isDark ? 'text-green-500' : 'text-green-600',
+        hover: isDark ? 'hover:text-green-400 hover:bg-green-500/10' : 'hover:text-green-600 hover:bg-green-50',
+        particle: '#22c55e'
+      },
+      reply: {
+        active: isDark ? 'text-info-500' : 'text-info-600',
+        hover: isDark ? 'hover:text-info-400 hover:bg-info-500/10' : 'hover:text-info-600 hover:bg-info-50',
+        particle: '#3b82f6'
+      },
+      share: {
+        active: isDark ? 'text-blue-500' : 'text-blue-600',
+        hover: isDark ? 'hover:text-blue-400 hover:bg-blue-500/10' : 'hover:text-blue-600 hover:bg-blue-50',
+        particle: '#3b82f6'
+      },
+      bookmark: {
+        active: isDark ? 'text-yellow-500' : 'text-yellow-600',
+        hover: isDark ? 'hover:text-yellow-400 hover:bg-yellow-500/10' : 'hover:text-yellow-600 hover:bg-yellow-50',
+        particle: '#eab308'
+      }
     };
 
-    const activeColorMap = {
-      red: isDark ? 'text-red-500 ' : 'text-red-600 ',
-      blue: isDark ? 'text-info-500 ' : 'text-info-600 ',
-      green: isDark ? 'text-green-500 ' : 'text-green-600 ',
-      yellow: isDark ? 'text-orange-500 ' : 'text-orange-600 ',
-    };
+    const currentStyle = colorStyles[type];
 
     const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
       const rect = buttonRef.current?.getBoundingClientRect();
@@ -136,22 +132,19 @@ const EnhancedActionButton: React.FC<{
         const id = rippleIdRef.current++;
         setRipples((prev) => [...prev, { x, y, id }]);
 
-        setTimeout(() => {
-          setRipples((prev) => prev.filter((r) => r.id !== id));
-        }, 600);
+        scale.set(0.9); // Press in
+        setTimeout(() => setRipples((prev) => prev.filter((r) => r.id !== id)), 600);
       }
     };
 
+    const handleMouseUp = () => {
+      scale.set(1); // Release
+    }
+
     const handleClick = () => {
-      setIsPressed(true);
       onClick();
-
       // Haptic feedback
-      if (navigator.vibrate) {
-        navigator.vibrate(10);
-      }
-
-      setTimeout(() => setIsPressed(false), 150);
+      if (navigator.vibrate) navigator.vibrate(15);
     };
 
     return (
@@ -159,124 +152,68 @@ const EnhancedActionButton: React.FC<{
         ref={buttonRef}
         onClick={handleClick}
         onMouseDown={handleMouseDown}
-        onHoverStart={() => onHover?.()}
-        onHoverEnd={() => onHover?.(false)}
-        style={{
-          scale,
-        }}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        style={{ scale }}
         className={cn(
-          'relative flex items-center gap-1 px-2 py-1 rounded-full transition-all duration-300 group overflow-hidden',
-          isActive ? activeColorMap[color] : colorMap[color],
+          'relative flex items-center gap-1.5 p-2 -ml-2 rounded-full transition-colors duration-200 group overflow-hidden select-none', // Negative margin for alignment
+          isActive ? currentStyle.active : (isDark ? 'text-gray-500' : 'text-gray-500'),
+          currentStyle.hover,
           isMobile ? 'text-xs' : 'text-sm'
         )}
-        whileTap={{ scale: 0.95 }}
-        whileHover={{ scale: 1.05 }}
       >
-        {/* Ripple effects */}
-        {ripples.map((ripple) => (
-          <RippleEffect key={ripple.id} x={ripple.x} y={ripple.y} />
-        ))}
-
-        {/* Icon */}
-        <motion.div
-          className="relative"
-          animate={isPressed ? { scale: 1.2 } : { scale: 1 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-        >
-          {icon}
-        </motion.div>
-
-        {/* Count with increment animation */}
-        {count !== undefined && count > 0 && (
-          <motion.span
-            key={displayCount}
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 1.2, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="text-xs opacity-75 font-medium"
-          >
-            {displayCount}
-          </motion.span>
-        )}
-
-        {/* Particles for like effect */}
-        {showParticles &&
-          [0, 1, 2, 3].map((i) => (
-            <FloatingParticle key={i} delay={i * 0.1} />
+        {/* Ripples */}
+        <AnimatePresence>
+          {ripples.map((ripple) => (
+            <RippleEffect key={ripple.id} x={ripple.x} y={ripple.y} />
           ))}
+        </AnimatePresence>
+
+        {/* Icon Container */}
+        <div className="relative z-10">
+          {icon}
+
+          {/* Particles */}
+          {showParticles && isActive &&
+            [...Array(6)].map((_, i) => (
+              <FloatingParticle key={i} delay={i * 0.05} color={currentStyle.particle} />
+            ))
+          }
+        </div>
+
+        {/* Count Animation */}
+        <AnimatePresence mode='wait'>
+          {count !== undefined && count > 0 && (
+            <motion.span
+              key={displayCount} // Trigger animation on change
+              initial={{ y: 5, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -5, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className={cn(
+                "font-medium tabular-nums leading-none",
+                isActive ? "font-semibold" : "opacity-80"
+              )}
+            >
+              {displayCount}
+            </motion.span>
+          )}
+        </AnimatePresence>
       </motion.button>
     );
   };
 
-// Post Card Container with elevation and hover effects
-const PostCardContainer: React.FC<{ children: React.ReactNode; isDark: boolean; isMobile: boolean }> = ({
-  children,
-  isDark,
-  isMobile,
-}) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!isHovered || isMobile) return;
-
-    const container = containerRef.current;
-    if (!container) return;
-
-    // Subtle shadow elevation on hover using GSAP
-    gsap.to(container, {
-      boxShadow: isDark
-        ? '0 20px 40px rgba(0, 0, 0, 0.8)'
-        : '0 20px 40px rgba(0, 0, 0, 0.1)',
-      duration: 0.3,
-      ease: 'power2.out',
-    });
-
-    return () => {
-      gsap.to(container, {
-        boxShadow: isDark
-          ? '0 1px 3px rgba(0, 0, 0, 0.12)'
-          : '0 1px 3px rgba(0, 0, 0, 0.1)',
-        duration: 0.3,
-        ease: 'power2.out',
-      });
-    };
-  }, [isHovered, isDark, isMobile]);
-
-  return (
-    <motion.div
-      ref={containerRef}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      className={cn(
-        'relative rounded-2xl transition-all duration-300',
-        // isDark ? 'hover:bg-gray-900/50' : 'hover:bg-gray-50/50'
-      )}
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-    >
-      {children}
-    </motion.div>
-  );
-};
-
-// Main component
 export const EnhancedPostCardInteractions: React.FC<EnhancedPostCardInteractionsProps> = ({
   postId,
   initialLikes,
   initialRetweets,
   initialReplies,
   isLiked,
-  isBookmarked,
   isRetweeted,
   onLike,
+  onComment,
   onReply,
-  onRetweet,
-  onShare,
-  onBookmark,
+  onRetweet
 }) => {
   const [showLikeParticles, setShowLikeParticles] = useState(false);
   const { isDark } = useTheme();
@@ -285,95 +222,66 @@ export const EnhancedPostCardInteractions: React.FC<EnhancedPostCardInteractions
   const handleLikeClick = async () => {
     if (!isLiked) {
       setShowLikeParticles(true);
-      setTimeout(() => setShowLikeParticles(false), 800);
+      setTimeout(() => setShowLikeParticles(false), 1000); // Reset
     }
     await onLike(postId);
   };
 
-  const handleReplyClick = () => {
-    onReply(postId);
-  };
-
-  const handleRetweetClick = async () => {
-    await onRetweet(postId);
-  };
-
-  const handleShareClick = () => {
-    onShare(postId);
-  };
-
-  const handleBookmarkClick = async () => {
-    await onBookmark(postId);
-  };
-
   return (
-    <PostCardContainer isDark={isDark} isMobile={isMobile}>
-      <div className={cn(
-        'flex items-center justify-between gap-2',
-        isMobile ? 'max-w-full' : 'max-w-lg',
-        isDark ? 'text-gray-400' : 'text-gray-600'
-      )}>
-        {/* Reply Button */}
-        <EnhancedActionButton
-          icon={<MessageCircle className={cn(isMobile ? 'h-4 w-4' : 'h-5 w-5')} />}
-          count={initialReplies}
-          isDark={isDark}
-          isMobile={isMobile}
-          color="blue"
-          onClick={handleReplyClick}
-        />
+    <div className={cn(
+      "flex items-center justify-between w-full mt-2",
+      isMobile ? "max-w-full px-1" : "max-w-[90%]" // Adjusted width
+    )}>
+      {/* Reply Group */}
+      <EnhancedActionButton
+        type="reply"
+        icon={<MessageCircle className={cn(isMobile ? 'w-[18px] h-[18px]' : 'w-5 h-5')} />}
+        count={initialReplies}
+        isDark={isDark}
+        isMobile={isMobile}
+        onClick={() => onComment(postId)}
+      />
 
-        {/* Retweet Button */}
-        <EnhancedActionButton
-          icon={<Repeat2 className={cn(isMobile ? 'h-4 w-4' : 'h-5 w-5')} />}
-          count={initialRetweets}
-          isActive={isRetweeted}
-          isDark={isDark}
-          isMobile={isMobile}
-          color="green"
-          onClick={handleRetweetClick}
-        />
+      {/* Retweet Group */}
+      <EnhancedActionButton
+        type="retweet"
+        icon={<Repeat2 className={cn(isMobile ? 'w-[18px] h-[18px]' : 'w-5 h-5')} />}
+        count={initialRetweets}
+        isActive={isRetweeted}
+        isDark={isDark}
+        isMobile={isMobile}
+        onClick={() => onRetweet(postId)}
+      />
 
-        {/* Like Button */}
-        <div className="relative">
-          <EnhancedActionButton
-            icon={
-              <motion.div
-                animate={isLiked ? { scale: [1, 1.3, 1] } : {}}
-                transition={{ duration: 0.4 }}
-              >
-                <Heart
-                  className={cn(
-                    isMobile ? 'h-4 w-4' : 'h-5 w-5',
-                    isLiked ? 'fill-current' : ''
-                  )}
-                />
-              </motion.div>
-            }
-            count={initialLikes}
-            isActive={isLiked}
-            isDark={isDark}
-            isMobile={isMobile}
-            color="red"
-            onClick={handleLikeClick}
-            showParticles={showLikeParticles}
+      {/* Like Group */}
+      <EnhancedActionButton
+        type="like"
+        icon={
+          <Heart
+            className={cn(
+              isMobile ? 'w-[18px] h-[18px]' : 'w-5 h-5',
+              isLiked && "fill-current"
+            )}
           />
-        </div>
+        }
+        count={initialLikes}
+        isActive={isLiked}
+        isDark={isDark}
+        isMobile={isMobile}
+        onClick={handleLikeClick}
+        showParticles={showLikeParticles}
+      />
 
-        {/* Share Button */}
-        <EnhancedActionButton
-          icon={<Share className={cn(isMobile ? 'h-4 w-4' : 'h-5 w-5')} />}
-          isDark={isDark}
-          isMobile={isMobile}
-          color="blue"
-
-          onClick={handleShareClick}
-        />
-
-
-      </div>
-    </PostCardContainer>
+      {/* Reply Action Group */}
+      <EnhancedActionButton
+        type="reply"
+        icon={<MessageSquare className={cn(isMobile ? 'w-[18px] h-[18px]' : 'w-5 h-5')} />}
+        isDark={isDark}
+        isMobile={isMobile}
+        onClick={() => onReply(postId)}
+      />
+    </div>
   );
 };
 
-export default EnhancedPostCardInteractions;
+export default EnhancedPostCardInteractions;  
